@@ -1,0 +1,207 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4" th:fragment="sidebar">
+	<!-- Brand Logo -->
+	<a href="../../index3.html" class="brand-link">
+		<img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+		<span class="brand-text font-weight-light">AdminLTE 3</span>
+	</a>
+
+	<!-- Sidebar -->
+	<div class="sidebar">
+		<!-- Sidebar user (optional) -->
+		<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+			<div class="image">
+				<img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+			</div>
+			<div class="info">
+				<a href="#" class="d-block">Alexander Pierce</a>
+			</div>
+		</div>
+
+		<!-- SidebarSearch Form -->
+		<div class="form-inline">
+			<div class="input-group" data-widget="sidebar-search">
+				<input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+				<div class="input-group-append">
+					<button class="btn btn-sidebar">
+						<i class="fas fa-search fa-fw"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- 메인 정보 -->
+		<nav class="mt-2">
+			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+				
+				<!-- 인사 정보 --> 
+				<li class="nav-item">
+					<a href="#" class="nav-link">
+						<p>
+							인사
+							<i class="fas fa-angle-left right"></i>
+						</p>
+					</a>
+					<ul class="nav nav-treeview">
+						<li class="nav-header">ㅡ  내 인사 정보</li>
+						<li class="nav-item">
+							<a href="../calendar.html" class="nav-link">
+								<p>내 기본 정보 조회 및 수정 요청</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../gallery.html" class="nav-link">
+								<p>직급/부서 내역 확인</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../kanban.html" class="nav-link">
+								
+								<p>인사일, 경력 사항 조회</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  교육 및 자격</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<p>이수한 교육 내역 보기</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/mailbox.html" class="nav-link">
+								<p>자격증 및 스킬 정보 죄회</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/compose.html" class="nav-link">
+								<p>교육 일정 확인 및 신청</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  인사 문서 요청</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>재직/경력 증명서 요청</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>인사 관련 공지 확인</p>
+							</a>
+						</li>
+					</ul>
+				</li>
+				<!-- /.인사 정보 -->
+				
+				<!-- 근태 정보 --> 
+				<li class="nav-item">
+				
+					<a href="#" class="nav-link">
+						<p>
+							근태
+							<i class="fas fa-angle-left right"></i>
+						</p>
+					</a>
+					<ul class="nav nav-treeview">
+						<li class="nav-header">ㅡ  출퇴근 기록</li>
+						<li class="nav-item">
+							<a href="../calendar.html" class="nav-link">
+								<p>내 출/퇴근 기록 확인</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../gallery.html" class="nav-link">
+								<p>출/퇴근 기록 수정 요청</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../kanban.html" class="nav-link">
+								<p>지각/조퇴/결근 내역 보기</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  휴가 관리</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<p>휴가 신청 및 상태 확인</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/mailbox.html" class="nav-link">
+								<p>연차/반차/특별휴가 내역 조회</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/compose.html" class="nav-link">
+								<p>휴가 잔여일 확인</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  근무 일정 확인</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>개인 근무 스케줄 조회</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>공휴일 및 휴무일 확인</p>
+							</a>
+						</li>
+					</ul>
+				</li>
+				<!-- /.근태 정보 -->
+				
+				<!-- 급여 정보 --> 
+				<li class="nav-item">
+				
+					<a href="#" class="nav-link">
+						<p>
+							급여
+							<i class="fas fa-angle-left right"></i>
+						</p>
+					</a>
+					<ul class="nav nav-treeview">
+						<li class="nav-header">ㅡ  급여 명세서</li>
+						<li class="nav-item">
+							<a href="../calendar.html" class="nav-link">
+								<p>월별 급여 명세서 조회 및 다운로드</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../gallery.html" class="nav-link">
+								<p>초과근무 수당/공제 내역 확인</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  급여 관련 요청</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<p>지급 오류 신고</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/mailbox.html" class="nav-link">
+								<p>급여 정산 요청</p>
+							</a>
+						</li>
+						
+						<li class="nav-header">ㅡ  연말정산</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>개인 연말정산 정보 확인</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../mailbox/read-mail.html" class="nav-link">
+								<p>제출 서류 업로드</p>
+							</a>
+						</li>
+					</ul>
+				</li>
+				<!-- /.급여 정보 -->
+				
+			</ul>
+		</nav>
+		<!-- /.메인 정보 -->
+	</div>
+	<!-- /.sidebar -->
+</aside>
