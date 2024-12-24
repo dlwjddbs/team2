@@ -29,17 +29,15 @@ public class AttendanceController {
 		String id = "20241222";
 		map.put("id", id);
 		
-		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
 		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
-		model.addAttribute("commuteHistory", commuteHistory);
 		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
 		
 		return "/attendance/myCommuteHistory";
 	}
 	
-	@PostMapping("/getMyCommuteHistoryLimit")
+	@PostMapping("/getMyCommuteHistory")
 	@ResponseBody
-	public List<Map<String, Object>> getMyCommuteHistoryLimit(@RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getMyCommuteHistory(@RequestParam Map<String, Object> map) {
 		String id = "20241222";
 		map.put("id", id);
 		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
