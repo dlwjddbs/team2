@@ -48,6 +48,11 @@ public class TestController {
 	public String calendar() {
 		return "calendar";
 	}
+	
+	@GetMapping("/mypage")
+	public String mypage() {
+		return "mypage";
+	}
 }
 
 
