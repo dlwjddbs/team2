@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.AttendanceMapper">
+    <select id="getMyCommuteHistory" resultType="map">
+        SELECT 
+		      TO_CHAR(CHECK_IN_TIME, 'YYYY-MM-DD')	AS commute_check_in_date
+		    , TO_CHAR(CHECK_IN_TIME, 'HH24:MI:SS')	AS commute_check_in_time
+		    , TO_CHAR(CHECK_OUT_TIME, 'HH24:MI:SS')	AS commute_check_out_time
+		  FROM
+		      COMMUTE
+    </select>
+</mapper>
