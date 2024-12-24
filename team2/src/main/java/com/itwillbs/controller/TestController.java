@@ -24,6 +24,11 @@ public class TestController {
 		return "index";
 	}
 	
+	@GetMapping("/advanced")
+	public String advanced() {
+		return "/attendance/advanced";
+	}
+	
 	@GetMapping("/data")
 	public String data() {
 		return "data";

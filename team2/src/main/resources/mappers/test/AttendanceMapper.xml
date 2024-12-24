@@ -5,6 +5,7 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.AttendanceMapper">
+	<!-- getMyCommuteHistory 출퇴근기록 조회 -->
     <select id="getMyCommuteHistory" resultType="map">
         SELECT 
 		      TO_CHAR(CHECK_IN_TIME, 'YYYY-MM-DD')	AS commute_check_in_date
@@ -12,5 +13,30 @@
 		    , TO_CHAR(CHECK_OUT_TIME, 'HH24:MI:SS')	AS commute_check_out_time
 		  FROM
 		      COMMUTE
+		 WHERE
+		 	  1 = 1
+		   AND
+			  member_id = #{id}
+		   <if test='startDate != null and startDate != ""
+		   			and endDate != null and endDate != ""'>
+		   AND 
+			  TO_CHAR(CHECK_IN_TIME, 'YYYY-MM-DD') BETWEEN TO_DATE(#{startDate}, 'MM/DD/YYYY') 
+													   AND TO_DATE(#{endDate}, 'MM/DD/YYYY') 
+		   </if>
+		 ORDER BY
+		 	  CHECK_IN_TIME DESC
+    </select>
+    
+    <!-- getMyCommuteHistoryMinMaxDate 출퇴근기록에서 최대최소일 조회 -->
+    <select id="getMyCommuteHistoryMinMaxDate" resultType="map">
+        SELECT 
+		      MAX(TO_CHAR(CHECK_IN_TIME, 'MM/DD/YYYY'))	AS commute_max_date
+		    , MIN(TO_CHAR(CHECK_IN_TIME, 'MM/DD/YYYY')) AS commute_min_date
+		  FROM
+		      COMMUTE
+	     WHERE
+			  1 = 1
+		   AND
+			  member_id = #{id}
     </select>
 </mapper>
