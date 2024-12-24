@@ -38,7 +38,16 @@ public class TestController {
 	public String modals() {
 		return "modals";
 	}
+
+	@GetMapping("/index")
+	public String index() {
+		return "index";
+	}
 	
+	@GetMapping("/calendar")
+	public String calendar() {
+		return "calendar";
+	}
 }
 
 
