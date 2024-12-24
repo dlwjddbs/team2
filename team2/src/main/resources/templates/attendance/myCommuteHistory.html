@@ -139,6 +139,7 @@
 		$(function () {
 			// 페이지 첫 로딩 시 테이블 출력
 			$("#example1").DataTable({
+				aaSorting: [], // 초기 정렬 비활성화
 				// 버튼 위치 조절
 				dom:	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
 					  + "<'row'<'col-sm-12'tr>>"
@@ -177,8 +178,10 @@
 			     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
 			      	"firstDay": 1
 			    },
-				startDate: date.COMMUTE_MIN_DATE,
-				endDate: date.COMMUTE_MAX_DATE
+				startDate: date.COMMUTE_MIN_DATE,  // 초기 설정 값
+				endDate: date.COMMUTE_MAX_DATE,  // 초기 설정 값
+				minDate: date.COMMUTE_MIN_DATE,  // 선택 제한 값
+				maxDate: date.COMMUTE_MAX_DATE  // 선택 제한 값
 			});
 			$("#reservation").attr("readonly",true); 
 			
@@ -189,6 +192,7 @@
 				let date = $("#reservation").val().split(' ~ ');
 				
 				$("#example1").DataTable({
+					aaSorting: [], // 초기 정렬 비활성화
 					// 버튼 위치 조절
 					dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
 						  + "<'row'<'col-sm-12'tr>>"
