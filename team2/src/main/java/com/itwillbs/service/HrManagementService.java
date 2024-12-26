@@ -14,8 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class HrManagementService {
 	private final HrManagementMapper hrManagementMapper;
 	
-	public List<Map<String, Object>> getmemberList() {
-		System.out.println("=============Service List=============");
-		return hrManagementMapper.selectmemberList();
+	public List<Map<String, Object>> getMemberList() {
+		return hrManagementMapper.selectMemberList();
 	}
 }

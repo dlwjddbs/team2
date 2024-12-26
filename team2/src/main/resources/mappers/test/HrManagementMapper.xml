@@ -12,7 +12,7 @@
 <!--  			  dual-->
 <!--    </select>-->
 
-    <select id="selectmemberList" resultType="map">
+    <select id="selectMemberList" resultType="map">
         select 
         	  * 
           from 
