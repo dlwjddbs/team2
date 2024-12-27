@@ -8,9 +8,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper	
 public interface CmtMapper {
 		 
-//	Map<String, Object> getCheckIn(Map<String, Object> map);
 	void getCheckIn(Map<String, Object> map);
 	
-		
+	void updateCheckOut(Map<String, Object> map);
+
+	Map<String, Object> getCheckInTime(String memberId);
 	}
 

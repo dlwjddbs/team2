@@ -34,4 +34,21 @@
                 </otherwise>
             </choose>)
 </insert>
+
+<update id="updateCheckOut" parameterType="map">
+    UPDATE COMMUTE
+    SET CHECK_OUT_TIME = 
+        <choose>
+            <when test="checkOutTime != null">
+                #{checkOutTime, jdbcType=TIMESTAMP}
+            </when>
+            <otherwise>
+                SYSDATE
+            </otherwise>
+        </choose>
+    WHERE MEMBER_ID = #{memberId, jdbcType=VARCHAR}
+      AND CHECK_OUT_TIME IS NULL
+</update>
+
+
 </mapper>

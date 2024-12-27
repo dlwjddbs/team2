@@ -28,23 +28,42 @@ public class CmtController {
     private final CmtService cmtService;
 
     
-	@GetMapping("/cmt")
+	@GetMapping("/commute/cmt")
 	public String cmt() {
 		
-		return "cmt";
+		return "commute/cmt";
 		}
 
-	@PostMapping("/cmt")
+	@PostMapping("/cmt/start")
 	public String cmtPro(@RequestParam Map<String, Object> map, Model model) {
 		String id = "20241222";
-		map.put("memberId", id);
+		map.put("memberId", id);		
+		cmtService.getCheckIn(map);
 		
-//		Map<String, Object> checkIn = 
-				cmtService.getCheckIn(map);
-//		model.addAttribute("checkIn", checkIn);
-		
-		return "redirect:/cmt";
+		return "redirect:/commute/cmt";
 		}
 	
+	@PostMapping("/cmt/end")
+	public String endPro(@RequestParam Map<String, Object> map, Model model) {
+	    String id = "20241222"; // 사용자 ID
+	    map.put("memberId", id);
+
+	    cmtService.updateCheckOut(map);
+
+	    return "redirect:/commute/cmt";
+	}
+	
+	
+	@PostMapping("/cmt/checkIn")
+	public String checkIn(@RequestParam Map<String, Object> map, Model model) {
+	    String memberId = "20241222"; // 예시로 하드코딩된 ID, 실제로는 로그인된 사용자 ID로 대체
+
+
+	    // 출근 시간 가져오기
+	    Map<String, Object> checkInData = cmtService.getCheckInTime(memberId);
+	    
+	    model.addAttribute("checkInTime", checkInData.get("CHECK_IN_TIME"));
+	    return "commute/cmt";  // cmt.html로 이동
+	}
 	
 }
