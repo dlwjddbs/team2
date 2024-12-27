@@ -13,9 +13,67 @@
 <!--    </select>-->
 
     <select id="selectMemberList" resultType="map">
-        select 
-        	  * 
-          from 
-        	  member 
+		SELECT
+
+				TO_CHAR(m.JOIN_DATE, 'YYYY-MM-DD') AS JOIN_DATE,
+				m.ID,
+				m.NAME,
+				m.PHONE,
+				m.EMAIL,
+				
+				(SELECT d.NAME 
+			       FROM DEPARTMENT d 
+				  WHERE d.ID = dh.DEPARTMENT_ID) AS DEPARTMENT,
+				  
+				(SELECT g.NAME 
+				   FROM GRADE g 
+				  WHERE g.ID = gh.GRADE_ID) AS GRADE
+				  
+		  FROM MEMBER m 
+	 LEFT JOIN DEPARTMENT_HISTORY dh 
+										ON m.ID = dh.MEMBER_ID
+	 LEFT JOIN GRADE_HISTORY gh 
+										ON m.ID = gh.MEMBER_ID
+        	   
     </select>
+    
+    <select id="selectOrganizationData" resultType="map">
+	SELECT JSON_OBJECT(
+        'bankCodes' VALUE (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT('code' VALUE CODE, 'bankName' VALUE BANK_NAME)
+            )
+            FROM BANK_CODES
+        ),
+        'departments' VALUE (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id' VALUE ID,
+                    'name' VALUE NAME,
+                    'subDepartments' VALUE (
+                        SELECT JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id' VALUE ID,
+                                'name' VALUE NAME,
+                                'subDepartments' VALUE NULL
+                            )
+                        )
+                        FROM DEPARTMENT CHILD
+                        WHERE CHILD.PARENT_DEPARTMENT_ID = PARENT.ID
+                    )
+                )
+            )
+            FROM DEPARTMENT PARENT
+            WHERE PARENT.PARENT_DEPARTMENT_ID IS NULL
+        ),
+        'grades' VALUE (
+            SELECT JSON_ARRAYAGG(
+                JSON_OBJECT('id' VALUE ID, 'name' VALUE NAME)
+            )
+            FROM GRADE
+        )
+    ) AS ORGANIZATION_DATA
+    FROM DUAL;
+    </select>
+    
 </mapper>

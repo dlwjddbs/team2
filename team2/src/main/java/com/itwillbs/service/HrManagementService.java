@@ -17,4 +17,8 @@ public class HrManagementService {
 	public List<Map<String, Object>> getMemberList() {
 		return hrManagementMapper.selectMemberList();
 	}
+
+	public List<Map<String, Object>> getOrganizationData() {
+		return hrManagementMapper.selectOrganizationData();
+	}
 }
