@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.CmtMapper">
+   
+    <!-- 출근 기록 저장 -->
+<!--    <insert id="getCheckIn" parameterType="map">-->
+<!--        INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)-->
+<!--        VALUES (#{id}, #{memberId}, SYSDATE, SYSDATE)-->
+<!-- INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)-->
+<!--    VALUES (#{id}, #{memberId, jdbcType=VARCHAR}, #{checkInTime, jdbcType=TIMESTAMP}, #{createDate, jdbcType=TIMESTAMP})-->
+<!--    </insert>-->
+
+     <insert id="getCheckIn" parameterType="map">
+    INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)
+    VALUES (#{id}, #{memberId, jdbcType=VARCHAR}, 
+            <choose>
+                <when test="checkInTime != null">
+                    #{checkInTime, jdbcType=TIMESTAMP}
+                </when>
+                <otherwise>
+                    SYSDATE
+                </otherwise>
+            </choose>, 
+            <choose>
+                <when test="createDate != null">
+                    #{createDate, jdbcType=TIMESTAMP}
+                </when>
+                <otherwise>
+                    SYSDATE
+                </otherwise>
+            </choose>)
+</insert>
+</mapper>
