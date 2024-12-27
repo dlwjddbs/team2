@@ -68,23 +68,7 @@
 							<div class="card">
 								<div class="card-body">
 									<table id="example1" class="table table-bordered table-striped">
-										<thead>
-											<tr>
-												<th>일자</th>
-												<th>출근시각</th>
-												<th>퇴근시각</th>
-											</tr>
-										</thead>
-										<tbody>
-											<!-- dataTable Ajax -->
-										</tbody>
-										<tfoot>
-											<tr>
-												<th>일자</th>
-												<th>출근시각</th>
-												<th>퇴근시각</th>
-											</tr>
-										</tfoot>
+										<!-- dataTable Ajax -->
 									</table>
 								</div>
 							<!-- /.card-body -->
@@ -148,6 +132,15 @@
 				dom:	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
 					  + "<'row'<'col-sm-12'tr>>"
 					  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+				language : {
+					search : "검색",
+					paginate: {
+		                "first" : "처음",
+		                "last" : "마지막",
+		                "next" : "다음",
+		                "previous" : "이전"
+		            }
+				},
 				ajax : {
 					url : "/getMyCommuteHistory",
 					type :"POST",
@@ -158,9 +151,9 @@
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data : "COMMUTE_CHECK_IN_DATE"},
-					{data : "COMMUTE_CHECK_IN_TIME"},
-					{data : "COMMUTE_CHECK_OUT_TIME"}
+					{data : "COMMUTE_CHECK_IN_DATE", title : "일자"},
+					{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각"},
+					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각"}
 			  	],
 				responsive : true, 
 				lengthChange : false, 
@@ -201,6 +194,15 @@
 					dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
 						  + "<'row'<'col-sm-12'tr>>"
 						  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+					language : {
+						search : "검색",
+						paginate: {
+			                "first" : "처음",
+			                "last" : "마지막",
+			                "next" : "다음",
+			                "previous" : "이전"
+			            }
+					},
 					ajax : {
 						url : "/getMyCommuteHistory",
 						type:"POST",
@@ -213,11 +215,10 @@
 			            }
 					},
 					columns : [
-						// DB컬럼명 일치하게 작성
-						{data: "COMMUTE_CHECK_IN_DATE"},
-						{data: "COMMUTE_CHECK_IN_TIME"},
-						{data: "COMMUTE_CHECK_OUT_TIME"}
-				  	],
+						{data : "COMMUTE_CHECK_IN_DATE", title : "일자"},
+						{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각"},
+						{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각"}
+					],
 					responsive : true, 
 					lengthChange : false, 
 					autoWidth : false,
