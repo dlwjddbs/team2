@@ -45,6 +45,28 @@ public class AttendanceController {
 		return commuteHistory;
 	}
 	
+	@GetMapping("/myAttendanceHistory")
+	public String getmyAttendanceHistory(Model model, Map<String, Object> map) {
+		// session id 20241222 임시
+		String id = "20241222";
+		map.put("id", id);
+		
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
+		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/attendance/myAttendanceHistory";
+	}
+	
+	@PostMapping("/getMyAttendanceHistory")
+	@ResponseBody
+	public List<Map<String, Object>> getMyAttendanceHistory(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		List<Map<String, Object>> attendanceHistory = attendanceService.getMyAttendanceHistory(map);
+		
+		return attendanceHistory;
+	}
+	
 }
 
 

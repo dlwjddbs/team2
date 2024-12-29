@@ -22,4 +22,8 @@ public class AttendanceService {
 	public Map<String, Object> getMyCommuteHistoryMinMaxDate(String id) {
 		return attendanceMapper.getMyCommuteHistoryMinMaxDate(id);
 	}
+
+	public List<Map<String, Object>> getMyAttendanceHistory(Map<String, Object> map) {
+		return attendanceMapper.getMyAttendanceHistory(map);
+	}
 }
