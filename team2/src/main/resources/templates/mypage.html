@@ -97,8 +97,10 @@
 							<div class="card">
 								<div class="card-header p-2">
 									<ul class="nav nav-pills" id="myTabs">
-									    <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">개인 정보 수정</a></li>
-									    <li class="nav-item"><a class="nav-link" href="#edu" data-toggle="tab">자격/교육</a></li>
+										<li class="nav-item"><a class="nav-link active" href="#settings"
+												data-toggle="tab">개인 정보 수정</a></li>
+										<li class="nav-item"><a class="nav-link" href="#edu" data-toggle="tab">자격/교육</a>
+										</li>
 									</ul>
 
 								</div><!-- /.card-header -->
@@ -220,7 +222,8 @@
 														</div>
 
 														<div class="d-flex justify-content-end">
-															<button type="button" class="btn btn-primary" id="savePersonalInfo">저장</button>
+															<button type="button" class="btn btn-primary"
+																id="savePersonalInfo">저장</button>
 														</div>
 													</div>
 												</div>
@@ -232,11 +235,11 @@
 											<form th:action="@{/mypage/education}" th:method="post"
 												id="certificatesEducationForm">
 												<div class="row">
-													<div class="col-md-12 d-flex align-items-center bg-light rounded">
-														<div class="card-body box-profile">
+													<div class="col-md-12">
+														<div class="card-body box-profile bg-light rounded">
 															<div class="form-group">
 																<div class="d-flex justify-content-between">
-																	<label>자격증</label>
+																	<label>보유 자격증</label>
 																	<button type="button" id="addCerBtn"
 																		class="btn btn-outline-primary btn-sm">
 																		<i class="fa-solid fa-plus mr-1"></i> 추가
@@ -256,11 +259,12 @@
 																	</div>
 																</div>
 															</div>
-
-															<hr>
-															<div class="form-group mt-4">
+														</div>
+														<hr class="">
+														<div class="card-body box-profile mt-2 bg-light rounded">
+															<div class="form-group">
 																<div class="d-flex justify-content-between">
-																	<label>교육</label>
+																	<label>교육 이수</label>
 																	<button type="button" id="addEduBtn"
 																		class="btn btn-outline-primary btn-sm">
 																		<i class="fa-solid fa-plus"></i> 추가
@@ -280,9 +284,11 @@
 																	</div>
 																</div>
 															</div>
-															<div class="d-flex justify-content-end mt-3">
-																<button type="button" class="btn btn-primary mt-3" id="saveEducation">저장</button>
-															</div>
+
+														</div>
+														<div class="d-flex justify-content-end mt-3">
+															<button type="button" class="btn btn-primary mt-3"
+																id="saveEducation">저장</button>
 														</div>
 													</div>
 												</div>
@@ -356,7 +362,7 @@
 					preview.src = e.target.result; // 선택한 파일 URL을 img 태그에 바로적용
 				};
 
-				reader.readAsDataURL(file); 
+				reader.readAsDataURL(file);
 			} else {
 				// default 이미지 설정
 				preview.src = '/images/default.jpg';
@@ -405,57 +411,57 @@
 	<script>
 		// 개인정보 저장
 		document.getElementById("savePersonalInfo").addEventListener("click", function () {
-		    const confirmBtn = document.getElementById("confirmSaveBtn");
-		    confirmBtn.setAttribute("data-target", "personal");
-		    $("#confirmModal").modal("show"); 
+			const confirmBtn = document.getElementById("confirmSaveBtn");
+			confirmBtn.setAttribute("data-target", "personal");
+			$("#confirmModal").modal("show");
 		});
 
 		// 교육 저장
 		document.getElementById("saveEducation").addEventListener("click", function () {
-		    const confirmBtn = document.getElementById("confirmSaveBtn");
-		    confirmBtn.setAttribute("data-target", "education");
-		    $("#confirmModal").modal("show");
+			const confirmBtn = document.getElementById("confirmSaveBtn");
+			confirmBtn.setAttribute("data-target", "education");
+			$("#confirmModal").modal("show");
 		});
 
 		// 모달 확인 버튼 클릭 시 동작 분기
 		document.getElementById("confirmSaveBtn").addEventListener("click", function () {
-		    const target = this.getAttribute("data-target");
-		    if (target === "personal") {
-		        document.getElementById("mypageForm").submit();
-		    } else if (target === "education") {
-		        const form = document.getElementById("certificatesEducationForm");
+			const target = this.getAttribute("data-target");
+			if (target === "personal") {
+				document.getElementById("mypageForm").submit();
+			} else if (target === "education") {
+				const form = document.getElementById("certificatesEducationForm");
 
-		        // 자격증, 교육 데이터 병합
-		        const certificates = Array.from(document.querySelectorAll("input[name='certificate']"))
-		            .map(input => input.value.trim())
-		            .filter(value => value !== "");
-		        const educations = Array.from(document.querySelectorAll("input[name='education']"))
-		            .map(input => input.value.trim())
-		            .filter(value => value !== "");
+				// 자격증, 교육 데이터 병합
+				const certificates = Array.from(document.querySelectorAll("input[name='certificate']"))
+					.map(input => input.value.trim())
+					.filter(value => value !== "");
+				const educations = Array.from(document.querySelectorAll("input[name='education']"))
+					.map(input => input.value.trim())
+					.filter(value => value !== "");
 
-		        let certificateField = form.querySelector("input[name='certificate_merged']");
-		        let educationField = form.querySelector("input[name='education_merged']");
+				let certificateField = form.querySelector("input[name='certificate_merged']");
+				let educationField = form.querySelector("input[name='education_merged']");
 
-		        if (!certificateField) {
-		            certificateField = document.createElement("input");
-		            certificateField.type = "hidden";
-		            certificateField.name = "certificate_merged";
-		            form.appendChild(certificateField);
-		        }
+				if (!certificateField) {
+					certificateField = document.createElement("input");
+					certificateField.type = "hidden";
+					certificateField.name = "certificate_merged";
+					form.appendChild(certificateField);
+				}
 
-		        if (!educationField) {
-		            educationField = document.createElement("input");
-		            educationField.type = "hidden";
-		            educationField.name = "education_merged";
-		            form.appendChild(educationField);
-		        }
+				if (!educationField) {
+					educationField = document.createElement("input");
+					educationField.type = "hidden";
+					educationField.name = "education_merged";
+					form.appendChild(educationField);
+				}
 
-		        certificateField.value = certificates.join(",");
-		        educationField.value = educations.join(",");
+				certificateField.value = certificates.join(",");
+				educationField.value = educations.join(",");
 
-		        form.submit();
-		    }
-		    $("#confirmModal").modal("hide");
+				form.submit();
+			}
+			$("#confirmModal").modal("hide");
 		});
 
 	</script>
@@ -509,28 +515,28 @@
 	<script>
 		// 새로 고침시 현재 탭 그대로 띄우기
 		document.addEventListener("DOMContentLoaded", function () {
-		    const tabs = document.querySelectorAll('#myTabs .nav-link');
+			const tabs = document.querySelectorAll('#myTabs .nav-link');
 
-		    // 페이지 로드 시, 저장된 탭 상태가 있으면 해당 탭 활성화
-		    const activeTab = localStorage.getItem('activeTab');
-		    if (activeTab) {
-		        document.querySelector(`#myTabs .nav-link[href="${activeTab}"]`).classList.add('active');
-		        document.querySelector(activeTab).classList.add('active', 'show');
-		        tabs.forEach(tab => {
-		            if (tab.getAttribute('href') !== activeTab) {
-		                document.querySelector(tab.getAttribute('href')).classList.remove('active', 'show');
-		                tab.classList.remove('active');
-		            }
-		        });
-		    }
+			// 페이지 로드 시, 저장된 탭 상태가 있으면 해당 탭 활성화
+			const activeTab = localStorage.getItem('activeTab');
+			if (activeTab) {
+				document.querySelector(`#myTabs .nav-link[href="${activeTab}"]`).classList.add('active');
+				document.querySelector(activeTab).classList.add('active', 'show');
+				tabs.forEach(tab => {
+					if (tab.getAttribute('href') !== activeTab) {
+						document.querySelector(tab.getAttribute('href')).classList.remove('active', 'show');
+						tab.classList.remove('active');
+					}
+				});
+			}
 
-		    // 탭 클릭 시, 활성화된 탭 상태를 저장
-		    tabs.forEach(tab => {
-		        tab.addEventListener('click', function () {
-		            const href = this.getAttribute('href');
-		            localStorage.setItem('activeTab', href);
-		        });
-		    });
+			// 탭 클릭 시, 활성화된 탭 상태를 저장
+			tabs.forEach(tab => {
+				tab.addEventListener('click', function () {
+					const href = this.getAttribute('href');
+					localStorage.setItem('activeTab', href);
+				});
+			});
 		});
 
 	</script>
