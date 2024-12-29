@@ -1,306 +1,330 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>AdminLTE 3 | Mypage</title>
 
 	<!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
-    <!-- daterange picker -->
-    <link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
-    <!-- iCheck for checkboxes and radio inputs -->
-    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- Bootstrap Color Picker -->
-    <link rel="stylesheet" href="../../plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="../../plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="../../plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-    <!-- Bootstrap4 Duallistbox -->
-    <link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
-    <!-- BS Stepper -->
-    <link rel="stylesheet" href="../../plugins/bs-stepper/css/bs-stepper.min.css">
-    <!-- dropzonejs -->
-    <link rel="stylesheet" href="../../plugins/dropzone/min/dropzone.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- iCheck for checkboxes and radio inputs -->
+	<link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+	<!-- Bootstrap Color Picker -->
+	<link rel="stylesheet" href="../../plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+	<!-- Tempusdominus Bootstrap 4 -->
+	<link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+	<!-- Select2 -->
+	<link rel="stylesheet" href="../../plugins/select2/css/select2.min.css">
+	<link rel="stylesheet" href="../../plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+	<!-- Bootstrap4 Duallistbox -->
+	<link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+	<!-- BS Stepper -->
+	<link rel="stylesheet" href="../../plugins/bs-stepper/css/bs-stepper.min.css">
+	<!-- dropzonejs -->
+	<link rel="stylesheet" href="../../plugins/dropzone/min/dropzone.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- Test scss -->
 	<link rel="stylesheet" href="../static/dist/css/test.scss">
 </head>
+
 <body class="hold-transition sidebar-mini">
 	<!-- wrapper -->
 	<div class="wrapper">
 		<!-- 상단 메뉴 -->
 		<nav th:replace="~{includes/navbar :: navbar}"></nav>
 		<!-- /.상단 메뉴 -->
-		
+
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 
 
 		<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper" style="min-height: 1604.44px;">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>마이페이지<small>new</small></h1>			
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">마이페이지</li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
+		<div class="content-wrapper" style="min-height: 1604.44px;">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>마이페이지</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">마이페이지</li>
+							</ol>
+						</div>
+					</div>
+				</div><!-- /.container-fluid -->
+			</section>
 
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-3">
-
-            <!-- Profile Image -->
-            <div class="card card-primary card-outline">
-              <div class="card-body box-profile">
-                <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle" src="../../dist/img/user4-128x128.jpg" alt="User profile picture">
-                </div>
-
-				<div class="d-flex justify-content-center align-items-end">
-                <h2 class="profile-username text-center">user.name</h2>
-				</div>
-                <p class="text-muted text-center">department.name<span>grade.name</span></p>
-
-                <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>입사일</b> <a class="float-right">2024-12-24</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>사용연차</b> <a class="float-right">14</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>남은연차</b> <a class="float-right">2</a>
-                  </li>
-                </ul>
-
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
-          <div class="col-md-9">
-            <div class="card">
-              <div class="card-header p-2">
-                <ul class="nav nav-pills">
-                  <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">개인 정보 수정</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
-                </ul>
-              </div><!-- /.card-header -->
-              <div class="card-body">
-                <div class="tab-content">
-					<div class="tab-pane active" id="settings">
-		                 <form class="form-horizontal">
-							<div class="form-group row">
-							  <label for="inputRegistNum" class="col-sm-1 col-form-label">사원번호</label>
-							  <div class="col-sm-5">
-							    <input type="text" class="form-control" id="inputRegistNum" name="resident_regist_num" placeholder="사원번호" readonly>
-							  </div>
-							  <label for="inputDepartmentName" class="col-sm-1 col-form-label">부서</label>
-							  <div class="col-sm-5">
-							    <input type="text" class="form-control" id="inputDepartmentName" name="deapartment_name" placeholder="부서" readonly>
-							  </div>
+			<!-- Main content -->
+			<section class="content">
+				<div class="container-fluid">
+					<!-- 확인 모달 -->
+					<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog"
+						aria-labelledby="confirmModalLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="confirmModalLabel">저장</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									저장 하시겠습니까?
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-primary" id="confirmSaveBtn"
+										data-target="">확인</button>
+								</div>
 							</div>
-							<div class="form-group row">
-							  <label for="inputGradeName" class="col-sm-1 col-form-label">직급</label>
-							  <div class="col-sm-5">
-							    <input type="text" class="form-control" id="inputGradeName" name="grade_name" placeholder="직급" readonly>
-							  </div>
-							  <label for="inputName" class="col-sm-1 col-form-label">이름</label>
-							  <div class="col-sm-5">
-							    <input type="text" class="form-control" id="inputName" name="user_name" placeholder="이름" readonly>
-							  </div>
+						</div>
+					</div>
+
+					<div class="row">
+						<!-- /.col -->
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header p-2">
+									<ul class="nav nav-pills" id="myTabs">
+									    <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">개인 정보 수정</a></li>
+									    <li class="nav-item"><a class="nav-link" href="#edu" data-toggle="tab">자격/교육</a></li>
+									</ul>
+
+								</div><!-- /.card-header -->
+								<div class="card-body">
+									<div class="tab-content">
+										<div class="tab-pane active" id="settings">
+											<form th:action="@{/mypage}" th:method="post" enctype="multipart/form-data"
+												id="mypageForm" class="form-horizontal">
+												<div class="row">
+													<div class="col-md-3 d-flex align-items-center bg-light rounded">
+														<div class="card-body box-profile">
+															<div class="text-center profile-circle">
+																<img id="profilePreview"
+																	class="profile-user-img img-fluid img-circle"
+																	th:src="${member.profilePic != null and member.profilePic != ''} ? @{'/images/' + ${member.profilePic}} : @{'/images/default.jpg'}"
+																	alt="User profile picture">
+																<!-- 프로필 이미지 변경 -->
+																<div class="form-img-btn">
+																	<!-- 이미지 선택 버튼 -->
+																	<button type="button" class="btn btn-icon"
+																		id="selectImageBtn">
+																		<i class="fa-solid fa-pencil"></i>
+																	</button>
+																	<input hidden type="file" class="form-control"
+																		id="profilePic" name="profilePicFile"
+																		accept="image/*">
+																</div>
+															</div>
+
+															<div class="d-flex justify-content-center align-items-end">
+																<h2 th:text="${member.name}"
+																	class="profile-username text-center mt-4 font-weight-bold">
+																</h2>
+															</div>
+															<p class="text-muted text-center">department.name<span
+																	class="ml-1">grade.name</span></p>
+														</div>
+													</div>
+
+													<div class="col-md-9 pl-4">
+														<div class="form-group row">
+															<label for="inputRegistNum"
+																class="col-sm-1 col-form-label">사원번호</label>
+															<div class="col-sm-5">
+																<input type="text" class="form-control"
+																	id="inputRegistNum"
+																	th:value="${member.residentRegistNum}"
+																	name="residentRegistNu" placeholder="사원번호" readonly>
+															</div>
+															<label for="inputDepartmentName"
+																class="col-sm-1 col-form-label">부서</label>
+															<div class="col-sm-5">
+																<input type="text" class="form-control"
+																	id="inputDepartmentName" name="deapartment_name"
+																	placeholder="부서" readonly>
+															</div>
+														</div>
+														<div class="form-group row">
+															<label for="inputGradeName"
+																class="col-sm-1 col-form-label">직급</label>
+															<div class="col-sm-5">
+																<input type="text" class="form-control"
+																	id="inputGradeName" name="grade_name"
+																	placeholder="직급" readonly>
+															</div>
+															<label for="inputName"
+																class="col-sm-1 col-form-label">이름</label>
+															<div class="col-sm-5">
+																<input type="text" class="form-control" id="inputName"
+																	th:value="${member.name}" name="name"
+																	placeholder="이름" readonly>
+															</div>
+														</div>
+														<div class="form-group row">
+															<label for="inputBank"
+																class="col-sm-1 col-form-label">계좌번호</label>
+															<div class="col-sm-11">
+																<input type="text" class="form-control" id="inputBank"
+																	name="inputBank" placeholder="계좌번호">
+															</div>
+														</div>
+														<div class="form-group row">
+															<label for="inputEmail"
+																class="col-sm-1 col-form-label">E-mail</label>
+															<div class="col-sm-11">
+																<input type="email" class="form-control" id="inputEmail"
+																	th:value="${member.email}" name="email"
+																	placeholder="E-mail">
+															</div>
+														</div>
+														<div class="form-group row">
+															<label for="inputAdd1"
+																class="col-sm-1 col-form-label">주소</label>
+															<div class="col-sm-5">
+																<input type="text" class="form-control" id="inputAdd1"
+																	th:value="${member.address1}" name="address1"
+																	placeholder="도로명 주소">
+															</div>
+															<label for="inputAddNum"
+																class="col-sm-1 col-form-label">우편번호</label>
+															<div class="col-sm-4">
+																<input id="postcode" type="text" class="form-control"
+																	name="addressNum" th:value="${member.addressNum}"
+																	placeholder="우편번호">
+															</div>
+															<div class="col-sm-1 text-right">
+																<button class="btn btn-secondary"
+																	onclick="exercDaumPostcode(); return false;">
+																	<div class="">검색</div>
+																</button>
+															</div>
+														</div>
+														<div class="form-group row">
+															<div class="col-sm-11 offset-sm-1">
+																<input class="form-control" id="inputAdd2"
+																	th:value="${member.address2}" name="address2"
+																	placeholder="상세주소"></input>
+															</div>
+														</div>
+
+														<div class="d-flex justify-content-end">
+															<button type="button" class="btn btn-primary" id="savePersonalInfo">저장</button>
+														</div>
+													</div>
+												</div>
+											</form>
+										</div>
+										<!-- /.tab-pane -->
+
+										<div class="tab-pane" id="edu">
+											<form th:action="@{/mypage/education}" th:method="post"
+												id="certificatesEducationForm">
+												<div class="row">
+													<div class="col-md-12 d-flex align-items-center bg-light rounded">
+														<div class="card-body box-profile">
+															<div class="form-group">
+																<div class="d-flex justify-content-between">
+																	<label>자격증</label>
+																	<button type="button" id="addCerBtn"
+																		class="btn btn-outline-primary btn-sm">
+																		<i class="fa-solid fa-plus mr-1"></i> 추가
+																	</button>
+																</div>
+																<div id="cerContainer">
+																	<!-- 자격증 리스트 반복 출력 -->
+																	<div th:each="cert : ${certificateList}"
+																		class="input-group my-2">
+																		<input type="text" class="form-control"
+																			name="certificate" th:value="${cert}"
+																			placeholder="자격증 입력">
+																		<button type="button"
+																			class="btn btn-secondary btn-sm remove-btn px-2">
+																			<i class="fa-solid fa-trash mr-1"></i>
+																		</button>
+																	</div>
+																</div>
+															</div>
+
+															<hr>
+															<div class="form-group mt-4">
+																<div class="d-flex justify-content-between">
+																	<label>교육</label>
+																	<button type="button" id="addEduBtn"
+																		class="btn btn-outline-primary btn-sm">
+																		<i class="fa-solid fa-plus"></i> 추가
+																	</button>
+																</div>
+																<div id="eduContainer">
+																	<!-- 교육 리스트 반복 출력 -->
+																	<div th:each="edu : ${educationList}"
+																		class="input-group my-2">
+																		<input type="text" class="form-control"
+																			name="education" th:value="${edu}"
+																			placeholder="교육 입력">
+																		<button type="button"
+																			class="btn btn-secondary btn-sm remove-btn">
+																			<i class="fa-solid fa-trash mr-1"></i>
+																		</button>
+																	</div>
+																</div>
+															</div>
+															<div class="d-flex justify-content-end mt-3">
+																<button type="button" class="btn btn-primary mt-3" id="saveEducation">저장</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</form>
+										</div>
+
+										<!-- /.tab-pane -->
+
+
+									</div>
+									<!-- /.tab-content -->
+								</div><!-- /.card-body -->
 							</div>
-							<div class="form-group row">
-		                     <label for="inputBank" class="col-sm-1 col-form-label" >계좌번호</label>
-		                     <div class="col-sm-11">
-		                       <input type="text" class="form-control" id="inputBank" name="inputBank" placeholder="계좌번호">
-		                     </div>
-		                   </div>					
-		                   <div class="form-group row">
-		                     <label for="inputEmail" class="col-sm-1 col-form-label" >E-mail</label>
-		                     <div class="col-sm-11">
-		                       <input type="email" class="form-control" id="inputEmail" name="email" placeholder="E-mail">
-		                     </div>
-		                   </div>
-		                   <div class="form-group row">
-		                     <label for="inputAdd1" class="col-sm-1 col-form-label">주소</label>
-		                     <div class="col-sm-5">
-		                       <input type="text" class="form-control" id="inputAdd1" placeholder="도로명 주소">
-		                     </div>
-							 <label for="inputAddNum" class="col-sm-1 col-form-label">우편번호</label>
-							 <div class="col-sm-4">
-	  	                          <input type="text" class="form-control" id="inputAddNum" placeholder="우편번호">
-							 </div>
-								  <div class="col-sm-1">
-	 	                         <button type="submit" class="btn btn-primary"> <div class="font-weight-bold">검색</div></button>
-	 	                     </div>
-		                   </div>
-		                   <div class="form-group row">
-		                     <div class="col-sm-10 offset-sm-1">
-		                       <input class="form-control" id="inputAdd2" placeholder="상세주소"></input>
-		                     </div>
-		                   </div>
-		                 
-		                   <div class="form-group d-flex justify-content-end">
-		                     <div class="">
-		                       <button type="submit" class="btn btn-danger">수정</button>
-		                     </div>
-		                   </div>
-		                 </form>
-		               </div>
-		               <!-- /.tab-pane -->
-								   
-                  <div class="tab-pane" id="timeline">
-                    <!-- The timeline -->
-                    <div class="timeline timeline-inverse">
-                      <!-- timeline time label -->
-                      <div class="time-label">
-                        <span class="bg-danger">
-                          10 Feb. 2014
-                        </span>
-                      </div>
-                      <!-- /.timeline-label -->
-                      <!-- timeline item -->
-                      <div>
-                        <i class="fas fa-envelope bg-primary"></i>
-
-                        <div class="timeline-item">
-                          <span class="time"><i class="far fa-clock"></i> 12:05</span>
-
-                          <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-
-                          <div class="timeline-body">
-                            Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                            weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                            jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                            quora plaxo ideeli hulu weebly balihoo...
-                          </div>
-                          <div class="timeline-footer">
-                            <a href="#" class="btn btn-primary btn-sm">Read more</a>
-                            <a href="#" class="btn btn-danger btn-sm">Delete</a>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- END timeline item -->
-                      <!-- timeline item -->
-                      <div>
-                        <i class="fas fa-user bg-info"></i>
-
-                        <div class="timeline-item">
-                          <span class="time"><i class="far fa-clock"></i> 5 mins ago</span>
-
-                          <h3 class="timeline-header border-0"><a href="#">Sarah Young</a> accepted your friend request
-                          </h3>
-                        </div>
-                      </div>
-                      <!-- END timeline item -->
-                      <!-- timeline item -->
-                      <div>
-                        <i class="fas fa-comments bg-warning"></i>
-
-                        <div class="timeline-item">
-                          <span class="time"><i class="far fa-clock"></i> 27 mins ago</span>
-
-                          <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
-
-                          <div class="timeline-body">
-                            Take me to your leader!
-                            Switzerland is small and neutral!
-                            We are more like Germany, ambitious and misunderstood!
-                          </div>
-                          <div class="timeline-footer">
-                            <a href="#" class="btn btn-warning btn-flat btn-sm">View comment</a>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- END timeline item -->
-                      <!-- timeline time label -->
-                      <div class="time-label">
-                        <span class="bg-success">
-                          3 Jan. 2014
-                        </span>
-                      </div>
-                      <!-- /.timeline-label -->
-                      <!-- timeline item -->
-                      <div>
-                        <i class="fas fa-camera bg-purple"></i>
-
-                        <div class="timeline-item">
-                          <span class="time"><i class="far fa-clock"></i> 2 days ago</span>
-
-                          <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
-
-                          <div class="timeline-body">
-                            <img src="https://placehold.it/150x100" alt="...">
-                            <img src="https://placehold.it/150x100" alt="...">
-                            <img src="https://placehold.it/150x100" alt="...">
-                            <img src="https://placehold.it/150x100" alt="...">
-                          </div>
-                        </div>
-                      </div>
-                      <!-- END timeline item -->
-                      <div>
-                        <i class="far fa-clock bg-gray"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.tab-pane -->
-
-               
-                </div>
-                <!-- /.tab-content -->
-              </div><!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-  </div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div><!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
 		<!-- /.Content Wrapper. Contains page content -->
 
-		
-		
-			<footer class="main-footer">
-		<div class="float-right d-none d-sm-block">
-			<b>Version</b> 3.1.0
-		</div>
-		<strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
-	</footer>
-	
-	  <!-- Control Sidebar -->
-	<aside class="control-sidebar control-sidebar-dark">
-	    <!-- Control sidebar content goes here -->
-	</aside>
-	  <!-- /.control-sidebar -->
+
+
+		<footer class="main-footer">
+			<div class="float-right d-none d-sm-block">
+				<b>Version</b> 3.1.0
+			</div>
+			<strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights
+			reserved.
+		</footer>
+
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+			<!-- Control sidebar content goes here -->
+		</aside>
+		<!-- /.control-sidebar -->
 	</div>
 	<!-- ./wrapper -->
-	
+
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
@@ -315,295 +339,242 @@
 	<script src="../../dist/js/demo.js"></script>
 	<!-- Page specific script -->
 	<script>
-	  $(function() {
-	    var Toast = Swal.mixin({
-	      toast: true,
-	      position: 'top-end',
-	      showConfirmButton: false,
-	      timer: 3000
-	    });
-	
-	    $('.swalDefaultSuccess').click(function() {
-	      Toast.fire({
-	        icon: 'success',
-	        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.swalDefaultInfo').click(function() {
-	      Toast.fire({
-	        icon: 'info',
-	        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.swalDefaultError').click(function() {
-	      Toast.fire({
-	        icon: 'error',
-	        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.swalDefaultWarning').click(function() {
-	      Toast.fire({
-	        icon: 'warning',
-	        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.swalDefaultQuestion').click(function() {
-	      Toast.fire({
-	        icon: 'question',
-	        title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	
-	    $('.toastrDefaultSuccess').click(function() {
-	      toastr.success('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
-	    });
-	    $('.toastrDefaultInfo').click(function() {
-	      toastr.info('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
-	    });
-	    $('.toastrDefaultError').click(function() {
-	      toastr.error('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
-	    });
-	    $('.toastrDefaultWarning').click(function() {
-	      toastr.warning('Lorem ipsum dolor sit amet, consetetur sadipscing elitr.')
-	    });
-	
-	    $('.toastsDefaultDefault').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultTopLeft').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        position: 'topLeft',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultBottomRight').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        position: 'bottomRight',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultBottomLeft').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        position: 'bottomLeft',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultAutohide').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        autohide: true,
-	        delay: 750,
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultNotFixed').click(function() {
-	      $(document).Toasts('create', {
-	        title: 'Toast Title',
-	        fixed: false,
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultFull').click(function() {
-	      $(document).Toasts('create', {
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        icon: 'fas fa-envelope fa-lg',
-	      })
-	    });
-	    $('.toastsDefaultFullImage').click(function() {
-	      $(document).Toasts('create', {
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        image: '../../dist/img/user3-128x128.jpg',
-	        imageAlt: 'User Picture',
-	      })
-	    });
-	    $('.toastsDefaultSuccess').click(function() {
-	      $(document).Toasts('create', {
-	        class: 'bg-success',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultInfo').click(function() {
-	      $(document).Toasts('create', {
-	        class: 'bg-info',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultWarning').click(function() {
-	      $(document).Toasts('create', {
-	        class: 'bg-warning',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultDanger').click(function() {
-	      $(document).Toasts('create', {
-	        class: 'bg-danger',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	    $('.toastsDefaultMaroon').click(function() {
-	      $(document).Toasts('create', {
-	        class: 'bg-maroon',
-	        title: 'Toast Title',
-	        subtitle: 'Subtitle',
-	        body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
-	      })
-	    });
-	  });
+		// 숨겨진 파일 입력 필드를 버튼 클릭으로 연결
+		document.getElementById('selectImageBtn').addEventListener('click', function () {
+			document.getElementById('profilePic').click(); // 숨겨진 파일 입력 필드 클릭
+		});
+
+		// 파일 첨부 시 미리보기 이미지 표시
+		document.getElementById('profilePic').addEventListener('change', function (event) {
+			const file = event.target.files[0]; // 선택된 파일
+			const preview = document.getElementById('profilePreview'); // 미리보기 이미지 태그
+
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = function (e) {
+					preview.src = e.target.result; // 선택한 파일 URL을 img 태그에 바로적용
+				};
+
+				reader.readAsDataURL(file); 
+			} else {
+				// default 이미지 설정
+				preview.src = '/images/default.jpg';
+			}
+		});
 	</script>
-	
+	<!-- Daum 우편번호 서비스 -->
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
-	  $(function () {
-	    //Initialize Select2 Elements
-	    $('.select2').select2()
-	
-	    //Initialize Select2 Elements
-	    $('.select2bs4').select2({
-	      theme: 'bootstrap4'
-	    })
-	
-	    //Datemask dd/mm/yyyy
-	    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
-	    //Datemask2 mm/dd/yyyy
-	    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
-	    //Money Euro
-	    $('[data-mask]').inputmask()
-	
-	    //Date picker
-	    $('#reservationdate').datetimepicker({
-	        format: 'L'
-	    });
-	
-	    //Date and time picker
-	    $('#reservationdatetime').datetimepicker({ icons: { time: 'far fa-clock' } });
-	
-	    //Date range picker
-	    $('#reservation').daterangepicker()
-	    //Date range picker with time picker
-	    $('#reservationtime').daterangepicker({
-	      timePicker: true,
-	      timePickerIncrement: 30,
-	      locale: {
-	        format: 'MM/DD/YYYY hh:mm A'
-	      }
-	    })
-	    //Date range as a button
-	    $('#daterange-btn').daterangepicker(
-	      {
-	        ranges   : {
-	          'Today'       : [moment(), moment()],
-	          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-	          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-	          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-	          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-	          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-	        },
-	        startDate: moment().subtract(29, 'days'),
-	        endDate  : moment()
-	      },
-	      function (start, end) {
-	        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-	      }
-	    )
-	
-	    //Timepicker
-	    $('#timepicker').datetimepicker({
-	      format: 'LT'
-	    })
-	
-	    //Bootstrap Duallistbox
-	    $('.duallistbox').bootstrapDualListbox()
-	
-	    //Colorpicker
-	    $('.my-colorpicker1').colorpicker()
-	    //color picker with addon
-	    $('.my-colorpicker2').colorpicker()
-	
-	    $('.my-colorpicker2').on('colorpickerChange', function(event) {
-	      $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
-	    })
-	
-	    $("input[data-bootstrap-switch]").each(function(){
-	      $(this).bootstrapSwitch('state', $(this).prop('checked'));
-	    })
-	
-	  })
-	  // BS-Stepper Init
-	  document.addEventListener('DOMContentLoaded', function () {
-	    window.stepper = new Stepper(document.querySelector('.bs-stepper'))
-	  })
-	
-	  // DropzoneJS Demo Code Start
-	  Dropzone.autoDiscover = false
-	
-	  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-	  var previewNode = document.querySelector("#template")
-	  previewNode.id = ""
-	  var previewTemplate = previewNode.parentNode.innerHTML
-	  previewNode.parentNode.removeChild(previewNode)
-	
-	  var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-	    url: "/target-url", // Set the url
-	    thumbnailWidth: 80,
-	    thumbnailHeight: 80,
-	    parallelUploads: 20,
-	    previewTemplate: previewTemplate,
-	    autoQueue: false, // Make sure the files aren't queued until manually added
-	    previewsContainer: "#previews", // Define the container to display the previews
-	    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
-	  })
-	
-	  myDropzone.on("addedfile", function(file) {
-	    // Hookup the start button
-	    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
-	  })
-	
-	  // Update the total progress bar
-	  myDropzone.on("totaluploadprogress", function(progress) {
-	    document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
-	  })
-	
-	  myDropzone.on("sending", function(file) {
-	    // Show the total progress bar when upload starts
-	    document.querySelector("#total-progress").style.opacity = "1"
-	    // And disable the start button
-	    file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
-	  })
-	
-	  // Hide the total progress bar when nothing's uploading anymore
-	  myDropzone.on("queuecomplete", function(progress) {
-	    document.querySelector("#total-progress").style.opacity = "0"
-	  })
-	
-	  // Setup the buttons for all transfers
-	  // The "add files" button doesn't need to be setup because the config
-	  // `clickable` has already been specified.
-	  document.querySelector("#actions .start").onclick = function() {
-	    myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
-	  }
-	  document.querySelector("#actions .cancel").onclick = function() {
-	    myDropzone.removeAllFiles(true)
-	  }
-	  // DropzoneJS Demo Code End
+		function exercDaumPostcode() {
+			new daum.Postcode({
+				oncomplete: function (data) {
+					var addr = ''; // 주소 변수
+					var extraAddr = ''; // 참고항목 변수
+
+					if (data.userSelectedType === 'R') {
+						addr = data.roadAddress;
+					} else {
+						addr = data.jibunAddress;
+					}
+
+					if (data.userSelectedType === 'R') {
+						if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+							extraAddr += data.bname;
+						}
+						if (data.buildingName !== '' && data.apartment === 'Y') {
+							extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+						}
+						if (extraAddr !== '') {
+							extraAddr = ' (' + extraAddr + ')';
+						}
+					} else {
+						extraAddr = '';
+					}
+
+					console.log("우편번호: ", data.zonecode);
+					console.log("주소: ", addr + extraAddr);
+
+					document.getElementById('postcode').value = data.zonecode;
+					document.getElementById("inputAdd1").value = addr + extraAddr;
+					document.getElementById("inputAdd2").focus();
+				}
+			}).open();
+		}
 	</script>
+	<script>
+		// 개인정보 저장
+		document.getElementById("savePersonalInfo").addEventListener("click", function () {
+		    const confirmBtn = document.getElementById("confirmSaveBtn");
+		    confirmBtn.setAttribute("data-target", "personal");
+		    $("#confirmModal").modal("show"); 
+		});
+
+		// 교육 저장
+		document.getElementById("saveEducation").addEventListener("click", function () {
+		    const confirmBtn = document.getElementById("confirmSaveBtn");
+		    confirmBtn.setAttribute("data-target", "education");
+		    $("#confirmModal").modal("show");
+		});
+
+		// 모달 확인 버튼 클릭 시 동작 분기
+		document.getElementById("confirmSaveBtn").addEventListener("click", function () {
+		    const target = this.getAttribute("data-target");
+		    if (target === "personal") {
+		        document.getElementById("mypageForm").submit();
+		    } else if (target === "education") {
+		        const form = document.getElementById("certificatesEducationForm");
+
+		        // 자격증, 교육 데이터 병합
+		        const certificates = Array.from(document.querySelectorAll("input[name='certificate']"))
+		            .map(input => input.value.trim())
+		            .filter(value => value !== "");
+		        const educations = Array.from(document.querySelectorAll("input[name='education']"))
+		            .map(input => input.value.trim())
+		            .filter(value => value !== "");
+
+		        let certificateField = form.querySelector("input[name='certificate_merged']");
+		        let educationField = form.querySelector("input[name='education_merged']");
+
+		        if (!certificateField) {
+		            certificateField = document.createElement("input");
+		            certificateField.type = "hidden";
+		            certificateField.name = "certificate_merged";
+		            form.appendChild(certificateField);
+		        }
+
+		        if (!educationField) {
+		            educationField = document.createElement("input");
+		            educationField.type = "hidden";
+		            educationField.name = "education_merged";
+		            form.appendChild(educationField);
+		        }
+
+		        certificateField.value = certificates.join(",");
+		        educationField.value = educations.join(",");
+
+		        form.submit();
+		    }
+		    $("#confirmModal").modal("hide");
+		});
+
+	</script>
+
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			// 자격증 추가
+			document.getElementById("addCerBtn").addEventListener("click", function () {
+				const cerContainer = document.getElementById("cerContainer");
+
+				// 자격증 input 추가
+				const newInput = document.createElement("div");
+				newInput.classList.add("input-group", "my-2");
+				newInput.innerHTML = `
+		                <input type="text" class="form-control" name="certificate" placeholder="자격증 입력">
+		                <button type="button" class="btn btn-secondary btn-sm remove-btn px-2">
+		                    <i class="fa-solid fa-trash mr-1"></i>
+		                </button>
+		            `;
+				cerContainer.appendChild(newInput);
+			});
+
+			// 교육 추가
+			document.getElementById("addEduBtn").addEventListener("click", function () {
+				const eduContainer = document.getElementById("eduContainer");
+
+				// 교육 input 추가
+				const newInput = document.createElement("div");
+				newInput.classList.add("input-group", "my-2");
+				newInput.innerHTML = `
+		                <input type="text" class="form-control" name="education" placeholder="교육 입력">
+		                <button type="button" class="btn btn-secondary btn-sm remove-btn">
+		                    <i class="fa-solid fa-trash mr-1"></i>
+		                </button>
+		            `;
+				eduContainer.appendChild(newInput);
+			});
+
+			// 삭제
+			document.addEventListener("click", function (event) {
+				if (event.target && event.target.closest(".remove-btn")) {
+					const inputGroup = event.target.closest(".input-group");
+					if (inputGroup) {
+						inputGroup.remove();
+					}
+				}
+			});
+		});
+	</script>
+	<script>
+		// 새로 고침시 현재 탭 그대로 띄우기
+		document.addEventListener("DOMContentLoaded", function () {
+		    const tabs = document.querySelectorAll('#myTabs .nav-link');
+
+		    // 페이지 로드 시, 저장된 탭 상태가 있으면 해당 탭 활성화
+		    const activeTab = localStorage.getItem('activeTab');
+		    if (activeTab) {
+		        document.querySelector(`#myTabs .nav-link[href="${activeTab}"]`).classList.add('active');
+		        document.querySelector(activeTab).classList.add('active', 'show');
+		        tabs.forEach(tab => {
+		            if (tab.getAttribute('href') !== activeTab) {
+		                document.querySelector(tab.getAttribute('href')).classList.remove('active', 'show');
+		                tab.classList.remove('active');
+		            }
+		        });
+		    }
+
+		    // 탭 클릭 시, 활성화된 탭 상태를 저장
+		    tabs.forEach(tab => {
+		        tab.addEventListener('click', function () {
+		            const href = this.getAttribute('href');
+		            localStorage.setItem('activeTab', href);
+		        });
+		    });
+		});
+
+	</script>
+
+
 	<!-- Tempusdominus Bootstrap 4 -->
 	<script src="../../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
+	<style>
+		.profile-user-img {
+			width: 180px;
+		}
+
+		.profile-circle {
+			position: relative;
+		}
+
+		.form-img-btn {
+			position: absolute;
+			top: 0;
+			right: 50px;
+		}
+
+		.btn-icon {
+			background-color: transparent;
+			border: none;
+			border-radius: 50%;
+			background-color: #007bff;
+			width: 3rem;
+			height: 3rem;
+			cursor: pointer;
+		}
+
+		.btn-icon i {
+			font-size: 20px;
+			color: #fff;
+		}
+
+		.btn-icon:hover i {
+			color: #b8eeff;
+			transition: all 0.3s;
+		}
+	</style>
 </body>
+
 </html>
