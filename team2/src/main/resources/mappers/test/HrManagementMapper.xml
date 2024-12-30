@@ -36,7 +36,7 @@
 										ON m.ID = gh.MEMBER_ID
         	   
     </select>
-    
+    <!--
     <select id="selectOrganizationData" resultType="map">
 	SELECT JSON_OBJECT(
         'bankCodes' VALUE (
@@ -75,5 +75,29 @@
     ) AS ORGANIZATION_DATA
     FROM DUAL;
     </select>
-    
+    -->
+    <select id="seletTable" resultType="map">
+    	SELECT
+    			${col1},
+    			${col2}
+    	  FROM
+    	  		${table_name}
+    </select>
+    <select id="selectDepartment" resultType="map">
+		SELECT 
+			    d1.id AS parent_id, 
+			    d1.name AS parent_name, 
+			    d2.id AS child_id, 
+			    d2.name AS child_name
+		  FROM 
+		    	department d1
+	 LEFT JOIN 
+		    	department d2 
+			ON 
+		    	d1.id = d2.parent_department_id
+		 WHERE
+		 		d2.id IS NOT null
+	  ORDER BY 
+		    	d1.id, d2.id
+    </select>
 </mapper>

@@ -50,27 +50,18 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				<div class="col-2">
-					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-prepend">
-								<span class="input-group-text">
-									<i class="far fa-calendar-alt"></i>
-								</span>
-							</div>
-							<input type="text" class="form-control float-right" id="reservation">
-						</div>
-					</div>
-					<!-- new member modal -->
-					<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
-						생성
-					</button>
-					<nav th:replace="~{includes/modals/new :: new}"></nav>
-				</div>
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
+
 							<div class="card">
+								<div class="card-header">
+									<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-lg">
+										생성
+									</button>
+									<nav th:replace="~{includes/modals/new :: new}"></nav>
+								</div>
+								<!-- /.card-header -->
 								<div class="card-body">
 									<table id="example1" class="table table-bordered table-striped">
 										<thead>
@@ -83,7 +74,6 @@
 												<th>직급</th>
 												<th>E-Mail</th>
 											</tr>
-										</thead>
 										</thead>
 										<tbody>
 											<!-- dataTable Ajax -->
@@ -100,6 +90,7 @@
 											</tr>
 										</tfoot>
 									</table>
+									
 								</div>
 							<!-- /.card-body -->
 							</div>
@@ -299,29 +290,5 @@
 	        }).open();
 	    }
 	</script>
-	<script>
-		$(document).ready(function () {
-		    $.ajax({
-		        url: '/getOrganizationData',
-		        method: 'POST',
-		        success: function (data) {
-					
-					function populateSelectBox(selectBoxId, dataArray, valueKey, textKey) {
-			            let selectBox = $(selectBoxId);
-			            dataArray.forEach(function (item) {
-			                let option = $('<option></option>')
-			                    .val(item[valueKey])
-			                    .text(item[textKey]);
-			                selectBox.append(option);
-			            });
-			        }
-
-			        populateSelectBox('#bank', data.banks, 'CODE', 'BANK_NAME');
-			        populateSelectBox('#department', data.departments, 'CHILD_ID', 'CHILD_NAME');
-			        populateSelectBox('#grade', data.grades, 'ID', 'NAME');
-		        }
-		    });
-		});
-	</script>	
 </body>
 </html>

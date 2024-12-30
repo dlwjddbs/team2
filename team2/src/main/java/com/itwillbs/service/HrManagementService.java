@@ -1,5 +1,7 @@
 package com.itwillbs.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +20,19 @@ public class HrManagementService {
 		return hrManagementMapper.selectMemberList();
 	}
 
-	public List<Map<String, Object>> getOrganizationData() {
-		return hrManagementMapper.selectOrganizationData();
+	public Map<String, Object> getOrganizationData() {
+		Map<String, Object> OrganizationData = new HashMap<>();
+		
+		List<Map<String, Object>> department = hrManagementMapper.selectDepartment(); 
+		
+		List<Map<String, Object>> grade = hrManagementMapper.seletTable("GRADE", "NAME", "ID");
+		
+		List<Map<String, Object>> bank = hrManagementMapper.seletTable("BANK_CODES", "BANK_NAME", "CODE");
+		
+		OrganizationData.put("departments", department);
+		OrganizationData.put("grades", grade);
+		OrganizationData.put("banks", bank);
+		
+		return OrganizationData;
 	}
 }

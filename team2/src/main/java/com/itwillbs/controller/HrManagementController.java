@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itwillbs.repository.TestMapper;
 import com.itwillbs.service.HrManagementService;
 
@@ -54,9 +56,12 @@ public class HrManagementController {
 	// 은행코드, 부서, 직급
 	@PostMapping("/getOrganizationData")
 	@ResponseBody
-	public List<Map<String, Object>> getOrganizationData(@RequestParam Map<String, Object> map) {
-		List<Map<String, Object>> data = hrManagementService.getOrganizationData();
-		log.info(data.toString());
+	public Map<String, Object> getOrganizationData(@RequestParam Map<String, Object> map) throws JsonProcessingException {
+		Map<String, Object> data = hrManagementService.getOrganizationData();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+		
 		return data;
 	}	
 	
