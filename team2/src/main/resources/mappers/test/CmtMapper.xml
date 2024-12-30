@@ -50,5 +50,12 @@
       AND CHECK_OUT_TIME IS NULL
 </update>
 
+<select id="selectTodayHistory" parameterType="map" resultType="map">
+    SELECT check_in_time, check_out_time
+    FROM commute
+    WHERE member_id = #{memberId}
+    AND TRUNC(CHECK_IN_TIME) = TRUNC(CURRENT_DATE)
+</select>
+
 
 </mapper>

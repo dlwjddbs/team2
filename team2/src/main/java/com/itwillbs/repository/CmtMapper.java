@@ -1,6 +1,5 @@
 package com.itwillbs.repository;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +11,7 @@ public interface CmtMapper {
 	
 	void updateCheckOut(Map<String, Object> map);
 
-	Map<String, Object> getCheckInTime(String memberId);
+	Map<String, Object> selectTodayHistory(Map<String, Object> map);
+
 	}
 
