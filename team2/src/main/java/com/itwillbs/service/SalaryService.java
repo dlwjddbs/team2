@@ -17,4 +17,14 @@ public class SalaryService {
 	public List<Map<String, Object>> getSalaryList() {
 		return salaryMapper.selectSalaryList();
 	}
+
+	public Map<String, Object> getSalaryHistoryMinMaxDate() {
+		return salaryMapper.getSalaryHistoryMinMaxDate();
+	}
+
+	public List<Map<String, Object>> getSalaryHistory(Map<String, Object> map) {
+		return salaryMapper.getSalaryHistory(map);
+	}
+
+
 }
