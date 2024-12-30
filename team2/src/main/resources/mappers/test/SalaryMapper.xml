@@ -18,4 +18,18 @@
           from 
         	  salary_history
     </select>
+    
+    <!-- getSalaryHistoryMinMaxDate 지급받은 급여 목록에서 최대최소일 조회 -->
+    <select id="getSalaryHistoryMinMaxDate" resultType="map">
+	    SELECT 
+		      MAX(TO_CHAR(PAYDAY, 'YYYY-MM-DD')) AS salary_max_date
+		    , MIN(TO_CHAR(PAYDAY, 'YYYY-MM-DD')) AS salary_min_date
+	  FROM
+	      salary_history
+	 WHERE
+	 	  1 = 1
+    </select>
+    
+    
+    
 </mapper>
