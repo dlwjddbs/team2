@@ -34,22 +34,25 @@ public class HrManagementController {
 		
 		log.info("=============Add Member=============");
 		
-		String email = param.get("email_id").toString() + "@" + param.get("email_domain").toString();
+//		String email = param.get("email_id").toString() + "@" + param.get("email_domain").toString();
 		
 		LocalDateTime now = LocalDateTime.now();
-		String create_date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		String CREATE_DATE = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		
 //======================================================================================================
 		
-		param.put("email", email);
-		param.put("create_date", create_date);
+//		param.put("email", email);
+		param.put("CREATE_DATE", CREATE_DATE);
 		
 		System.out.println(param.toString());
-//		int insertCount = hrManagementService.addMember(param);
-//		System.out.println("insertCount = "+insertCount);
-		//int = 0, 처리
+		int insertCount = hrManagementService.addMember(param);
+		System.out.println(insertCount);
+//		if(insertCount > 0) {
+//			hrManagementService.addHistory(param, "GRADE_HISTORY");
+//			hrManagementService.addHistory(param, "DEPARTMENT_HISTORY");
+//		}
 		
-		return "/HRManagement/member_list";
+		return "redirect:/memberList";
 	}
 	
 	@GetMapping("/memberList")

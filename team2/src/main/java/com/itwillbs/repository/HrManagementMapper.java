@@ -22,4 +22,6 @@ public interface HrManagementMapper {
 	List<Map<String, Object>> selectDepartment();
 
 	int insertMember(Map<String, Object> param);
+
+	void insertHistory(Map<String, Object> param, @Param("table_name") String string);
 }

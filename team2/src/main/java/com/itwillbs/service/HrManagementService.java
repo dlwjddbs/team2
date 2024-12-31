@@ -40,5 +40,9 @@ public class HrManagementService {
 		return OrganizationData;
 	}
 
+	public void addHistory(Map<String, Object> param, String string) {
+		hrManagementMapper.insertHistory(param, string);
+	}
+
 
 }
