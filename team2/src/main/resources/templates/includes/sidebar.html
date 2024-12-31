@@ -13,7 +13,7 @@
 				<img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
 			</div>
 			<div class="info">
-				<a href="../mypage.html" class="d-block">Alexander Pierce</a>
+				<a th:href="@{/mypage}"  class="d-block">Alexander Pierce</a>
 			</div>
 		</div>
 
@@ -32,22 +32,22 @@
 		<nav class="mt-2">
 			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 				
-				<!-- 인사 정보 --> 
+					<!-- 인사 정보 --> 
 				<li class="nav-item">
 					<a href="#" class="nav-link">
 						<p>
-							인사
+							인사관리
 							<i class="fas fa-angle-left right"></i>
 						</p>
 					</a>
 					<ul class="nav nav-treeview">
-						<li class="nav-header">ㅡ  내 인사 정보</li>
+						<li class="nav-header text-right">ㅡ  일반 사용자 화면</li>
 						<li class="nav-item">
-							<a href="../calendar.html" class="nav-link">
-								<p>내 기본 정보 조회 및 수정 요청</p>
+							<a th:href="@{/mypage}"  class="nav-link">
+								<p>마이페이지</p>
 							</a>
 						</li>
-						<li class="nav-item">
+					<!--	<li class="nav-item">
 							<a href="../gallery.html" class="nav-link">
 								<p>직급/부서 내역 확인</p>
 							</a>
@@ -57,15 +57,15 @@
 								
 								<p>인사일, 경력 사항 조회</p>
 							</a>
-						</li>
+						</li>-->
 						
-						<li class="nav-header">ㅡ  교육 및 자격</li>
+						<li class="nav-header text-right">ㅡ  관리자 화면</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link">
-								<p>이수한 교육 내역 보기</p>
+							<a th:href="@{/personnelAppointments}"class="nav-link">
+								<p>인사발령</p>
 							</a>
 						</li>
-						<li class="nav-item">
+						<!--<li class="nav-item">
 							<a href="../mailbox/mailbox.html" class="nav-link">
 								<p>자격증 및 스킬 정보 죄회</p>
 							</a>
@@ -86,10 +86,11 @@
 							<a href="../mailbox/read-mail.html" class="nav-link">
 								<p>인사 관련 공지 확인</p>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</li>
 				<!-- /.인사 정보 -->
+
 				
 				<!-- 근태 정보 --> 
 				<li class="nav-item">
