@@ -306,6 +306,8 @@
 		        method: 'POST',
 		        success: function (data) {
 					
+					console.log(data);
+					
 					function populateSelectBox(selectBoxId, dataArray, valueKey, textKey) {
 			            let selectBox = $(selectBoxId);
 			            dataArray.forEach(function (item) {

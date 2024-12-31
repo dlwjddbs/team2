@@ -38,13 +38,13 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>이름</label>
-									<input type="text" name="name" id="name" class="form-control" required>
+									<input type="text" name="name" id="name" class="form-control"> <!--required-->
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>주민등록번호</label>
-									<input type="text" name="resident_regist_num" class="form-control" required>
+									<input type="text" name="resident_regist_num" class="form-control"> <!--required-->
 								</div>
 							</div>
 						</div>
@@ -52,7 +52,7 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>전화번호</label>
-									<input type="text" name="phone" class="form-control" required>
+									<input type="text" name="phone" class="form-control"> <!--required-->
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -108,7 +108,7 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
 										</div>
-										<input type="text" id="datemask" name="join_date" class="form-control" placeholder="dd/mm/yyyy" required>
+										<input type="text" id="datemask" name="join_date" class="form-control" placeholder="dd/mm/yyyy"> <!--required-->
 									</div>
 								</div>
 							</div>
@@ -123,7 +123,7 @@
 			                        		</label>
 		                      			</div>
 										<div class="icheck-primary d-inline col-md-6">
-											<input type="radio" id="radioPrimary2" name="r1">
+											<input type="radio" id="radioPrimary2" name="r2">
 											<label for="radioPrimary2">
 												경력
 											</label>
@@ -156,16 +156,16 @@
 							<label for="exampleInputEmail1">계좌번호</label>
 							<div class="row">
 								<div class="col-md-3">
-									<select class="form-control select" id="bank" name="bank" style="width: 100%">
+									<select class="form-control select" id="bank" name="code" style="width: 100%">
 										<option selected="selected" disabled>은행</option>
 										<!-- 변경 예정 -->												
 									</select>											
 								</div>
 								<div class="col-md-3">
-									<input type="text" class="form-control">	
+									<input type="text" name="account_name" class="form-control">	
 								</div>
 								<div class="col-md-6">
-									<input type="text" class="form-control">												
+									<input type="text" name="account_num" class="form-control">												
 								</div>
 							</div>
 						</div>
@@ -179,7 +179,7 @@
 				<div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-primary">Save changes</button>
+						<button type="submit" class="btn btn-primary">Save</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->

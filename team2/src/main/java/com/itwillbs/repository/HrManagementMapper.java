@@ -20,4 +20,6 @@ public interface HrManagementMapper {
 	
 	// 부서, 상위 하위 select
 	List<Map<String, Object>> selectDepartment();
+
+	int insertMember(Map<String, Object> param);
 }

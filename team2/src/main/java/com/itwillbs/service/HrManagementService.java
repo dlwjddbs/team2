@@ -16,6 +16,10 @@ import lombok.RequiredArgsConstructor;
 public class HrManagementService {
 	private final HrManagementMapper hrManagementMapper;
 	
+	public int addMember(Map<String, Object> param) {
+		return hrManagementMapper.insertMember(param);
+	}
+	
 	public List<Map<String, Object>> getMemberList() {
 		return hrManagementMapper.selectMemberList();
 	}
@@ -35,4 +39,6 @@ public class HrManagementService {
 		
 		return OrganizationData;
 	}
+
+
 }

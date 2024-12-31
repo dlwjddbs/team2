@@ -1,5 +1,7 @@
 package com.itwillbs.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itwillbs.repository.TestMapper;
 import com.itwillbs.service.HrManagementService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,20 @@ public class HrManagementController {
 		
 		log.info("=============Add Member=============");
 		log.info(param.toString());
+		
+		String email = param.get("email_id").toString() + "@" + param.get("email_domain").toString();
+		
+		LocalDateTime now = LocalDateTime.now();
+		String create_date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		
+//======================================================================================================
+		
+		param.put("email", email);
+		param.put("create_date", create_date);
+		
+		int insertCount = hrManagementService.addMember(param);
+
+		//int = 0, 처리
 		
 		return "/HRManagement/member_list";
 	}
