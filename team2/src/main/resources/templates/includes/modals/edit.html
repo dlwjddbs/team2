@@ -1,0 +1,218 @@
+<!--
+	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
+		수정
+	</button>
+-->
+
+<!-- 모달창 -->
+<div class="modal fade" id="modal-lg" th:fragment="edit">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">인사정보수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- form -->
+			<form th:action="@{/editMember}" method="post" id="editMemberForm">
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="customFile">프로필 사진</label> 
+									<div class="custom-file">
+										<input type="file" class="custom-file-input" id="customFile">
+										<label class="custom-file-label" for="customFile">Choose file</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>이름</label>
+									<input type="text" name="name" id="name" class="form-control" required>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>주민등록번호</label>
+									<input type="text" name="resident_regist_num" class="form-control" required>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>전화번호</label>
+									<input type="text" name="phone" id="phone" class="form-control" required>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>이메일</label>
+									<div class="row">
+										<div class="col-md-5">
+											<input type="text" name="email_id" class="form-control">
+										</div>
+										<div class="input-group col-md-7">
+											<div class="input-group-prepend">
+												<span class="input-group-text">@</span>
+											</div>
+											<select class="form-control select" name="email_domain">
+												<option selected="selected" disabled>example.com</option>												
+												<option>gmail.com</option>												
+												<option>naver.com</option>												
+												<option>daum.net</option>												
+												<option>nate.com</option>												
+												<option>kakao.com</option>												
+											</select>		
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- 주소 -->
+						<div class="form-group">
+							<label for="exampleInputEmail1">주소</label>
+							<div class="row">
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="address_num" id="postcode" placeholder="우편번호" onclick="exercDaumPostcode()">
+								</div>
+							</div>
+							<br>
+							<div class="row">
+								<div class="col-md-6">
+									<input type="text" class="form-control" name="address1" id="address" placeholder="주소">								
+								</div>
+								<div class="col-md-6">
+									<input type="text" class="form-control" name="address2" id="detail_address" placeholder="상세주소">								
+								</div>
+							</div>
+						</div>
+						<!-- /.주소 -->
+						
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>입사일자</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+										</div>
+										<input type="text" id="datemask" name="join_date" class="form-control" placeholder="dd/mm/yyyy" required>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="exampleInputEmail1" name="">입사구분</label>
+									<div class="row">
+										<div class="icheck-primary d-inline col-md-6">
+											<input type="radio" id="radioPrimary1" name="r1" checked required>
+											<label for="radioPrimary1">
+												신입
+			                        		</label>
+		                      			</div>
+										<div class="icheck-primary d-inline col-md-6">
+											<input type="radio" id="radioPrimary2" name="r1">
+											<label for="radioPrimary2">
+												경력
+											</label>
+					                    </div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="exampleInputEmail1">부서명</label>
+									<select class="form-control select" name="departments">
+										<option selected="selected" disabled>상위부서</option>												
+										<option></option>												
+										<option></option>												
+										<option></option>												
+										<option></option>												
+									</select>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="exampleInputEmail1">직급</label>
+									<input type="text" name="grades" id="grades" class="form-control" required>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label for="exampleInputEmail1">계좌번호</label>
+							<div class="row">
+								<div class="col-md-3">
+									<select class="form-control select" style="width: 100%">
+										<option selected="selected" disabled>은행</option>
+										<!-- 변경 예정 -->												
+										<option>광주은행</option>
+										<option>단위농협(지역농축협)</option>
+										<option>부산은행</option>
+										<option>새마을금고</option>
+										<option>산림조합</option>
+										<option>신한은행</option>
+										<option>신협</option>
+										<option>씨티은행</option>
+										<option>우리은행</option>
+										<option>우체국예금보험</option>
+										<option>저축은행중앙회</option>
+										<option>전북은행</option>
+										<option>제주은행</option>
+										<option>카카오뱅크</option>
+										<option>케이뱅크</option>
+										<option>토스뱅크</option>
+										<option>하나은행</option>
+										<option>홍콩상하이은행</option>
+										<option>IBK기업은행</option>
+										<option>KB국민은행</option>
+										<option>DGB대구은행</option>
+										<option>KDB산업은행</option>
+										<option>NH농협은행</option>
+										<option>SC제일은행</option>
+										<option>Sh수협은행</option>											
+									</select>											
+								</div>
+								<div class="col-md-3">
+									<input type="text" class="form-control">	
+								</div>
+								<div class="col-md-6">
+									<input type="text" class="form-control">												
+								</div>
+							</div>
+						</div>
+						
+						
+						
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</form>
+			<!-- /.form -->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
