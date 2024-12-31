@@ -33,7 +33,6 @@ public class HrManagementController {
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
 		log.info("=============Add Member=============");
-		log.info(param.toString());
 		
 		String email = param.get("email_id").toString() + "@" + param.get("email_domain").toString();
 		
