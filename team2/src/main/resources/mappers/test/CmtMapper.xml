@@ -49,13 +49,24 @@
     WHERE MEMBER_ID = #{memberId, jdbcType=VARCHAR}
       AND CHECK_OUT_TIME IS NULL
 </update>
-
 <select id="selectTodayHistory" parameterType="map" resultType="map">
-    SELECT check_in_time, check_out_time
+SELECT 
+    	  NVL(TO_CHAR(check_in_time), ' ') AS check_in_time
+    	, NVL(TO_CHAR(CHECK_OUT_TIME), ' ') AS check_out_time 
     FROM commute
     WHERE member_id = #{memberId}
     AND TRUNC(CHECK_IN_TIME) = TRUNC(CURRENT_DATE)
 </select>
+
+
+<!-- <select id="selectTodayHistory" parameterType="map" resultType="map"> -->
+<!--     SELECT  -->
+<!--     	  check_in_time -->
+<!--     	, check_out_time -->
+<!--     FROM commute -->
+<!--     WHERE member_id = #{memberId} -->
+<!--     AND TRUNC(CHECK_IN_TIME) = TRUNC(CURRENT_DATE) -->
+<!-- </select> -->
 
 
 </mapper>

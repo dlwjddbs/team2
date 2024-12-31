@@ -18,6 +18,7 @@ import com.itwillbs.service.TestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import oracle.sql.TIMESTAMP;
 
 
 @Controller
@@ -27,7 +28,8 @@ public class CmtController {
 	
 	
     private final CmtService cmtService;
-
+    
+    
     
 //	@GetMapping("/commute/cmt")
 //	public String cmt() {
@@ -40,6 +42,8 @@ public class CmtController {
 		String id = "20241222";
 		map.put("memberId", id);		
 		cmtService.getCheckIn(map);
+		
+		model.addAttribute("todayHistory", null);
 		
 		return "redirect:/commute/cmt";
 		}
@@ -65,6 +69,7 @@ public class CmtController {
 	    boolean isCheckedIn = todayHistory != null && todayHistory.get("check_in_time") != null;
 	    boolean isCheckedOut = todayHistory != null && todayHistory.get("check_out_time") != null;
 		
+	    
 		 // todayHistory가 null이면 확인
 	    if (todayHistory == null) {
 	        System.out.println("todayHistory is null");
