@@ -12,12 +12,12 @@
 <!--  			  dual-->
 <!--    </select>-->
 	
-	<select id="insertMember" >
-		INSERT INTO MEMBER VALUES (
-			NULL
-			, #{}
-		)
-	</select>
+<!-- 	<select id="insertMember" > -->
+<!-- 		INSERT INTO MEMBER VALUES ( -->
+<!-- 			NULL -->
+<!-- 			, #{} -->
+<!-- 		) -->
+<!-- 	</select> -->
     <select id="selectMemberList" resultType="map">
 		SELECT
 
