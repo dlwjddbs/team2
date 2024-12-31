@@ -135,5 +135,9 @@ public class MemberController {
         }
     }
 
-    
+	@GetMapping("/personnelAppointments")
+	public String personnelAppointments() {
+		return "/HRManagement/personnelAppointments";
+	}
+
 }
