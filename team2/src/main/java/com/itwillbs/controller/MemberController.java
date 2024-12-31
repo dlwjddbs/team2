@@ -40,7 +40,7 @@ public class MemberController {
 
     @GetMapping("/mypage")
     public String info(HttpSession session, Model model) {
-        String id = (String) session.getAttribute("id");
+        Integer id = (Integer) session.getAttribute("id");
 
         if (id == null) {
             return "redirect:/login"; 
@@ -75,7 +75,7 @@ public class MemberController {
     public String updateMemberInfo(HttpSession session,
                                    @ModelAttribute MemberDTO memberDTO) {
         try {
-            String id = (String) session.getAttribute("id"); 
+            Integer id = (Integer) session.getAttribute("id"); 
             memberDTO.setId(id);
 
             // 프로필 이미지 처리
@@ -113,18 +113,18 @@ public class MemberController {
     
     @PostMapping("/mypage/education")
     public String updateEducation(@RequestParam("certificate_merged") String certificates,
-                                                 @RequestParam("education_merged") String trainings,
+                                                 @RequestParam("education_merged") String education,
                                                  HttpSession session,
                                                  RedirectAttributes redirectAttributes) {
         try {
-            String id = (String) session.getAttribute("id");
+            Integer id = (Integer) session.getAttribute("id");
             if (id == null) {
                 redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
                 return "redirect:/login";
             }
 
             // 자격증 및 교육 정보 업데이트
-            memberService.updateEducation(id, certificates, trainings);
+            memberService.updateEducation(id, certificates, education);
 
             redirectAttributes.addFlashAttribute("success", "자격증 및 교육 정보가 성공적으로 업데이트되었습니다.");
             return "redirect:/mypage?tab=edu";

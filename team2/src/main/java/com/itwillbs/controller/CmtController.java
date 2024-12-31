@@ -1,5 +1,6 @@
 package com.itwillbs.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +29,12 @@ public class CmtController {
     private final CmtService cmtService;
 
     
-	@GetMapping("/commute/cmt")
-	public String cmt() {
-		
-		return "commute/cmt";
-		}
-
+//	@GetMapping("/commute/cmt")
+//	public String cmt() {
+//		
+//		return "commute/cmt";
+//		}
+	
 	@PostMapping("/cmt/start")
 	public String cmtPro(@RequestParam Map<String, Object> map, Model model) {
 		String id = "20241222";
@@ -47,23 +48,36 @@ public class CmtController {
 	public String endPro(@RequestParam Map<String, Object> map, Model model) {
 	    String id = "20241222"; // 사용자 ID
 	    map.put("memberId", id);
-
 	    cmtService.updateCheckOut(map);
 
 	    return "redirect:/commute/cmt";
 	}
 	
 	
-	@PostMapping("/cmt/checkIn")
-	public String checkIn(@RequestParam Map<String, Object> map, Model model) {
-	    String memberId = "20241222"; // 예시로 하드코딩된 ID, 실제로는 로그인된 사용자 ID로 대체
-
-
-	    // 출근 시간 가져오기
-	    Map<String, Object> checkInData = cmtService.getCheckInTime(memberId);
-	    
-	    model.addAttribute("checkInTime", checkInData.get("CHECK_IN_TIME"));
-	    return "commute/cmt";  // cmt.html로 이동
+	@GetMapping("/commute/cmt")
+	public String getTodayHistory(@RequestParam Map<String, Object> map,Model model) {
+		String id = "20241222";
+		
+		map.put("memberId", id);
+		Map<String, Object> todayHistory = cmtService.getTodayHistory(map);
+		
+		  // 출근 시간과 퇴근 시간이 존재하는지 확인
+	    boolean isCheckedIn = todayHistory != null && todayHistory.get("check_in_time") != null;
+	    boolean isCheckedOut = todayHistory != null && todayHistory.get("check_out_time") != null;
+		
+		 // todayHistory가 null이면 확인
+	    if (todayHistory == null) {
+	        System.out.println("todayHistory is null");
+	    } else {
+	        System.out.println("todayHistory: " + todayHistory);
+	    }
+		
+		model.addAttribute("todayHistory", todayHistory);
+		model.addAttribute("isCheckedIn", isCheckedIn);  // 출근 여부
+	    model.addAttribute("isCheckedOut", isCheckedOut); // 퇴근 여부
+		
+		return "commute/cmt";
 	}
 	
+
 }

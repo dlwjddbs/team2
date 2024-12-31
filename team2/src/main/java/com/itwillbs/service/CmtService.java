@@ -33,10 +33,15 @@ public class CmtService {
 		    cmtMapper.updateCheckOut(map);
 	}
 
-
-
-	public Map<String, Object> getCheckInTime(String memberId) {
-		// TODO Auto-generated method stub
-		return cmtMapper.getCheckInTime(memberId);
+	public Map<String, Object> getTodayHistory(Map<String, Object> map) {
+		
+		return cmtMapper.selectTodayHistory(map);
 	}
+
+
+
+//	public List<Map<String, Object>> getTodayHistory(String memberId) {
+//		
+//		return cmtMapper.getTodayHistory(memberId);
+//	}
 }

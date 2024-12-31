@@ -13,5 +13,9 @@ public interface AttendanceMapper {
 	Map<String, Object> getMyCommuteHistoryMinMaxDate(String id);
 
 	List<Map<String, Object>> getMyAttendanceHistory(Map<String, Object> map);
+
+	List<Map<String, Object>> getMyCommuteTime(Map<String, Object> map);
+
+	Map<String, Object> getMyCommuteTimeMinMaxDate(String id);
 	
 }
