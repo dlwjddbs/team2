@@ -36,7 +36,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>지각/조퇴/결근 내역</h1>
+							<h1>출/퇴근 기록</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -139,26 +139,21 @@
 		                "last" : "마지막",
 		                "next" : "다음",
 		                "previous" : "이전"
-		            },
-		            zeroRecords : "검색 결과 없음"
+		            }
 				},
 				ajax : {
-					url : "/getMyAttendanceHistory",
+					url : "/getMyCommuteHistory",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (res) {
-						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data : "CREATE_DATE", title : "일자"},
-					{data : "CT_CHECK_IN_TIME", title : "출근기준"},
-					{data : "CHECK_IN_TIME", title : "출근시각"},
-					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준"},
-					{data : "CHECK_OUT_TIME", title : "퇴근시각"},
-					{data : "ATTENDANCE_TEXT", title : "종류"}
+					{data : "COMMUTE_CHECK_IN_DATE", title : "일자"},
+					{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각"},
+					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각"}
 			  	],
 				responsive : true, 
 				lengthChange : false, 
@@ -206,11 +201,10 @@
 			                "last" : "마지막",
 			                "next" : "다음",
 			                "previous" : "이전"
-			            },
-			            zeroRecords : "검색 결과 없음"
+			            }
 					},
 					ajax : {
-						url : "/getMyAttendanceHistory",
+						url : "/getMyCommuteHistory",
 						type:"POST",
 						data : {
 							startDate : date[0],					
@@ -221,12 +215,9 @@
 			            }
 					},
 					columns : [
-						{data : "CREATE_DATE", title : "일자"},
-						{data : "CT_CHECK_IN_TIME", title : "출근기준"},
-						{data : "CHECK_IN_TIME", title : "출근시각"},
-						{data : "CT_CHECK_OUT_TIME", title : "퇴근기준"},
-						{data : "CHECK_OUT_TIME", title : "퇴근시각"},
-						{data : "ATTENDANCE_TEXT", title : "종류"}
+						{data : "COMMUTE_CHECK_IN_DATE", title : "일자"},
+						{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각"},
+						{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각"}
 					],
 					responsive : true, 
 					lengthChange : false, 

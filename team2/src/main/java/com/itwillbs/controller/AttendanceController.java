@@ -89,6 +89,16 @@ public class AttendanceController {
 		return commuteTime;
 	}
 	
+	@GetMapping("/commuteHistory")
+	public String getCommuteHistory(Model model) {
+		// session id 20241222 임시
+		String id = "20241222";
+		
+		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
+		
+		return "/attendance/commuteHistory";
+	}
 }
 
 
