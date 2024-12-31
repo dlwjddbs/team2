@@ -44,8 +44,9 @@ public class HrManagementController {
 		param.put("email", email);
 		param.put("create_date", create_date);
 		
-		int insertCount = hrManagementService.addMember(param);
-
+		System.out.println(param.toString());
+//		int insertCount = hrManagementService.addMember(param);
+//		System.out.println("insertCount = "+insertCount);
 		//int = 0, 처리
 		
 		return "/HRManagement/member_list";
@@ -63,6 +64,7 @@ public class HrManagementController {
 	@ResponseBody
 	public List<Map<String, Object>> getMemberList(@RequestParam Map<String, Object> map) {
 		List<Map<String, Object>> memberList = hrManagementService.getMemberList();
+		log.info(memberList.toString());
 		return memberList;
 	}	
 	

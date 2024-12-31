@@ -12,12 +12,15 @@
 <!--  			  dual-->
 <!--    </select>-->
 	
-<!-- 	<select id="insertMember" > -->
-<!-- 		INSERT INTO MEMBER VALUES ( -->
-<!-- 			NULL -->
-<!-- 			, #{} -->
-<!-- 		) -->
-<!-- 	</select> -->
+ 	<select id="insertMember" > 
+		INSERT INTO MEMBER (
+				 		 NAME
+				   , CREATE_DATE)
+			VALUES (
+					 #(name)
+				   
+				   , SYSDATE);
+ 	</select> 
     <select id="selectMemberList" resultType="map">
 		SELECT
 
@@ -40,7 +43,7 @@
 										ON m.ID = dh.MEMBER_ID
 	 LEFT JOIN GRADE_HISTORY gh 
 										ON m.ID = gh.MEMBER_ID
-        	   
+     WHERE m.USE_YN = 'Y'  	   
     </select>
     <!--
     <select id="selectOrganizationData" resultType="map">
