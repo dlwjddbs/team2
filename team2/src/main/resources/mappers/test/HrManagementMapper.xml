@@ -12,7 +12,7 @@
 <!--  			  dual-->
 <!--    </select>-->
 	
- 	<select id="insertMember"> 
+ 	<insert id="insertMember" useGeneratedKeys="true" keyProperty="ID"> 
 		INSERT INTO MEMBER 
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 	        <if test="NAME != null">NAME,</if>
@@ -22,13 +22,11 @@
 	        <if test="ADDRESS2 != null">ADDRESS2,</if>
 	        <if test="EMAIL != null">EMAIL,</if>
 	        <if test="PHONE != null">PHONE,</if>
-	        <if test="PASSWD != null">PASSWD,</if>
 	        <if test="JOIN_DATE != null">JOIN_DATE,</if>
-	        <if test="RESIGN_DATE != null">RESIGN_DATE,</if>
 	        <if test="CREATE_DATE != null">CREATE_DATE,</if>
-    	</trim>
-    	VALUES
-    	<trim suffixOverrides=",">
+	    </trim>
+	    VALUES
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
 	        <if test="NAME != null">#{NAME},</if>
 	        <if test="RESIDENT_REGIST_NUM != null">#{RESIDENT_REGIST_NUM},</if>
 	        <if test="ADDRESS_NUM != null">#{ADDRESS_NUM},</if>
@@ -36,12 +34,10 @@
 	        <if test="ADDRESS2 != null">#{ADDRESS2},</if>
 	        <if test="EMAIL != null">#{EMAIL},</if>
 	        <if test="PHONE != null">#{PHONE},</if>
-	        <if test="PASSWD != null">#{PASSWD},</if>
 	        <if test="JOIN_DATE != null">#{JOIN_DATE},</if>
-	        <if test="RESIGN_DATE != null">#{RESIGN_DATE},</if>
 	        <if test="CREATE_DATE != null">#{CREATE_DATE},</if>
-        </trim>
- 	</select> 
+	    </trim>
+ 	</insert> 
  	
  	<insert id="insertHistory">
  		

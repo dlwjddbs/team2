@@ -17,6 +17,7 @@ public class HrManagementService {
 	private final HrManagementMapper hrManagementMapper;
 	
 	public int addMember(Map<String, Object> param) {
+		System.out.println("service param : " + param);
 		return hrManagementMapper.insertMember(param);
 	}
 	
