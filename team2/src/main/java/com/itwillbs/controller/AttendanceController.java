@@ -67,6 +67,16 @@ public class AttendanceController {
 		return attendanceHistory;
 	}
 	
+	@PostMapping("/getMyAttendanceHistoryDonutChart")
+	@ResponseBody
+	public List<Map<String, Object>> getMyAttendanceHistoryDonutChart(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		List<Map<String, Object>> attendanceHistoryDonut = attendanceService.getMyAttendanceHistoryDonutChart(map);
+		
+		return attendanceHistoryDonut;
+	}
+	
 	@GetMapping("/myAttendanceTime")
 	public String getMyAttendanceTime(Model model) {
 		// session id 20241222 임시

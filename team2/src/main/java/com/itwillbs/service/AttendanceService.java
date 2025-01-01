@@ -35,4 +35,8 @@ public class AttendanceService {
 		return attendanceMapper.getMyCommuteTime(map);
 	}
 
+	public List<Map<String, Object>> getMyAttendanceHistoryDonutChart(Map<String, Object> map) {
+		return attendanceMapper.getMyAttendanceHistoryDonutChart(map);
+	}
+
 }
