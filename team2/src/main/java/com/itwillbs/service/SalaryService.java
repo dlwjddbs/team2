@@ -26,5 +26,13 @@ public class SalaryService {
 		return salaryMapper.getSalaryHistory(map);
 	}
 
+	public int writeSalary(Map<String, Object> param) {
+		return salaryMapper.insertSalary(param);
+	}
+
+	public List<Map<String, Object>> memberSalaryList() {
+		return salaryMapper.selectSalaryList();
+	}
+
 
 }

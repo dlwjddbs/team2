@@ -13,4 +13,6 @@ public interface SalaryMapper {
 	Map<String, Object> getSalaryHistoryMinMaxDate();
 
 	List<Map<String, Object>> getSalaryHistory(Map<String, Object> map);
+
+	int insertSalary(Map<String, Object> param);
 }
