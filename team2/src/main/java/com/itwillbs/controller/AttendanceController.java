@@ -85,7 +85,7 @@ public class AttendanceController {
 		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
 		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
 		
-		return "/attendance/myCommuteTime";
+		return "/attendance/myAttendanceTime";
 	}
 	
 	@PostMapping("/getMyAttendanceTime")
@@ -108,6 +108,17 @@ public class AttendanceController {
 		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
 		
 		return "/attendance/commuteHistory";
+	}
+	
+	@GetMapping("/setHoliday")
+	public String setHoliday(Model model) {
+		// session id 20241222 임시
+		String id = "20241222";
+		
+		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
+		
+		return "/attendance/setHoliday";
 	}
 }
 

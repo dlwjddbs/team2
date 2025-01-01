@@ -179,5 +179,19 @@
   	     ORDER BY
  	  		  STARTING_DATE DESC
     </select>
+    
+    <select id="getWeekend" resultType="map">
+    <!-- getWeekend 주말 조회 -->
+		SELECT TO_CHAR(TO_DATE(DT, 'YYYY-MM-DD'), 'YYYY-MM-DD')	AS DATE_TIME
+			 , CASE WHEN TO_CHAR(TO_DATE(DT),'D') IN ('1','7')
+		  			THEN '주말'
+		            ELSE '평일' 
+				END 											AS WEEK_DAY
+		  FROM (SELECT TO_CHAR(TO_DATE(ST_DT, 'YYYYMMDD') + LEVEL - 1, 'YYYYMMDD') AS DT
+				  FROM (SELECT '20241201' AS ST_DT
+							  ,'20241231' AS END_DT
+		            	  FROM DUAL)
+		CONNECT BY LEVEL <![CDATA[<=]]> TO_DATE(END_DT, 'YYYYMMDD') - TO_DATE(ST_DT, 'YYYYMMDD') + 1)
+    </select>
 
 </mapper>
