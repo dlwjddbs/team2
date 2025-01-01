@@ -103,13 +103,20 @@
 										<div class="row">
 											<div class="col-md-6">
 												<form th:action="@{/cmt/start}" method="post" id="startForm">
-												    <button id="startButton" name="check_In_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmStart()" th:disabled="${todayHistory?.CHECK_IN_TIME != null}">출근하기</button>
+												    <button id="startButton" name="check_In_time" type="submit" class="btn btn-block btn-outline-primary" 
+													onclick="return confirmStart()" th:disabled="${todayHistory?.CHECK_IN_TIME != null}">출근하기</button>
 												</form>
 											</div>
 											<div class="col-md-6">
 												<form th:action="@{/cmt/end}" method="post" id="endForm">
-												       <button id="endButton" name="check_Out_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>
-												   </form>
+												       <button id="endButton" name="check_Out_time" type="submit" 
+													   class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" 
+													   th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>
+
+													   
+													   <!--	 <button id="endButton" name="check_Out_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>-->
+
+												    </form>
 											</div>
 										</div>
 										<button type="button" class="btn btn-block btn-outline-primary mt-3">상태변경</button>

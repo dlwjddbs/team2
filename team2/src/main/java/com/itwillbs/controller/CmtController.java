@@ -1,6 +1,5 @@
 package com.itwillbs.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,25 +28,17 @@ public class CmtController {
 	
     private final CmtService cmtService;
     
-    
-    
-//	@GetMapping("/commute/cmt")
-//	public String cmt() {
-//		
-//		return "commute/cmt";
-//		}
-	
+	//출근 
 	@PostMapping("/cmt/start")
 	public String cmtPro(@RequestParam Map<String, Object> map, Model model) {
 		String id = "20241222";
 		map.put("memberId", id);		
 		cmtService.getCheckIn(map);
 		
-		model.addAttribute("todayHistory", null);
-		
 		return "redirect:/commute/cmt";
 		}
 	
+	//퇴근
 	@PostMapping("/cmt/end")
 	public String endPro(@RequestParam Map<String, Object> map, Model model) {
 	    String id = "20241222"; // 사용자 ID
@@ -57,18 +48,13 @@ public class CmtController {
 	    return "redirect:/commute/cmt";
 	}
 	
-	
+	// 출퇴근 기록
 	@GetMapping("/commute/cmt")
 	public String getTodayHistory(@RequestParam Map<String, Object> map,Model model) {
 		String id = "20241222";
 		
 		map.put("memberId", id);
-		Map<String, Object> todayHistory = cmtService.getTodayHistory(map);
-		
-		  // 출근 시간과 퇴근 시간이 존재하는지 확인
-	    boolean isCheckedIn = todayHistory != null && todayHistory.get("check_in_time") != null;
-	    boolean isCheckedOut = todayHistory != null && todayHistory.get("check_out_time") != null;
-		
+		Map<String, Object> todayHistory = cmtService.getTodayHistory(map);		
 	    
 		 // todayHistory가 null이면 확인
 	    if (todayHistory == null) {
@@ -78,8 +64,6 @@ public class CmtController {
 	    }
 		
 		model.addAttribute("todayHistory", todayHistory);
-		model.addAttribute("isCheckedIn", isCheckedIn);  // 출근 여부
-	    model.addAttribute("isCheckedOut", isCheckedOut); // 퇴근 여부
 		
 		return "commute/cmt";
 	}

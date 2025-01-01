@@ -6,67 +6,69 @@
 
 <mapper namespace="com.itwillbs.repository.CmtMapper">
    
-    <!-- 출근 기록 저장 -->
-<!--    <insert id="getCheckIn" parameterType="map">-->
-<!--        INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)-->
-<!--        VALUES (#{id}, #{memberId}, SYSDATE, SYSDATE)-->
-<!-- INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)-->
-<!--    VALUES (#{id}, #{memberId, jdbcType=VARCHAR}, #{checkInTime, jdbcType=TIMESTAMP}, #{createDate, jdbcType=TIMESTAMP})-->
-<!--    </insert>-->
-
-     <insert id="getCheckIn" parameterType="map">
-    INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE)
-    VALUES (#{id}, #{memberId, jdbcType=VARCHAR}, 
+<insert id="getCheckIn" parameterType="map">
+    INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE, CHECK_IN_DATE, CHECK_OUT_DATE)
+    VALUES (#{id}, #{memberId, jdbcType=VARCHAR},
             <choose>
                 <when test="checkInTime != null">
-                    #{checkInTime, jdbcType=TIMESTAMP}
+                    #{checkInTime, jdbcType=VARCHAR} <!-- String 형식으로 저장 -->
                 </when>
                 <otherwise>
-                    SYSDATE
+                    TO_CHAR(SYSDATE, 'HH24:MI:SS') <!-- 현재 시간 형식으로 저장 -->
                 </otherwise>
-            </choose>, 
+            </choose>,
             <choose>
                 <when test="createDate != null">
-                    #{createDate, jdbcType=TIMESTAMP}
+                    #{createDate, jdbcType=VARCHAR} <!-- String 형식으로 저장 -->
                 </when>
                 <otherwise>
-                    SYSDATE
+                    TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') <!-- 현재 시간 형식으로 저장 -->
                 </otherwise>
-            </choose>)
+            </choose>,
+            <choose>
+                <when test="checkInDate != null">
+                    #{checkInDate, jdbcType=VARCHAR} <!-- checkInTime을 CHECK_IN_DATE에 넣기 -->
+                </when>
+                <otherwise>
+                    TO_CHAR(SYSDATE, 'YYYY-MM-DD') <!-- 기본값으로 현재 날짜를 'YYYY-MM-DD' 형식으로 저장 -->
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="checkOutDate != null">
+                    #{checkOutDate, jdbcType=VARCHAR} <!-- checkInTime을 CHECK_IN_DATE에 넣기 -->
+                </when>
+                <otherwise>
+                    TO_CHAR(SYSDATE, 'YYYY-MM-DD') <!-- 기본값으로 현재 날짜를 'YYYY-MM-DD' 형식으로 저장 -->
+                </otherwise>
+            </choose>
+    )
 </insert>
+
 
 <update id="updateCheckOut" parameterType="map">
     UPDATE COMMUTE
     SET CHECK_OUT_TIME = 
         <choose>
             <when test="checkOutTime != null">
-                #{checkOutTime, jdbcType=TIMESTAMP}
+                #{checkOutTime, jdbcType=VARCHAR} <!-- String 형식으로 저장 -->
             </when>
             <otherwise>
-                SYSDATE
+                TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') <!-- 현재 시간 형식으로 저장 -->
             </otherwise>
         </choose>
     WHERE MEMBER_ID = #{memberId, jdbcType=VARCHAR}
       AND CHECK_OUT_TIME IS NULL
 </update>
+
+
 <select id="selectTodayHistory" parameterType="map" resultType="map">
+
 SELECT 
-    	  NVL(TO_CHAR(check_in_time), ' ') AS check_in_time
-    	, NVL(TO_CHAR(CHECK_OUT_TIME), ' ') AS check_out_time 
-    FROM commute
-    WHERE member_id = #{memberId}
-    AND TRUNC(CHECK_IN_TIME) = TRUNC(CURRENT_DATE)
-</select>
-
-
-<!-- <select id="selectTodayHistory" parameterType="map" resultType="map"> -->
-<!--     SELECT  -->
-<!--     	  check_in_time -->
-<!--     	, check_out_time -->
-<!--     FROM commute -->
-<!--     WHERE member_id = #{memberId} -->
-<!--     AND TRUNC(CHECK_IN_TIME) = TRUNC(CURRENT_DATE) -->
-<!-- </select> -->
-
+    NVL(check_in_time, ' ') AS check_in_time,
+    NVL(check_out_time, ' ') AS check_out_time
+FROM commute
+WHERE member_id = #{memberId}
+  AND TO_DATE(check_in_date) = TRUNC(CURRENT_DATE)
+  </select>
 
 </mapper>
