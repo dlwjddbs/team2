@@ -1,6 +1,8 @@
 package com.itwillbs.controller;
 
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,15 @@ public class AttendanceController {
 		map.put("id", id);
 		
 		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
+		
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
 		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
 		
 		return "/attendance/myCommuteHistory";
@@ -52,6 +63,15 @@ public class AttendanceController {
 		map.put("id", id);
 		
 		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
+		
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
 		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
 		
 		return "/attendance/myAttendanceHistory";
@@ -83,6 +103,15 @@ public class AttendanceController {
 		String id = "20241222";
 		
 		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		
+		if (commuteTimeMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteTimeMinMaxDate = new HashMap<>();
+			commuteTimeMinMaxDate.put("MIN_STARTING_DATE", now);
+			commuteTimeMinMaxDate.put("MAX_STARTING_DATE", now);
+		}
+		
 		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
 		
 		return "/attendance/myAttendanceTime";
