@@ -30,6 +30,28 @@
 	 	  1 = 1
     </select>
     
-    
+    <!-- id에 해당하는 급여정보를 조회 (미구현) -->
+    <select id="selectSalaryListById" resultType="map">
+<!-- 		SELECT
+			TO_CHAR(m.JOIN_DATE, 'YYYY-MM-DD') AS JOIN_DATE,
+			m.ID,
+			m.NAME,
+			m.PHONE,
+			m.EMAIL,
+			
+			(SELECT d.NAME 
+				FROM DEPARTMENT d 
+				WHERE d.ID = dh.DEPARTMENT_ID) AS DEPARTMENT,
+				
+			(SELECT g.NAME 
+				FROM GRADE g 
+				WHERE g.ID = gh.GRADE_ID) AS GRADE
+				
+		FROM MEMBER m 
+			LEFT JOIN DEPARTMENT_HISTORY dh ON m.ID = dh.MEMBER_ID
+	 		LEFT JOIN GRADE_HISTORY gh ON m.ID = gh.MEMBER_ID
+	 	
+	 	WHERE m.ID = #{id} -->
+    </select>
     
 </mapper>

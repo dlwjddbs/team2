@@ -33,6 +33,11 @@ public class SalaryService {
 	public List<Map<String, Object>> memberSalaryList() {
 		return salaryMapper.selectSalaryList();
 	}
+	
+	// 급여 정보로 수정 예정
+	public Map<String, Object> findSalaryById(String id) {
+		return salaryMapper.selectSalaryListById(id);
+	}
 
 
 }
