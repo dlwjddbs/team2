@@ -7,7 +7,7 @@
 <mapper namespace="com.itwillbs.repository.CmtMapper">
    
 <insert id="getCheckIn" parameterType="map">
-    INSERT INTO COMMUTE (ID, MEMBER_ID, CHECK_IN_TIME, CREATE_DATE, CHECK_IN_DATE, CHECK_OUT_DATE)
+    INSERT INTO COMMUTE (COMMUTE_ID, MEMBER_ID, CHECK_IN_TIME,  CHECK_IN_DATE, CHECK_OUT_DATE)
     VALUES (#{id}, #{memberId, jdbcType=VARCHAR},
             <choose>
                 <when test="checkInTime != null">
@@ -15,14 +15,6 @@
                 </when>
                 <otherwise>
                     TO_CHAR(SYSDATE, 'HH24:MI:SS') <!-- 현재 시간 형식으로 저장 -->
-                </otherwise>
-            </choose>,
-            <choose>
-                <when test="createDate != null">
-                    #{createDate, jdbcType=VARCHAR} <!-- String 형식으로 저장 -->
-                </when>
-                <otherwise>
-                    TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') <!-- 현재 시간 형식으로 저장 -->
                 </otherwise>
             </choose>,
             <choose>

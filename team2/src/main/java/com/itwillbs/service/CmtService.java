@@ -1,5 +1,6 @@
 package com.itwillbs.service;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -23,19 +24,23 @@ public class CmtService {
 	    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	    String checkInTime = sdf.format(new java.util.Date());
 	    map.put("checkInTime", checkInTime); // varchar2로 저장될 수 있도록 String 값으로 저장
-
-	    // createDate도 동일하게 처리
-	    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    String createDate = sdf1.format(new java.util.Date());
-	    map.put("createDate", createDate); // varchar2로 저장될 수 있도록 String 값으로 저장
 	    
-	    SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-	    String checkInDate = sdf2.format(new java.util.Date());
+	    map.put("createDate", new Timestamp(System.currentTimeMillis()));
+
+	    
+	    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+	    String checkInDate = sdf1.format(new java.util.Date());
 	    map.put("checkInDate", checkInDate); 
-	    String checkOutDate = sdf2.format(new java.util.Date());
+	    String checkOutDate = sdf1.format(new java.util.Date());
 	    map.put("checkOutDate", checkOutDate); 
 
 		cmtMapper.getCheckIn(map);
+		
+		
+		// createDate도 동일하게 처리
+//	    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//	    String createDate = sdf1.format(new java.util.Date());
+//	    map.put("createDate", createDate); // varchar2로 저장될 수 있도록 String 값으로 저장
 	}
 
 
