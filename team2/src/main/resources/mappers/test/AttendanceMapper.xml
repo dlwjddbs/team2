@@ -43,14 +43,19 @@
     <select id="getMyAttendanceHistory" resultType="map">
     <!-- getMyAttendanceHistory 지각/조퇴/결근 기록 조회 -->
 		SELECT 
-			  b.*
+			  	TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+			  , b.CT_CHECK_IN_TIME
+			  , b.CHECK_IN_TIME
+			  , b.CT_CHECK_OUT_TIME
+			  , b.CHECK_OUT_TIME
+			  , b.ATTENDANCE_TEXT
 		  FROM (
 			  SELECT 
 					a.*
-				  , ROW_NUMBER() OVER(PARTITION BY ID ORDER BY CT_STARTING_DATE DESC)			AS ROW_NUM
+				  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
 			   FROM (
 				   SELECT
-				         c.id																	AS ID
+				         c.COMMUTE_ID															AS COMMUTE_ID
 				       , c.MEMBER_ID 															AS MEMBER_ID
 				       , c.CHECK_IN_TIME														AS CHECK_IN_TIME 	
 				       , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
@@ -84,8 +89,8 @@
 	 	  <if test='startDate != null and startDate != ""
 			 		and endDate != null and endDate != ""'>
 			  AND 
-				 CREATE_DATE BETWEEN #{startDate} 
-								 AND #{endDate} 
+				 TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
+								 						AND #{endDate} 
 		  </if>
     </select>
     
@@ -100,10 +105,10 @@
 				  FROM (
 					  SELECT 
 							a.*
-						  , ROW_NUMBER() OVER(PARTITION BY ID ORDER BY CT_STARTING_DATE DESC)			AS ROW_NUM
+						  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
 					   FROM (
 						   SELECT
-						         c.id																	AS ID
+						         c.COMMUTE_ID															AS COMMUTE_ID
 						       , c.MEMBER_ID 															AS MEMBER_ID
 						       , c.CHECK_IN_TIME														AS CHECK_IN_TIME 	
 						       , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
@@ -137,8 +142,8 @@
 			 	  <if test='startDate != null and startDate != ""
 					 		and endDate != null and endDate != ""'>
 					  AND 
-						 CREATE_DATE BETWEEN #{startDate} 
-										 AND #{endDate} 
+						 TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
+										 						AND #{endDate} 
 				  </if>
 		 	 )  c
 		 GROUP BY
