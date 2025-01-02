@@ -56,6 +56,35 @@ public class AttendanceController {
 		return commuteHistory;
 	}
 	
+	// 관리자 출퇴근 기록 조회
+	@GetMapping("/commuteHistory")
+	public String getCommuteHistory(Model model, Map<String, Object> map) {
+		String id = "admin";
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
+		
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
+		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/attendance/commuteHistory";
+	}
+	
+	// 관리자 출퇴근 기록 조회
+	@PostMapping("/getCommuteHistory")
+	@ResponseBody
+	public List<Map<String, Object>> getCommuteHistory(@RequestParam Map<String, Object> map) {
+		map.put("id", "admin");
+		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
+		
+		return commuteHistory;
+	}
+	
 	@GetMapping("/myAttendanceHistory")
 	public String getMyAttendanceHistory(Model model, Map<String, Object> map) {
 		// session id 20241222 임시
@@ -126,28 +155,6 @@ public class AttendanceController {
 		List<Map<String, Object>> commuteTime = attendanceService.getMyCommuteTime(map);
 		
 		return commuteTime;
-	}
-	
-	@GetMapping("/commuteHistory")
-	public String getCommuteHistory(Model model) {
-		// session id 20241222 임시
-		String id = "20241222";
-		
-		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
-		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
-		
-		return "/attendance/commuteHistory";
-	}
-	
-	@GetMapping("/setHoliday")
-	public String setHoliday(Model model) {
-		// session id 20241222 임시
-		String id = "20241222";
-		
-		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
-		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
-		
-		return "/attendance/setHoliday";
 	}
 }
 
