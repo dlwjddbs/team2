@@ -248,4 +248,23 @@
 			, #{STARTING_DATE}
 		)
 	</insert>
+	
+	<select id="getSelectBoxList" resultType="map">
+    <!-- getSelectBoxList 셀렉트박스 목록 조회 -->
+	SELECT 
+	 		GROUP_ID || '_' || CODE_ID 	AS CODE
+	 	  , CODE_NAME 					AS NAME
+	  FROM  COMMON_CODE
+	 WHERE 
+			1 = 1
+	   AND  USE_YN = 'Y'
+	   <if test='type != null and type != ""'>
+		   <if test='type == "RANK"'>
+		   		AND  GROUP_ID = 'RANK'
+		   </if>
+		   <if test='type == "DEP"'>
+		   		AND  GROUP_ID = 'DEP'
+		   </if>
+	   </if>
+    </select>
 </mapper>

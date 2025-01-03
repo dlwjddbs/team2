@@ -28,4 +28,5 @@ public interface AttendanceMapper {
 
 	int insertAttendanceTime(Map<String, Object> map);
 	
+	List<Map<String, Object>> getSelectBoxList(Map<String, Object> map);
 }

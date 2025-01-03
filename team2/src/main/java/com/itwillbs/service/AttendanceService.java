@@ -88,4 +88,7 @@ public class AttendanceService {
 		return message;
 	}
 
+	public List<Map<String, Object>> getSelectBoxList(Map<String, Object> map) {
+		return attendanceMapper.getSelectBoxList(map);
+	}
 }
