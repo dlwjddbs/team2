@@ -49,9 +49,14 @@ public class AttendanceService {
 		String resultCode = "0";
 		
 		if (is_deletable) {
-			attendanceMapper.deleteAttendanceTime(map);
-			result = "삭제 되었습니다.";
-			resultCode = "1";
+			int resultCnt = attendanceMapper.deleteAttendanceTime(map);
+			
+			if (resultCnt > 0) {
+				result = "삭제 되었습니다.";
+				resultCode = "1";
+			} else {
+				result = "삭제 실패.";
+			}
 		}
 		
 		message.put("result", result);

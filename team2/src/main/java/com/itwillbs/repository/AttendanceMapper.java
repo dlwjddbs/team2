@@ -20,7 +20,7 @@ public interface AttendanceMapper {
 
 	List<Map<String, Object>> getMyAttendanceHistoryDonutChart(Map<String, Object> map);
 
-	void deleteAttendanceTime(Map<String, Object> map);
+	int deleteAttendanceTime(Map<String, Object> map);
 
 	Boolean isDeletableAttendanceTime(Map<String, Object> map);
 
