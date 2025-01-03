@@ -164,22 +164,28 @@
 		     COMMUTE_TIME
 		WHERE
 		  	 1 = 1
-		  AND
-		  	 member_id = #{id}
+	  	 <if test='id != "admin"'>
+			  AND
+			  	 member_id = #{id}
+	  	 </if>
     </select>
     
     <select id="getMyCommuteTime" resultType="map">
     <!-- getMyCommuteTime 내 출퇴근 기준 시간 조회 -->
 		SELECT
-		  	  CHECK_IN_TIME 	AS CHECK_IN_TIME
+			  COM_TIME_ID 		AS COM_TIME_ID
+			, MEMBER_ID 		AS MEMBER_ID
+		  	, CHECK_IN_TIME 	AS CHECK_IN_TIME
 			, CHECK_OUT_TIME 	AS CHECK_OUT_TIME
 			, STARTING_DATE 	AS STARTING_DATE
 	  	  FROM 
 		 	  COMMUTE_TIME
 		 WHERE
 		  	  1 = 1
-		   AND
-		  	  member_id = #{id}
+	  	  <if test='id != "admin"'>
+			   AND
+			  	  member_id = #{id}
+	  	  </if>
 	  	  <if test='startDate != null and startDate != ""
    			 		and endDate != null and endDate != ""'>
 			  AND 
@@ -203,5 +209,21 @@
 		            	  FROM DUAL)
 		CONNECT BY LEVEL <![CDATA[<=]]> TO_DATE(END_DT, 'YYYYMMDD') - TO_DATE(ST_DT, 'YYYYMMDD') + 1)
     </select>
+    
+    <select id="isDeletableAttendanceTime" resultType="Boolean">
+    <!-- isDeletableAttendanceTime 출퇴근 시간 적용 일자 오늘부터 이전까진 삭제 불가 -->
+    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 'false'
+					ELSE 'true'
+				END				AS IS_DELETABLE
+		  FROM COMMUTE_TIME
+		 WHERE 
+			   1 = 1
+		   AND COM_TIME_ID = #{id} 
+    </select>
 
+	<delete id="deleteAttendanceTime">
+	<!-- deleteAttendanceTime 출퇴근 시간 기준 삭제 -->
+		DELETE FROM COMMUTE_TIME
+ 		 WHERE COM_TIME_ID = #{id}
+	</delete>
 </mapper>

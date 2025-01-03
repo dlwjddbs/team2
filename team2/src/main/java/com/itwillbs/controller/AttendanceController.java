@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -156,6 +157,55 @@ public class AttendanceController {
 		
 		return commuteTime;
 	}
+	
+	// 관리자 출퇴근 기준 시간 관리
+	@GetMapping("/attendanceTime")
+	public String attendanceTime(Model model) {
+		String id = "admin";
+		
+		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		
+		if (commuteTimeMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteTimeMinMaxDate = new HashMap<>();
+			commuteTimeMinMaxDate.put("MIN_STARTING_DATE", now);
+			commuteTimeMinMaxDate.put("MAX_STARTING_DATE", now);
+		}
+		
+		model.addAttribute("commuteTimeMinMaxDate", commuteTimeMinMaxDate);
+		
+		return "/attendance/attendanceTime";
+	}
+	
+	@PostMapping("/getAttendanceTime")
+	@ResponseBody
+	public List<Map<String, Object>> getAttendanceTime(@RequestParam Map<String, Object> map) {
+		String id = "admin";
+		map.put("id", id);
+		
+		List<Map<String, Object>> commuteTime = attendanceService.getMyCommuteTime(map);
+		
+		return commuteTime;
+	}
+	
+	@PostMapping("/deleteAttendanceTime")
+	@ResponseBody
+	public Map<String, Object> deleteAttendanceTime(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = attendanceService.deleteAttendanceTime(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/Holiday")
+	@ResponseBody
+	public String postMethodName(@RequestBody Map<String, String> param) {
+		
+		System.out.println(param);
+		
+		return "";
+	}
+	
 }
 
 

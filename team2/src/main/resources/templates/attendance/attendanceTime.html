@@ -36,7 +36,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>휴일 관리</h1>
+							<h1>출/퇴근 기준 시각 관리</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -53,16 +53,6 @@
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
-<!--						<div class="d-flex">-->
-<!--							<label class="col-form-label mr-3">발령구분</label> <select class="appointGubun" name="appointGubun"-->
-<!--								style="min-width: 120px">-->
-<!--								<option selected="selected" disabled>발령구분</option>-->
-<!--								<option>승진</option>-->
-<!--								<option>부서이동</option>-->
-<!--								<option>퇴사</option>-->
-<!--							</select>-->
-<!--						</div>-->
-					
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
@@ -76,11 +66,9 @@
 							</div>
 						</div>
 					</div>
-					<button type="button" class="btn btn-primary" id="btnAPI">apiTest</button>
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				
-				<!-- /.card -->
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -140,81 +128,42 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
-	<!-- ChartJS -->
-	<script src="../../plugins/chart.js/Chart.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
+			dateRangePicker();
+			
+			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
+			let date = $("#reservation").val().split(' ~ ');
+			dataTable('example1', date, false);
 		});
 		
-		$("#btnAPI").on("click", function() {
-			getHolidayAPI()
-							.then(data => {
-								console.log(data);
-								sendHolidaysToController(data);
-							})
-							.catch(error => {
-								console.error(error);
-							});
+		$("#btnSearch").on("click", function() {
+			let date = $("#reservation").val().split(' ~ ');
+			dataTable('example1', date, true);
 		});
 		
-		function getHolidayAPI() {
-			return new Promise((resolve, reject) => {
-				let data = {};
-							
-				var xhr = new XMLHttpRequest();
-				var url = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'; /*URL*/
-				var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'Kzk%2FzP8JrAlHgSZ%2B2U4glzgw0FQf3e780Ekifo2Tt7EeGVIuXj1QuokxdkZx%2Brm7wg5Dcc71116nLS6Z4O8KLg%3D%3D'; /*Service Key*/
-				queryParams += '&' + encodeURIComponent('solYear') + '=' + encodeURIComponent('2025'); /*년*/
-		//			queryParams += '&' + encodeURIComponent('solMonth') + '=' + encodeURIComponent('01'); /*월*/
-				queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /*한 페이지 출력 개수*/
-				
-				xhr.open('GET', url + queryParams);
-				
-				xhr.onreadystatechange = function () {
-					if (this.readyState == 4) {
-						if (this.status == 200) {
-							var parser = new DOMParser();
-							var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
-					
-							var items = xmlDoc.getElementsByTagName("item");
-							for (var i = 0; i < items.length; i++) {
-								var locdate = items[i].getElementsByTagName("locdate")[0].textContent;
-								var dateName = items[i].getElementsByTagName("dateName")[0].textContent;
-					
-								data[locdate] = dateName;
-								
-							}
-							
-							resolve(data);
-							
-						} else {
-							console.error('오류 발생. HTTP 상태 코드:', this.status);
-						}
-					}
-				};
-				xhr.send('');
+		function dateRangePicker() {
+			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
+			let date = /*[[${commuteTimeMinMaxDate}]]*/
+			$('#reservation').daterangepicker({
+				locale: {
+					"separator": " ~ ",
+					"format": 'YYYY-MM-DD',
+					"applyLabel": "선택",
+			     	"cancelLabel": "취소",
+			     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
+			     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+			      	"firstDay": 1
+			    },
+				startDate: date.MIN_STARTING_DATE,  // 초기 설정 값
+				endDate: date.MAX_STARTING_DATE,  // 초기 설정 값
+				minDate: date.MIN_STARTING_DATE,  // 선택 제한 값
+				maxDate: date.MAX_STARTING_DATE  // 선택 제한 값
 			});
+			$("#reservation").attr("readonly",true); 
 		}
-		
-		function sendHolidaysToController(data) {
-			console.log("sendHolidaysToController");
-			fetch('/Holiday', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(data)
-			})
-			.then(response => response.text())
-			.then(result => {
-				console.log('Response from server:', result);
-			})
-			.catch(error => {
-				console.error('Error:', error);
-			});
-		}	
 		
 		function dataTable(tableId, date, isUpdate) {
 			// 기존 테이블 삭제
@@ -239,7 +188,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getMyAttendanceHistory",
+					url : "/getAttendanceTime",
 					type:"POST",
 					data : {
 						startDate : date[0],					
@@ -250,12 +199,18 @@
 		            }
 				},
 				columns : [
-					{data : "CREATE_DATE", title : "일자", "defaultContent": ""},
-					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
-					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
-					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
-					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
+					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
+					{data : "CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
+					{data : "CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
+					{data : "STARTING_DATE", title : "적용시작일", "defaultContent": ""},
+			        {
+			            data: "COM_TIME_ID",
+			            render: function(data) {
+			            	let btn = "<button id='" + data + "' onclick='confirmDeleteAttendanceTime(`" + data + "`)' class='btn btn-outline-primary btn-sm'>삭제</button>";
+			            	
+			            	return btn;
+			            }
+			        }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -264,6 +219,33 @@
 			}).buttons()
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
+		}
+		
+		function confirmDeleteAttendanceTime(id) {
+			if (confirm("삭제 하시겠습니까?")) {
+				deleteAttendanceTime(id);
+        	}
+		}
+		
+		function deleteAttendanceTime(id) {
+			$.ajax({
+                type : "POST",
+                url : "/deleteAttendanceTime",
+                data : {
+                	id : id
+				},
+                success : function(res){
+                	alert(res.result);
+                	
+                	if (res.resultCode == 1) {
+	                	let date = $("#reservation").val().split(' ~ ');
+	        			dataTable('example1', date, true);
+                	}
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("deleteAttendanceTime() ajax 실패");
+                }
+            });
 		}
 	</script>
 </body>
