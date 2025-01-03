@@ -149,42 +149,72 @@
 		});
 		
 		$("#btnAPI").on("click", function() {
-			
+			getHolidayAPI()
+							.then(data => {
+								console.log(data);
+								sendHolidaysToController(data);
+							})
+							.catch(error => {
+								console.error(error);
+							});
 		});
 		
 		function getHolidayAPI() {
-			let data = {};
-						
-			var xhr = new XMLHttpRequest();
-			var url = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'; /*URL*/
-			var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'Kzk%2FzP8JrAlHgSZ%2B2U4glzgw0FQf3e780Ekifo2Tt7EeGVIuXj1QuokxdkZx%2Brm7wg5Dcc71116nLS6Z4O8KLg%3D%3D'; /*Service Key*/
-			queryParams += '&' + encodeURIComponent('solYear') + '=' + encodeURIComponent('2025'); /*년*/
-//			queryParams += '&' + encodeURIComponent('solMonth') + '=' + encodeURIComponent('01'); /*월*/
-			queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /*한 페이지 출력 개수*/
-			xhr.open('GET', url + queryParams);
-			xhr.onreadystatechange = function () {
-			    if (this.readyState == 4) {
-					if (this.status == 200) {
-		                var parser = new DOMParser();
-		                var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
-		        
-		                var items = xmlDoc.getElementsByTagName("item");
-		                for (var i = 0; i < items.length; i++) {
-		                    var locdate = items[i].getElementsByTagName("locdate")[0].textContent;
-		                    var dateName = items[i].getElementsByTagName("dateName")[0].textContent;
-		        
-		                    data[locdate] = dateName;
-		                }
-		            } else {
-		                console.error('오류 발생. HTTP 상태 코드:', this.status);
-		            }
-			    }
-			};
-
-			xhr.send('');
-			
-			return data;
+			return new Promise((resolve, reject) => {
+				let data = {};
+							
+				var xhr = new XMLHttpRequest();
+				var url = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'; /*URL*/
+				var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'Kzk%2FzP8JrAlHgSZ%2B2U4glzgw0FQf3e780Ekifo2Tt7EeGVIuXj1QuokxdkZx%2Brm7wg5Dcc71116nLS6Z4O8KLg%3D%3D'; /*Service Key*/
+				queryParams += '&' + encodeURIComponent('solYear') + '=' + encodeURIComponent('2025'); /*년*/
+		//			queryParams += '&' + encodeURIComponent('solMonth') + '=' + encodeURIComponent('01'); /*월*/
+				queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /*한 페이지 출력 개수*/
+				
+				xhr.open('GET', url + queryParams);
+				
+				xhr.onreadystatechange = function () {
+					if (this.readyState == 4) {
+						if (this.status == 200) {
+							var parser = new DOMParser();
+							var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
+					
+							var items = xmlDoc.getElementsByTagName("item");
+							for (var i = 0; i < items.length; i++) {
+								var locdate = items[i].getElementsByTagName("locdate")[0].textContent;
+								var dateName = items[i].getElementsByTagName("dateName")[0].textContent;
+					
+								data[locdate] = dateName;
+								
+							}
+							
+							resolve(data);
+							
+						} else {
+							console.error('오류 발생. HTTP 상태 코드:', this.status);
+						}
+					}
+				};
+				xhr.send('');
+			});
 		}
+		
+		function sendHolidaysToController(data) {
+			console.log("sendHolidaysToController");
+			fetch('/Holiday', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			})
+			.then(response => response.text())
+			.then(result => {
+				console.log('Response from server:', result);
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		}	
 		
 		function dataTable(tableId, date, isUpdate) {
 			// 기존 테이블 삭제
