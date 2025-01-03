@@ -72,7 +72,7 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력 내역 조회
-	 @PostMapping("/getSalaryInput")
+	 @PostMapping("/salaryInput")
 	 @ResponseBody
 	 public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> map) {
 			map.put("id", "admin");
