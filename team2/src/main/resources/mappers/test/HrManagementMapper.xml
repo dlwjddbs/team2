@@ -107,28 +107,37 @@
     FROM DUAL;
     </select>
     -->
-    <select id="seletTable" resultType="map">
-    	SELECT
-    			${col1},
-    			${col2}
-    	  FROM
-    	  		${table_name}
-    </select>
-    <select id="selectDepartment" resultType="map">
-		SELECT 
-			    d1.id AS parent_id, 
-			    d1.name AS parent_name, 
-			    d2.id AS child_id, 
-			    d2.name AS child_name
+    <select id="selectOrganizationData" resultType="map">
+    	SELECT 
+				c.GROUP_ID AS GROUP_ID		
+				, d.DEPT_ID	AS ID		
+				, d.PARENT_DEPT_ID	AS PARENT
+				, c.CODE_NAME	AS NAME
 		  FROM 
-		    	department d1
-	 LEFT JOIN 
-		    	department d2 
+				DEPARTMENT d
+		  JOIN 
+				COMMON_CODE c
 			ON 
-		    	d1.id = d2.parent_department_id
-		 WHERE
-		 		d2.id IS NOT null
-	  ORDER BY 
-		    	d1.id, d2.id
+				d.DEPT_ID = c.CODE_ID
+		 WHERE 
+				c.USE_YN = 'Y' AND d.PARENT_DEPT_ID IS NOT NULL
+		UNION ALL
+		SELECT 
+				GROUP_ID 
+				, CODE_ID
+				, 'none'
+				, CODE_NAME
+		  FROM
+	  			 COMMON_CODE CC 
+		WHERE
+				GROUP_ID = 'RANK' AND USE_YN = 'Y'
+		UNION ALL
+		SELECT
+				'BANK'
+				, TO_CHAR(CODE)
+				, 'none'
+				, BANK_NAME
+		FROM
+				BANK_CODES
     </select>
 </mapper>

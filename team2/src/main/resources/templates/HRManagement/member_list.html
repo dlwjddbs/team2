@@ -36,12 +36,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>출/퇴근 기록</h1>
+							<h1>인사목록</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">DataTables</li>
+								<li class="breadcrumb-item"><a href="#">인사관리</a></li>
+								<li class="breadcrumb-item active">인사목록</li>
 							</ol>
 						</div>
 					</div>
@@ -66,6 +66,7 @@
 						생성
 					</button>
 					<nav th:replace="~{includes/modals/new :: new}"></nav>
+					<!-- new member modal -->
 				</div>
 				<div class="container-fluid">
 					<div class="row">
@@ -130,6 +131,40 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
+			
+			$(function () {
+				dateRangePicker();
+				// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
+				let date = $("#reservation").val().split(' ~ ');
+				dataTable('example1', date, false);
+			});
+			
+			$("#btnSearch").on("click", function() {
+				let date = $("#reservation").val().split(' ~ ');
+				dataTable('example1', date, true);
+			});
+			
+			function dateRangePicker() {
+				// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
+				let date = /*[[${commuteMinMaxDate}]]*/
+				$('#reservation').daterangepicker({
+					locale: {
+						"separator": " ~ ",
+						"format": 'YYYY-MM-DD',
+						"applyLabel": "선택",
+				     	"cancelLabel": "취소",
+				     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
+				     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				      	"firstDay": 1
+				    },
+					startDate: date.COMMUTE_MIN_DATE,  // 초기 설정 값
+					endDate: date.COMMUTE_MAX_DATE,  // 초기 설정 값
+					minDate: date.COMMUTE_MIN_DATE,  // 선택 제한 값
+					maxDate: date.COMMUTE_MAX_DATE  // 선택 제한 값
+				});
+				$("#reservation").attr("readonly",true); 
+			}
+			
 			// 페이지 첫 로딩 시 테이블 출력
 			$("#example1").DataTable({
 				aaSorting: [], // 초기 정렬 비활성화
@@ -309,29 +344,59 @@
 	<!-- 부서, 직급, 은행 정보 -->
 	<script>
 		$(document).ready(function () {
-		    $.ajax({
-		        url: '/getOrganizationData',
-		        method: 'POST',
-		        success: function (data) {
-					
-					console.log(data);
-					
-					function populateSelectBox(selectBoxId, dataArray, valueKey, textKey) {
-			            let selectBox = $(selectBoxId);
-			            dataArray.forEach(function (item) {
-			                let option = $('<option></option>')
-			                    .val(item[valueKey])
-			                    .text(item[textKey]);
-			                selectBox.append(option);
-			            });
-			        }
+			$.ajax({
+	            url: '/getOrganizationData',
+	            method: 'POST',
+	            success: function (data) {
+	                console.log(data);
 
-			        populateSelectBox('#bank', data.banks, 'CODE', 'BANK_NAME');
-			        populateSelectBox('#department', data.departments, 'CHILD_ID', 'CHILD_NAME');
-			        populateSelectBox('#grade', data.grades, 'ID', 'NAME');
-					
-		        }
-		    });
+	                // 데이터 가공 함수
+	                function organizeDataByGroup(dataArray) {
+	                    let groupedData = {};
+	                    dataArray.forEach(item => {
+	                        if (!groupedData[item.GROUP_ID]) {
+	                            groupedData[item.GROUP_ID] = [];
+	                        }
+	                        groupedData[item.GROUP_ID].push(item);
+	                    });
+	                    return groupedData;
+	                }
+
+	                // Select 박스 데이터 추가 함수
+	                function populateSelectBox(selectBoxId, dataArray, placeholder) {
+	                    let selectBox = $(selectBoxId);
+	                    selectBox.empty(); // 기존 데이터 제거
+	                    selectBox.append(`<option selected disabled>${placeholder}</option>`);
+	                    dataArray.forEach(item => {
+	                        let option = $('<option></option>')
+	                            .val(item.ID)
+	                            .text(item.NAME + (item.NAME ? ` (code: ${item.ID})` : ''));
+	                        selectBox.append(option);
+	                    });
+	                }
+
+	                // 데이터 가공
+	                let groupedData = organizeDataByGroup(data);
+
+	                // 부서 데이터
+	                if (groupedData["DEP"]) {
+	                    populateSelectBox("#department", groupedData["DEP"], "부서선택");
+	                }
+
+	                // 직급 데이터
+	                if (groupedData["RANK"]) {
+	                    populateSelectBox("#grade", groupedData["RANK"], "직급선택");
+	                }
+
+	                // 은행 데이터
+	                if (groupedData["BANK"]) {
+	                    populateSelectBox("#bank", groupedData["BANK"], "은행");
+	                }
+	            },
+	            error: function (xhr, status, error) {
+	                console.error("Error fetching data:", error);
+	            }
+	        });
 		});
 	</script>
 	<!-- /. 부서, 직급, 은행 정보 -->	

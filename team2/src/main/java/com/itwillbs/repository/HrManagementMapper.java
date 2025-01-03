@@ -13,7 +13,7 @@ public interface HrManagementMapper {
 	List<Map<String, Object>> selectMemberList();
 	
 	// 은행, 부서, 직급
-	// List<Map<String, Object>> selectOrganizationData();
+	List<Map<String, Object>> selectOrganizationData();
 	
 	// 테이블 조회
 	List<Map<String, Object>> seletTable(@Param("table_name") String table_name, @Param("col1") String col1, @Param("col2") String col2);
