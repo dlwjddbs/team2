@@ -214,6 +214,14 @@ public class AttendanceController {
 		return message;
 	}
 	
+	@PostMapping("/selectBox")
+	@ResponseBody
+	public List<Map<String, Object>> selectBox(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> selectBoxList = attendanceService.getSelectBoxList(map);
+		
+		return selectBoxList;
+	}
+	
 }
 
 
