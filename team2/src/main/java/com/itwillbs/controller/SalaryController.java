@@ -1,7 +1,9 @@
 package com.itwillbs.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class SalaryController {
 	// MyBatis흐름
 	// Controller -> Service -> Mapper.java -> Mapper.xml
 	
-	// 급여조회
+	// 사원별 급여조회
 	@GetMapping("/salaryHistory")
 	public String salaryhistory(Map<String, Object> map, Model model) {
 		log.info("============= salaryhistory =============");
@@ -35,8 +37,8 @@ public class SalaryController {
 		List<Map<String, Object>> salaryHistory = salaryService.getSalaryList();
 		model.addAttribute("salaryHistory", salaryHistory);
 		
-		Map<String, Object> salaryHistoryMinMaxDate = salaryService.getSalaryHistoryMinMaxDate();
-		model.addAttribute("salaryHistoryMinMaxDate", salaryHistoryMinMaxDate);
+//		Map<String, Object> salaryMinMaxDate = salaryService.getSalaryMinMaxDate();
+//		model.addAttribute("salaryMinMaxDate", salaryMinMaxDate);
 		
 		return "/salary/salaryHistory";
 	}
@@ -51,35 +53,53 @@ public class SalaryController {
 		return allSalaryHistory;
 	}
 	
-	// 급여입력(관리자)
+	// 관리자 급여입력 내역 조회
 	@GetMapping("/salaryInput")
-	public String salaryInput() {
+	public String salaryInput(Map<String, Object> map, Model model) {
+		log.info("============= salaryInput =============");
+		
+		String id = "admin";
+		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryInputMinMaxDate(id);
+		
+		if (salaryInputMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			salaryInputMinMaxDate = new HashMap<>();
+			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
+			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
+		
 		return "/salary/salaryInput";
 	}
 	
-	// @PostMapping("/salaryInput")
+	// 관리자 급여입력 내역 조회
+	@PostMapping("/salaryInput")
+	@ResponseBody
+	public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> map) {
+		log.info("============= salaryInput POST =============");
+		
+		map.put("id", "admin");
+		List<Map<String, Object>> salaryInput = salaryService.salaryInputList(map);
+		
+		return salaryInput;
+	}
 	
+	// 급여입력(관리자)
 	@PostMapping("/writeSalary")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		log.info("============= writeSalary =============");
 		
-//		String email = param.get("email_id").toString() + "@" + param.get("email_domain").toString();
-		
+//		<< CREATE_DATE 추가 >>
 		LocalDateTime now = LocalDateTime.now();
 		String CREATE_DATE = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		
-		// ======================================================================================================
-		
-//		param.put("email", email);
 		param.put("CREATE_DATE", CREATE_DATE);
 		
 		System.out.println(param.toString());
+		
 		int insertCount = salaryService.writeSalary(param);
 		System.out.println(insertCount);
-//		if(insertCount > 0) {
-//			salaryService.addHistory(param, "GRADE_HISTORY");
-//			salaryService.addHistory(param, "DEPARTMENT_HISTORY");
-//		}
 		
 		return "redirect:/salaryInput";
 	}	
@@ -97,31 +117,47 @@ public class SalaryController {
 		return salaryList;
 	}
 	
-	// 수정 버튼을 클릭시 해당 멤버의 정보를 가져옴 (Test)
-	// 급여 정보를 가져오는걸로 수정 예정
+	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴 (Test)
     @PostMapping("/getModalContent")
-    public String getModalContent(@RequestParam("id") String id, Model model) {
+    @ResponseBody
+    public Map<String, Object> getModalContent(@RequestParam("id") String id) {
     	log.info("============= getModalContent POST start =============");
     	
     	log.info(id);
     	
         // ID에 해당하는 데이터를 가져와서 model에 추가
-//    	Map<String, Object> salaryData = salaryService.findSalaryById(id); // DB에서 ID에 맞는 정보를 가져옴
-//    	
-//    	log.info("Salary Data : " + salaryData.toString());
-//    	
-//    	model.addAttribute("salaryData", salaryData);
+    	Map<String, Object> salaryData = salaryService.findSalaryById(id); // DB에서 ID에 맞는 정보를 가져옴
+    	
+    	log.info("Salary Data : " + salaryData.toString());
     	
     	log.info("============= getModalContent POST end =============");
     	
-    	// "includes/modals/edit" 반환
-        return "includes/modals/edit :: edit";         
+    	return salaryData;
     }
     
     // 급여 정보 (Test)
 	@GetMapping("/salaryInfo")
 	public String salaryInfo(Map<String, Object> map, Model model) {
 		log.info("============= salaryInfo =============");
+		
+		String id = "admin";
+		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryInputMinMaxDate(id);
+		
+		if (salaryInputMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			salaryInputMinMaxDate = new HashMap<>();
+			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
+			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
+		
+//		List<Map<String, Object>> salaryHistory = salaryService.getSalaryList();
+//		model.addAttribute("salaryHistory", salaryHistory);
+//		
+//		Map<String, Object> salaryHistoryMinMaxDate = salaryService.getSalaryHistoryMinMaxDate();
+//		model.addAttribute("salaryHistoryMinMaxDate", salaryHistoryMinMaxDate);
 		
 		return "/salary/salaryInfo";
 	}

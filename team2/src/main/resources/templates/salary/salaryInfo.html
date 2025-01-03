@@ -36,7 +36,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>급여정보관리(Test) - 출/퇴근 기록</h1>
+							<h1>급여정보관리(Test)</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -50,22 +50,26 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				<div class="col-2">
-					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-prepend">
-								<span class="input-group-text">
-									<i class="far fa-calendar-alt"></i>
-								</span>
+			
+				<nav th:replace="~{includes/modals/editSalary :: editSalary}"></nav>
+				
+				<!-- 검색 필터 -->
+				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+					<div class="d-flex">
+						<div class="d-flex ml-4">
+							<!-- Date range -->
+							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text">
+										<i class="far fa-calendar-alt"></i>
+									</span>
+								</div>
+								<input type="text" class="form-control float-right" id="reservation">
 							</div>
-							<input type="text" class="form-control float-right" id="reservation">
 						</div>
 					</div>
-					<!-- new member modal -->
-					<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
-						생성
-					</button>
-					<nav th:replace="~{includes/modals/edit :: edit}"></nav>
+					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				<div class="container-fluid">
 					<div class="row">
@@ -147,7 +151,7 @@
 		            }
 				},
 				ajax : {
-					url : "/getMemberList",
+					url : "/getSalaryHistory",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (res) {
@@ -157,13 +161,20 @@
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data : "ID", title : "사원번호", "defaultContent": "" },
-					{data : "NAME", title : "이름", "defaultContent": "" },
-					{data : "GRADE", title : "직급", "defaultContent": "" },
-					{data : "DEPARTMENT", title : "부서", "defaultContent": "" },
-					{data : "PHONE", title : "전화번호", "defaultContent": "" },
-					{data : "JOIN_DATE", title : "입사일", "defaultContent": "" },
-					{data : "ID", "defaultContent": "", title : '수정',
+					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
+					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "" },
+					{data: "NAME", title: "사원명", "defaultContent": "" },
+					{data: "GRADE_ID", title: "직급", "defaultContent": "" },
+					{data: "DEPR_ID", title: "부서", "defaultContent": "" },
+					{data: "SALARY", title: "기본급", "defaultContent": "" },
+					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
+					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
+					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
+					{data: "YEAREND_BONUS", title: "연말결려수당", "defaultContent": "" },
+					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
+					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
+					{data: "TOTAL", title: "실지금액", "defaultContent": "" },
+					{data : "MEMBER_ID", "defaultContent": "", title : '급여수정',
 							render: function(data){
 								return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
   							}
@@ -191,17 +202,22 @@
 			    url: "/getModalContent",  
 			    type: "POST",
 			    data: { id: id },
-			    success: function(memberData) {
+			    success: function(salaryData) {
 			    	
 			  		console.log(id);
-			  		console.log(memberData);
+			  		console.log(salaryData);
 			  		
 			        // 받은 데이터를 각 입력 필드에 설정
-			        $('#name').val(memberData.NAME);  // 예시: 이름
-			        $('#phone').val(memberData.PHONE);  // 예시: 전화번호
-			        $('#grades').val(memberData.GRADE);  // 예시: 직급
-			        $('#department').val(memberData.DEPARTMENT);  // 예시: 부서
-			        $('#datemask').val(memberData.JOIN_DATE);  // 예시: 입사일
+					$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
+					$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
+					$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
+					$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
+					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
+					$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
+					$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
+					$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
+					$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
+					$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
 			  		
 			  		// 서버에서 받아온 HTML을 Modal 본문에 삽입
 			    	//$('#modalBody').html(response); 
@@ -217,7 +233,7 @@
 			}
 			  
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
-			let date = /*[[${commuteMinMaxDate}]]*/
+			let date = /*[[${salaryHistoryMinMaxDate}]]*/
 			$('#reservation').daterangepicker({
 				locale: {
 					"separator": " ~ ",
@@ -228,10 +244,10 @@
 			     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
 			      	"firstDay": 1
 			    },
-				startDate: date.COMMUTE_MIN_DATE,  // 초기 설정 값
-				endDate: date.COMMUTE_MAX_DATE,  // 초기 설정 값
-				minDate: date.COMMUTE_MIN_DATE,  // 선택 제한 값
-				maxDate: date.COMMUTE_MAX_DATE  // 선택 제한 값
+				startDate: date.SALARY_MIN_DATE,  // 초기 설정 값
+				endDate: date.SALARY_MAX_DATE,  // 초기 설정 값
+				minDate: date.SALARY_MIN_DATE,  // 선택 제한 값
+				maxDate: date.SALARY_MAX_DATE  // 선택 제한 값
 			});
 			$("#reservation").attr("readonly",true); 
 			
@@ -257,7 +273,7 @@
 			            }
 					},
 					ajax : {
-						url : "/getMemberList",
+						url : "/getSalaryHistory",
 						type:"POST",
 						data : {
 							startDate : date[0],					
@@ -268,20 +284,26 @@
 			            }
 					},
 					columns : [
-					// DB컬럼명 일치하게 작성
-						{data : "ID", title : "사원번호", "defaultContent": "" },
-						{data : "NAME", title : "이름", "defaultContent": "" },
-						{data : "GRADE", title : "직급", "defaultContent": "" },
-						{data : "DEPARTMENT", title : "부서", "defaultContent": "" },
-						{data : "PHONE", title : "전화번호", "defaultContent": "" },
-						{data : "JOIN_DATE", title : "입사일", "defaultContent": "" },
-						{data : "", "defaultContent": "", title : '수정',
+						// DB컬럼명 일치하게 작성
+						{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
+						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "" },
+						{data: "NAME", title: "사원명", "defaultContent": "" },
+						{data: "GRADE_ID", title: "직급", "defaultContent": "" },
+						{data: "DEPR_ID", title: "부서", "defaultContent": "" },
+						{data: "SALARY", title: "기본급", "defaultContent": "" },
+						{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
+						{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
+						{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
+						{data: "YEAREND_BONUS", title: "연말결려수당", "defaultContent": "" },
+						{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
+						{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
+						{data: "TOTAL", title: "실지금액", "defaultContent": "" },
+						{data : "MEMBER_ID", "defaultContent": "", title : '급여수정',
 								render: function(data){
-									return "<button id='bt' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
+									return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
 	  							}
 						}
-						
-					],
+				  	],
 					responsive : true, 
 					lengthChange : false, 
 					autoWidth : false,
@@ -292,86 +314,7 @@
 			});
 		});
 		
-		
 	</script>
-	<!-- Daum 우편번호 서비스 -->
-	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-	<script>
-	    function exercDaumPostcode() {
-	        new daum.Postcode({
-	            oncomplete: function(data) {
-	                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-
-	                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-	                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-	                var addr = ''; // 주소 변수
-	                var extraAddr = ''; // 참고항목 변수
-
-	                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-	                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-	                    addr = data.roadAddress;
-	                } else { // 사용자가 지번 주소를 선택했을 경우(J)
-	                    addr = data.jibunAddress;
-	                }
-
-	                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-	                if(data.userSelectedType === 'R'){
-	                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-	                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-	                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-	                        extraAddr += data.bname;
-	                    }
-	                    // 건물명이 있고, 공동주택일 경우 추가한다.
-	                    if(data.buildingName !== '' && data.apartment === 'Y'){
-	                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-	                    }
-	                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-	                    if(extraAddr !== ''){
-	                        extraAddr = ' (' + extraAddr + ')';
-	                    }
-	                
-	                } else {
-	                    extraAddr = '';
-	                }
-
-	                // 우편번호와 주소 정보를 해당 필드에 넣는다.
-	                document.getElementById('postcode').value = data.zonecode;
-	                document.getElementById("address").value = addr + extraAddr;
-	                // 커서를 상세주소 필드로 이동한다.
-	                document.getElementById("detail_address").focus();
-	            }
-	        }).open();
-	    }
-	</script>
-	<!-- /. Daum 우편번호 서비스 -->
-	<!-- 선택된 사원의 정보들 -->
-	<script>
-		$(document).ready(function () {
-		    $.ajax({
-		        url: '/getOrganizationData',
-		        method: 'POST',
-		        success: function (data) {
-					
-					console.log(data);
-					
-					function populateSelectBox(selectBoxId, dataArray, valueKey, textKey) {
-			            let selectBox = $(selectBoxId);
-			            dataArray.forEach(function (item) {
-			                let option = $('<option></option>')
-			                    .val(item[valueKey])
-			                    .text(item[textKey]);
-			                selectBox.append(option);
-			            });
-			        }
-
-			        populateSelectBox('#bank', data.banks, 'CODE', 'BANK_NAME');
-			        populateSelectBox('#department', data.departments, 'CHILD_ID', 'CHILD_NAME');
-			        populateSelectBox('#grade', data.grades, 'ID', 'NAME');
-					
-		        }
-		    });
-		});
-	</script>
-	<!-- /. 부서, 직급, 은행 정보 -->	
+	<!-- 선택된 사원의 급여 정보들 -->
 </body>
 </html>
