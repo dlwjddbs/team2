@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.itwillbs.entity.Member;
 
-public interface MemberRepository extends JpaRepository<Member, Integer>{
+public interface MemberRepository extends JpaRepository<Member, String>{
 
-	Member findByIdAndPasswd(Integer id, String Passwd);
+	Member findByIdAndPasswd(String id, String Passwd);
 }

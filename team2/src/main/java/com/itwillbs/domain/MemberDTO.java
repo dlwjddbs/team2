@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString 
 public class MemberDTO {
 
-	private Integer id;
+	private String id;
 	private String name;
 	private String residentRegistNum;
 	private String addressNum;

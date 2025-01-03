@@ -24,7 +24,7 @@ public class Member {
 	
 	@Id
 	@Column(name = "member_id", length = 10, nullable = false, updatable = false)
-	private Integer id;
+	private String id;
 	
 	@Column(name = "name", length = 100)
 	private String name;

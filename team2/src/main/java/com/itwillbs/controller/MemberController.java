@@ -40,7 +40,7 @@ public class MemberController {
 
     @GetMapping("/mypage")
     public String info(HttpSession session, Model model) {
-        Integer id = (Integer) session.getAttribute("id");
+    	String id = (String) session.getAttribute("id");
 
         if (id == null) {
             return "redirect:/login"; 
@@ -75,7 +75,7 @@ public class MemberController {
     public String updateMemberInfo(HttpSession session,
                                    @ModelAttribute MemberDTO memberDTO) {
         try {
-            Integer id = (Integer) session.getAttribute("id"); 
+            String id = (String) session.getAttribute("id"); 
             memberDTO.setId(id);
 
             // 프로필 이미지 처리
@@ -117,7 +117,7 @@ public class MemberController {
                                                  HttpSession session,
                                                  RedirectAttributes redirectAttributes) {
         try {
-            Integer id = (Integer) session.getAttribute("id");
+            String id = (String) session.getAttribute("id");
             if (id == null) {
                 redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
                 return "redirect:/login";

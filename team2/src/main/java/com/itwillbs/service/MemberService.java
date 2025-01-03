@@ -20,7 +20,7 @@ public class MemberService {
     @Autowired
     private final MemberRepository memberRepository;
     
-    public Optional<Member> findById(Integer id) {
+    public Optional<Member> findById(String id) {
     	return memberRepository.findById(id);
     }
     
@@ -53,7 +53,7 @@ public class MemberService {
     }    
 
     @Transactional
-    public void updateEducation(Integer memberId, String certificate, String education) {
+    public void updateEducation(String memberId, String certificate, String education) {
     	Member member = memberRepository.findById(memberId)
     			.orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다. ID: " + memberId));
     	
