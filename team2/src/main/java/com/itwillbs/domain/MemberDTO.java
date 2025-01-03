@@ -22,8 +22,8 @@ public class MemberDTO {
 	private String email;
 	private String profilePic;
 	private MultipartFile profilePicFile;  
-	private Timestamp joinDate;
-	private Timestamp resignDate;
+	private String joinDate;
+	private String resignDate;
 	private String passwd;	
 	private String useYn;
 	private Timestamp createDate;
