@@ -206,6 +206,14 @@ public class AttendanceController {
 		return "";
 	}
 	
+	@PostMapping("/addAttendanceTime")
+	@ResponseBody
+	public Map<String, Object> addAttendanceTime(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = attendanceService.addAttendanceTime(map);
+		
+		return message;
+	}
+	
 }
 
 

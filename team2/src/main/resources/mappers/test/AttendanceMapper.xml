@@ -226,4 +226,26 @@
 		DELETE FROM COMMUTE_TIME
  		 WHERE COM_TIME_ID = #{id}
 	</delete>
+	
+	<select id="isDuplicateAttendanceTime" resultType="Integer">
+	<!-- isDuplicateAttendanceTime 출퇴근 시간 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMUTE_TIME
+		 WHERE 
+			   MEMBER_ID = #{MEMBER_ID} 
+		   AND STARTING_DATE = #{STARTING_DATE}
+	</select>
+   
+	<insert id="insertAttendanceTime">
+   	<!-- insertAttendanceTime 출퇴근 기준 시간 등록 -->
+	   	INSERT INTO COMMUTE_TIME
+		VALUES(
+			  (SELECT 'CT' || LPAD(NVL(MAX(SUBSTR(COM_TIME_ID, 3)), 0) + 1, 10, 0) FROM COMMUTE_TIME)
+			, #{CHECK_IN_TIME}
+			, #{CHECK_OUT_TIME}
+			, #{MEMBER_ID}
+			, SYSDATE
+			, #{STARTING_DATE}
+		)
+	</insert>
 </mapper>

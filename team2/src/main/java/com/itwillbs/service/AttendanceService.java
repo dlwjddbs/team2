@@ -44,15 +44,41 @@ public class AttendanceService {
 		Map<String, Object> message = new HashMap<>();
 		
 		Boolean is_deletable = attendanceMapper.isDeletableAttendanceTime(map);
+		
+		String result = "오늘 이하의 적용시작일은 삭제할 수 없습니다.";
+		String resultCode = "0";
+		
 		if (is_deletable) {
 			attendanceMapper.deleteAttendanceTime(map);
-			message.put("result", "삭제 되었습니다.");
-			message.put("resultCode", "1");
-			
-			return message;
+			result = "삭제 되었습니다.";
+			resultCode = "1";
 		}
-		message.put("result", "오늘 이하의 적용시작일은 삭제할 수 없습니다.");
-		message.put("resultCode", "0");
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> addAttendanceTime(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "이미 등록된 날짜입니다.";
+		String resultCode = "0";
+		
+		int duplicateCnt = attendanceMapper.isDuplicateAttendanceTime(map);
+		if (duplicateCnt == 0) {
+			int resultCnt = attendanceMapper.insertAttendanceTime(map);
+			if (resultCnt > 0) {
+				result = "등록 되었습니다.";
+				resultCode = "1";
+			} else {
+				result = "등록 실패.";
+			}
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
 		
 		return message;
 	}

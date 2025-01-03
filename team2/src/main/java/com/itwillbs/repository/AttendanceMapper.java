@@ -23,5 +23,9 @@ public interface AttendanceMapper {
 	void deleteAttendanceTime(Map<String, Object> map);
 
 	Boolean isDeletableAttendanceTime(Map<String, Object> map);
+
+	int isDuplicateAttendanceTime(Map<String, Object> map);
+
+	int insertAttendanceTime(Map<String, Object> map);
 	
 }
