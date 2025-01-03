@@ -1,0 +1,111 @@
+<!--
+	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
+		수정
+	</button>
+-->
+
+<!-- 모달창 -->
+<div class="modal fade" id="modal-lg" th:fragment="editSalary">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">급여정보수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- form -->
+			<form th:action="@{/editSalary}" method="post" id="editSalaryForm">
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+					
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+					              <label>귀속 연월</label>
+					                <div class="input-group date" id="reservationdate" data-target-input="nearest">
+					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+					                    <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+					                    </div>
+					                </div>
+					            </div>
+				            </div>
+						 </div>
+						<div class="row">
+							<div class="col-md-1">
+								<div class="icheck-primary d-inline">
+		                        	<input type="checkbox" id="checkboxPrimary1" checked>
+		                       			<label for="checkboxPrimary1"></label>
+		                    	</div>
+							</div>
+							<div class="col-md-3">
+				                <div class="form-group">
+				                  <label>급여 항목</label>
+				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                </div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-group">
+				                  <label>금액</label>
+									<input type="text" id="salary" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="positionBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="holidayBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="nightBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="yearendBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="performanceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+				                </div>
+							</div>
+						</div>
+							<div class="col-md-12">
+								<div class="form-group">
+					              <label>지급일</label>
+					                <div class="input-group date" id="reservationdate2" data-target-input="nearest">
+					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate2"/>
+					                    <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">
+					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+					                    </div>
+					                </div>
+					            </div>
+							</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+					              <label>지급 연월</label>
+					                <div class="input-group date" id="reservationdate3" data-target-input="nearest">
+					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate3"/>
+					                    <div class="input-group-append" data-target="#reservationdate3" data-toggle="datetimepicker">
+					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+					                    </div>
+					                </div>
+					            </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</form>
+			<!-- /.form -->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
