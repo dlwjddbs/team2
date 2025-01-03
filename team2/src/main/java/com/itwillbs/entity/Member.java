@@ -23,14 +23,13 @@ import lombok.ToString;
 public class Member {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", length = 8, nullable = false, updatable = false)
+	@Column(name = "member_id", length = 10, nullable = false, updatable = false)
 	private Integer id;
 	
-	@Column(name = "name", length = 100, nullable = false)
+	@Column(name = "name", length = 100)
 	private String name;
 	
-	@Column(name = "resident_regist_num", length = 20, nullable = false)
+	@Column(name = "resident_regist_num", length = 20)
 	private String residentRegistNum;
 	
 	@Column(name = "address_num", length = 10)
@@ -48,26 +47,50 @@ public class Member {
 	@Column(name = "profile_pic", length = 200)
 	private String profilePic;
 	
-	@Column(name = "join_date", nullable = false, updatable = false)
+	@Column(name = "join_date")
 	private Timestamp joinDate;	
 	
 	@Column(name = "resign_date")
 	private Timestamp resignDate;		
 	
-	@Column(name = "passwd", length = 30, nullable = false)
+	@Column(name = "passwd", length = 30)
 	private String passwd;	
 	
 	@Column(name = "use_yn", length = 1)
 	private String useYn;
 	
-	@Column(name = "create_date", nullable = false, updatable = false)
+	@Column(name = "create_date")
 	private Timestamp createDate;	
+	
+	@Column(name = "update_date")
+	private Timestamp updateDate;	
+	
+	@Column(name = "salary")
+	private Integer salary;
+	
+	@Column(name = "bank_code")
+	private Integer bankCode;
+	
+	@Column(name = "account", length = 20)
+	private String account;
+	
+	@Column(name = "account_holder", length = 20)
+	private String accountHolder;
 	
 	@Column(name = "certificate", length = 300)
 	private String certificate;
 	
 	@Column(name = "education", length = 300)
 	private String education;
+	
+	@Column(name = "dept_id", length = 20)
+	private String deptId;
+	
+	@Column(name = "grade_id", length = 20)
+	private String gradeId;
+	
+	@Column(name = "authority", length = 20)
+	private String authority;
 	
 //	@Column(name = "update_date")
 //	private Timestamp updateDate;

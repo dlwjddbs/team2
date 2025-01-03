@@ -7,7 +7,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.entity.Member;
+import com.itwillbs.service.AppointmentsService;
 import com.itwillbs.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
@@ -34,6 +37,7 @@ import lombok.extern.java.Log;
 public class MemberController {
 
     private final MemberService memberService;
+    private final AppointmentsService appointmentsService;
     
     @Value("${file.upload-dir}")
     private String uploadDir;  // 이미지 저장 경로
@@ -134,10 +138,27 @@ public class MemberController {
             return "redirect:/mypage";
         }
     }
+	    
+    @GetMapping("/appointList")
+    public String appointListPage() {
+        return "/HRManagement/personnelAppointments"; 
+    }
 
-	@GetMapping("/personnelAppointments")
-	public String personnelAppointments() {
-		return "/HRManagement/personnelAppointments";
-	}
 
+    @GetMapping("/getMinMaxDate")
+    public Map<String, String> getMinMaxDate() {
+        return appointmentsService.getMinMaxDate();
+    }
+	
+    @PostMapping("/getAppointList")
+    public List<Map<String, Object>> getAppointList(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String appointGubun) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        params.put("appointGubun", appointGubun);
+        return appointmentsService.getAppointList(params);
+    }
 }

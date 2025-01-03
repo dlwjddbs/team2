@@ -27,7 +27,14 @@ public class MemberDTO {
 	private String passwd;	
 	private String useYn;
 	private Timestamp createDate;
-//	private Timestamp updateDate;
+	private Timestamp updateDate;
+	private Integer salary;
+	private Integer bankCode;
+	private String acount;
+	private String acountHolder;
 	private String certificate;
 	private String education;
+	private String deptId;
+	private String gradeId;
+	private String authority;
 }
