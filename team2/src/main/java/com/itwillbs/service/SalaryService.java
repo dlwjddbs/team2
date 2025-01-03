@@ -18,15 +18,12 @@ public class SalaryService {
 		return salaryMapper.selectSalaryList();
 	}
 
-	public Map<String, Object> getSalaryHistoryMinMaxDate() {
-		return salaryMapper.getSalaryHistoryMinMaxDate();
-	}
-
 	public List<Map<String, Object>> getSalaryHistory(Map<String, Object> map) {
 		return salaryMapper.getSalaryHistory(map);
 	}
 
 	public int writeSalary(Map<String, Object> param) {
+		System.out.println("service param : " + param);
 		return salaryMapper.insertSalary(param);
 	}
 
@@ -38,6 +35,16 @@ public class SalaryService {
 	public Map<String, Object> findSalaryById(String id) {
 		return salaryMapper.selectSalaryListById(id);
 	}
+	
+	// 입력된 급여 조회(관리자)
+	public List<Map<String, Object>> salaryInputList(Map<String, Object> map) {
+		return salaryMapper.selectSalaryInputList(map);
+	}
+
+	public Map<String, Object> getSalaryInputMinMaxDate(String id) {
+		return salaryMapper.getSalaryInputMinMaxDate(id);
+	}
+
 
 
 }

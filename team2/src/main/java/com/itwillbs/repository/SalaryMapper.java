@@ -20,4 +20,9 @@ public interface SalaryMapper {
 	
 	// 급여 정보로 수정 예정 (mapper 추가 필요)
 	Map<String, Object> selectSalaryListById(String id);
+
+	List<Map<String, Object>> selectSalaryInputList(Map<String, Object> map);
+
+	Map<String, Object> getSalaryInputMinMaxDate(String id);
+
 }
