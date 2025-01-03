@@ -29,37 +29,16 @@ public class SalaryController {
 	// MyBatis흐름
 	// Controller -> Service -> Mapper.java -> Mapper.xml
 	
-	// 사원별 급여조회
-	@GetMapping("/salaryHistory")
-	public String salaryhistory(Map<String, Object> map, Model model) {
-		log.info("============= salaryhistory =============");
-		
-		List<Map<String, Object>> salaryHistory = salaryService.getSalaryList();
-		model.addAttribute("salaryHistory", salaryHistory);
-		
-//		Map<String, Object> salaryMinMaxDate = salaryService.getSalaryMinMaxDate();
-//		model.addAttribute("salaryMinMaxDate", salaryMinMaxDate);
-		
-		return "/salary/salaryHistory";
-	}
-	
-	@PostMapping("/getSalaryHistory")
-	@ResponseBody
-	public List<Map<String, Object>> getSalaryHistory(@RequestParam Map<String, Object> map) {
-		log.info("============= getSalaryHistory =============");
-		
-		List<Map<String, Object>> allSalaryHistory = salaryService.getSalaryHistory(map); 
-		
-		return allSalaryHistory;
-	}
+	// 사원별 급여조회 - 추가 예정
 	
 	// 관리자 급여입력 내역 조회
+	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
 	@GetMapping("/salaryInput")
 	public String salaryInput(Map<String, Object> map, Model model) {
 		log.info("============= salaryInput =============");
 		
 		String id = "admin";
-		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryInputMinMaxDate(id);
+		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
 		
 		if (salaryInputMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
@@ -74,19 +53,20 @@ public class SalaryController {
 		return "/salary/salaryInput";
 	}
 	
-	// 관리자 급여입력 내역 조회
+	// 관리자 급여입력 내역 조회 (POST)
+	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
 	@PostMapping("/salaryInput")
 	@ResponseBody
 	public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> map) {
 		log.info("============= salaryInput POST =============");
 		
 		map.put("id", "admin");
-		List<Map<String, Object>> salaryInput = salaryService.salaryInputList(map);
+		List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
 		
-		return salaryInput;
+		return salaryInputData;
 	}
 	
-	// 급여입력(관리자)
+	// 관리자 급여입력
 	@PostMapping("/writeSalary")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		log.info("============= writeSalary =============");
@@ -104,17 +84,25 @@ public class SalaryController {
 		return "redirect:/salaryInput";
 	}	
 	
-	// 급여 입력 정보
-	// 맴버 정보
-	@PostMapping("/memberSalaryList")
-	@ResponseBody
-	public List<Map<String, Object>> memberSalaryList(@RequestParam Map<String, Object> map) {
-		log.info("============= memberSalaryList =============");
+    // 급여 정보 (Test)
+	@GetMapping("/salaryInfo")
+	public String salaryInfo(Map<String, Object> map, Model model) {
+		log.info("============= salaryInfo =============");
 		
-		List<Map<String, Object>> salaryList = salaryService.memberSalaryList();
-		log.info(salaryList.toString());
+		String id = "admin";
+		Map<String, Object> salaryInfoMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
 		
-		return salaryList;
+		if (salaryInfoMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			salaryInfoMinMaxDate = new HashMap<>();
+			salaryInfoMinMaxDate.put("SALARY_MIN_DATE", now);
+			salaryInfoMinMaxDate.put("SALARY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("salaryInfoMinMaxDate", salaryInfoMinMaxDate);
+		
+		return "/salary/salaryInfo";
 	}
 	
 	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴 (Test)
@@ -134,33 +122,5 @@ public class SalaryController {
     	
     	return salaryData;
     }
-    
-    // 급여 정보 (Test)
-	@GetMapping("/salaryInfo")
-	public String salaryInfo(Map<String, Object> map, Model model) {
-		log.info("============= salaryInfo =============");
-		
-		String id = "admin";
-		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryInputMinMaxDate(id);
-		
-		if (salaryInputMinMaxDate == null) {
-			LocalDate now = LocalDate.now();
-			
-			salaryInputMinMaxDate = new HashMap<>();
-			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
-			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
-		}
-		
-		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
-		
-//		List<Map<String, Object>> salaryHistory = salaryService.getSalaryList();
-//		model.addAttribute("salaryHistory", salaryHistory);
-//		
-//		Map<String, Object> salaryHistoryMinMaxDate = salaryService.getSalaryHistoryMinMaxDate();
-//		model.addAttribute("salaryHistoryMinMaxDate", salaryHistoryMinMaxDate);
-		
-		return "/salary/salaryInfo";
-	}
-	
 	
 }

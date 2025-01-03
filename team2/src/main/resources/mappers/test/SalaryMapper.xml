@@ -5,53 +5,68 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.SalaryMapper">
-<!--    <select id="selectTest" resultType="string">-->
-<!--        SELECT -->
-<!--        	  TO_CHAR(SYSDATE, 'yyyy-mm-dd')-->
-<!--  		  FROM -->
-<!--  			  dual-->
-<!--    </select>-->
 
     <select id="selectSalaryList" resultType="map">
-        select 
-        	  * 
-          from 
-        	  salary
+    <!-- selectSalaryList - 급여기록 조회 -->
+    <!-- getSalaryListMinMaxDate에서 조회된 최대최소일 범위의 급여기록 조회 -->
+		SELECT
+			  MEMBER_ID
+			, GRADE_ID
+			, PAYDAY
+			, POSITION_BONUS
+			, HOLIDAY_BONUS
+		FROM
+			SALARY
+		WHERE
+			1 = 1
+			<if test='id != "admin"'>
+			   AND
+				  member_id = #{id}
+		  	</if>
+			<if test='startDate != null and startDate != "" 
+						and endDate != null and endDate != ""'>
+				AND 
+					PAYDAY BETWEEN #{startDate} 
+					AND #{endDate} 
+			</if>
+		ORDER BY
+			PAYDAY DESC
     </select>
     
-    <!-- getSalaryHistoryMinMaxDate 지급받은 급여 목록에서 최대최소일 조회 -->
-<!--    <select id="getSalaryHistoryMinMaxDate" resultType="map">-->
-<!--	    SELECT -->
-<!--		      MAX(TO_CHAR(PAYDAY, 'YYYY-MM-DD')) AS salary_max_date-->
-<!--		    , MIN(TO_CHAR(PAYDAY, 'YYYY-MM-DD')) AS salary_min_date-->
-<!--	  FROM-->
-<!--	      salary-->
-<!--	 WHERE-->
-<!--	 	  1 = 1-->
-<!--    </select>-->
+    <select id="getSalaryListMinMaxDate" resultType="map">
+     <!-- getSalaryInputMinMaxDate - 급여조회에서 최대최소일 조회 -->
+        SELECT 
+		      MAX(PAYDAY)	AS SALARY_MAX_DATE
+    		, MIN(PAYDAY) 	AS SALARY_MIN_DATE
+		FROM
+		      SALARY
+	    WHERE
+			  1 = 1
+		  <if test='id != "admin"'>
+			  AND
+				 member_id = #{id}
+		  </if>
+    </select>
     
-    <!-- id에 해당하는 급여정보를 조회 (미구현) -->
     <select id="selectSalaryListById" resultType="map">
-<!-- 		SELECT
-			TO_CHAR(m.JOIN_DATE, 'YYYY-MM-DD') AS JOIN_DATE,
-			m.ID,
-			m.NAME,
-			m.PHONE,
-			m.EMAIL,
-			
-			(SELECT d.NAME 
-				FROM DEPARTMENT d 
-				WHERE d.ID = dh.DEPARTMENT_ID) AS DEPARTMENT,
-				
-			(SELECT g.NAME 
-				FROM GRADE g 
-				WHERE g.ID = gh.GRADE_ID) AS GRADE
-				
-		FROM MEMBER m 
-			LEFT JOIN DEPARTMENT_HISTORY dh ON m.ID = dh.MEMBER_ID
-	 		LEFT JOIN GRADE_HISTORY gh ON m.ID = gh.MEMBER_ID
-	 	
-	 	WHERE m.ID = #{id} -->
+    <!-- 사원ID에 해당하는 급여정보를 조회 -->
+		SELECT 
+		      MEMBER_ID
+		    , GRADE_ID 
+		    , PAYDAY
+		    , POSITION_BONUS
+		    , HOLIDAY_BONUS
+		    , NIGHT_BONUS
+		    , YEAREND_BONUS
+		    , FULLSERVICE_BONUS
+		    , PERFORMANCE_BONUS
+		    , TOTAL
+		FROM 
+			SALARY
+		WHERE 
+			MEMBER_ID = #{id}
+		
+		<!-- WHERE MEMBER_ID = '202501030001' -->
     </select>
     
     <!-- 사원별 급여 입력(관리자) -->
@@ -61,35 +76,4 @@
 	    
 <!-- 	</insert> -->
 
-    <select id="selectSalaryInputList" resultType="map">
-    <!-- selectSalaryInputList 급여기록 조회 -->
-		SELECT
-			MEMBER_ID
-			, GRADE_ID
-			, PAYDAY
-			, POSITION_BONUS
-			, HOLIDAY_BONUS
-		FROM
-			SALARY
-
-    </select>
-    
-    <select id="getSalaryInputMinMaxDate" resultType="map">
-     <!-- getSalaryInputMinMaxDate 급여조회에서 최대최소일 조회 -->
-        SELECT 
-		      MAX(PAYDAY)	AS SALARY_MAX_DATE
-    		, MIN(PAYDAY) 	AS SALARY_MIN_DATE
-		  FROM
-		      SALARY
-	     WHERE
-			  1 = 1
-		  <if test='id != "admin"'>
-			   AND
-				  member_id = #{id}
-		  </if>
-    </select>
-    
-    
-    
-    
 </mapper>

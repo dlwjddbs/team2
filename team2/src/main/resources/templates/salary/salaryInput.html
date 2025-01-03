@@ -164,12 +164,13 @@
 		            }
 				},
 				ajax : {
-					url : "/getSalaryInput",
+					url : "/salaryInput",
 					type :"POST",
 					data : {},
-					"dataSrc" : function (res) {
-						console.log(res);
-		                return res;
+					"dataSrc" : function (abc) {
+						console.log(abc);
+						console.log("abc : " + abc);
+		                return abc;
 		            }
 				},
 				columns : [
@@ -253,6 +254,7 @@
 						"dataSrc": function (res) {
 			                return res;
 			            }
+						
 					},
 					columns : [
 						// DB컬럼명 일치하게 작성
@@ -281,6 +283,8 @@
 					lengthChange : false, 
 					autoWidth : false,
 					buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]
+					
+	                
 				}).buttons()
 				  .container()
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
