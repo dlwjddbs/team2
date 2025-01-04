@@ -287,11 +287,6 @@
 			let CHECK_OUT_TIME = $("#CHECK_OUT_TIME").val();
 			let STARTING_DATE = $("#STARTING_DATE").val();
 			
-// 			console.log(MEMBER_ID);
-// 			console.log(CHECK_IN_TIME);
-// 			console.log(CHECK_OUT_TIME);
-// 			console.log(STARTING_DATE);
-			
 			if (MEMBER_ID == null || MEMBER_ID == ''
 				|| CHECK_IN_TIME == null || CHECK_IN_TIME == '' 
 				|| CHECK_OUT_TIME == null || CHECK_OUT_TIME == '' 
@@ -323,7 +318,7 @@
                 	}
                 },
                 error : function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("deleteAttendanceTime() ajax 실패");
+                    console.log("addAttendanceTime() ajax 실패");
                 }
             });
 		});

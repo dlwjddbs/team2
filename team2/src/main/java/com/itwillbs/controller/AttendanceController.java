@@ -222,6 +222,23 @@ public class AttendanceController {
 		return selectBoxList;
 	}
 	
+	@GetMapping("/myCommuteHistoryCal")
+	public String getMyCommuteHistoryCal(Model model, Map<String, Object> map) {
+		
+		return "/attendance/myCommuteHistoryCal";
+	}
+	
+	@PostMapping("/insertCheckTime")
+	@ResponseBody
+	public Map<String, Object> insertCheckTime(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		
+		Map<String, Object> message = attendanceService.insertCheckTime(map);
+		
+		return message;
+	}
+	
 }
 
 

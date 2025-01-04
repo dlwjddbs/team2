@@ -10,22 +10,26 @@
 		SELECT 
               CHECK_IN_DATE				AS COMMUTE_CHECK_IN_DATE
     		, CHECK_IN_TIME				AS COMMUTE_CHECK_IN_TIME
-    		, NVL(CHECK_OUT_TIME, '-')	AS COMMUTE_CHECK_OUT_TIME
+    		, CHECK_OUT_DATE			AS COMMUTE_CHECK_OUT_DATE
+    		, CHECK_OUT_TIME			AS COMMUTE_CHECK_OUT_TIME
     		, MEMBER_ID					AS COMMUTE_MEMBER_ID
 		  FROM
 		      COMMUTE
 		 WHERE
 		 	  1 = 1
 			  <if test='id != "admin"'>
-		   	 	AND
-				  member_id = #{id}
+		   	 	AND member_id = #{id}
 			  </if>
-			  <if test='startDate != null and startDate != ""
+			  <choose>
+			 	 <when test='isToday != null and isToday != ""'>
+					AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE    
+			   	 </when>
+			 	 <when test='startDate != null and startDate != ""
 	   			 		and endDate != null and endDate != ""'>
-				  AND 
-					  CHECK_IN_DATE BETWEEN #{startDate} 
-										AND #{endDate} 
-			  </if>
+			  	  	AND CHECK_IN_DATE BETWEEN #{startDate} 
+										  AND #{endDate}   
+			  	 </when>    
+			  </choose>
 		 ORDER BY
 		 	  CHECK_IN_TIME DESC
     </select>
@@ -212,7 +216,7 @@
     
     <select id="isDeletableAttendanceTime" resultType="Boolean">
     <!-- isDeletableAttendanceTime 출퇴근 시간 적용 일자 오늘부터 이전까진 삭제 불가 -->
-    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 'false'
+    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') THEN 'false'
 					ELSE 'true'
 				END				AS IS_DELETABLE
 		  FROM COMMUTE_TIME
@@ -244,7 +248,7 @@
 			, #{CHECK_IN_TIME}
 			, #{CHECK_OUT_TIME}
 			, #{MEMBER_ID}
-			, SYSDATE
+			, CURRENT_DATE
 			, #{STARTING_DATE}
 		)
 	</insert>
@@ -259,12 +263,33 @@
 			1 = 1
 	   AND  USE_YN = 'Y'
 	   <if test='type != null and type != ""'>
-		   <if test='type == "RANK"'>
-		   		AND  GROUP_ID = 'RANK'
-		   </if>
-		   <if test='type == "DEP"'>
-		   		AND  GROUP_ID = 'DEP'
-		   </if>
+			AND  GROUP_ID = #{type}
 	   </if>
     </select>
+    
+    <insert id="insertCheckInTime">
+   	<!-- insertCheckTime 출퇴근 등록 -->
+	   INSERT INTO COMMUTE (
+	         COMMUTE_ID
+	       , CHECK_IN_TIME
+	       , MEMBER_ID
+	       , CHECK_IN_DATE
+	       , CREATE_DATE
+	   )
+	   VALUES (
+	         (SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)	
+	       , TO_CHAR(CURRENT_DATE, 'HH24:MI:SS') 
+	       , #{id}
+	       , TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+	       , CURRENT_DATE
+	   )
+	</insert>
+	
+	<update id="insertCheckOutTime">
+		UPDATE COMMUTE 
+	   	   SET 
+	   	   	   CHECK_OUT_TIME = TO_CHAR(CURRENT_DATE, 'HH24:MI:SS')
+	       	 , CHECK_OUT_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+	 	 WHERE TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE
+	</update>
 </mapper>

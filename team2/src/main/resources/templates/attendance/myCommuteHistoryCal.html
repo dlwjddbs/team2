@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdminLTE 3 | Calendar</title>
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+<!-- Ion Slider -->
+<link rel="stylesheet" href="../plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
+<!-- fullCalendar -->
+<link rel="stylesheet" href="../plugins/fullcalendar/main.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+	<!-- Content Wrapper. Contains page content -->
+	
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+	
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+	
+		<div class="content-wrapper">
+			<!-- 콘텐츠 해더 -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Calendar</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">Calendar</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 해더 -->
+			
+			<!-- 콘텐츠 메인 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+					
+						<!-- 캘린더 -->
+						<div class="col-md-10">
+							<div class="card card-primary">
+								<div class="card-body p-0">
+									<!-- THE CALENDAR -->
+									<div id="calendar"></div>
+								</div>
+							</div>
+						</div>
+						<!-- /.캘린더 -->
+						
+						<!-- 출퇴관리 -->
+						<div class="col-md-2">
+							<div class="sticky-top mb-2">
+								<div class="card">
+									<div class="card-header">
+										<h4 class="card-title">출근관리</h4>
+									</div>
+									<div class="card-body">
+										<div class="mb-4">
+											<span id="currentDateTime">날짜</span>
+										</div>
+										<div class="d-flex align-items-baseline">
+											<h1>24</h1><p>시간</p><h1>30</h1><p>분</p>
+										</div>
+										<div class="row margin mb-5">
+											<div class="col-sm-12">
+												<input id="range_6" type="text" name="range_6">
+											</div>
+										</div>
+										<p>출근시간 : <span id = "checkInTime" class="time_display"></span> </p>
+										<p>퇴근시간 : <span id = "checkOutTime" class="time_display"></span></p>
+										<hr>
+										<div class="row">
+											<div class="col-md-6">
+												<button type="button" id="checkInBtn" class="btn btn-block btn-outline-primary">출근하기</button>
+											</div>
+											<div class="col-md-6">
+												<button type="button" id="checkOutBtn" class="btn btn-block btn-outline-primary">퇴근하기</button>
+											</div>
+										</div>
+										<button type="button" class="btn btn-block btn-outline-primary mt-3">상태변경</button>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+						<!-- /.출퇴관리 -->
+						
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 메인 -->
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+	
+		<!-- 푸터 -->
+		<aside th:replace="~{includes/footer :: footer}"></aside>
+	
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark"></aside>
+		
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap -->
+	<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- jQuery UI -->
+	<script src="../plugins/jquery-ui/jquery-ui.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../dist/js/adminlte.min.js"></script>
+	<!-- fullCalendar 2.2.5 -->
+	<script src="../plugins/moment/moment.min.js"></script>
+	<script src="../plugins/fullcalendar/main.js"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="../dist/js/demo.js"></script>
+	<!-- Ion Slider -->
+	<script src="../plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
+	
+	<script th:inline="javascript">
+		$(function () {
+			calendar();
+			slider();
+		    updateDateTime();
+			checkInOutInit();
+			event();
+		});
+
+		function event() {
+			$("#checkInBtn").on("click", function() {
+				checkBtn('checkIn');
+			});
+			
+			$("#checkOutBtn").on("click", function() {
+				checkBtn('checkOut');
+			});
+		}
+		
+		function checkInOutInit() {
+			$.ajax({
+	            type : "POST",
+	            url : "/getMyCommuteHistory",
+	            data : {
+					isToday : 'Y'
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						return;	
+					}
+					
+					let checkInTime = res[0].COMMUTE_CHECK_IN_TIME;
+					if (checkInTime != null) {
+						disabledBtn('checkInBtn');
+						$("#checkInTime").text(checkInTime);
+					}
+					
+					let checkOutTime = res[0].COMMUTE_CHECK_OUT_TIME;
+					if (checkOutTime != null) {
+						disabledBtn('checkOutBtn');
+						$("#checkOutTime").text(checkOutTime);
+					}
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("calendar() ajax 실패");
+	            }
+	        });
+		}
+		
+		function disabledBtn(id) {
+			$("#" + id).attr("disabled", true);
+			$("#" + id).removeClass("btn-outline-primary");
+			$("#" + id).addClass("btn-primary");
+		}
+		
+		function checkBtn(type) {
+			$.ajax({
+	            type : "POST",
+	            url : "/insertCheckTime",
+	            data : {
+					type : type
+				},
+	            success : function(res){
+					alert(res.result);
+					               		
+                	if (res.resultCode == 1) {
+						location.reload();
+                	}
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("checkInBtn() ajax 실패");
+	            }
+	        });
+		}
+		
+		function updateDateTime() {
+			$("#currentDateTime").text(new Date().toLocaleString());
+//			setInterval(updateDateTime, 1000);
+	    }
+		
+		function slider() {
+			/* ION SLIDER */
+			$('#range_6').ionRangeSlider({
+				min     : 0,	//슬라이더 최소값
+				max     : 52,	//슬라이더 최대값
+				from    : 20,	//위치 값
+				type    : 'single',
+				step    : 1,
+				postfix : '시간',
+				prettify: false,
+				hasGrid : false,
+				readOnly: true,
+			})
+			
+			$('#range_6').parent().css('pointer-events', 'none');
+		}
+		
+		function calendar() {
+			let Calendar = FullCalendar.Calendar;
+			let calendarEl = document.getElementById('calendar');
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/getMyCommuteHistory",
+	            data : {},
+	            success : function(res){
+					let events = [];
+					
+					res.forEach(function(el) {
+						let check_in_dt = el.COMMUTE_CHECK_IN_DATE + ' ' + el.COMMUTE_CHECK_IN_TIME;
+						let check_out_dt = el.COMMUTE_CHECK_OUT_DATE + ' ' + el.COMMUTE_CHECK_OUT_TIME;
+						
+						events.push({
+		                    title: "출근",
+		                    start: check_in_dt,
+		                    backgroundColor: '#0073b7'
+		                });
+						
+						events.push({
+		                    title: "퇴근",
+		                    start: check_out_dt,
+		                    backgroundColor: '#00c0ef'
+		                });
+					});
+					
+					let calendar = new Calendar(calendarEl, {
+						locale: 'kor',
+						headerToolbar: {
+							left  : 'prev,next today',
+							center: 'title',
+							right : 'dayGridMonth,timeGridWeek,timeGridDay'
+						},
+						themeSystem: 'bootstrap',
+						events: events,
+						contentHeight: 700
+					});
+					
+					calendar.render();
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("calendar() ajax 실패");
+	            }
+	        });
+		}
+	</script>
+</body>
+</html>

@@ -91,4 +91,36 @@ public class AttendanceService {
 	public List<Map<String, Object>> getSelectBoxList(Map<String, Object> map) {
 		return attendanceMapper.getSelectBoxList(map);
 	}
+
+	public Map<String, Object> insertCheckTime(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "등록 실패.";
+		String resultCode = "0";
+		int resultCnt = 0;
+		
+		switch(map.get("type").toString()) {
+		    case "checkIn": 
+		    	resultCnt = attendanceMapper.insertCheckInTime(map);
+				if (resultCnt > 0) {
+					result = "출근 등록 완료.";
+					resultCode = "1";
+				}
+				
+		    	break;
+		    case "checkOut": 
+		    	resultCnt = attendanceMapper.insertCheckOutTime(map);
+				if (resultCnt > 0) {
+					result = "퇴근 등록 완료.";
+					resultCode = "1";
+				}
+		    	
+		    	break;
+		}	
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
 }
