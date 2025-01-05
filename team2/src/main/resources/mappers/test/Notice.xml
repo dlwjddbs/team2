@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.NoticeMapper">
+
+	<select id="getNoticeList" resultType="map">
+        SELECT 
+            NOTICE_ID,
+            NAME,
+            SUBJECT,
+            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME,
+            CONTENT
+        FROM 
+            NOTICE
+        WHERE member_id = #{memberId}
+       	 ORDER BY 
+          	  CREATE_TIME DESC
+    </select>
+
+<!--	<select id="getNoticeListMinMaxDate" resultType="map">-->
+	
+<!--		SELECT-->
+<!--			MAX(CREATE_TIME) AS NOTICE_MAX_TIME-->
+<!--		  , MIN(CREATE_TIME) AS NOTICE_MIN_TIME-->
+<!--		 FROM -->
+<!--		 	 NOTICE-->
+<!--		 WHERE-->
+<!--			  1 = 1-->
+<!--		  <if test='id != "admin"'>-->
+<!--			   AND-->
+<!--				  member_id = #{memberId}-->
+<!--		  </if>	-->
+<!--	</select>-->
+
+	<insert id="createNotice" parameterType="map">
+        INSERT INTO NOTICE (NOTICE_ID, NAME, SUBJECT, MEMBER_ID, CONTENT)
+        VALUES (#{noticeAuthor}, 'admin', #{noticeTitle}, #{memberId}, #{noticeContent})
+    </insert>
+	
+	
+
+
+
+</mapper>
