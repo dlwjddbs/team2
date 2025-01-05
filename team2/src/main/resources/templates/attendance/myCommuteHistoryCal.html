@@ -162,7 +162,7 @@
 		$(function () {
 			calendar();
 			slider();
-		    updateDateTime();
+		    setInterval(updateDateTime, 1000);
 			checkInOutBtnInit();
 			event();
 		});
@@ -246,7 +246,6 @@
 		
 		function updateDateTime() {
 			$("#currentDateTime").text(new Date().toLocaleString());
-			setInterval(updateDateTime, 1000);
 	    }
 		
 		function slider() {
