@@ -61,8 +61,36 @@
 						</div>
 						<!-- /.캘린더 -->
 						
-						<!-- 출퇴관리 -->
 						<div class="col-md-2">
+							<!-- 유저 프로필 -->
+							<div class="card card-widget widget-user">
+								<div class="widget-user-header bg-info">
+									<h3 class="widget-user-username">유저명</h3>
+									<h5 class="widget-user-desc">부서명</h5>
+								</div>
+								<div class="widget-user-image">
+									<img class="img-circle elevation-2" src="../dist/img/user1-128x128.jpg" alt="User Avatar">
+								</div>
+								<div class="card-footer">
+									<div class="row">
+										<div class="col-sm-6 border-right">
+											<div class="description-block">
+												<h5 class="description-header">총휴가</h5>
+												<span class="description-text">12</span>
+											</div>
+										</div>
+										<div class="col-sm-6 border-right">
+											<div class="description-block">
+												<h5 class="description-header">잔여휴가</h5>
+												<span class="description-text">7</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- /.유저 프로필 -->
+							
+							<!-- 출퇴관리 -->
 							<div class="sticky-top mb-2">
 								<div class="card">
 									<div class="card-header">
@@ -93,12 +121,10 @@
 										</div>
 										<button type="button" class="btn btn-block btn-outline-primary mt-3">상태변경</button>
 									</div>
-									
 								</div>
 							</div>
+							<!-- /.출퇴관리 -->
 						</div>
-						<!-- /.출퇴관리 -->
-						
 					</div>
 				</div>
 			</section>
@@ -188,6 +214,17 @@
 		}
 		
 		function checkBtn(type) {
+			let message = "";
+
+			switch (type) {
+				case "checkIn": message = '출근 하시겠습니까?'; break;
+				case "checkOut": message = '퇴근 하시겠습니까?'; break;
+			}
+			
+			if (!confirm(message)) {
+				return;
+			}
+						
 			$.ajax({
 	            type : "POST",
 	            url : "/insertCheckTime",
@@ -202,14 +239,14 @@
                 	}
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
-	                console.log("checkInBtn() ajax 실패");
+	                console.log("checkBtn() ajax 실패");
 	            }
 	        });
 		}
 		
 		function updateDateTime() {
 			$("#currentDateTime").text(new Date().toLocaleString());
-//			setInterval(updateDateTime, 1000);
+			setInterval(updateDateTime, 1000);
 	    }
 		
 		function slider() {
@@ -235,7 +272,7 @@
 					$('#range_6').parent().css('pointer-events', 'none');
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
-	                console.log("checkInBtn() ajax 실패");
+	                console.log("slider() ajax 실패");
 	            }
 	        });
 		}
