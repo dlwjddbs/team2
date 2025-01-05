@@ -13,36 +13,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SalaryService {
 	private final SalaryMapper salaryMapper;
-
-	public List<Map<String, Object>> getSalaryList() {
-		return salaryMapper.selectSalaryList();
-	}
-
-	public List<Map<String, Object>> getSalaryHistory(Map<String, Object> map) {
-		return salaryMapper.getSalaryHistory(map);
+	
+	// 입력된 급여 조회(관리자)
+	public List<Map<String, Object>> getSalaryList(Map<String, Object> map) {
+		return salaryMapper.selectSalaryList(map);
 	}
 
 	public int writeSalary(Map<String, Object> param) {
 		System.out.println("service param : " + param);
 		return salaryMapper.insertSalary(param);
 	}
-
-	public List<Map<String, Object>> memberSalaryList() {
-		return salaryMapper.selectSalaryList();
-	}
 	
-	// 급여 정보로 수정 예정
+	// 급여 조회 - 사원 ID의 급여 정보를 조회
 	public Map<String, Object> findSalaryById(String id) {
 		return salaryMapper.selectSalaryListById(id);
 	}
 	
-	// 입력된 급여 조회(관리자)
-	public List<Map<String, Object>> salaryInputList(Map<String, Object> map) {
-		return salaryMapper.selectSalaryInputList(map);
-	}
-
-	public Map<String, Object> getSalaryInputMinMaxDate(String id) {
-		return salaryMapper.getSalaryInputMinMaxDate(id);
+	// 급여 입력 - 입력된 날짜 조회
+	public Map<String, Object> getSalaryListMinMaxDate(String id) {
+		return salaryMapper.getSalaryListMinMaxDate(id);
 	}
 
 

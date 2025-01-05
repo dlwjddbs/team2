@@ -206,6 +206,49 @@ public class AttendanceController {
 		return "";
 	}
 	
+	@PostMapping("/addAttendanceTime")
+	@ResponseBody
+	public Map<String, Object> addAttendanceTime(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = attendanceService.addAttendanceTime(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/selectBox")
+	@ResponseBody
+	public List<Map<String, Object>> selectBox(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> selectBoxList = attendanceService.getSelectBoxList(map);
+		
+		return selectBoxList;
+	}
+	
+	@GetMapping("/myCommuteHistoryCal")
+	public String getMyCommuteHistoryCal(Model model, Map<String, Object> map) {
+		
+		return "/attendance/myCommuteHistoryCal";
+	}
+	
+	@PostMapping("/insertCheckTime")
+	@ResponseBody
+	public Map<String, Object> insertCheckTime(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		
+		Map<String, Object> message = attendanceService.insertCheckTime(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/getWeekendTotalWorkHour")
+	@ResponseBody
+	public int getWeekendTotalWorkHour(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		
+		int count = attendanceService.getWeekendTotalWorkHour(map);
+		
+		return count;
+	}
 }
 
 

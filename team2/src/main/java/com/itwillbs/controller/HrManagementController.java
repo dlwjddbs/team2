@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.service.HrManagementService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,27 +32,7 @@ public class HrManagementController {
 	@PostMapping("/addMember")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
-//		<< null 또는 "" 값 제거 >>
-		param.entrySet().removeIf(entry -> 
-	        entry.getValue() == null || (entry.getValue() instanceof String && ((String) entry.getValue()).isEmpty())
-	    );
-		
-//		<< EAMIL 추가 >>
-		if(!ObjectUtils.isEmpty(param.get("EMAIL_ID"))) {
-			String email = param.get("EMAIL_ID") + "@" + param.get("EMAIL_DOMAIN");
-			
-			param.remove("EMAIL_ID");
-			param.remove("EMAIL_DOMAIN");
-			
-			param.put("EMAIL", email);
-		} 
-		
-//		<< CREATE_DATE 추가 >>
-		LocalDateTime now = LocalDateTime.now();
-		String create_date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		param.put("CREATE_DATE", create_date);
-		
-		
+		/*		
 		int insertCount = hrManagementService.addMember(param);
 		
 		if(insertCount > 0) {
@@ -64,6 +45,7 @@ public class HrManagementController {
 //			hrManagementService.addHistory(param, "GRADE_HISTORY");
 //			hrManagementService.addHistory(param, "DEPARTMENT_HISTORY");
 		}
+		*/
 		
 		
 		return "redirect:/memberList";
@@ -90,8 +72,8 @@ public class HrManagementController {
 	// 은행코드, 부서, 직급
 	@PostMapping("/getOrganizationData")
 	@ResponseBody
-	public Map<String, Object> getOrganizationData(@RequestParam Map<String, Object> map) throws JsonProcessingException {
-		Map<String, Object> data = hrManagementService.getOrganizationData();
+	public List<Map<String, Object>> getOrganizationData() throws JsonProcessingException {
+		List<Map<String, Object>> data = hrManagementService.getOrganizationData();
 		
 		ObjectMapper mapper = new ObjectMapper();
 		String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);

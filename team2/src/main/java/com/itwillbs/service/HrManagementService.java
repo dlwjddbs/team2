@@ -25,20 +25,12 @@ public class HrManagementService {
 		return hrManagementMapper.selectMemberList();
 	}
 
-	public Map<String, Object> getOrganizationData() {
-		Map<String, Object> OrganizationData = new HashMap<>();
+	public List<Map<String, Object>> getOrganizationData() {
 		
-		List<Map<String, Object>> department = hrManagementMapper.selectDepartment(); 
+		List<Map<String, Object>> data = hrManagementMapper.selectOrganizationData(); 
 		
-		List<Map<String, Object>> grade = hrManagementMapper.seletTable("GRADE", "NAME", "ID");
 		
-		List<Map<String, Object>> bank = hrManagementMapper.seletTable("BANK_CODES", "BANK_NAME", "CODE");
-		
-		OrganizationData.put("departments", department);
-		OrganizationData.put("grades", grade);
-		OrganizationData.put("banks", bank);
-		
-		return OrganizationData;
+		return data;
 	}
 
 	public void addHistory(Map<String, Object> param, String string) {

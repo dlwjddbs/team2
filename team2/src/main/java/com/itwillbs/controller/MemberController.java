@@ -60,8 +60,8 @@ public class MemberController {
             model.addAttribute("educationList", educationList);
 
             // 입사일만 추출 (시간 제외)
-            LocalDate joinDateWithoutTime = m.getJoinDateWithoutTime();
-            model.addAttribute("joinDate", joinDateWithoutTime);  
+//            LocalDate joinDateWithoutTime = m.getJoinDateWithoutTime();
+//            model.addAttribute("joinDate", joinDateWithoutTime);  
         } else {
             return "redirect:/login";  
         }

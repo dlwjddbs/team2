@@ -10,22 +10,26 @@
 		SELECT 
               CHECK_IN_DATE				AS COMMUTE_CHECK_IN_DATE
     		, CHECK_IN_TIME				AS COMMUTE_CHECK_IN_TIME
-    		, NVL(CHECK_OUT_TIME, '-')	AS COMMUTE_CHECK_OUT_TIME
+    		, CHECK_OUT_DATE			AS COMMUTE_CHECK_OUT_DATE
+    		, CHECK_OUT_TIME			AS COMMUTE_CHECK_OUT_TIME
     		, MEMBER_ID					AS COMMUTE_MEMBER_ID
 		  FROM
 		      COMMUTE
 		 WHERE
 		 	  1 = 1
 			  <if test='id != "admin"'>
-		   	 	AND
-				  member_id = #{id}
+		   	 	AND member_id = #{id}
 			  </if>
-			  <if test='startDate != null and startDate != ""
+			  <choose>
+			 	 <when test='isToday != null and isToday != ""'>
+					AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE    
+			   	 </when>
+			 	 <when test='startDate != null and startDate != ""
 	   			 		and endDate != null and endDate != ""'>
-				  AND 
-					  CHECK_IN_DATE BETWEEN #{startDate} 
-										AND #{endDate} 
-			  </if>
+			  	  	AND CHECK_IN_DATE BETWEEN #{startDate} 
+										  AND #{endDate}   
+			  	 </when>    
+			  </choose>
 		 ORDER BY
 		 	  CHECK_IN_TIME DESC
     </select>
@@ -212,7 +216,7 @@
     
     <select id="isDeletableAttendanceTime" resultType="Boolean">
     <!-- isDeletableAttendanceTime 출퇴근 시간 적용 일자 오늘부터 이전까진 삭제 불가 -->
-    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(SYSDATE, 'YYYY-MM-DD') THEN 'false'
+    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') THEN 'false'
 					ELSE 'true'
 				END				AS IS_DELETABLE
 		  FROM COMMUTE_TIME
@@ -226,4 +230,73 @@
 		DELETE FROM COMMUTE_TIME
  		 WHERE COM_TIME_ID = #{id}
 	</delete>
+	
+	<select id="isDuplicateAttendanceTime" resultType="Integer">
+	<!-- isDuplicateAttendanceTime 출퇴근 시간 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMUTE_TIME
+		 WHERE 
+			   MEMBER_ID = #{MEMBER_ID} 
+		   AND STARTING_DATE = #{STARTING_DATE}
+	</select>
+   
+	<insert id="insertAttendanceTime">
+   	<!-- insertAttendanceTime 출퇴근 기준 시간 등록 -->
+	   	INSERT INTO COMMUTE_TIME
+		VALUES(
+			  (SELECT 'CT' || LPAD(NVL(MAX(SUBSTR(COM_TIME_ID, 3)), 0) + 1, 10, 0) FROM COMMUTE_TIME)
+			, #{CHECK_IN_TIME}
+			, #{CHECK_OUT_TIME}
+			, #{MEMBER_ID}
+			, CURRENT_DATE
+			, #{STARTING_DATE}
+		)
+	</insert>
+	
+	<select id="getSelectBoxList" resultType="map">
+    <!-- getSelectBoxList 셀렉트박스 목록 조회 -->
+	SELECT 
+	 		GROUP_ID || '_' || CODE_ID 	AS CODE
+	 	  , CODE_NAME 					AS NAME
+	  FROM  COMMON_CODE
+	 WHERE 
+			1 = 1
+	   AND  USE_YN = 'Y'
+	   <if test='type != null and type != ""'>
+			AND  GROUP_ID = #{type}
+	   </if>
+    </select>
+    
+    <insert id="insertCheckInTime">
+   	<!-- insertCheckTime 출퇴근 등록 -->
+	   INSERT INTO COMMUTE (
+	         COMMUTE_ID
+	       , CHECK_IN_TIME
+	       , MEMBER_ID
+	       , CHECK_IN_DATE
+	       , CREATE_DATE
+	   )
+	   VALUES (
+	         (SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)	
+	       , TO_CHAR(CURRENT_DATE, 'HH24:MI:SS') 
+	       , #{id}
+	       , TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+	       , CURRENT_DATE
+	   )
+	</insert>
+	
+	<update id="insertCheckOutTime">
+		UPDATE COMMUTE 
+	   	   SET 
+	   	   	   CHECK_OUT_TIME = TO_CHAR(CURRENT_DATE, 'HH24:MI:SS')
+	       	 , CHECK_OUT_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+	 	 WHERE TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE
+	</update>
+	
+	<select id="getWeekendTotalWorkHour" resultType="Integer">
+		SELECT SUM(TRUNC((TO_DATE(CHECK_OUT_TIME,'HH24:MI:SS') - TO_DATE(CHECK_IN_TIME,'HH24:MI:SS')) * 24)) AS WEEKEND_TOTAL_HOUR
+		  FROM COMMUTE
+		 WHERE CHECK_IN_DATE BETWEEN TO_CHAR(TRUNC(CURRENT_DATE, 'IW'), 'YYYY-MM-DD')
+		 						 AND TO_CHAR(TRUNC(CURRENT_DATE, 'IW') + 6, 'YYYY-MM-DD')
+	</select>
 </mapper>

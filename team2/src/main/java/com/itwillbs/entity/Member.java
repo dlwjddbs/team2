@@ -48,10 +48,10 @@ public class Member {
 	private String profilePic;
 	
 	@Column(name = "join_date")
-	private Timestamp joinDate;	
+	private String joinDate;	
 	
 	@Column(name = "resign_date")
-	private Timestamp resignDate;		
+	private String resignDate;		
 	
 	@Column(name = "passwd", length = 30)
 	private String passwd;	
@@ -95,10 +95,10 @@ public class Member {
 //	@Column(name = "update_date")
 //	private Timestamp updateDate;
 	
-	public LocalDate getJoinDateWithoutTime() {
-        // Timestamp에서 LocalDate로 변환
-        return joinDate.toLocalDateTime().toLocalDate();
-    }
+//	public LocalDate getJoinDateWithoutTime() {
+//        // Timestamp에서 LocalDate로 변환
+//        return joinDate.toLocalDateTime().toLocalDate();
+//    }
 		
 	public static Member setMemberEntity(MemberDTO memberDTO) {
 		
