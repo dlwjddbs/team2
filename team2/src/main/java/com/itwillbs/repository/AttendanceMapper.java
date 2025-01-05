@@ -33,4 +33,6 @@ public interface AttendanceMapper {
 	int insertCheckInTime(Map<String, Object> map);
 
 	int insertCheckOutTime(Map<String, Object> map);
+
+	int getWeekendTotalWorkHour(Map<String, Object> map);
 }

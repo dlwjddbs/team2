@@ -239,6 +239,16 @@ public class AttendanceController {
 		return message;
 	}
 	
+	@PostMapping("/getWeekendTotalWorkHour")
+	@ResponseBody
+	public int getWeekendTotalWorkHour(@RequestParam Map<String, Object> map) {
+		String id = "20241222";
+		map.put("id", id);
+		
+		int count = attendanceService.getWeekendTotalWorkHour(map);
+		
+		return count;
+	}
 }
 
 

@@ -137,7 +137,7 @@
 			calendar();
 			slider();
 		    updateDateTime();
-			checkInOutInit();
+			checkInOutBtnInit();
 			event();
 		});
 
@@ -151,7 +151,7 @@
 			});
 		}
 		
-		function checkInOutInit() {
+		function checkInOutBtnInit() {
 			$.ajax({
 	            type : "POST",
 	            url : "/getMyCommuteHistory",
@@ -213,20 +213,31 @@
 	    }
 		
 		function slider() {
-			/* ION SLIDER */
-			$('#range_6').ionRangeSlider({
-				min     : 0,	//슬라이더 최소값
-				max     : 52,	//슬라이더 최대값
-				from    : 20,	//위치 값
-				type    : 'single',
-				step    : 1,
-				postfix : '시간',
-				prettify: false,
-				hasGrid : false,
-				readOnly: true,
-			})
-			
-			$('#range_6').parent().css('pointer-events', 'none');
+			$.ajax({
+	            type : "POST",
+	            url : "/getWeekendTotalWorkHour",
+	            data : {},
+	            success : function(res){
+
+					/* ION SLIDER */
+					$('#range_6').ionRangeSlider({
+						min     : 0,	//슬라이더 최소값
+						max     : 52,	//슬라이더 최대값
+						from    : res,	//위치 값
+						type    : 'single',
+						step    : 1,
+						postfix : '시간',
+						prettify: false,
+						hasGrid : false,
+						readOnly: true,
+					})
+
+					$('#range_6').parent().css('pointer-events', 'none');
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("checkInBtn() ajax 실패");
+	            }
+	        });
 		}
 		
 		function calendar() {

@@ -123,4 +123,8 @@ public class AttendanceService {
 		
 		return message;
 	}
+
+	public int getWeekendTotalWorkHour(Map<String, Object> map) {
+		return attendanceMapper.getWeekendTotalWorkHour(map);
+	}
 }
