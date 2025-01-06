@@ -17,6 +17,8 @@
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- daterange picker -->
 	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- date picker -->
+	<link rel="stylesheet" href="../../plugins/datepicker/datepicker.css">
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -68,17 +70,6 @@
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				<div class="col-2">
-<!-- 					<div class="form-group"> -->
-<!-- 						<div class="input-group"> -->
-<!-- 							<div class="input-group-prepend"> -->
-<!-- 								<span class="input-group-text"> -->
-<!-- 									<i class="far fa-calendar-alt"></i> -->
-<!-- 								</span> -->
-<!-- 							</div> -->
-<!-- 							<input type="text" class="form-control float-right" id="reservation"> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
-					<!-- new member modal -->
 					<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
 						급여 정보 입력
 					</button>
@@ -143,6 +134,8 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- date-picker -->
+	<script src="../../plugins/datepicker/datepicker.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
@@ -290,21 +283,76 @@
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			});
 			
-	        $('#daterange').daterangepicker({
-	            opens: 'left',
-	            startDate: moment().startOf('month'),
-	            endDate: moment().endOf('month'),
-	            locale: {
-	                format: 'YYYY-MM'
-	            },
-	            singleDatePicker: true, // 단일 날짜 선택
-	            showDropdowns: true, // 드롭다운으로 연도 및 월 선택
-	            minYear: 1901, // 최소 연도
-	            maxYear: parseInt(moment().format('YYYY'), 10) // 최대 연도
-	        }, function(start, end) {
-	            $('#daterange').val(start.format('YYYY-MM'));
+	        $(document).ready(function () {
+	            $('#daterange').datepicker({
+	                format: "yyyy-mm",
+	                autoclose: true,
+	                startView: "months", // 월 선택 모드
+	                minViewMode: "months" // 선택할 수 있는 최소 뷰 모드
+	            }).on('changeDate', function(e) {
+	                $('#daterange').val(e.format());
+	            });
+	            
+	            // 모달이 열릴 때마다 입력 필드 초기화
+	            $('#modal-lg').on('show.bs.modal', function () {
+	                $('#daterange').val(''); // 입력 필드 초기화
+	            });
 	        });
+
 		});
+		
+// 		function isNumberKey(evt) {
+//             // 숫자만 입력되도록 제한
+//             var charCode = (evt.which) ? evt.which : evt.keyCode;
+//             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+//                 return false; // 숫자가 아닌 경우 false 반환
+//             }
+//             return true; // 숫자인 경우 true 반환
+//         }
+
+//         $(document).ready(function() {
+//             // 모든 금액 입력 필드에 대해 이벤트를 설정
+//             $('input[type="text"]').on('input', function() {
+//                 // 입력값을 숫자로 변환
+//                 let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
+                
+//                 // 숫자 형식으로 변환
+//                 if (value && !isNaN(value)) {
+//                     value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+//                 } else if (value) {
+//                     alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
+//                     $(this).val(''); // 입력 필드 초기화
+//                     return; // 추가 처리 방지
+//                 }
+//                 $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
+//             });
+//         });
+
+		 function isNumberKey(evt) {
+		            // 숫자만 입력되도록 제한
+		            var charCode = (evt.which) ? evt.which : evt.keyCode;
+		            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		                return false; // 숫자가 아닌 경우 false 반환
+		            }
+		            return true; // 숫자인 경우 true 반환
+		        }
+		
+		        $(document).ready(function() {
+		            // 모든 금액 입력 필드에 대해 이벤트를 설정
+		            $('input[type="text"]').on('input', function() {
+		                let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
+		                
+		                // 숫자 형식으로 변환
+		                if (value && !isNaN(value)) {
+		                    value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+		                } else if (value) {
+		                    alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
+		                    $(this).val(''); // 입력 필드 초기화
+		                    return; // 추가 처리 방지
+		                }
+		                $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
+		            });
+		        });
 		
 		
 	</script>

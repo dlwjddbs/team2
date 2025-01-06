@@ -19,9 +19,9 @@ public class SalaryService {
 		return salaryMapper.selectSalaryList(map);
 	}
 
-	public int writeSalary(Map<String, Object> param) {
+	public void writeSalary(Map<String, Object> param) {
 		System.out.println("service param : " + param);
-		return salaryMapper.insertSalary(param);
+		salaryMapper.insertSalary(param);
 	}
 	
 	// 급여 조회 - 사원 ID의 급여 정보를 조회
