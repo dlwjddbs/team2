@@ -53,16 +53,18 @@
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
-<!--						<div class="d-flex">-->
-<!--							<label class="col-form-label mr-3">발령구분</label> <select class="appointGubun" name="appointGubun"-->
-<!--								style="min-width: 120px">-->
-<!--								<option selected="selected" disabled>발령구분</option>-->
-<!--								<option>승진</option>-->
-<!--								<option>부서이동</option>-->
-<!--								<option>퇴사</option>-->
-<!--							</select>-->
-<!--						</div>-->
-					
+						<div class="d-flex">
+							<label class="col-form-label mr-3">부서구분</label> 
+							<select class="appointGubun" id="DEP" name="appointGubun" style="min-width: 120px">
+								<!-- ajax -->
+							</select>
+						</div>
+						<div class="d-flex ml-4">
+							<label class="col-form-label mr-3">직급구분</label> 
+							<select class="appointGubun" id="RANK" name="appointGubun" style="min-width: 120px">
+								<!-- ajax -->
+							</select>
+						</div>
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
@@ -151,6 +153,8 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
+			selectBox("RANK");
+			selectBox("DEP");
 			dateRangePicker();
 			
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
@@ -188,6 +192,9 @@
 		}
 		
 		function dataTable(tableId, date, isUpdate) {
+			let deptCode = $("#DEP").val();
+			let rankCode = $("#RANK").val();
+			
 			// 기존 테이블 삭제
 			if (isUpdate) {
 				$("#" + tableId).DataTable().destroy();
@@ -214,7 +221,9 @@
 					type:"POST",
 					data : {
 						startDate : date[0],					
-						endDate : date[1]
+						endDate : date[1],
+						deptCode : deptCode,
+						rankCode : rankCode
 					},
 					"dataSrc": function (res) {
 		                return res;
@@ -222,6 +231,10 @@
 				},
 				columns : [
 					{data : "CREATE_DATE", title : "일자", "defaultContent": ""},
+					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
+					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
+					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
+					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
 					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
 					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
 					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
@@ -286,6 +299,29 @@
                 }
             });
 		};
+		
+		// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+		function selectBox(type) {
+			$.ajax({
+                type : "POST",
+                url : "/selectBox",
+                data : {
+                	type : type
+                },
+                success : function(res){
+                	let str = '<option value="" selected="selected" disabled>전체</option>';
+                	
+                	res.forEach((el)=>{
+						str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+               		})
+               		
+               		$("#" + type).html(str);
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("selectBox() ajax 실패");
+                }
+            });
+		}
 	</script>
 </body>
 </html>

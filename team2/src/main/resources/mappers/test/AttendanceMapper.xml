@@ -69,117 +69,132 @@
     </select>
     
     <select id="getMyAttendanceHistory" resultType="map">
-    <!-- getMyAttendanceHistory 지각/조퇴/결근 기록 조회 -->
-		SELECT 
-			  	TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
-			  , b.CT_CHECK_IN_TIME
-			  , b.CHECK_IN_TIME
-			  , b.CT_CHECK_OUT_TIME
-			  , b.CHECK_OUT_TIME
-			  , b.ATTENDANCE_TEXT
-		  FROM (
-			  SELECT 
-					a.*
-				  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
-			   FROM (
-				   SELECT
-				         c.COMMUTE_ID															AS COMMUTE_ID
-				       , c.MEMBER_ID 															AS MEMBER_ID
-				       , c.CHECK_IN_TIME														AS CHECK_IN_TIME 	
-				       , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
-					   , CASE 
-					  	     WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 				THEN '지각' 
-					         WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 	THEN '조퇴' 
-					         ELSE '정상출근'
-					     END																	AS ATTENDANCE_TEXT
-					       , c.CREATE_DATE 														AS CREATE_DATE
-					       , ct.STARTING_DATE 													AS CT_STARTING_DATE
-					       , ct.CHECK_IN_TIME 													AS CT_CHECK_IN_TIME
-						   , ct.CHECK_OUT_TIME 													AS CT_CHECK_OUT_TIME
-				     FROM
-				         COMMUTE											c
-				         INNER JOIN COMMUTE_TIME 							ct 
-				      		     ON c.CHECK_IN_DATE >= ct.STARTING_DATE
-				    WHERE
-				         1 = 1
-				         <if test='id != null and id != ""'>
-						      AND
-						         c.member_id = #{id}
-				         </if>
-				    ORDER BY 
-				         c.CHECK_IN_DATE DESC
-			) a
-			ORDER BY
-			 	 CREATE_DATE DESC
-		) b
-		 WHERE
-		 	  1 = 1
-		   AND
-		 	  ROW_NUM = 1
-	 	  <if test='startDate != null and startDate != ""
-			 		and endDate != null and endDate != ""'>
-			  AND 
-				 TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
-								 						AND #{endDate} 
-		  </if>
+    <!-- getMyAttendanceHistory 근태 기록 조회 -->
+    	SELECT 
+				TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+			  , c.*
+		  FROM (SELECT 
+						b.*
+				  	  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+				  FROM (SELECT 
+								a.*
+							  , cc.CODE_NAME	AS GRADE_NAME
+						  FROM (SELECT
+										c.COMMUTE_ID															AS COMMUTE_ID
+						   			  , c.MEMBER_ID 															AS MEMBER_ID
+						   			  , c.CHECK_IN_TIME															AS CHECK_IN_TIME 	
+						   			  , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
+						   			  , CASE 
+											WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 				THEN '지각' 
+						         			WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 	THEN '조퇴' 
+						         			ELSE '정상출근'
+						     			END																		AS ATTENDANCE_TEXT
+									  , c.CREATE_DATE 															AS CREATE_DATE
+									  , ct.STARTING_DATE 														AS CT_STARTING_DATE
+						       		  , ct.CHECK_IN_TIME 														AS CT_CHECK_IN_TIME
+							   		  , ct.CHECK_OUT_TIME 														AS CT_CHECK_OUT_TIME
+							   		  , m.NAME 																	AS MEMBER_NAME
+							   		  , m.DEPT_ID 																AS DEPT_ID
+							   		  , m.GRADE_ID 																AS GRADE_ID
+							   		  , cc.CODE_NAME 															AS DEPT_NAME
+								  FROM	COMMUTE											c
+										INNER JOIN COMMUTE_TIME 						ct 
+						  		     			ON c.CHECK_IN_DATE >= ct.STARTING_DATE
+							 			INNER JOIN MEMBER								m
+							 		 			ON c.MEMBER_ID = m.MEMBER_ID 
+							 			INNER JOIN COMMON_CODE 							cc
+							 		 			ON m.DEPT_ID = cc.CODE_ID 
+						 WHERE 1 = 1
+						<if test='id != null and id != ""'>
+							AND c.member_id = #{id}
+			         	</if>
+			         	<if test='deptCode != null and deptCode != ""'>
+				   	 		AND m.dept_id = #{deptCode}
+						</if>
+						<if test='rankCode != null and rankCode != ""'>
+				   	 		AND m.grade_id = #{rankCode}
+						</if>
+						 ORDER BY c.CHECK_IN_DATE DESC
+					) a
+					INNER JOIN COMMON_CODE cc
+							ON a.grade_id = cc.CODE_ID 
+			) b
+			ORDER BY CREATE_DATE DESC
+		) c
+		 WHERE 1 = 1
+		   AND ROW_NUM = 1
+			<if test='startDate != null and startDate != ""
+ 			 		and endDate != null and endDate != ""'>
+				AND TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
+														   AND #{endDate} 
+			</if>
     </select>
     
     <select id="getMyAttendanceHistoryDonutChart" resultType="map">
     <!-- getMyAttendanceHistoryDonutChart 지각/조퇴/결근 기록 조회 -->
-		SELECT
-		  	  c.ATTENDANCE_TEXT
-		    , COUNT(c.ATTENDANCE_TEXT)	AS PIE_CHART_VALUE
-		  FROM (
-			    SELECT 
-					  b.*
-				  FROM (
-					  SELECT 
-							a.*
-						  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
-					   FROM (
-						   SELECT
-						         c.COMMUTE_ID															AS COMMUTE_ID
-						       , c.MEMBER_ID 															AS MEMBER_ID
-						       , c.CHECK_IN_TIME														AS CHECK_IN_TIME 	
-						       , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
-							   , CASE 
-							  	     WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME				THEN '지각' 
-							         WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 	THEN '조퇴' 
-							         ELSE '정상출근'
-							     END																	AS ATTENDANCE_TEXT
-							       , c.CREATE_DATE 														AS CREATE_DATE
-							       , ct.STARTING_DATE 													AS CT_STARTING_DATE
-							       , ct.CHECK_IN_TIME 													AS CT_CHECK_IN_TIME
-								   , ct.CHECK_OUT_TIME 													AS CT_CHECK_OUT_TIME
-						     FROM
-						         COMMUTE											c
-						         INNER JOIN COMMUTE_TIME 							ct 
-						      		     ON c.CHECK_IN_DATE >= ct.STARTING_DATE
-						    WHERE
-						         1 = 1
-						         <if test='id != null and id != ""'>
-							      AND
-							         c.member_id = #{id}
-						         </if>
-						    ORDER BY 
-						         c.CHECK_IN_DATE DESC
-					) a
-					ORDER BY
-					 	 CREATE_DATE DESC
-				) b
-				 WHERE
-				 	  1 = 1
-				   AND
-				 	  ROW_NUM = 1
-			 	  <if test='startDate != null and startDate != ""
-					 		and endDate != null and endDate != ""'>
-					  AND 
-						 TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
-										 						AND #{endDate} 
+	    SELECT
+		  	  	d.ATTENDANCE_TEXT
+		      , COUNT(d.ATTENDANCE_TEXT)	AS PIE_CHART_VALUE
+		  FROM  (SELECT 
+						TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+			  		  , c.*
+		  		   FROM (SELECT 
+								b.*
+				  	  		  , ROW_NUMBER() OVER(PARTITION BY COMMUTE_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+				  		   FROM (SELECT 
+										a.*
+							  		  , cc.CODE_NAME	AS GRADE_NAME
+						  		   FROM (SELECT
+												c.COMMUTE_ID															AS COMMUTE_ID
+						   			  		  , c.MEMBER_ID 															AS MEMBER_ID
+						   			  		  , c.CHECK_IN_TIME															AS CHECK_IN_TIME 	
+						   			  		  , NVL(c.CHECK_OUT_TIME, '-')												AS CHECK_OUT_TIME
+						   			  		  , CASE 
+													WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 				THEN '지각' 
+						         					WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 	THEN '조퇴' 
+						         					ELSE '정상출근'
+						     					END																		AS ATTENDANCE_TEXT
+									  		  , c.CREATE_DATE 															AS CREATE_DATE
+									 		  , ct.STARTING_DATE 														AS CT_STARTING_DATE
+						       		  		  , ct.CHECK_IN_TIME 														AS CT_CHECK_IN_TIME
+							   				  , ct.CHECK_OUT_TIME 														AS CT_CHECK_OUT_TIME
+							   				  , m.NAME 																	AS MEMBER_NAME
+							   				  , m.DEPT_ID 																AS DEPT_ID
+							   				  , m.GRADE_ID 																AS GRADE_ID
+							   				  , cc.CODE_NAME 															AS DEPT_NAME
+								 		 FROM	COMMUTE											c
+												INNER JOIN COMMUTE_TIME 						ct 
+						  		     					ON c.CHECK_IN_DATE >= ct.STARTING_DATE
+							 					INNER JOIN MEMBER								m
+							 		 					ON c.MEMBER_ID = m.MEMBER_ID 
+							 					INNER JOIN COMMON_CODE 							cc
+							 		 					ON m.DEPT_ID = cc.CODE_ID 
+						 		 		WHERE 1 = 1
+										<if test='id != null and id != ""'>
+											AND c.member_id = #{id}
+				         				</if>
+				         				<if test='deptCode != null and deptCode != ""'>
+								   	 		AND m.dept_id = #{deptCode}
+										</if>
+										<if test='rankCode != null and rankCode != ""'>
+								   	 		AND m.grade_id = #{rankCode}
+										</if>
+						  				ORDER BY c.CHECK_IN_DATE DESC
+								) a
+								INNER JOIN COMMON_CODE cc
+										ON a.grade_id = cc.CODE_ID 
+						) b
+						ORDER BY CREATE_DATE DESC
+				) c
+				WHERE 1 = 1
+		   		  AND ROW_NUM = 1
+				  <if test='startDate != null and startDate != ""
+ 			 				and endDate != null and endDate != ""'>
+						AND TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
+														   		   AND #{endDate} 
 				  </if>
-		 	 )  c
-		 GROUP BY
- 			  ATTENDANCE_TEXT
+			) d
+		 GROUP BY ATTENDANCE_TEXT
     </select>
     
     <select id="getMyCommuteTimeMinMaxDate" resultType="map">
@@ -222,31 +237,6 @@
 			</if>
 		 ORDER BY STARTING_DATE DESC
     </select>
-<!--     <select id="getMyCommuteTime" resultType="map"> -->
-<!--     getMyCommuteTime 내 출퇴근 기준 시간 조회 -->
-<!-- 		SELECT -->
-<!-- 			  COM_TIME_ID 		AS COM_TIME_ID -->
-<!-- 			, MEMBER_ID 		AS MEMBER_ID -->
-<!-- 		  	, CHECK_IN_TIME 	AS CHECK_IN_TIME -->
-<!-- 			, CHECK_OUT_TIME 	AS CHECK_OUT_TIME -->
-<!-- 			, STARTING_DATE 	AS STARTING_DATE -->
-<!-- 	  	  FROM  -->
-<!-- 		 	  COMMUTE_TIME -->
-<!-- 		 WHERE -->
-<!-- 		  	  1 = 1 -->
-<!-- 	  	  <if test='id != null and id != ""'> -->
-<!-- 			   AND -->
-<!-- 			  	  member_id = #{id} -->
-<!-- 	  	  </if> -->
-<!-- 	  	  <if test='startDate != null and startDate != "" -->
-<!--    			 		and endDate != null and endDate != ""'> -->
-<!-- 			  AND  -->
-<!-- 				  STARTING_DATE BETWEEN #{startDate}  -->
-<!-- 									AND #{endDate}  -->
-<!-- 		  </if> -->
-<!--   	     ORDER BY -->
-<!--  	  		  STARTING_DATE DESC -->
-<!--     </select> -->
     
     <select id="getWeekend" resultType="map">
     <!-- getWeekend 주말 조회 -->
