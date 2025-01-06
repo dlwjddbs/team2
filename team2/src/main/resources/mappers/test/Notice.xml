@@ -12,7 +12,7 @@
             NAME,
             SUBJECT,
             TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME,
-            CONTENT
+            SUBSTR(CONTENT, 1, 40) AS CONTENT
         FROM 
             NOTICE
 <!--         WHERE member_id = #{memberId} -->
@@ -36,11 +36,19 @@
 <!--	</select>-->
 
 	<insert id="createNotice" parameterType="map">
-        INSERT INTO NOTICE (NOTICE_ID, NAME, SUBJECT, MEMBER_ID, CONTENT)
-        VALUES (#{noticeAuthor}, 'admin', #{noticeTitle}, #{memberId}, #{noticeContent})
+        INSERT INTO NOTICE (NAME, SUBJECT, MEMBER_ID, CONTENT)
+        VALUES ((SELECT NAME FROM MEMBER WHERE MEMBER_ID = #{memberId}), #{noticeTitle}, #{memberId}, #{noticeContent})
     </insert>
 	
-	
+	<select id="getNoticeById" parameterType="int" resultType="map">
+        SELECT 
+            NOTICE_ID, 
+            NAME, 
+            SUBJECT, 
+            CONTENT, 
+            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_TIME
+        FROM NOTICE
+    </select>
 
 
 

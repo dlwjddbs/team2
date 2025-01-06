@@ -14,6 +14,7 @@ public interface NoticeMapper {
 
 	void createNotice(Map<String, Object> map);
 
+
 		
 	
 	
