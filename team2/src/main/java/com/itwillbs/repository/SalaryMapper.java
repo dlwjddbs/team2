@@ -20,7 +20,7 @@ public interface SalaryMapper {
 	Map<String, Object> getSalaryListMinMaxDate(String id);
 	
 	// 급여 입력
-	int insertSalary(Map<String, Object> param);
+	void insertSalary(Map<String, Object> param);
 	
 	// 급여 수정
 	void updateSalary(Map<String, Object> map);

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.itwillbs.repository.CmtMapper;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,8 +19,7 @@ public class CmtService {
     
 
 	public void getCheckIn(Map<String, Object> map) {
-		map.put("member_id", "20241222");
-		map.put("id", "C0000000096");
+		map.put("member_id", map);
 		// 현재 시간을 "yyyy-MM-dd HH:mm:ss" 형식으로 포맷팅하여 String으로 변환
 	    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	    String checkInTime = sdf.format(new java.util.Date());
@@ -45,7 +45,7 @@ public class CmtService {
 
 
 	public void updateCheckOut(Map<String, Object> map) {
-		 map.put("member_id", "20241222");
+//		 map.put("member_id", "20241222");
 		 
 		// checkOutTime을 "yyyy-MM-dd HH:mm:ss" 형식의 String으로 변환
 		    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");

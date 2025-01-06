@@ -34,7 +34,15 @@ public interface AttendanceMapper {
 
 	int insertCheckOutTime(Map<String, Object> map);
 
-	int getWeekendTotalWorkHour(Map<String, Object> map);
+	double getWeekendTotalWorkHour(Map<String, Object> map);
 
 	List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map);
+
+	int deleteCommuteTime(Map<String, Object> map);
+
+	int isDuplicateCommuteTime(Map<String, Object> map);
+
+	int insertCommuteTime(Map<String, Object> map);
+
+	List<Map<String, Object>> getUserInfo(Map<String, Object> map);
 }

@@ -8,7 +8,8 @@
    
 <insert id="getCheckIn" parameterType="map">
     INSERT INTO COMMUTE (COMMUTE_ID, MEMBER_ID, CHECK_IN_TIME,  CHECK_IN_DATE, CHECK_OUT_DATE)
-    VALUES (#{id}, #{memberId, jdbcType=VARCHAR},
+    VALUES ((SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)
+    , #{memberId, jdbcType=VARCHAR},
             <choose>
                 <when test="checkInTime != null">
                     #{checkInTime, jdbcType=VARCHAR} <!-- String 형식으로 저장 -->

@@ -31,7 +31,7 @@
 			1 = 1
 			<if test='id != "admin"'>
 			   AND
-				  member_id = #{id}
+				  S.MEMBER_ID = #{id}
 		  	</if>
 			<if test='startDate != null and startDate != "" 
 						and endDate != null and endDate != ""'>
@@ -76,20 +76,13 @@
             (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS + 
              S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL
 		FROM 
-			SALARY
+			SALARY S
 		JOIN MEMBER M
           ON S.MEMBER_ID = M.MEMBER_ID
 		WHERE
 			1 = 1
 		AND
-			MEMBER_ID = #{id}
-		<!-- WHERE MEMBER_ID = '202501030001' -->
-			<if test='startDate != null and startDate != "" 
-						and endDate != null and endDate != ""'>
-				AND 
-					PAYDAY BETWEEN #{startDate} 
-					AND #{endDate} 
-			</if>
+			S.MEMBER_ID = #{id}
 		ORDER BY
 			PAYDAY DESC
 		
@@ -106,7 +99,8 @@
             , #{DEPT_ID}
             , #{SALARY})
             INTO salary (payday, member_id, POSITION_BONUS, HOLIDAY_BONUS, NIGHT_BONUS, YEAREND_BONUS, FULLSERVICE_BONUS, PERFORMANCE_BONUS) 
-            VALUES (SYSDATE
+            VALUES (
+              SYSDATE
             , #{member_id}
             , #{POSITION_BONUS}
             , #{HOLIDAY_BONUS}

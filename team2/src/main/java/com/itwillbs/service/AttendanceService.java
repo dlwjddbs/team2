@@ -124,11 +124,56 @@ public class AttendanceService {
 		return message;
 	}
 
-	public int getWeekendTotalWorkHour(Map<String, Object> map) {
+	public double getWeekendTotalWorkHour(Map<String, Object> map) {
 		return attendanceMapper.getWeekendTotalWorkHour(map);
 	}
 
 	public List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map) {
 		return attendanceMapper.getMemberSelectBoxList(map);
+	}
+
+	public Map<String, Object> deleteCommuteTime(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "삭제 실패.";
+		String resultCode = "0";
+		
+		int resultCnt = attendanceMapper.deleteCommuteTime(map);
+		if (resultCnt > 0) {
+			result = "삭제 되었습니다.";
+			resultCode = "1";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> addCommuteTime(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "이미 등록된 날짜입니다.";
+		String resultCode = "0";
+		
+		int duplicateCnt = attendanceMapper.isDuplicateCommuteTime(map);
+		if (duplicateCnt == 0) {
+			int resultCnt = attendanceMapper.insertCommuteTime(map);
+			if (resultCnt > 0) {
+				result = "등록 되었습니다.";
+				resultCode = "1";
+			} else {
+				result = "등록 실패.";
+			}
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public List<Map<String, Object>> getUserInfo(Map<String, Object> map) {
+		return attendanceMapper.getUserInfo(map);
 	}
 }

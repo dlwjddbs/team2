@@ -67,13 +67,13 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력
-//	@PostMapping("/writeSalary")
-//	@ResponseBody
-//	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
-//		log.info("============= writeSalary =============");
-//		
-//		
-//		int insertCount = salaryService.writeSalary(param);
+	@PostMapping("/writeSalary")
+	@ResponseBody
+	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
+		log.info("============= writeSalary =============");
+		
+		
+		salaryService.writeSalary(param);
 //		System.out.println(insertCount);
 //		
 //		if(insertCount > 0) {
@@ -81,9 +81,10 @@ public class SalaryController {
 //			System.out.println("insertCount: " + insertCount);
 //		
 //		}
-//		
-//		return writeSalary;
-//	}
+		
+		
+		return "급여 입력 성공!";
+	}
 	
     // 급여 정보 (Test)
 	@GetMapping("/salaryInfo")
