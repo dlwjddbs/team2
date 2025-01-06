@@ -127,4 +127,8 @@ public class AttendanceService {
 	public int getWeekendTotalWorkHour(Map<String, Object> map) {
 		return attendanceMapper.getWeekendTotalWorkHour(map);
 	}
+
+	public List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map) {
+		return attendanceMapper.getMemberSelectBoxList(map);
+	}
 }

@@ -35,4 +35,6 @@ public interface AttendanceMapper {
 	int insertCheckOutTime(Map<String, Object> map);
 
 	int getWeekendTotalWorkHour(Map<String, Object> map);
+
+	List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map);
 }

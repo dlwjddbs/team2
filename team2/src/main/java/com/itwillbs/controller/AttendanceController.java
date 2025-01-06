@@ -368,6 +368,14 @@ public class AttendanceController {
 		return selectBoxList;
 	}
 	
+	@PostMapping("/memberSelectBox")
+	@ResponseBody
+	public List<Map<String, Object>> memberSelectBox(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> memberSelectBoxList = attendanceService.getMemberSelectBoxList(map);
+		
+		return memberSelectBoxList;
+	}
+	
 	@GetMapping("/logout")
 	public String logout(HttpSession session, Model model, Map<String, Object> map) {
 		session.invalidate();

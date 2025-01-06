@@ -161,12 +161,34 @@
 		        format: 'YYYY-MM-DD',
 		        minDate: moment()  // 내일 부터 선택 가능
 		    });
+		    
+		    memberSelectBox();
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
 			dataTable('example1', date, true);
 		});
+		
+		function memberSelectBox() {
+			$.ajax({
+                type : "POST",
+                url : "/memberSelectBox",
+                data : {},
+                success : function(res){
+                	let str = '<option value="" selected="selected" disabled>전체</option>';
+                	
+                	res.forEach((el)=>{
+						str += '<option value="' + el.MEMBER_ID + '">' + el.MEMBER_ID + ' - ' + el.NAME + '</option>';
+               		})
+               		
+               		$("#memberSelect").html(str);
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("selectBox() ajax 실패");
+                }
+            });
+		}
 		
 		function dateRangePicker() {
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
@@ -282,10 +304,15 @@
 		}
 		
 		$("#timeSave").on("click", function() {
-			let MEMBER_ID = $("#MEMBER_ID").val();
+			let MEMBER_ID = $("#memberSelect").val();
 			let CHECK_IN_TIME = $("#CHECK_IN_TIME").val();
 			let CHECK_OUT_TIME = $("#CHECK_OUT_TIME").val();
 			let STARTING_DATE = $("#STARTING_DATE").val();
+			
+			console.log(MEMBER_ID);
+			console.log(CHECK_IN_TIME);
+			console.log(CHECK_OUT_TIME);
+			console.log(STARTING_DATE);
 			
 			if (MEMBER_ID == null || MEMBER_ID == ''
 				|| CHECK_IN_TIME == null || CHECK_IN_TIME == '' 
