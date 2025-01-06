@@ -22,4 +22,6 @@ public interface SalaryMapper {
 	// 급여 입력
 	int insertSalary(Map<String, Object> param);
 	
+	// 급여 수정
+	void updateSalary(Map<String, Object> map);
 }

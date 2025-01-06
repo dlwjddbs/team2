@@ -116,5 +116,19 @@
             , #{PERFORMANCE_BONUS})
         SELECT * FROM dual;
  	</insert> 
+ 	
+ 	<!-- 급여 수정 -->
+ 	<update id="updateSalary" parameterType="map">
+		UPDATE SALARY 
+	   	   SET 
+	   	   	   POSITION_BONUS = #{positionBonus}
+	       	 , HOLIDAY_BONUS = #{holidayBonus}
+	       	 , NIGHT_BONUS = #{nightBonus}
+	       	 , YEAREND_BONUS = #{yearendBonus}
+	       	 , FULLSERVICE_BONUS = #{fullserviceBonus}
+	       	 , PERFORMANCE_BONUS = #{performanceBonus}
+		WHERE 
+			 MEMBER_ID = #{id}
+	</update>
 
 </mapper>
