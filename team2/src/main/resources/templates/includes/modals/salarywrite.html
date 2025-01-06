@@ -21,10 +21,7 @@
 								<div class="form-group">
 					              <label>귀속 연월</label>
 									<div class="input-group date" id="reservationdate" data-target-input="nearest">
-									    <input type="text" class="form-control datetimepicker-input" id="daterange" placeholder="년-월 선택" readonly />
-<!-- 									    <div class="input-group-append" data-target="#reservationdate" data-toggle="datepicker"> -->
-<!-- 									        <div class="input-group-text"><i class="fa fa-calendar"></i></div> -->
-<!-- 									    </div> -->
+									    <input type="text" class="form-control datetimepicker-input" id="daterange" name="PAYDAY" placeholder="년-월 선택" readonly />
 									</div>
 					            </div>
 				            </div>
@@ -33,13 +30,13 @@
 							<div class="col-md-5">
 								<div class="form-group">
 					              <label>사원 번호</label>
-				                    <input type="text" class="form-control" data-target="#reservationdate"/>
+				                    <input type="text" class="form-control" id="member" name="MEMBER_ID" data-target="#reservationdate"/>
 					            </div>
 							</div>
 							<div class="col-md-7">
 								<div class="form-group">
 					              <label>사원명</label>
-				                    <input type="text" class="form-control"  placeholder="사원명을 입력하세요.">
+				                    <input type="text" class="form-control" id="name" name="NAME" placeholder="사원명을 입력하세요.">
 					            </div>
 				            </div>
 						 </div>
@@ -49,15 +46,15 @@
 									<label for="exampleInputEmail1">부서명</label>
 									<select class="form-control select" id="department" name="DEPARTMENT">
 										<option selected="selected" disabled>부서선택</option>
-										<option value="1">인사팀</option>												
-										<option value="2">회계팀</option>												
-										<option value="3">총무팀</option>												
-										<option value="4">국내영업팀</option>												
-										<option value="5">영업기획팀</option>												
-										<option value="6">서버개발팀</option>												
-										<option value="7">웹개발팀</option>												
-										<option value="8">모바일개발팀</option>												
-										<option value="9">유지보수팀</option>												
+										<option value="HR">인사팀</option>												
+										<option value="AC">회계팀</option>												
+										<option value="AD">총무팀</option>												
+										<option value="DN">국내영업팀</option>												
+										<option value="PL">영업기획팀</option>												
+										<option value="SRV">서버개발팀</option>												
+										<option value="WEB">웹개발팀</option>												
+										<option value="MOB">모바일개발팀</option>												
+										<option value="MNT">유지보수팀</option>												
 									</select>
 								</div>
  							</div> 
@@ -66,17 +63,17 @@
 									<label for="exampleInputEmail1">직급</label>
 									<select class="form-control select" id="grade" name="GRADE">
 										<option selected="selected" disabled>직급선택</option>												
-										<option value="1">대리</option>												
-										<option value="2">과장</option>												
-										<option value="3">차장</option>												
-										<option value="4">부장</option>												
-										<option value="5">이사</option>												
-										<option value="6">상무</option>												
-										<option value="7">전무</option>												
-										<option value="8">부사장</option>												
-										<option value="9">사장</option>												
-										<option value="10">사원</option>												
-										<option value="11">주임</option>												
+										<option value="AS">대리</option>												
+										<option value="MG">과장</option>												
+										<option value="SM">차장</option>												
+										<option value="GM">부장</option>												
+										<option value="DR">이사</option>												
+										<option value="ED">상무</option>												
+										<option value="SD">전무</option>												
+										<option value="VP">부사장</option>												
+										<option value="PR">사장</option>												
+										<option value="ST">사원</option>												
+										<option value="AM">주임</option>												
 									</select>
  								</div> 
  							</div> 
@@ -85,13 +82,13 @@
 							<div class="col-md-4">
 				                <div class="form-group">
 				                  <label>급여 항목</label>
-				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                 	<input type="text" readonly class="form-control" id="salary" name="SALARY" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="position" name="POSITION_BONUS" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="holiday" name="HOLIDAY_BONUS" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="night" name="NIGHT_BONUS" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="yearend" name="YEAREND_BONUS" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="fullservice" name="FULLSERVICE_BONUS" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="performance  " name="PERFORMANCE_BONUS" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
 							</div>
 							<div class="col-md-8">
@@ -120,7 +117,7 @@
 				<div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-						<button type="submit" class="btn btn-primary">등록</button>
+						<button type="submit" id="submitBtn" class="btn btn-primary">등록</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->

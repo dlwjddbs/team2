@@ -301,59 +301,74 @@
 
 		});
 		
-// 		function isNumberKey(evt) {
-//             // 숫자만 입력되도록 제한
-//             var charCode = (evt.which) ? evt.which : evt.keyCode;
-//             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-//                 return false; // 숫자가 아닌 경우 false 반환
-//             }
-//             return true; // 숫자인 경우 true 반환
-//         }
 
-//         $(document).ready(function() {
-//             // 모든 금액 입력 필드에 대해 이벤트를 설정
-//             $('input[type="text"]').on('input', function() {
-//                 // 입력값을 숫자로 변환
-//                 let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
-                
-//                 // 숫자 형식으로 변환
-//                 if (value && !isNaN(value)) {
-//                     value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
-//                 } else if (value) {
-//                     alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
-//                     $(this).val(''); // 입력 필드 초기화
-//                     return; // 추가 처리 방지
-//                 }
-//                 $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
-//             });
-//         });
+			function isNumberKey(evt) {
+			            // 숫자만 입력되도록 제한
+			            var charCode = (evt.which) ? evt.which : evt.keyCode;
+			            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+			                return false; // 숫자가 아닌 경우 false 반환
+			            }
+			            return true; // 숫자인 경우 true 반환
+			        }
+			
+					
+					$(document).ready(function() {
+					    // 금액 입력 필드에만 이벤트를 설정
+					    $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
+					        let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
+					        
+					        // 숫자 형식으로 변환
+					        if (value && !isNaN(value)) {
+					            value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+					        } else if (value) {
+					            alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
+					            $(this).val(''); // 입력 필드 초기화
+					            return; // 추가 처리 방지
+					        }
+					        $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
+					    });
+					});
+					
+			// 급여 등록 버튼을 클릭시 이벤트 발생
+			$('#submitBtn').click(function () {
+			    // 입력 필드 값 가져오기
+			    var datarange = $('#daterange').val();
+			    var member = $('#memberId').val(); // 사원 번호
+			    var name = $('#name').val(); // 사원명
+			    var department = $('#department').val(); // 부서
+			    var salary = $('#salary').val(); // 급여
+			    var position = $('#position').val(); // 직책
+			    var holiday = $('#holiday').val(); // 연휴 수당
+			    var night = $('#night').val(); // 야근 수당
+			    var yearend = $('#yearend').val(); // 연말 격려 수당
+			    var fullservice = $('#fullservice').val(); // 만기 근속자 포상
+			    var performance = $('#performance').val(); // 실적 우수자 포상
 
-		 function isNumberKey(evt) {
-		            // 숫자만 입력되도록 제한
-		            var charCode = (evt.which) ? evt.which : evt.keyCode;
-		            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-		                return false; // 숫자가 아닌 경우 false 반환
-		            }
-		            return true; // 숫자인 경우 true 반환
-		        }
-		
-		        $(document).ready(function() {
-		            // 모든 금액 입력 필드에 대해 이벤트를 설정
-		            $('input[type="text"]').on('input', function() {
-		                let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
-		                
-		                // 숫자 형식으로 변환
-		                if (value && !isNaN(value)) {
-		                    value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
-		                } else if (value) {
-		                    alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
-		                    $(this).val(''); // 입력 필드 초기화
-		                    return; // 추가 처리 방지
-		                }
-		                $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
-		            });
-		        });
-		
+			    // AJAX로 서버에 데이터 전송
+			    $.ajax({
+			        url: '/writeSalary', // 컨트롤러 매핑 URL
+			        type: 'POST',
+			        data: {
+			            daterange: datarange,
+			            member: member,
+			            name: name,
+			            department: department,
+			            salary: salary,
+			            position: position,
+			            holiday: holiday,
+			            night: night,
+			            yearend: yearend,
+			            fullservice: fullservice,
+			            performance: performance,
+			        },
+			        success: function (response) {
+			            alert('급여 입력 성공!');
+			        },
+			        error: function (error) {
+			            alert('급여 입력 실패');
+			        }
+			    });
+			});
 		
 	</script>
 </body>

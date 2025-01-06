@@ -20,7 +20,6 @@ public class SalaryService {
 	}
 
 	public void writeSalary(Map<String, Object> param) {
-		System.out.println("service param : " + param);
 		salaryMapper.insertSalary(param);
 	}
 	

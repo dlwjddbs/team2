@@ -90,25 +90,40 @@
     
     <!-- 사원별 급여 입력(관리자) -->
 	<insert id="insertSalary"> 
-		 INSERT ALL
-            INTO member (member_id, NAME, GRADE_ID, DEPT_ID, SALARY) 
-            VALUES (
-			  #{member_id}
-            , #{NAME}
-            , #{GRADE_ID}
-            , #{DEPT_ID}
-            , #{SALARY})
-            INTO salary (payday, member_id, POSITION_BONUS, HOLIDAY_BONUS, NIGHT_BONUS, YEAREND_BONUS, FULLSERVICE_BONUS, PERFORMANCE_BONUS) 
-            VALUES (
-              SYSDATE
-            , #{member_id}
-            , #{POSITION_BONUS}
-            , #{HOLIDAY_BONUS}
-            , #{NIGHT_BONUS}
-            , #{YEAREND_BONUS}
-            , #{FULLSERVICE_BONUS}
-            , #{PERFORMANCE_BONUS})
-        SELECT * FROM dual;
+		INSERT ALL
+        INTO SALARY (
+			<if test="PAYDAY != null"> PAYDAY </if>
+		  , <if test="MEMBER_ID != null"> MEMBER_ID </if>
+		  , <if test="GRADE != null"> GRADE </if>
+		  , <if test="POSITION_BONUS != null"> POSITION_BONUS </if>
+		  , <if test="HOLIDAY_BONUS != null"> HOLIDAY_BONUS </if>
+		  , <if test="NIGHT_BONUS != null"> NIGHT_BONUS </if>
+		  , <if test="YEAREND_BONUS != null"> YEAREND_BONUS </if>
+		  , <if test="FULLSERVICE_BONUS != null"> FULLSERVICE_BONUS </if>
+		  , <if test="PERFORMANCE_BONUS != null"> PERFORMANCE_BONUS </if>
+		 	 )
+        VALUES (
+			<if test="PAYDAY != null"> #{PAYDAY} </if>
+		  , <if test="MEMBER_ID != null"> #{MEMBER_ID} </if>
+		  , <if test="GRADE != null"> #{GRADE} </if>
+		  , <if test="POSITION_BONUS != null"> #{POSITION_BONUS} </if>
+		  , <if test="HOLIDAY_BONUS != null"> #{HOLIDAY_BONUS} </if>
+		  , <if test="NIGHT_BONUS != null"> #{NIGHT_BONUS} </if>
+		  , <if test="YEAREND_BONUS != null"> #{YEAREND_BONUS} </if>
+		  , <if test="FULLSERVICE_BONUS != null"> #{FULLSERVICE_BONUS} </if>
+		  , <if test="PERFORMANCE_BONUS != null"> #{PERFORMANCE_BONUS} </if>
+			  )
+        INTO MEMBER (
+			<if test="NAME != null"> NAME </if>
+		  , <if test="DEPARTMENT != null"> DEPARTMENT </if>
+		  , <if test="SALARY != null"> SALARY </if>
+			  )
+        VALUES (
+			<if test="NAME != null"> #{NAME} </if>
+	  	  , <if test="DEPARTMENT != null"> #{DEPARTMENT} </if>
+		  , <if test="SALARY != null"> #{SALARY} </if>
+		  	 )
+    	SELECT * FROM dual
  	</insert> 
  	
  	<!-- 급여 수정 -->
