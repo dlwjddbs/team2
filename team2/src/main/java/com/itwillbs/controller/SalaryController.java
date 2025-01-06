@@ -67,22 +67,23 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력
-	@PostMapping("/writeSalary")
-	public String addMember(@RequestParam Map<String, Object> param, Model model) {
-		log.info("============= writeSalary =============");
-		
-//		<< CREATE_DATE 추가 >>
-		LocalDateTime now = LocalDateTime.now();
-		String CREATE_DATE = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		param.put("CREATE_DATE", CREATE_DATE);
-		
-		System.out.println(param.toString());
-		
-		int insertCount = salaryService.writeSalary(param);
-		System.out.println(insertCount);
-		
-		return "redirect:/salaryInput";
-	}	
+//	@PostMapping("/writeSalary")
+//	@ResponseBody
+//	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
+//		log.info("============= writeSalary =============");
+//		
+//		
+//		int insertCount = salaryService.writeSalary(param);
+//		System.out.println(insertCount);
+//		
+//		if(insertCount > 0) {
+//			System.out.println("========insert 성공");
+//			System.out.println("insertCount: " + insertCount);
+//		
+//		}
+//		
+//		return writeSalary;
+//	}
 	
     // 급여 정보 (Test)
 	@GetMapping("/salaryInfo")

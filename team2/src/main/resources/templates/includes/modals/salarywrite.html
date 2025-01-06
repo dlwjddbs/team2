@@ -1,8 +1,3 @@
-<!--
-	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
-		수정
-	</button>
--->
 
 <!-- 모달창 -->
 <div class="modal fade" id="modal-lg" th:fragment="salarywrite">
@@ -56,7 +51,15 @@
 									<label for="exampleInputEmail1">부서명</label>
 									<select class="form-control select" id="department" name="DEPARTMENT">
 										<option selected="selected" disabled>부서선택</option>
-										<option>개발부</option>												
+										<option>인사팀</option>												
+										<option>회계팀</option>												
+										<option>총무팀</option>												
+										<option>국내영업팀</option>												
+										<option>영업기획팀</option>												
+										<option>서버개발팀</option>												
+										<option>웹개발팀</option>												
+										<option>모바일개발팀</option>												
+										<option>유지보수팀</option>												
 									</select>
 								</div>
  							</div> 
@@ -66,6 +69,16 @@
 									<select class="form-control select" id="grade" name="GRADE">
 										<option selected="selected" disabled>직급선택</option>												
 										<option>대리</option>												
+										<option>과장</option>												
+										<option>차장</option>												
+										<option>부장</option>												
+										<option>이사</option>												
+										<option>상무</option>												
+										<option>전무</option>												
+										<option>부사장</option>												
+										<option>사장</option>												
+										<option>사원</option>												
+										<option>주임</option>												
 									</select>
  								</div> 
  							</div> 
@@ -96,132 +109,6 @@
 				                </div>
 							</div>
 						</div>
-<!--						<div class="row">-->
-<!--							<div class="col-md-12">-->
-<!--								<div class="form-group">-->
-<!--					              <label>지급일</label>-->
-<!--					                <div class="input-group date" id="reservationdate2" data-target-input="nearest">-->
-<!--					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate2"/>-->
-<!--					                    <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">-->
-<!--					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>-->
-<!--					                    </div>-->
-<!--					                </div>-->
-<!--					            </div>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--						<div class="row">-->
-<!--							<div class="col-md-12">-->
-<!--								<div class="form-group">-->
-<!--					              <label>지급 연월</label>-->
-<!--					                <div class="input-group date" id="reservationdate3" data-target-input="nearest">-->
-<!--					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate3"/>-->
-<!--					                    <div class="input-group-append" data-target="#reservationdate3" data-toggle="datetimepicker">-->
-<!--					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>-->
-<!--					                    </div>-->
-<!--					                </div>-->
-<!--					            </div>-->
-<!--							</div>-->
-<!--						</div>-->
-						
-						<!-- 주소 -->
-<!-- 						<div class="form-group"> -->
-<!-- 							<label for="exampleInputEmail1">주소</label> -->
-<!-- 							<div class="row"> -->
-<!-- 								<div class="col-md-3"> -->
-<!-- 									<input type="text" class="form-control" name="address_num" id="postcode" placeholder="우편번호" onclick="exercDaumPostcode()"> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 							<br> -->
-<!-- 							<div class="row"> -->
-<!-- 								<div class="col-md-6"> -->
-<!-- 									<input type="text" class="form-control" name="address1" id="address" placeholder="주소">								 -->
-<!-- 								</div> -->
-<!-- 								<div class="col-md-6"> -->
-<!-- 									<input type="text" class="form-control" name="address2" id="detail_address" placeholder="상세주소">								 -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-						<!-- /.주소 -->
-						
-<!-- 						<div class="row"> -->
-<!-- 							<div class="col-md-6"> -->
-<!-- 								<div class="form-group"> -->
-<!-- 									<label>입사일자</label> -->
-<!-- 									<div class="input-group"> -->
-<!-- 										<div class="input-group-prepend"> -->
-<!-- 											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span> -->
-<!-- 										</div> -->
-<!-- 										<input type="text" id="datemask" name="join_date" class="form-control" placeholder="dd/mm/yyyy" required> -->
-<!-- 									</div> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 							<div class="col-md-6"> -->
-<!-- 								<div class="form-group"> -->
-<!-- 									<label for="exampleInputEmail1" name="">입사구분</label> -->
-<!-- 									<div class="row"> -->
-<!-- 										<div class="icheck-primary d-inline col-md-6"> -->
-<!-- 											<input type="radio" id="radioPrimary1" name="r1" checked required> -->
-<!-- 											<label for="radioPrimary1"> -->
-<!-- 												신입 -->
-<!-- 			                        		</label> -->
-<!-- 		                      			</div> -->
-<!-- 										<div class="icheck-primary d-inline col-md-6"> -->
-<!-- 											<input type="radio" id="radioPrimary2" name="r1"> -->
-<!-- 											<label for="radioPrimary2"> -->
-<!-- 												경력 -->
-<!-- 											</label> -->
-<!-- 					                    </div> -->
-<!-- 									</div> -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-						
-						
-<!-- 						<div class="form-group"> -->
-<!-- 							<label for="exampleInputEmail1">계좌번호</label> -->
-<!-- 							<div class="row"> -->
-<!-- 								<div class="col-md-3"> -->
-<!-- 									<select class="form-control select" style="width: 100%"> -->
-<!-- 										<option selected="selected" disabled>은행</option> -->
-<!-- 										변경 예정												 -->
-<!-- 										<option>광주은행</option> -->
-<!-- 										<option>단위농협(지역농축협)</option> -->
-<!-- 										<option>부산은행</option> -->
-<!-- 										<option>새마을금고</option> -->
-<!-- 										<option>산림조합</option> -->
-<!-- 										<option>신한은행</option> -->
-<!-- 										<option>신협</option> -->
-<!-- 										<option>씨티은행</option> -->
-<!-- 										<option>우리은행</option> -->
-<!-- 										<option>우체국예금보험</option> -->
-<!-- 										<option>저축은행중앙회</option> -->
-<!-- 										<option>전북은행</option> -->
-<!-- 										<option>제주은행</option> -->
-<!-- 										<option>카카오뱅크</option> -->
-<!-- 										<option>케이뱅크</option> -->
-<!-- 										<option>토스뱅크</option> -->
-<!-- 										<option>하나은행</option> -->
-<!-- 										<option>홍콩상하이은행</option> -->
-<!-- 										<option>IBK기업은행</option> -->
-<!-- 										<option>KB국민은행</option> -->
-<!-- 										<option>DGB대구은행</option> -->
-<!-- 										<option>KDB산업은행</option> -->
-<!-- 										<option>NH농협은행</option> -->
-<!-- 										<option>SC제일은행</option> -->
-<!-- 										<option>Sh수협은행</option>											 -->
-<!-- 									</select>											 -->
-<!-- 								</div> -->
-<!-- 								<div class="col-md-3"> -->
-<!-- 									<input type="text" class="form-control">	 -->
-<!-- 								</div> -->
-<!-- 								<div class="col-md-6"> -->
-<!-- 									<input type="text" class="form-control">												 -->
-<!-- 								</div> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-						
-						
-						
 					</div>
 				</div>
 				<!-- /.모달창 바디 -->
