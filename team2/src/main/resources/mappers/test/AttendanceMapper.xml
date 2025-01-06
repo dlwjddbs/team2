@@ -8,30 +8,48 @@
     <select id="getMyCommuteHistory" resultType="map">
     <!-- getMyCommuteHistory 출퇴근기록 조회 -->
 		SELECT 
-              CHECK_IN_DATE				AS COMMUTE_CHECK_IN_DATE
-    		, CHECK_IN_TIME				AS COMMUTE_CHECK_IN_TIME
-    		, CHECK_OUT_DATE			AS COMMUTE_CHECK_OUT_DATE
-    		, CHECK_OUT_TIME			AS COMMUTE_CHECK_OUT_TIME
-    		, MEMBER_ID					AS COMMUTE_MEMBER_ID
-		  FROM
-		      COMMUTE
-		 WHERE
-		 	  1 = 1
-			  <if test='id != null and id != ""'>
-		   	 	AND member_id = #{id}
-			  </if>
-			  <choose>
-			 	 <when test='isToday != null and isToday != ""'>
-					AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE    
-			   	 </when>
-			 	 <when test='startDate != null and startDate != ""
-	   			 		and endDate != null and endDate != ""'>
-			  	  	AND CHECK_IN_DATE BETWEEN #{startDate} 
-										  AND #{endDate}   
-			  	 </when>    
-			  </choose>
+				a.*
+			  , c.CODE_NAME			AS DEPT_NAME
+			  , c2.CHECK_IN_DATE 	AS COMMUTE_CHECK_IN_DATE
+			  , c2.CHECK_IN_TIME 	AS COMMUTE_CHECK_IN_TIME
+			  , c2.CHECK_OUT_DATE 	AS COMMUTE_CHECK_OUT_DATE
+			  , c2.CHECK_OUT_TIME 	AS COMMUTE_CHECK_OUT_TIME
+		  FROM (SELECT 
+						m.MEMBER_ID		AS COMMUTE_MEMBER_ID
+					  , m.NAME 
+					  , m.GRADE_ID 
+					  , c.CODE_NAME		AS GRADE_NAME
+					  , m.DEPT_ID 
+				  FROM 	MEMBER					m
+						INNER JOIN COMMON_CODE	c
+				 				ON m.GRADE_ID = c.CODE_ID) a
+		 INNER JOIN COMMON_CODE c
+				 ON a.dept_id = c.CODE_ID
+		 INNER JOIN COMMUTE c2 
+		 		 ON a.COMMUTE_MEMBER_ID = c2.MEMBER_ID 
+		 WHERE 
+		 		1 = 1
+				<if test='id != null and id != ""'>
+		   	 		AND a.COMMUTE_MEMBER_ID = #{id}
+				</if>
+				<choose>
+					<when test='isToday != null and isToday != ""'>
+						AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE    
+					</when>
+			 	 	<when test='startDate != null and startDate != ""
+ 	   			 				and endDate != null and endDate != ""'>
+						AND CHECK_IN_DATE BETWEEN #{startDate} 
+											  AND #{endDate}   
+			  	 	</when>    
+				</choose>
+				<if test='deptCode != null and deptCode != ""'>
+		   	 		AND a.dept_id = #{deptCode}
+				</if>
+				<if test='rankCode != null and rankCode != ""'>
+		   	 		AND a.grade_id = #{rankCode}
+				</if>
 		 ORDER BY
-		 	  CHECK_IN_TIME DESC
+		 	  CHECK_IN_DATE DESC
     </select>
     
     <select id="getMyCommuteHistoryMinMaxDate" resultType="map">

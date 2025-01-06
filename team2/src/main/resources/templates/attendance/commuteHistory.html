@@ -204,7 +204,7 @@
 		
 		function dataTable(tableId, date, isUpdate) {
 			// TODO 멤버 테이블 안정화 되면 필터 기능 추가
-			let depCode = $("#DEP").val();
+			let deptCode = $("#DEP").val();
 			let rankCode = $("#RANK").val();
 			
 			// 기존 테이블 삭제
@@ -234,16 +234,20 @@
 					data : {
 						startDate : date[0],					
 						endDate : date[1],
-						depCode : depCode,
+						deptCode : deptCode,
 						rankCode : rankCode
 					},
 					"dataSrc": function (res) {
+						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
 					{data : "COMMUTE_CHECK_IN_DATE", title : "일자", "defaultContent": ""},
 					{data : "COMMUTE_MEMBER_ID", title : "회원ID", "defaultContent": ""},
+					{data : "NAME", title : "회원명", "defaultContent": ""},
+					{data : "DEPT_NAME", title : "소속부서", "defaultContent": ""},
+					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
 					{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
 					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""}
 				],
