@@ -14,6 +14,7 @@
 			  , c2.CHECK_IN_TIME 	AS COMMUTE_CHECK_IN_TIME
 			  , c2.CHECK_OUT_DATE 	AS COMMUTE_CHECK_OUT_DATE
 			  , c2.CHECK_OUT_TIME 	AS COMMUTE_CHECK_OUT_TIME
+			  , c2.COMMUTE_ID 		AS COMMUTE_ID
 		  FROM (SELECT 
 						m.MEMBER_ID		AS COMMUTE_MEMBER_ID
 					  , m.NAME 
@@ -199,28 +200,53 @@
     <select id="getMyCommuteTime" resultType="map">
     <!-- getMyCommuteTime 내 출퇴근 기준 시간 조회 -->
 		SELECT
-			  COM_TIME_ID 		AS COM_TIME_ID
-			, MEMBER_ID 		AS MEMBER_ID
-		  	, CHECK_IN_TIME 	AS CHECK_IN_TIME
-			, CHECK_OUT_TIME 	AS CHECK_OUT_TIME
-			, STARTING_DATE 	AS STARTING_DATE
-	  	  FROM 
-		 	  COMMUTE_TIME
+				c.COM_TIME_ID 		AS COM_TIME_ID
+			  , c.MEMBER_ID 		AS MEMBER_ID
+		  	  , c.CHECK_IN_TIME 	AS CHECK_IN_TIME
+			  , c.CHECK_OUT_TIME 	AS CHECK_OUT_TIME
+			  , c.STARTING_DATE 	AS STARTING_DATE
+			  , m.NAME 				AS NAME
+		  FROM 
+				COMMUTE_TIME c
+				INNER JOIN MEMBER m 
+						ON c.MEMBER_ID = m.MEMBER_ID 
 		 WHERE
-		  	  1 = 1
-	  	  <if test='id != null and id != ""'>
-			   AND
-			  	  member_id = #{id}
-	  	  </if>
-	  	  <if test='startDate != null and startDate != ""
+				1 = 1
+			<if test='id != null and id != ""'>
+				AND m.member_id = #{id}
+			</if>
+			<if test='startDate != null and startDate != ""
    			 		and endDate != null and endDate != ""'>
-			  AND 
-				  STARTING_DATE BETWEEN #{startDate} 
-									AND #{endDate} 
-		  </if>
-  	     ORDER BY
- 	  		  STARTING_DATE DESC
+				AND STARTING_DATE BETWEEN #{startDate} 
+									  AND #{endDate} 
+			</if>
+		 ORDER BY STARTING_DATE DESC
     </select>
+<!--     <select id="getMyCommuteTime" resultType="map"> -->
+<!--     getMyCommuteTime 내 출퇴근 기준 시간 조회 -->
+<!-- 		SELECT -->
+<!-- 			  COM_TIME_ID 		AS COM_TIME_ID -->
+<!-- 			, MEMBER_ID 		AS MEMBER_ID -->
+<!-- 		  	, CHECK_IN_TIME 	AS CHECK_IN_TIME -->
+<!-- 			, CHECK_OUT_TIME 	AS CHECK_OUT_TIME -->
+<!-- 			, STARTING_DATE 	AS STARTING_DATE -->
+<!-- 	  	  FROM  -->
+<!-- 		 	  COMMUTE_TIME -->
+<!-- 		 WHERE -->
+<!-- 		  	  1 = 1 -->
+<!-- 	  	  <if test='id != null and id != ""'> -->
+<!-- 			   AND -->
+<!-- 			  	  member_id = #{id} -->
+<!-- 	  	  </if> -->
+<!-- 	  	  <if test='startDate != null and startDate != "" -->
+<!--    			 		and endDate != null and endDate != ""'> -->
+<!-- 			  AND  -->
+<!-- 				  STARTING_DATE BETWEEN #{startDate}  -->
+<!-- 									AND #{endDate}  -->
+<!-- 		  </if> -->
+<!--   	     ORDER BY -->
+<!--  	  		  STARTING_DATE DESC -->
+<!--     </select> -->
     
     <select id="getWeekend" resultType="map">
     <!-- getWeekend 주말 조회 -->
@@ -324,10 +350,64 @@
 	 	 WHERE TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE
 	</update>
 	
-	<select id="getWeekendTotalWorkHour" resultType="Integer">
-		SELECT NVL(SUM(TRUNC((TO_DATE(CHECK_OUT_TIME,'HH24:MI:SS') - TO_DATE(CHECK_IN_TIME,'HH24:MI:SS')) * 24)), 0) AS WEEKEND_TOTAL_HOUR
+	<select id="getWeekendTotalWorkHour" resultType="Double">
+		SELECT NVL(SUM(TRUNC((TO_DATE(CHECK_OUT_TIME,'HH24:MI:SS') - TO_DATE(CHECK_IN_TIME,'HH24:MI:SS')) * 24, 2)), 0) AS WEEKEND_TOTAL_HOUR
 		  FROM COMMUTE
 		 WHERE CHECK_IN_DATE BETWEEN TO_CHAR(TRUNC(CURRENT_DATE, 'IW'), 'YYYY-MM-DD')
 		 						 AND TO_CHAR(TRUNC(CURRENT_DATE, 'IW') + 6, 'YYYY-MM-DD')
+		   AND MEMBER_ID = #{id}
 	</select>
+	
+	<delete id="deleteCommuteTime">
+	<!-- deleteCommuteTime 출퇴근 기록 삭제 -->
+		DELETE FROM COMMUTE
+ 		 WHERE COMMUTE_ID = #{id}
+	</delete>
+	
+	<select id="isDuplicateCommuteTime" resultType="Integer">
+	<!-- isDuplicateCommuteTime 출퇴근 시간 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMUTE
+		 WHERE 
+			   MEMBER_ID = #{MEMBER_ID} 
+		   AND CHECK_IN_DATE = #{CHECK_IN_DATE}
+	</select>
+	
+	<insert id="insertCommuteTime">
+		INSERT INTO COMMUTE(
+			COMMUTE_ID
+			, CHECK_IN_TIME
+			, CHECK_OUT_TIME
+			, MEMBER_ID
+			, CHECK_IN_DATE
+			, CHECK_OUT_DATE
+			, CREATE_DATE
+			, UPDATE_DATE
+			, CORRECTOR_ID
+		)
+		VALUES(
+			(SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)
+			, #{CHECK_IN_TIME}
+			, #{CHECK_OUT_TIME}
+			, #{MEMBER_ID}
+			, #{CHECK_IN_DATE}
+			, #{CHECK_IN_DATE}
+			, CURRENT_DATE
+			, CURRENT_DATE
+			, #{session_id}
+		)
+	</insert>
+	
+	<select id="getUserInfo" resultType="map">
+    <!-- getUserInfo 메인화면 유저 정보 조회 -->
+	    SELECT 
+			MEMBER_ID
+		  , NAME
+		  , PROFILE_PIC	
+		  , c.CODE_NAME AS DEPT_NAME
+	  FROM 	MEMBER m
+	  		INNER JOIN COMMON_CODE c
+	  				ON m.dept_id = c.code_id
+	 WHERE	m.MEMBER_ID = #{id}
+    </select>
 </mapper>

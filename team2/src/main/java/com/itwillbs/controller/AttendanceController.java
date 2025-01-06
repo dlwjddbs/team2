@@ -214,6 +214,25 @@ public class AttendanceController {
 		
 		return commuteHistory;
 	}
+	
+	@PostMapping("/deleteCommuteTime")
+	@ResponseBody
+	public Map<String, Object> deleteCommuteTime(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = attendanceService.deleteCommuteTime(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/addCommuteTime")
+	@ResponseBody
+	public Map<String, Object> addCommuteTime(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("session_id", id);
+		
+		Map<String, Object> message = attendanceService.addCommuteTime(map);
+		
+		return message;
+	}
 
 	
 	/*====================================================================
@@ -299,7 +318,7 @@ public class AttendanceController {
 	
 	@PostMapping("/getAttendanceHistory")
 	@ResponseBody
-	public List<Map<String, Object>> getAttendanceHistory(HttpSession session, @RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getAttendanceHistory(@RequestParam Map<String, Object> map) {
 		List<Map<String, Object>> attendanceHistory = attendanceService.getMyAttendanceHistory(map);
 		
 		return attendanceHistory;
@@ -307,7 +326,7 @@ public class AttendanceController {
 	
 	@PostMapping("/getAttendanceHistoryDonutChart")
 	@ResponseBody
-	public List<Map<String, Object>> getAttendanceHistoryDonutChart(HttpSession session, @RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getAttendanceHistoryDonutChart(@RequestParam Map<String, Object> map) {
 		List<Map<String, Object>> attendanceHistoryDonut = attendanceService.getMyAttendanceHistoryDonutChart(map);
 		
 		return attendanceHistoryDonut;
@@ -319,15 +338,18 @@ public class AttendanceController {
 	 * */
 	
 	@GetMapping("/myCommuteHistoryCal")
-	public String getMyCommuteHistoryCal(Model model, Map<String, Object> map) {
+	public String getMyCommuteHistoryCal(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
 		
 		return "/attendance/myCommuteHistoryCal";
 	}
 	
 	@PostMapping("/insertCheckTime")
 	@ResponseBody
-	public Map<String, Object> insertCheckTime(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
+	public Map<String, Object> insertCheckTime(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
 		map.put("id", id);
 		
 		Map<String, Object> message = attendanceService.insertCheckTime(map);
@@ -337,13 +359,24 @@ public class AttendanceController {
 	
 	@PostMapping("/getWeekendTotalWorkHour")
 	@ResponseBody
-	public int getWeekendTotalWorkHour(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
+	public double getWeekendTotalWorkHour(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
 		map.put("id", id);
 		
-		int count = attendanceService.getWeekendTotalWorkHour(map);
+		double count = attendanceService.getWeekendTotalWorkHour(map);
 		
 		return count;
+	}
+	
+	@PostMapping("/getUserInfo")
+	@ResponseBody
+	public List<Map<String, Object>> getUserInfo(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		List<Map<String, Object>> userInfo = attendanceService.getUserInfo(map);
+		
+		return userInfo;
 	}
 	
 	/*====================================================================

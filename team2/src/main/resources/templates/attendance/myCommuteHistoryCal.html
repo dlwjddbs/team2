@@ -65,24 +65,24 @@
 							<!-- 유저 프로필 -->
 							<div class="card card-widget widget-user">
 								<div class="widget-user-header bg-info">
-									<h3 class="widget-user-username">유저명</h3>
-									<h5 class="widget-user-desc">부서명</h5>
+									<h3 class="widget-user-username" id="memberName"></h3>
+									<h5 class="widget-user-desc" id="deptName"></h5>
 								</div>
 								<div class="widget-user-image">
-									<img class="img-circle elevation-2" src="../dist/img/user1-128x128.jpg" alt="User Avatar">
+									<img class="img-circle elevation-2" id="profilePreview" src="/images/default.jpg" alt="/images/default.jpg">
 								</div>
 								<div class="card-footer">
 									<div class="row">
 										<div class="col-sm-6 border-right">
 											<div class="description-block">
 												<h5 class="description-header">총휴가</h5>
-												<span class="description-text">12</span>
+												<span class="description-text" id="totalVacation">12</span>
 											</div>
 										</div>
 										<div class="col-sm-6 border-right">
 											<div class="description-block">
 												<h5 class="description-header">잔여휴가</h5>
-												<span class="description-text">7</span>
+												<span class="description-text" id="remainingVacation">7</span>
 											</div>
 										</div>
 									</div>
@@ -101,7 +101,7 @@
 											<span id="currentDateTime">날짜</span>
 										</div>
 										<div class="d-flex align-items-baseline">
-											<h1>24</h1><p>시간</p><h1>30</h1><p>분</p>
+											<h1 id="workHour"></h1><p>시간</p><h1 id="workMinute"></h1><p>분</p>
 										</div>
 										<div class="row margin mb-5">
 											<div class="col-sm-12">
@@ -165,6 +165,7 @@
 		    setInterval(updateDateTime, 1000);
 			checkInOutBtnInit();
 			event();
+			getUserInfo();
 		});
 
 		function event() {
@@ -254,7 +255,6 @@
 	            url : "/getWeekendTotalWorkHour",
 	            data : {},
 	            success : function(res){
-
 					/* ION SLIDER */
 					$('#range_6').ionRangeSlider({
 						min     : 0,	//슬라이더 최소값
@@ -269,6 +269,11 @@
 					})
 
 					$('#range_6').parent().css('pointer-events', 'none');
+					
+					let hours = Math.floor(res);
+				    let minutes = Math.round((res - hours) * 60);
+				    $("#workHour").text(hours);
+				    $("#workMinute").text(minutes);
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
 	                console.log("slider() ajax 실패");
@@ -317,6 +322,31 @@
 					});
 					
 					calendar.render();
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("calendar() ajax 실패");
+	            }
+	        });
+		}
+		
+		function getUserInfo() {
+			$.ajax({
+	            type : "POST",
+	            url : "/getUserInfo",
+	            data : {},
+	            success : function(res){
+	            	if (res.length != 0) {
+		            	$("#deptName").text(res[0].DEPT_NAME);
+		            	$("#memberName").text(res[0].NAME);
+		            	
+		            	let img = "";
+		            	if (res[0].PROFILE_PIC == null || res[0].PROFILE_PIC == "") {
+		            		img = '/images/default.jpg';
+		            	} else {
+		            		img = "/images/" + res[0].PROFILE_PIC;
+		            	}
+		            	$("#profilePreview").attr("src", img);
+	            	}
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
 	                console.log("calendar() ajax 실패");

@@ -246,6 +246,7 @@
 				},
 				columns : [
 					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
+					{data : "NAME", title : "회원명", "defaultContent": ""},
 					{data : "CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
 					{data : "CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
 					{data : "STARTING_DATE", title : "적용시작일", "defaultContent": ""},
@@ -308,11 +309,6 @@
 			let CHECK_IN_TIME = $("#CHECK_IN_TIME").val();
 			let CHECK_OUT_TIME = $("#CHECK_OUT_TIME").val();
 			let STARTING_DATE = $("#STARTING_DATE").val();
-			
-			console.log(MEMBER_ID);
-			console.log(CHECK_IN_TIME);
-			console.log(CHECK_OUT_TIME);
-			console.log(STARTING_DATE);
 			
 			if (MEMBER_ID == null || MEMBER_ID == ''
 				|| CHECK_IN_TIME == null || CHECK_IN_TIME == '' 

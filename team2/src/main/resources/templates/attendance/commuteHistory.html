@@ -17,6 +17,8 @@
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- daterange picker -->
 	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- Tempusdominus Bootstrap 4 -->
+	<link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -28,6 +30,9 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
+		
+		<!-- 모달 -->
+		<nav th:replace="~{includes/modals/commuteTime :: commuteTime}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -78,7 +83,10 @@
 							</div>
 						</div>
 					</div>
-					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
+					<div class="d-flex">
+						<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
+						<button type="button" class="btn btn-primary mx-1" id="btnAdd">등록</button>
+					</div>
 				</div>
 				
 				<div class="container-fluid">
@@ -140,6 +148,8 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script src="../../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
@@ -151,11 +161,32 @@
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 			let date = $("#reservation").val().split(' ~ ');
 			dataTable('example1', date, false);
+			
+			//Timepicker
+		    $('#timepickerStart').datetimepicker({
+				format: 'HH:mm'
+		    });
+			
+		  	//Timepicker
+		    $('#timepickerEnd').datetimepicker({
+		    	format: 'HH:mm'
+		    });
+		    
+		    //Date picker
+		    $('#reservationdate').datetimepicker({
+		        format: 'YYYY-MM-DD'
+		    });
+		    
+		    memberSelectBox();
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
 			dataTable('example1', date, true);
+		});
+		
+		$("#btnAdd").on("click", function() {
+			$('#modal-lg').modal();
 		});
 		
 		// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
@@ -203,7 +234,6 @@
 		}
 		
 		function dataTable(tableId, date, isUpdate) {
-			// TODO 멤버 테이블 안정화 되면 필터 기능 추가
 			let deptCode = $("#DEP").val();
 			let rankCode = $("#RANK").val();
 			
@@ -238,7 +268,6 @@
 						rankCode : rankCode
 					},
 					"dataSrc": function (res) {
-						console.log(res);
 		                return res;
 		            }
 				},
@@ -249,7 +278,15 @@
 					{data : "DEPT_NAME", title : "소속부서", "defaultContent": ""},
 					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
 					{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""}
+					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
+					{
+			            data: "COMMUTE_ID",
+			            render: function(data) {
+			            	let btn = "<button id='D" + data + "' onclick='deleteCommuteTime(`" + data + "`)' class='btn btn-outline-primary btn-sm'>삭제</button>";
+			            	
+			            	return btn;
+			            }
+			        }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -258,6 +295,93 @@
 			}).buttons()
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
+		}
+		
+		function deleteCommuteTime(id) {
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			
+			$.ajax({
+                type : "POST",
+                url : "/deleteCommuteTime",
+                data : {
+                	id : id
+				},
+                success : function(res){
+                	alert(res.result);
+                	
+                	if (res.resultCode == 1) {
+	                	let date = $("#reservation").val().split(' ~ ');
+	        			dataTable('example1', date, true);
+                	}
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("deleteCommuteTime() ajax 실패");
+                }
+            });
+		}
+
+		$("#timeSave").on("click", function() {
+			let MEMBER_ID = $("#memberSelect").val();
+			let CHECK_IN_TIME = $("#CHECK_IN_TIME").val();
+			let CHECK_OUT_TIME = $("#CHECK_OUT_TIME").val();
+			let CHECK_IN_DATE = $("#CHECK_IN_DATE").val();
+			
+			if (MEMBER_ID == null || MEMBER_ID == ''
+				|| CHECK_IN_TIME == null || CHECK_IN_TIME == '' 
+				|| CHECK_OUT_TIME == null || CHECK_OUT_TIME == '' 
+				|| CHECK_IN_DATE == null || CHECK_IN_DATE == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+			if (CHECK_IN_TIME >= CHECK_OUT_TIME) {
+				alert("퇴근시간은 출근시간보다 커야합니다.");
+				
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/addCommuteTime",
+	            data : {
+	            	MEMBER_ID : MEMBER_ID,
+	            	CHECK_IN_TIME : CHECK_IN_TIME,
+	            	CHECK_OUT_TIME : CHECK_OUT_TIME,
+	            	CHECK_IN_DATE : CHECK_IN_DATE
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(XMLHttpRequest, textStatus, errorThrown){
+	                console.log("addCommuteTime() ajax 실패");
+	            }
+	        });
+		});
+		
+		function memberSelectBox() {
+			$.ajax({
+                type : "POST",
+                url : "/memberSelectBox",
+                data : {},
+                success : function(res){
+                	let str = '<option value="" selected="selected" disabled>전체</option>';
+                	
+                	res.forEach((el)=>{
+						str += '<option value="' + el.MEMBER_ID + '">' + el.MEMBER_ID + ' - ' + el.NAME + '</option>';
+               		})
+               		
+               		$("#memberSelect").html(str);
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("selectBox() ajax 실패");
+                }
+            });
 		}
 	</script>
 </body>
