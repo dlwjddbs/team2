@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.NoticeService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -23,8 +24,15 @@ public class NoticeController {
 	private final NoticeService noticeService;
        
     @GetMapping("/notice/noticeList")
-    public String getNoticeList(@RequestParam Map<String, Object> map, Model model) {
-    	String id = "20241222";
+    public String getNoticeList(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
+    	
+    	if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+    	
+    	
     	map.put("memberId", id);
     	List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
     	
@@ -41,8 +49,8 @@ public class NoticeController {
     
     @PostMapping("/getNoticeList")
     @ResponseBody
-    public List<Map<String, Object>> getNoticeList(@RequestParam Map<String, Object> map) {
-        String id = "20241222"; // 하드코딩된 관리자 ID
+    public List<Map<String, Object>> getNoticeList(HttpSession session, @RequestParam Map<String, Object> map) {
+    	String id = session.getAttribute("id").toString();
         map.put("memberId", id);
         List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
         System.out.println("noticeList: " + noticeList);

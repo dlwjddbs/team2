@@ -29,8 +29,8 @@ public class CmtController {
     
 	//출근 
 	@PostMapping("/cmt/start")
-	public String cmtPro(@RequestParam Map<String, Object> map, Model model) {
-		String id = "20241222";
+	public String cmtPro(HttpSession session,@RequestParam Map<String, Object> map, Model model) {
+		String id = session.getAttribute("id").toString();
 		map.put("memberId", id);		
 		cmtService.getCheckIn(map);
 		
@@ -39,8 +39,9 @@ public class CmtController {
 	
 	//퇴근
 	@PostMapping("/cmt/end")
-	public String endPro(@RequestParam Map<String, Object> map, Model model) {
-	    String id = "20241222"; // 사용자 ID
+	public String endPro(HttpSession session,@RequestParam Map<String, Object> map, Model model) {
+		String id = session.getAttribute("id").toString();
+		
 	    map.put("memberId", id);
 	    cmtService.updateCheckOut(map);
 
@@ -49,8 +50,12 @@ public class CmtController {
 	
 	// 출퇴근 기록
 	@GetMapping("/commute/cmt")
-	public String getTodayHistory(@RequestParam Map<String, Object> map,Model model) {
-		String id = "20241222";
+	public String getTodayHistory(HttpSession session, @RequestParam Map<String, Object> map,Model model) {
+		 if (session.getAttribute("id") == null) {
+	            return "redirect:/login"; 
+	        }
+	        
+	        String id = session.getAttribute("id").toString();
 		
 		map.put("memberId", id);
 		Map<String, Object> todayHistory = cmtService.getTodayHistory(map);		

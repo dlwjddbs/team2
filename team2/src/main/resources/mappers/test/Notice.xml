@@ -15,7 +15,7 @@
             CONTENT
         FROM 
             NOTICE
-        WHERE member_id = #{memberId}
+<!--         WHERE member_id = #{memberId} -->
        	 ORDER BY 
           	  CREATE_TIME DESC
     </select>
