@@ -175,25 +175,25 @@
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-//						{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
+					{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
 					{data : "MEMBER_ID", title : "사원 번호", "defaultContent": "" },
-//						{data : "NAME", title : "사원명", "defaultContent": "" },
+					{data : "NAME", title : "사원명", "defaultContent": "" },
 					{data : "GRADE_ID", title : "직급", "defaultContent": "" },
 					{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
-//						{data : "DEPR_ID", title : "부서", "defaultContent": "" },
-//						{data : "SALARY", title : "기본급", "defaultContent": "" },
+					{data : "DEPR_ID", title : "부서", "defaultContent": "" },
+					{data : "SALARY", title : "기본급", "defaultContent": "" },
 					{data : "POSITION_BONUS", title : "직책수당", "defaultContent": "" },
 					{data : "HOLIDAY_BONUS", title : "연휴수당", "defaultContent": "" },
-//						{data : "NIGHT_BONUS", title : "야근수당", "defaultContent": "" },
-//						{data : "YEAREND_BONUS", title : "연말격려수당", "defaultContent": "" },
-//						{data : "FULLSERVICE_BONUS", title : "만기근속자포상", "defaultContent": "" },
-//						{data : "PERFORMANCE_BONUS", title : "실적우수자포상", "defaultContent": "" },
-//						{data : "TOTAL", title : "실지급액", "defaultContent": "" },
-// 					{data : "ID", "defaultContent": "", title : '수정',
-// 							render: function(data){
-// 								return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
-//   							}
-// 					}
+					{data : "NIGHT_BONUS", title : "야근수당", "defaultContent": "" },
+					{data : "YEAREND_BONUS", title : "연말격려수당", "defaultContent": "" },
+					{data : "FULLSERVICE_BONUS", title : "만기근속자포상", "defaultContent": "" },
+					{data : "PERFORMANCE_BONUS", title : "실적우수자포상", "defaultContent": "" },
+					{data : "TOTAL", title : "실지급액", "defaultContent": "" },
+					{data : "ID", "defaultContent": "", title : '수정',
+						render: function(data){
+							return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
+   							}
+ 					}
 
 			  	],
 				responsive : true, 
@@ -258,25 +258,25 @@
 					},
 					columns : [
 						// DB컬럼명 일치하게 작성
-// 						{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
+						{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
 						{data : "MEMBER_ID", title : "사원 번호", "defaultContent": "" },
-// 						{data : "NAME", title : "사원명", "defaultContent": "" },
+ 						{data : "NAME", title : "사원명", "defaultContent": "" },
 						{data : "GRADE_ID", title : "직급", "defaultContent": "" },
 						{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
-// 						{data : "DEPR_ID", title : "부서", "defaultContent": "" },
-// 						{data : "SALARY", title : "기본급", "defaultContent": "" },
+ 						{data : "DEPR_ID", title : "부서", "defaultContent": "" },
+ 						{data : "SALARY", title : "기본급", "defaultContent": "" },
 						{data : "POSITION_BONUS", title : "직책수당", "defaultContent": "" },
 						{data : "HOLIDAY_BONUS", title : "연휴수당", "defaultContent": "" },
-// 						{data : "NIGHT_BONUS", title : "야근수당", "defaultContent": "" },
-// 						{data : "YEAREND_BONUS", title : "연말격려수당", "defaultContent": "" },
-// 						{data : "FULLSERVICE_BONUS", title : "만기근속자포상", "defaultContent": "" },
-// 						{data : "PERFORMANCE_BONUS", title : "실적우수자포상", "defaultContent": "" },
-// 						{data : "TOTAL", title : "실지급액", "defaultContent": "" },
-// 						{data : "ID", "defaultContent": "", title : '수정',
-// 								render: function(data){
-// 									return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
-// 	  							}
-// 						}
+ 						{data : "NIGHT_BONUS", title : "야근수당", "defaultContent": "" },
+ 						{data : "YEAREND_BONUS", title : "연말격려수당", "defaultContent": "" },
+ 						{data : "FULLSERVICE_BONUS", title : "만기근속자포상", "defaultContent": "" },
+ 						{data : "PERFORMANCE_BONUS", title : "실적우수자포상", "defaultContent": "" },
+ 						{data : "TOTAL", title : "실지급액", "defaultContent": "" },
+ 						{data : "ID", "defaultContent": "", title : '수정',
+ 								render: function(data){
+ 									return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
+ 	  							}
+ 						}
 
 				  	],
 					responsive : true, 
@@ -289,38 +289,24 @@
 				  .container()
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			});
+			
+	        $('#daterange').daterangepicker({
+	            opens: 'left',
+	            startDate: moment().startOf('month'),
+	            endDate: moment().endOf('month'),
+	            locale: {
+	                format: 'YYYY-MM'
+	            },
+	            singleDatePicker: true, // 단일 날짜 선택
+	            showDropdowns: true, // 드롭다운으로 연도 및 월 선택
+	            minYear: 1901, // 최소 연도
+	            maxYear: parseInt(moment().format('YYYY'), 10) // 최대 연도
+	        }, function(start, end) {
+	            $('#daterange').val(start.format('YYYY-MM'));
+	        });
 		});
 		
 		
 	</script>
-	<!-- 부서, 직급, 은행 정보 -->
-<!-- 	<script> -->
-<!-- 		$(document).ready(function () { -->
-<!-- 		    $.ajax({ -->
-<!-- 		        url: '/getOrganizationData', -->
-<!-- 		        method: 'POST', -->
-<!-- 		        success: function (data) { -->
-					
-<!-- 					console.log(data); -->
-					
-<!-- 					function populateSelectBox(selectBoxId, dataArray, valueKey, textKey) { -->
-<!-- 			            let selectBox = $(selectBoxId); -->
-<!-- 			            dataArray.forEach(function (item) { -->
-<!-- 			                let option = $('<option></option>') -->
-<!-- 			                    .val(item[valueKey]) -->
-<!-- 			                    .text(item[textKey]); -->
-<!-- 			                selectBox.append(option); -->
-<!-- 			            }); -->
-<!-- 			        } -->
-
-<!-- 			        populateSelectBox('#bank', data.banks, 'CODE', 'BANK_NAME'); -->
-<!-- 			        populateSelectBox('#department', data.departments, 'CHILD_ID', 'CHILD_NAME'); -->
-<!-- 			        populateSelectBox('#grade', data.grades, 'ID', 'NAME'); -->
-					
-<!-- 		        } -->
-<!-- 		    }); -->
-<!-- 		}); -->
-<!-- 	</script> -->
-	<!-- /. 부서, 직급, 은행 정보 -->	
 </body>
 </html>

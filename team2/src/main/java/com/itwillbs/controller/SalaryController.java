@@ -67,22 +67,23 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력
-	@PostMapping("/writeSalary")
-	public String addMember(@RequestParam Map<String, Object> param, Model model) {
-		log.info("============= writeSalary =============");
-		
-//		<< CREATE_DATE 추가 >>
-		LocalDateTime now = LocalDateTime.now();
-		String CREATE_DATE = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-		param.put("CREATE_DATE", CREATE_DATE);
-		
-		System.out.println(param.toString());
-		
-		int insertCount = salaryService.writeSalary(param);
-		System.out.println(insertCount);
-		
-		return "redirect:/salaryInput";
-	}	
+//	@PostMapping("/writeSalary")
+//	@ResponseBody
+//	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
+//		log.info("============= writeSalary =============");
+//		
+//		
+//		int insertCount = salaryService.writeSalary(param);
+//		System.out.println(insertCount);
+//		
+//		if(insertCount > 0) {
+//			System.out.println("========insert 성공");
+//			System.out.println("insertCount: " + insertCount);
+//		
+//		}
+//		
+//		return writeSalary;
+//	}
 	
     // 급여 정보 (Test)
 	@GetMapping("/salaryInfo")
@@ -105,6 +106,19 @@ public class SalaryController {
 		return "/salary/salaryInfo";
 	}
 	
+	// 관리자 급여 정보 조회 (POST) (Test)
+	// 페이지 첫 로딩 시 입력된 급여 테이블 출력 
+	@PostMapping("/getSalaryInfo")
+	@ResponseBody
+	public List<Map<String, Object>> getSalaryInfo(@RequestParam Map<String, Object> map) {
+		log.info("============= getSalaryInfo POST =============");
+		
+		map.put("id", "admin");
+		List<Map<String, Object>> salaryInfoData = salaryService.getSalaryList(map);
+		
+		return salaryInfoData;
+	}
+	
 	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴 (Test)
     @PostMapping("/getModalContent")
     @ResponseBody
@@ -121,6 +135,27 @@ public class SalaryController {
     	log.info("============= getModalContent POST end =============");
     	
     	return salaryData;
+    }
+    
+    // 수정 버튼을 클릭시 해당 멤버의 급여 정보를 수정 (Test)
+    // 현재 해당 멤버의 SALARY 테이블의 정보만 수정 가능, MEMBER 테이블의 기본급도 수정 추가 예정
+    // 현재 상여금만 수정 가능, 날짜도 수정되게 추가 필요
+    // 일단 코드 동작은 되나 좀 더 깔끔하게 수정 필요?
+    @PostMapping("/editSalary")
+    @ResponseBody
+    public String updateSalary(@RequestParam("id") String id, @RequestParam Map<String, Object> map) {
+    	log.info("============= updateSalary POST start =============");
+    	
+        log.info("id" +  id);
+        
+    	log.info(map.toString());
+    	
+    	salaryService.updateSalary(map);
+    	
+    	log.info("============= updateSalary POST end =============");
+    	
+    	//return "redirect:/salaryInfo";
+    	return "급여 수정 성공!";
     }
 	
 }

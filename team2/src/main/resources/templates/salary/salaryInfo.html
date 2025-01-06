@@ -151,8 +151,8 @@
 		            }
 				},
 				ajax : {
-					url : "/getSalaryHistory",
-					type :"POST",
+					url : "/getSalaryInfo",
+					type : "POST",
 					data : {},
 					"dataSrc" : function (res) {
 						console.log(res);
@@ -170,10 +170,10 @@
 					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
 					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
 					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-					{data: "YEAREND_BONUS", title: "연말결려수당", "defaultContent": "" },
+					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
 					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
 					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지금액", "defaultContent": "" },
+					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
 					{data : "MEMBER_ID", "defaultContent": "", title : '급여수정',
 							render: function(data){
 								return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
@@ -199,9 +199,9 @@
 			  // 서버에서 Modal 콘텐츠를 AJAX로 요청
 			  $.ajax({
 			    // 서버에서 Modal 내용을 처리
-			    url: "/getModalContent",  
-			    type: "POST",
-			    data: { id: id },
+			    url : "/getModalContent",  
+			    type : "POST",
+			    data : { id : id },
 			    success: function(salaryData) {
 			    	
 			  		console.log(id);
@@ -233,7 +233,7 @@
 			}
 			  
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
-			let date = /*[[${salaryHistoryMinMaxDate}]]*/
+			let date = /*[[${salaryInfoMinMaxDate}]]*/
 			$('#reservation').daterangepicker({
 				locale: {
 					"separator": " ~ ",
@@ -273,8 +273,8 @@
 			            }
 					},
 					ajax : {
-						url : "/getSalaryHistory",
-						type:"POST",
+						url : "/getSalaryInfo",
+						type : "POST",
 						data : {
 							startDate : date[0],					
 							endDate : date[1]
@@ -312,6 +312,45 @@
 				  .container()
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			});
+		});
+		
+		// 급여 수정 버튼을 클릭시 이벤트 발생
+		$('#submitBtn').click(function () {
+		    // id로 값을 가져오기
+		    // const salary = $('#salary').val();
+			const id = $('#memberId').val();
+		    const positionBonus = $('#positionBonus').val();
+		    const holidayBonus = $('#holidayBonus').val();
+		    const nightBonus = $('#nightBonus').val();
+		    const yearendBonus = $('#yearendBonus').val();
+		    const fullserviceBonus = $('#fullserviceBonus').val();
+		    const performanceBonus = $('#performanceBonus').val();
+			
+			console.log(id);
+			console.log(positionBonus);
+			
+		    // AJAX로 서버에 데이터 전송
+		    $.ajax({
+		        url : '/editSalary', // 컨트롤러 매핑 URL
+		        type : 'POST',
+		        data : {
+					id : id,
+		            positionBonus: positionBonus,
+					holidayBonus: holidayBonus, 
+					nightBonus: holidayBonus, 
+					yearendBonus: holidayBonus, 
+					fullserviceBonus: holidayBonus, 
+					performanceBonus: performanceBonus 
+		        },
+		        success: function (response) {
+		            alert('급여 수정 성공!');
+		            console.log(response);
+					window.location.href = '/salaryInfo';
+		        },
+		        error: function (error) {
+		            alert('급여 수정 실패');
+		        }
+		    });
 		});
 		
 	</script>

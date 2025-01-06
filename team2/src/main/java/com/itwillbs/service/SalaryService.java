@@ -34,6 +34,9 @@ public class SalaryService {
 		return salaryMapper.getSalaryListMinMaxDate(id);
 	}
 
-
+	// 급여 수정
+	public void updateSalary(Map<String, Object> map) {
+		salaryMapper.updateSalary(map);
+	}
 
 }

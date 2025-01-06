@@ -9,14 +9,24 @@
     <select id="selectSalaryList" resultType="map">
     <!-- selectSalaryList - 급여기록 조회 -->
     <!-- getSalaryListMinMaxDate에서 조회된 최대최소일 범위의 급여기록 조회 -->
-		SELECT
-			  MEMBER_ID
-			, GRADE_ID
-			, PAYDAY
-			, POSITION_BONUS
-			, HOLIDAY_BONUS
-		FROM
-			SALARY
+        SELECT
+            S.PAYDAY,
+            S.MEMBER_ID,
+            M.NAME,
+            S.GRADE_ID,
+            M.DEPT_ID,
+            M.SALARY,
+            S.POSITION_BONUS,
+            S.HOLIDAY_BONUS,
+            S.NIGHT_BONUS,
+            S.YEAREND_BONUS,
+            S.FULLSERVICE_BONUS,
+            S.PERFORMANCE_BONUS,
+            (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS + 
+             S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL
+        FROM SALARY S
+        JOIN MEMBER M
+          ON S.MEMBER_ID = M.MEMBER_ID
 		WHERE
 			1 = 1
 			<if test='id != "admin"'>
@@ -50,30 +60,75 @@
     
     <select id="selectSalaryListById" resultType="map">
     <!-- 사원ID에 해당하는 급여정보를 조회 -->
-		SELECT 
-		      MEMBER_ID
-		    , GRADE_ID 
-		    , PAYDAY
-		    , POSITION_BONUS
-		    , HOLIDAY_BONUS
-		    , NIGHT_BONUS
-		    , YEAREND_BONUS
-		    , FULLSERVICE_BONUS
-		    , PERFORMANCE_BONUS
-		    , TOTAL
+		 SELECT
+            S.PAYDAY,
+            S.MEMBER_ID,
+            M.NAME,
+            S.GRADE_ID,
+            M.DEPT_ID,
+            M.SALARY,
+            S.POSITION_BONUS,
+            S.HOLIDAY_BONUS,
+            S.NIGHT_BONUS,
+            S.YEAREND_BONUS,
+            S.FULLSERVICE_BONUS,
+            S.PERFORMANCE_BONUS,
+            (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS + 
+             S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL
 		FROM 
 			SALARY
-		WHERE 
+		JOIN MEMBER M
+          ON S.MEMBER_ID = M.MEMBER_ID
+		WHERE
+			1 = 1
+		AND
 			MEMBER_ID = #{id}
-		
 		<!-- WHERE MEMBER_ID = '202501030001' -->
+			<if test='startDate != null and startDate != "" 
+						and endDate != null and endDate != ""'>
+				AND 
+					PAYDAY BETWEEN #{startDate} 
+					AND #{endDate} 
+			</if>
+		ORDER BY
+			PAYDAY DESC
+		
     </select>
     
     <!-- 사원별 급여 입력(관리자) -->
-<!--	<insert id="insertSalary" useGeneratedKeys="true" keyProperty="ID"> -->
-<!--		INSERT INTO SALARY -->
-<!--	    VALUES-->
-	    
-<!-- 	</insert> -->
+	<insert id="insertSalary"> 
+		 INSERT ALL
+            INTO member (member_id, NAME, GRADE_ID, DEPT_ID, SALARY) 
+            VALUES (
+			  #{member_id}
+            , #{NAME}
+            , #{GRADE_ID}
+            , #{DEPT_ID}
+            , #{SALARY})
+            INTO salary (payday, member_id, POSITION_BONUS, HOLIDAY_BONUS, NIGHT_BONUS, YEAREND_BONUS, FULLSERVICE_BONUS, PERFORMANCE_BONUS) 
+            VALUES (SYSDATE
+            , #{member_id}
+            , #{POSITION_BONUS}
+            , #{HOLIDAY_BONUS}
+            , #{NIGHT_BONUS}
+            , #{YEAREND_BONUS}
+            , #{FULLSERVICE_BONUS}
+            , #{PERFORMANCE_BONUS})
+        SELECT * FROM dual;
+ 	</insert> 
+ 	
+ 	<!-- 급여 수정 -->
+ 	<update id="updateSalary" parameterType="map">
+		UPDATE SALARY 
+	   	   SET 
+	   	   	   POSITION_BONUS = #{positionBonus}
+	       	 , HOLIDAY_BONUS = #{holidayBonus}
+	       	 , NIGHT_BONUS = #{nightBonus}
+	       	 , YEAREND_BONUS = #{yearendBonus}
+	       	 , FULLSERVICE_BONUS = #{fullserviceBonus}
+	       	 , PERFORMANCE_BONUS = #{performanceBonus}
+		WHERE 
+			 MEMBER_ID = #{id}
+	</update>
 
 </mapper>

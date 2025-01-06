@@ -19,6 +19,7 @@
 			
 			<!-- form -->
 			<form th:action="@{/editSalary}" method="post" id="editSalaryForm">
+				<input type="hidden" id="memberId">
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
@@ -50,7 +51,7 @@
 				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
 				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
 				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연말 수당" style="background-color: white !important;"> <br>
 				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
 				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
@@ -98,8 +99,9 @@
 				<!-- 모달창 푸터-->
 				<div>
 					<div class="modal-footer justify-content-between">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-primary">Save changes</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+						<!-- <button type="submit" class="btn btn-primary">급여 수정</button> -->
+						<button type="button" id="submitBtn" class="btn btn-primary">급여 수정</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->
