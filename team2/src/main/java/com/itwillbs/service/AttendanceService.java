@@ -20,16 +20,16 @@ public class AttendanceService {
 		return attendanceMapper.getMyCommuteHistory(map);
 	}
 	
-	public Map<String, Object> getMyCommuteHistoryMinMaxDate(String id) {
-		return attendanceMapper.getMyCommuteHistoryMinMaxDate(id);
+	public Map<String, Object> getMyCommuteHistoryMinMaxDate(Map<String, Object> map) {
+		return attendanceMapper.getMyCommuteHistoryMinMaxDate(map);
 	}
 
 	public List<Map<String, Object>> getMyAttendanceHistory(Map<String, Object> map) {
 		return attendanceMapper.getMyAttendanceHistory(map);
 	}
 
-	public Map<String, Object> getMyCommuteTimeMinMaxDate(String id) {
-		return attendanceMapper.getMyCommuteTimeMinMaxDate(id);
+	public Map<String, Object> getMyCommuteTimeMinMaxDate(Map<String, Object> map) {
+		return attendanceMapper.getMyCommuteTimeMinMaxDate(map);
 	}
 	
 	public List<Map<String, Object>> getMyCommuteTime(Map<String, Object> map) {

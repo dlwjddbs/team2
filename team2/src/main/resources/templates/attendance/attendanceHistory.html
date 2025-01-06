@@ -36,7 +36,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>회원 출퇴근 기록</h1>
+							<h1>회원 지각/조퇴/결근 내역</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -53,18 +53,16 @@
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
-						<div class="d-flex">
-							<label class="col-form-label mr-3">부서구분</label> 
-							<select class="appointGubun" id="DEP" name="appointGubun" style="min-width: 120px">
-								<!-- ajax -->
-							</select>
-						</div>
-						<div class="d-flex ml-4">
-							<label class="col-form-label mr-3">직급구분</label> 
-							<select class="appointGubun" id="RANK" name="appointGubun" style="min-width: 120px">
-								<!-- ajax -->
-							</select>
-						</div>
+<!--						<div class="d-flex">-->
+<!--							<label class="col-form-label mr-3">발령구분</label> <select class="appointGubun" name="appointGubun"-->
+<!--								style="min-width: 120px">-->
+<!--								<option selected="selected" disabled>발령구분</option>-->
+<!--								<option>승진</option>-->
+<!--								<option>부서이동</option>-->
+<!--								<option>퇴사</option>-->
+<!--							</select>-->
+<!--						</div>-->
+					
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
@@ -81,6 +79,13 @@
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				
+				<div class="card card-danger">
+					<div class="card-body">	
+						<canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -140,46 +145,26 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- ChartJS -->
+	<script src="../../plugins/chart.js/Chart.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
 			dateRangePicker();
-			selectBox("RANK");
-			selectBox("DEP");
 			
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 			let date = $("#reservation").val().split(' ~ ');
+			let myDonutChart = '';
+			donutChart('donutChart', date, false);
 			dataTable('example1', date, false);
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
 			dataTable('example1', date, true);
+			donutChart('donutChart', date, true);
 		});
-		
-		// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
-		function selectBox(type) {
-			$.ajax({
-                type : "POST",
-                url : "/selectBox",
-                data : {
-                	type : type
-                },
-                success : function(res){
-                	let str = '<option value="" selected="selected" disabled>전체</option>';
-                	
-                	res.forEach((el)=>{
-						str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
-               		})
-               		
-               		$("#" + type).html(str);
-                },
-                error : function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("selectBox() ajax 실패");
-                }
-            });
-		}
 		
 		function dateRangePicker() {
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
@@ -203,10 +188,6 @@
 		}
 		
 		function dataTable(tableId, date, isUpdate) {
-			// TODO 멤버 테이블 안정화 되면 필터 기능 추가
-			let depCode = $("#DEP").val();
-			let rankCode = $("#RANK").val();
-			
 			// 기존 테이블 삭제
 			if (isUpdate) {
 				$("#" + tableId).DataTable().destroy();
@@ -229,23 +210,23 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getCommuteHistory",
+					url : "/getAttendanceHistory",
 					type:"POST",
 					data : {
 						startDate : date[0],					
-						endDate : date[1],
-						depCode : depCode,
-						rankCode : rankCode
+						endDate : date[1]
 					},
 					"dataSrc": function (res) {
 		                return res;
 		            }
 				},
 				columns : [
-					{data : "COMMUTE_CHECK_IN_DATE", title : "일자", "defaultContent": ""},
-					{data : "COMMUTE_MEMBER_ID", title : "회원ID", "defaultContent": ""},
-					{data : "COMMUTE_CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-					{data : "COMMUTE_CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""}
+					{data : "CREATE_DATE", title : "일자", "defaultContent": ""},
+					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
+					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
+					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
+					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
+					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -255,6 +236,56 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 		}
+
+		function donutChart(chartId, date, isUpdate) {
+			$.ajax({
+                type : "POST",
+                url : "/getAttendanceHistoryDonutChart",
+                data : {
+					startDate : date[0],					
+					endDate : date[1]
+				},
+                success : function(res){
+					let labels = [];
+					let data = [];
+					
+					res.forEach((element) => {
+						labels.push(element.ATTENDANCE_TEXT);
+						data.push(element.PIE_CHART_VALUE);
+					});
+					
+					let donutChartCanvas = $('#' + chartId).get(0).getContext('2d')
+					let donutData = {
+						labels: labels,
+						datasets: [
+							{
+								data: data,
+								backgroundColor: ['#f56954', '#f39c12', '#00a65a', '#00c0ef', '#3c8dbc', '#d2d6de'],
+							}
+						]
+					}
+					
+					let donutOptions = {
+						maintainAspectRatio: false,
+						responsive: true,
+					}
+					
+					// 차트 재생성 시 기존의 차트 삭제
+					if (isUpdate) {
+					    myDonutChart.destroy();
+					} 
+					
+					myDonutChart = new Chart(donutChartCanvas, {
+						type: 'doughnut',
+						data: donutData,
+						options: donutOptions
+					});
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("pieChart() ajax 실패");
+                }
+            });
+		};
 	</script>
 </body>
 </html>
