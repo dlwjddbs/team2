@@ -10,13 +10,13 @@ public interface AttendanceMapper {
 
 	List<Map<String, Object>> getMyCommuteHistory(Map<String, Object> map);
 	
-	Map<String, Object> getMyCommuteHistoryMinMaxDate(String id);
+	Map<String, Object> getMyCommuteHistoryMinMaxDate(Map<String, Object> map);
 
 	List<Map<String, Object>> getMyAttendanceHistory(Map<String, Object> map);
 
 	List<Map<String, Object>> getMyCommuteTime(Map<String, Object> map);
 
-	Map<String, Object> getMyCommuteTimeMinMaxDate(String id);
+	Map<String, Object> getMyCommuteTimeMinMaxDate(Map<String, Object> map);
 
 	List<Map<String, Object>> getMyAttendanceHistoryDonutChart(Map<String, Object> map);
 
@@ -35,4 +35,6 @@ public interface AttendanceMapper {
 	int insertCheckOutTime(Map<String, Object> map);
 
 	int getWeekendTotalWorkHour(Map<String, Object> map);
+
+	List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map);
 }

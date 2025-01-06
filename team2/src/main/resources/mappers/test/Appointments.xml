@@ -5,20 +5,20 @@
 <mapper namespace="com.itwillbs.repository.AppointmentsMapper">
 
     <select id="getAppointList" parameterType="map" resultType="map">
-	SELECT
-	mh.ASSIGNMENT_TYPE AS ASSIGNMENT_TYPE,
-	TO_CHAR(mh.CHANGE_DATE, 'YYYY-MM-DD') AS CHANGE_DATE,
-	mh.MEMBER_ID AS MEMBER_ID,
-	m.NAME AS NAME,
-	mh.OLD_GRADE AS OLD_GRADE,
-	mh.NEW_GRADE AS NEW_GRADE,
-	mh.OLD_DEPT AS OLD_DEPT,
-	mh.NEW_DEPT AS NEW_DEPT,
-	mh.ETC AS ETC
-	FROM MEMBER_HISTORY mh
-	LEFT JOIN MEMBER m
-	ON mh.member_id = m.member_id
-	WHERE 1=1
+		SELECT
+		mh.ASSIGNMENT_TYPE AS ASSIGNMENT_TYPE,
+		TO_CHAR(mh.CHANGE_DATE, 'YYYY-MM-DD') AS CHANGE_DATE,
+		mh.MEMBER_ID AS MEMBER_ID,
+		m.NAME AS NAME,
+		mh.OLD_GRADE AS OLD_GRADE,
+		mh.NEW_GRADE AS NEW_GRADE,
+		mh.OLD_DEPT AS OLD_DEPT,
+		mh.NEW_DEPT AS NEW_DEPT,
+		mh.ETC AS ETC
+		FROM MEMBER_HISTORY mh
+		LEFT JOIN MEMBER m
+		ON mh.member_id = m.member_id
+		WHERE 1=1
 	<if test="startDate != null and startDate != ''">
 		AND mh.change_date <![CDATA[>=]]>
 		#{startDate}
@@ -38,5 +38,31 @@
             TO_CHAR(NVL(MAX(CHANGE_DATE), SYSDATE), 'YYYY-MM-DD') AS maxDate
         FROM MEMBER_HISTORY
     </select>
-
+    
+ 	<!-- 모든 부서 조회 -->
+    <select id="getAllDepartments" resultType="map">
+        SELECT 
+            CODE_ID AS codeId,
+            CODE_NAME AS codeName
+        FROM 
+            COMMON_CODE
+        WHERE 
+            GROUP_ID = 'DEP'
+            AND USE_YN = 'Y'
+        ORDER BY codeName ASC
+    </select>
+    
+    <!-- 모든 직급 조회 -->
+    <select id="getAllRanks" resultType="map">
+    	SELECT
+    		CODE_ID AS codeId,
+    		CODE_NAME AS codeName
+   		FROM
+   			COMMON_CODE
+		WHERE
+			GROUP_ID = 'RANK'
+			AND USE_YN = 'Y'	
+		ORDER BY codeName ASC     		
+    </select>
+    
 </mapper>

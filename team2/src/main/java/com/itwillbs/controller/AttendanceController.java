@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.AttendanceService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -26,13 +28,36 @@ public class AttendanceController {
 	
 	private final AttendanceService attendanceService;
 	
+	/*====================================================================
+	 * - 목차 -
+	 * 1. 회원 출퇴근 기록 조회
+	 * 2. 회원 출퇴근 기준 시간 조회
+	 * 3. 회원 지각/조퇴/결근 내역 조회
+	 * 4. 관리자 출퇴근 기록 관리
+	 * 5. 관리자 출퇴근 기준 시간 관리
+	 * 6. 관리자 지각/조퇴/결근 내역 관리
+	 * 7. 메인 근태
+	 * ===================================================================
+	 * */
+	
+	
+	
+	
+	/*====================================================================
+	 * 1. 회원 출퇴근 기록 조회
+	 * ===================================================================
+	 * */
+	
 	@GetMapping("/myCommuteHistory")
-	public String getMyCommuteHistory(Model model, Map<String, Object> map) {
-		// session id 20241222 임시
-		String id = "20241222";
+	public String getMyCommuteHistory(HttpSession session, Model model, Map<String, Object> map) {
+        if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
 		map.put("id", id);
 		
-		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(map);
 		
 		if (commuteMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
@@ -49,90 +74,30 @@ public class AttendanceController {
 	
 	@PostMapping("/getMyCommuteHistory")
 	@ResponseBody
-	public List<Map<String, Object>> getMyCommuteHistory(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
+	public List<Map<String, Object>> getMyCommuteHistory(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
 		map.put("id", id);
+		
 		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
 		
 		return commuteHistory;
 	}
 	
-	// 관리자 출퇴근 기록 조회
-	@GetMapping("/commuteHistory")
-	public String getCommuteHistory(Model model, Map<String, Object> map) {
-		String id = "admin";
-		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
-		
-		if (commuteMinMaxDate == null) {
-			LocalDate now = LocalDate.now();
-			
-			commuteMinMaxDate = new HashMap<>();
-			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
-			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
-		}
-		
-		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
-		
-		return "/attendance/commuteHistory";
-	}
-	
-	// 관리자 출퇴근 기록 조회
-	@PostMapping("/getCommuteHistory")
-	@ResponseBody
-	public List<Map<String, Object>> getCommuteHistory(@RequestParam Map<String, Object> map) {
-		map.put("id", "admin");
-		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
-		
-		return commuteHistory;
-	}
-	
-	@GetMapping("/myAttendanceHistory")
-	public String getMyAttendanceHistory(Model model, Map<String, Object> map) {
-		// session id 20241222 임시
-		String id = "20241222";
-		map.put("id", id);
-		
-		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(id);
-		
-		if (commuteMinMaxDate == null) {
-			LocalDate now = LocalDate.now();
-			
-			commuteMinMaxDate = new HashMap<>();
-			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
-			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
-		}
-		
-		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
-		
-		return "/attendance/myAttendanceHistory";
-	}
-	
-	@PostMapping("/getMyAttendanceHistory")
-	@ResponseBody
-	public List<Map<String, Object>> getMyAttendanceHistory(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
-		map.put("id", id);
-		List<Map<String, Object>> attendanceHistory = attendanceService.getMyAttendanceHistory(map);
-		
-		return attendanceHistory;
-	}
-	
-	@PostMapping("/getMyAttendanceHistoryDonutChart")
-	@ResponseBody
-	public List<Map<String, Object>> getMyAttendanceHistoryDonutChart(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
-		map.put("id", id);
-		List<Map<String, Object>> attendanceHistoryDonut = attendanceService.getMyAttendanceHistoryDonutChart(map);
-		
-		return attendanceHistoryDonut;
-	}
+	/*====================================================================
+	 * 2. 회원 출퇴근 기준 시간 조회
+	 * ===================================================================
+	 * */
 	
 	@GetMapping("/myAttendanceTime")
-	public String getMyAttendanceTime(Model model) {
-		// session id 20241222 임시
-		String id = "20241222";
+	public String getMyAttendanceTime(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+		map.put("id", id);
 		
-		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(map);
 		
 		if (commuteTimeMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
@@ -149,8 +114,8 @@ public class AttendanceController {
 	
 	@PostMapping("/getMyAttendanceTime")
 	@ResponseBody
-	public List<Map<String, Object>> getMyAttendanceTime(@RequestParam Map<String, Object> map) {
-		String id = "20241222";
+	public List<Map<String, Object>> getMyAttendanceTime(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
 		map.put("id", id);
 		
 		List<Map<String, Object>> commuteTime = attendanceService.getMyCommuteTime(map);
@@ -158,12 +123,113 @@ public class AttendanceController {
 		return commuteTime;
 	}
 	
-	// 관리자 출퇴근 기준 시간 관리
-	@GetMapping("/attendanceTime")
-	public String attendanceTime(Model model) {
-		String id = "admin";
+	
+	/*====================================================================
+	 * 3. 회원 지각/조퇴/결근 내역 조회
+	 * ===================================================================
+	 * */
+	
+	@GetMapping("/myAttendanceHistory")
+	public String getMyAttendanceHistory(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+		map.put("id", id);
 		
-		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(id);
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(map);
+		
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
+		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/attendance/myAttendanceHistory";
+	}
+	
+	@PostMapping("/getMyAttendanceHistory")
+	@ResponseBody
+	public List<Map<String, Object>> getMyAttendanceHistory(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		List<Map<String, Object>> attendanceHistory = attendanceService.getMyAttendanceHistory(map);
+		
+		return attendanceHistory;
+	}
+	
+	@PostMapping("/getMyAttendanceHistoryDonutChart")
+	@ResponseBody
+	public List<Map<String, Object>> getMyAttendanceHistoryDonutChart(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		List<Map<String, Object>> attendanceHistoryDonut = attendanceService.getMyAttendanceHistoryDonutChart(map);
+		
+		return attendanceHistoryDonut;
+	}
+	
+	/*====================================================================
+	 * 4. 관리자 출퇴근 기록 관리
+	 * ===================================================================
+	 * */
+	@GetMapping("/commuteHistory")
+	public String getCommuteHistory(HttpServletRequest request, HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+        // 관리자 아닐 시 뒤로 보내기
+//        else if (!authority.equals("AD") && request.getHeader("Referer") != null) {
+//        	return "redirect:" + request.getHeader("Referer");
+//        }
+		
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(map);
+		
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
+		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/attendance/commuteHistory";
+	}
+	
+	@PostMapping("/getCommuteHistory")
+	@ResponseBody
+	public List<Map<String, Object>> getCommuteHistory(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> commuteHistory = attendanceService.getMyCommuteHistory(map);
+		
+		return commuteHistory;
+	}
+
+	
+	/*====================================================================
+	 * 5. 관리자 출퇴근 기준 시간 관리
+	 * ===================================================================
+	 * */
+	
+	@GetMapping("/attendanceTime")
+	public String attendanceTime(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+        
+		Map<String, Object> commuteTimeMinMaxDate = attendanceService.getMyCommuteTimeMinMaxDate(map);
 		
 		if (commuteTimeMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
@@ -181,9 +247,6 @@ public class AttendanceController {
 	@PostMapping("/getAttendanceTime")
 	@ResponseBody
 	public List<Map<String, Object>> getAttendanceTime(@RequestParam Map<String, Object> map) {
-		String id = "admin";
-		map.put("id", id);
-		
 		List<Map<String, Object>> commuteTime = attendanceService.getMyCommuteTime(map);
 		
 		return commuteTime;
@@ -197,14 +260,6 @@ public class AttendanceController {
 		return message;
 	}
 	
-	@PostMapping("/Holiday")
-	@ResponseBody
-	public String postMethodName(@RequestBody Map<String, String> param) {
-		
-		System.out.println(param);
-		
-		return "";
-	}
 	
 	@PostMapping("/addAttendanceTime")
 	@ResponseBody
@@ -214,13 +269,54 @@ public class AttendanceController {
 		return message;
 	}
 	
-	@PostMapping("/selectBox")
-	@ResponseBody
-	public List<Map<String, Object>> selectBox(@RequestParam Map<String, Object> map) {
-		List<Map<String, Object>> selectBoxList = attendanceService.getSelectBoxList(map);
+	/*====================================================================
+	 * 6. 관리자 지각/조퇴/결근 내역 관리
+	 * ===================================================================
+	 * */
+	
+	@GetMapping("/attendanceHistory")
+	public String attendanceHistory(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+        
+        String id = session.getAttribute("id").toString();
+        
+		Map<String, Object> commuteMinMaxDate = attendanceService.getMyCommuteHistoryMinMaxDate(map);
 		
-		return selectBoxList;
+		if (commuteMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			commuteMinMaxDate = new HashMap<>();
+			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+		}
+		
+		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/attendance/attendanceHistory";
 	}
+	
+	@PostMapping("/getAttendanceHistory")
+	@ResponseBody
+	public List<Map<String, Object>> getAttendanceHistory(HttpSession session, @RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> attendanceHistory = attendanceService.getMyAttendanceHistory(map);
+		
+		return attendanceHistory;
+	}
+	
+	@PostMapping("/getAttendanceHistoryDonutChart")
+	@ResponseBody
+	public List<Map<String, Object>> getAttendanceHistoryDonutChart(HttpSession session, @RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> attendanceHistoryDonut = attendanceService.getMyAttendanceHistoryDonutChart(map);
+		
+		return attendanceHistoryDonut;
+	}
+	
+	/*====================================================================
+	 * 7. 메인 근태
+	 * ===================================================================
+	 * */
 	
 	@GetMapping("/myCommuteHistoryCal")
 	public String getMyCommuteHistoryCal(Model model, Map<String, Object> map) {
@@ -248,6 +344,42 @@ public class AttendanceController {
 		int count = attendanceService.getWeekendTotalWorkHour(map);
 		
 		return count;
+	}
+	
+	/*====================================================================
+	 * 8. .....
+	 * ===================================================================
+	 * */
+	
+	@PostMapping("/Holiday")
+	@ResponseBody
+	public String postMethodName(@RequestBody Map<String, String> param) {
+		
+		System.out.println(param);
+		
+		return "";
+	}
+
+	@PostMapping("/selectBox")
+	@ResponseBody
+	public List<Map<String, Object>> selectBox(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> selectBoxList = attendanceService.getSelectBoxList(map);
+		
+		return selectBoxList;
+	}
+	
+	@PostMapping("/memberSelectBox")
+	@ResponseBody
+	public List<Map<String, Object>> memberSelectBox(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> memberSelectBoxList = attendanceService.getMemberSelectBoxList(map);
+		
+		return memberSelectBoxList;
+	}
+	
+	@GetMapping("/logout")
+	public String logout(HttpSession session, Model model, Map<String, Object> map) {
+		session.invalidate();
+		return "redirect:/login";
 	}
 }
 

@@ -26,4 +26,12 @@ public class AppointmentsService {
 //        System.out.println("Results: " + results);
         return results;
     }
+    
+    public List<Map<String, Object>> getAllDepartments() {
+        return appointMapper.getAllDepartments();
+    }
+    
+    public List<Map<String, Object>> getAllRanks(){
+    	return appointMapper.getAllRanks();
+    }
 }

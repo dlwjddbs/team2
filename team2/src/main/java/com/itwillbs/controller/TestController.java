@@ -56,6 +56,7 @@ public class TestController {
 
 		if (member != null) {
 			session.setAttribute("id", member.getId());
+			session.setAttribute("authority", member.getAuthority());
 
 			log.info("로그인 성공: " + member.getId());
 			
