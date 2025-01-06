@@ -19,6 +19,7 @@
 			
 			<!-- form -->
 			<form th:action="@{/addMember}" method="post" id="addMemberForm">
+				<input type="hidden" id="member_id" name="MEMBER_ID">
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
@@ -33,18 +34,17 @@
 								</div>
 							</div>
 						</div>
-						
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>이름</label>
-									<input type="text" name="name" id="name" class="form-control" required>
+									<input type="text" name="NAME" id="name" class="form-control" required>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>주민등록번호</label>
-									<input type="text" name="residentRegistNum" class="form-control" required>
+									<input type="text" name="RESIDENT_REGIST_NUM" id="resident_num" class="form-control" required>
 								</div>
 							</div>
 						</div>
@@ -52,7 +52,7 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>전화번호</label>
-									<input type="text" name="phone" class="form-control" required>
+									<input type="text" name="PHONE" id="phone" class="form-control" required>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -60,15 +60,14 @@
 									<label>이메일</label>
 									<div class="row">
 										<div class="col-md-5">
-											<input type="hidden" name="email">
-											<input type="text" name="emailId" class="form-control">
+											<input type="hidden" id="email" name="EMAIL">
+											<input type="text" id="emailId" name="emailId" class="form-control">
 										</div>
 										<div class="input-group col-md-7">
 											<div class="input-group-prepend">
 												<span class="input-group-text">@</span>
 											</div>
-											<select class="form-control select" name="emailDomain">
-												<option selected="selected" disabled>example.com</option>												
+											<select class="form-control select" id="emailDomain" name="emailDomain">
 												<option>gmail.com</option>												
 												<option>naver.com</option>												
 												<option>daum.net</option>												
@@ -86,16 +85,16 @@
 							<label for="exampleInputEmail1">주소</label>
 							<div class="row">
 								<div class="col-md-3">
-									<input type="text" class="form-control" name="addressNum" id="postcode" placeholder="우편번호" onclick="exercDaumPostcode()">
+									<input type="text" class="form-control" name="ADDRESS_NUM" id="postcode" placeholder="우편번호" onclick="exercDaumPostcode()">
 								</div>
 							</div>
 							<br>
 							<div class="row">
 								<div class="col-md-6">
-									<input type="text" class="form-control" name="address1" id="address" placeholder="주소">								
+									<input type="text" class="form-control" name="ADDRESS1" id="address1" placeholder="주소">								
 								</div>
 								<div class="col-md-6">
-									<input type="text" class="form-control" name="address2" id="detail_address" placeholder="상세주소">								
+									<input type="text" class="form-control" name="ADDRESS2" id="address2" placeholder="상세주소">								
 								</div>
 							</div>
 						</div>
@@ -109,7 +108,7 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
 										</div>
-										<input type="text" id="datemask" name="joinDate" class="form-control" placeholder="yyyy-mm-dd" required>
+										<input type="text" id="join_date" name="JOIN_DATE" class="form-control" placeholder="yyyy-mm-dd" required>
 									</div>
 								</div>
 							</div>
@@ -140,7 +139,7 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="exampleInputEmail1">부서명</label>
-									<select class="form-control select" id="department" name="deptId" required>
+									<select class="form-control select" id="department" name="DEPT_ID" required>
 										<option selected="selected" disabled>부서선택</option>
 									</select>
 								</div>
@@ -148,7 +147,7 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="exampleInputEmail1">직급</label>
-									<select class="form-control select" id="grade" name="gradeId" required>
+									<select class="form-control select" id="grade" name="GRADE_ID" required>
 										<option selected="selected" disabled>직급선택</option>												
 									</select>
 								</div>
@@ -159,16 +158,15 @@
 							<label for="exampleInputEmail1">계좌번호</label>
 							<div class="row">
 								<div class="col-md-3">
-									<select class="form-control select" id="bank" name="bankCode" style="width: 100%">
+									<select class="form-control select" id="bank_code" name="BANK_CODE" style="width: 100%">
 										<option selected="selected" disabled>은행</option>
-										<!-- 변경 예정 -->												
 									</select>											
 								</div>
 								<div class="col-md-3">
-									<input type="text" name="accountHolder" class="form-control">	
+									<input type="text" name="ACCOUNT_HOLDER" id="account_holder" class="form-control">	
 								</div>
 								<div class="col-md-6">
-									<input type="text" name="account" class="form-control">												
+									<input type="text" name="ACCOUNT" id="account" class="form-control">												
 								</div>
 							</div>
 						</div>
@@ -178,21 +176,21 @@
 								<div class="form-group">
 									<label>기본급여</label>
 									<div class="input-group">
-										<input type="text" id="salary" name="salary" class="form-control" required>
+										<input type="text" id="salary" name="SALARY" class="form-control" required>
 										<div class="input-group-prepend">
-											<span class="input-group-text">원</span>
+											<span class="input-group-text">만원</span>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="exampleInputEmail1">근무시간</label>
-									<select class="form-control select" id="">
-										<option selected="selected" disabled>만들어주면 가지고 오기 ^^</option>												
-									</select>
-								</div>
-							</div>
+<!--							<div class="col-md-6">-->
+<!--								<div class="form-group">-->
+<!--									<label for="exampleInputEmail1">근무시간</label>-->
+<!--									<select class="form-control select" id="">-->
+<!--										<option selected="selected" disabled>만들어주면 가지고 오기 ^^</option>												-->
+<!--									</select>-->
+<!--								</div>-->
+<!--							</div>-->
 						</div>
 						
 						
@@ -203,7 +201,7 @@
 				<div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-primary">Save</button>
+						<button type="submit" class="btn btn-primary" id="submitBtn" >Save</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->

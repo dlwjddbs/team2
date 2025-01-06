@@ -23,7 +23,12 @@
 	        <if test="EMAIL != null">EMAIL,</if>
 	        <if test="PHONE != null">PHONE,</if>
 	        <if test="JOIN_DATE != null">JOIN_DATE,</if>
-	        <if test="CREATE_DATE != null">CREATE_DATE,</if>
+	        <if test="SALARY != null">SALARY,</if>
+			<if test="BANK_CODE != null">BANK_CODE,</if>
+			<if test="ACCOUNT != null">ACCOUNT,</if>
+			<if test="ACCOUNT_HOLDER != null">ACCOUNT_HOLDER,</if>
+			<if test="DEPT_ID != null">DEPT_ID,</if>
+			<if test="GRADE_ID != null">GRADE_ID,</if>
 	    </trim>
 	    VALUES
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -35,38 +40,90 @@
 	        <if test="EMAIL != null">#{EMAIL},</if>
 	        <if test="PHONE != null">#{PHONE},</if>
 	        <if test="JOIN_DATE != null">#{JOIN_DATE},</if>
-	        <if test="CREATE_DATE != null">#{CREATE_DATE},</if>
+	        <if test="SALARY != null">#{SALARY},</if>
+			<if test="BANK_CODE != null">#{BANK_CODE},</if>
+			<if test="ACCOUNT != null">#{ACCOUNT},</if>
+			<if test="ACCOUNT_HOLDER != null">#{ACCOUNT_HOLDER},</if>
+			<if test="DEPT_ID != null">#{DEPT_ID},</if>
+			<if test="GRADE_ID != null">#{GRADE_ID},</if>
 	    </trim>
  	</insert> 
+ 	
+ 	<update id="updateMember" >
+ 		UPDATE
+ 			   MEMBER
+ 		   SET
+		<trim suffixOverrides=",">
+			<if test="NAME != null">NAME = #{NAME},</if>
+			<if test="RESIDENT_REGIST_NUM != null">RESIDENT_REGIST_NUM = #{RESIDENT_REGIST_NUM},</if>
+			<if test="ADDRESS_NUM != null">ADDRESS_NUM = #{ADDRESS_NUM},</if>
+			<if test="ADDRESS1 != null">ADDRESS1 = #{ADDRESS1},</if>
+			<if test="ADDRESS2 != null">ADDRESS2 = #{ADDRESS2},</if>
+			<if test="EMAIL != null">EMAIL = #{EMAIL},</if>
+			<if test="PHONE != null">PHONE = #{PHONE},</if>
+			<if test="JOIN_DATE != null">JOIN_DATE = #{JOIN_DATE},</if>
+			<if test="SALARY != null">SALARY = #{SALARY},</if>
+			<if test="BANK_CODE != null">BANK_CODE = #{BANK_CODE},</if>
+			<if test="ACCOUNT != null">ACCOUNT = #{ACCOUNT},</if>
+			<if test="ACCOUNT_HOLDER != null">ACCOUNT_HOLDER = #{ACCOUNT_HOLDER},</if>
+			<if test="DEPT_ID != null">DEPT_ID = #{DEPT_ID},</if>
+			<if test="GRADE_ID != null">GRADE_ID = #{GRADE_ID},</if>
+		</trim>
+ 		 WHERE
+ 		 	   MEMBER_ID = #{MEMBER_ID}
+ 	</update>
  	
  	<insert id="insertHistory">
  		
  	</insert>
  	
     <select id="selectMemberList" resultType="map">
-		SELECT
-
-				TO_CHAR(m.JOIN_DATE, 'YYYY-MM-DD') AS JOIN_DATE,
-				m.ID,
-				m.NAME,
-				m.PHONE,
-				m.EMAIL,
-				
-				(SELECT d.NAME 
-			       FROM DEPARTMENT d 
-				  WHERE d.ID = dh.DEPARTMENT_ID) AS DEPARTMENT,
-				  
-				(SELECT g.NAME 
-				   FROM GRADE g 
-				  WHERE g.ID = gh.GRADE_ID) AS GRADE
-				  
-		  FROM MEMBER m 
-	 LEFT JOIN DEPARTMENT_HISTORY dh 
-										ON m.ID = dh.MEMBER_ID
-	 LEFT JOIN GRADE_HISTORY gh 
-										ON m.ID = gh.MEMBER_ID
-     WHERE m.USE_YN = 'Y'  	   
+    
+    	SELECT
+			   M.JOIN_DATE
+			 , M.MEMBER_ID 
+			 , M.NAME 
+			 , M.PHONE 
+			 , M.EMAIL 
+			 , CC_DEPT.CODE_NAME AS DEPARTMENT
+			 , CC_GRADE.CODE_NAME AS GRADE
+		  FROM MEMBER M
+	 LEFT JOIN COMMON_CODE CC_DEPT
+	 								ON M.DEPT_ID = CC_DEPT.CODE_ID
+	 							   AND CC_DEPT.GROUP_ID = 'DEP'
+	 LEFT JOIN COMMON_CODE CC_GRADE
+	 								ON M.GRADE_ID = CC_GRADE.CODE_ID 
+	 							   AND CC_GRADE.GROUP_ID = 'RANK'
+		 WHERE M.USE_YN = 'Y'
+    
     </select>
+    
+    <!-- 사원 상세 정보 -->
+    <select id="selectMember" resultType="map">
+    
+		SELECT
+			   MEMBER_ID
+			 , NAME
+			 , RESIDENT_REGIST_NUM
+			 , ADDRESS_NUM
+			 , ADDRESS1
+			 , ADDRESS2
+			 , EMAIL
+			 , PHONE
+			 , JOIN_DATE
+			 , SALARY
+			 , BANK_CODE
+			 , ACCOUNT
+			 , ACCOUNT_HOLDER
+			 , DEPT_ID
+			 , GRADE_ID
+		  FROM
+			   MEMBER 
+		 WHERE
+		 	   MEMBER_ID = #{MEMBER_ID}
+    
+    </select>
+    
     <!--
     <select id="selectOrganizationData" resultType="map">
 	SELECT JSON_OBJECT(

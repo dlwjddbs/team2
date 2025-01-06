@@ -1,6 +1,5 @@
 package com.itwillbs.controller;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,9 +18,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.service.HrManagementService;
+import com.itwillbs.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -32,9 +35,11 @@ public class HrManagementController {
 	@PostMapping("/addMember")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
-		/*		
 		int insertCount = hrManagementService.addMember(param);
 		
+		
+		
+		/*		
 		if(insertCount > 0) {
 			System.out.println("========insert 성공");
 			System.out.println("insertCount: " + insertCount);
@@ -47,11 +52,23 @@ public class HrManagementController {
 		}
 		*/
 		
-		
 		return "redirect:/memberList";
 	}
 //======================================================================================================
 	
+	// 사원 상세 정보 수정
+	@PostMapping("/updateMember")
+	public String updateMember(@RequestParam Map<String, Object> param) {
+		System.out.println("====================== 사원 상세 정보 수정 ======================");
+		System.out.println(param);
+		
+		int updateCount = hrManagementService.updateMember(param);
+		
+		
+		return "redirect:/memberList";
+	}
+	
+	// 사원 정보
 	@GetMapping("/memberList")
 	public String memberList(Map<String, Object> map, Model model) {
 		log.info("=============Meber List=============");
@@ -59,14 +76,30 @@ public class HrManagementController {
 	}
 	
 	
-	// 맴버 정보
+	// 사원 정보
 	@PostMapping("/getMemberList")
 	@ResponseBody
-	public List<Map<String, Object>> getMemberList(@RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getMemberList(@RequestParam Map<String, Object> param) {
 		List<Map<String, Object>> memberList = hrManagementService.getMemberList();
 		log.info(memberList.toString());
 		return memberList;
 	}	
+	
+	// 사원 상세 정보
+	@PostMapping("/getMemberDetail")
+	@ResponseBody
+	public Map<String, Object> getMemberDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
+		System.out.println("====================== 사원 상세 정보 ======================");
+		System.out.println(param);
+		Map<String, Object> member = hrManagementService.getMemberDetail(param);
+		
+		/*
+		ObjectMapper mapper = new ObjectMapper();
+		String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(member);
+		*/
+		return member;
+	}
+
 	
 	
 	// 은행코드, 부서, 직급

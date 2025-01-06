@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.itwillbs.entity.Member;
 
 @Mapper
 public interface HrManagementMapper {
@@ -20,8 +23,14 @@ public interface HrManagementMapper {
 	
 	// 부서, 상위 하위 select
 	List<Map<String, Object>> selectDepartment();
-
+	
+	// 사원 신규 등록
 	int insertMember(Map<String, Object> param);
 
 	void insertHistory(Map<String, Object> param, @Param("table_name") String string);
+
+	Map<String, Object> selectMember(Map<String, Object> map);
+	
+	// 사원 상세 정보 수정
+	int updateMember(Map<String, Object> param);
 }
