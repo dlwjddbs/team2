@@ -3,6 +3,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,20 +49,50 @@ public class NoticeController {
     	return "/notice/noticeList";
     }
     
+    @GetMapping("/session")
+    public ResponseEntity<Map<String, Object>> getSessionData(HttpSession session) {
+        // 세션에서 사용자 ID와 역할(role)을 가져옴
+        String userId = (String) session.getAttribute("id");
+        String userRole = (String) session.getAttribute("authority");
+
+        // 세션 값이 없는 경우, 기본 응답 처리
+        if (userId == null || userRole == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        // 세션 데이터 응답
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", userId);
+        response.put("authority", userRole);
+
+        return ResponseEntity.ok(response);
+    }
+    
+    
+    
+    @GetMapping("/notice/noticeDetail")
+    public String getNoticeDetail(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
+    	String id = session.getAttribute("id").toString();
+    	map.put("memberId", id);
+    	List<Map<String, Object>> noticeDetail = noticeService.getNoticeDetail(map);
+    	model.addAttribute("noticeDetail", noticeDetail);
+    	
+        return "/notice/noticeDetail";
+    }
+    
+    
     @PostMapping("/getNoticeList")
     @ResponseBody
     public List<Map<String, Object>> getNoticeList(HttpSession session, @RequestParam Map<String, Object> map) {
     	String id = session.getAttribute("id").toString();
-    	int idx = 0;
         map.put("memberId", id);
         List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
         
-        // 글 순번
-        for(Map<String, Object> list : noticeList) {
-        	idx++;
-        	list.put("NUM", idx);
-        	System.out.println(idx);
-        }
+//        // 글 순번
+//        for(Map<String, Object> list : noticeList) {
+//        	list.put("NUM", list.get("NOTICE_ID"));
+//        }
         System.out.println("noticeList: " + noticeList);
         return noticeList;
     }

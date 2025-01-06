@@ -19,7 +19,15 @@
        	 ORDER BY 
           	  CREATE_TIME DESC
     </select>
-
+	
+	<select id="getNoticeDetail" resultType="map">
+        SELECT
+            NOTICE_ID, NAME, SUBJECT, TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
+        FROM
+            NOTICE
+        WHERE
+    </select>
+	
 <!--	<select id="getNoticeListMinMaxDate" resultType="map">-->
 	
 <!--		SELECT-->

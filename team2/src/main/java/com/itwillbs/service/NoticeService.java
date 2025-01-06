@@ -33,6 +33,11 @@ public class NoticeService {
 		
 	}
 
+	public List<Map<String, Object>> getNoticeDetail(Map<String, Object> map) {
+		map.put("createTime", new Timestamp(System.currentTimeMillis()));
+		return noticeMapper.getNoticeDetail(map);
+	}
+
 	
 	 
 }

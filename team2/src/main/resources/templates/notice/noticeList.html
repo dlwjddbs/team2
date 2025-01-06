@@ -47,12 +47,21 @@
 
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
+				<!--				<section class="content">-->
+				<!--							<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">-->
+				<!--												<div class="d-flex">-->
+				<!--													<div class="d-flex ml-4">-->
+				<!--														 Date range -->
+				<!--														<div class="input-group">-->
+
+				<!--													</div>-->
+				<!--												</div>-->
+				<!--											</div>-->
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<h3 class="card-title">공지사항 목록</h3>
 									<div class="card-tools">
 										<!-- 관리자만 작성 버튼 표시 -->
 										<button id="btnAddNotice" class="btn btn-primary" style="display:none;"
@@ -71,7 +80,7 @@
 											</div>
 											<div class="modal-body">
 												<form id="addNoticeForm">
-													
+
 													<div class="mb-3">
 														<label for="noticeTitle" class="form-label">제목</label>
 														<input type="text" class="form-control" id="noticeTitle"
@@ -82,17 +91,78 @@
 														<textarea class="form-control" id="noticeContent" rows="4"
 															required></textarea>
 													</div>
-													<button type="submit" class="btn btn-primary">저장</button>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary"
+															data-bs-dismiss="modal">닫기</button>
+														<button type="submit" class="btn btn-primary">저장</button>
+													</div>
+
 												</form>
 											</div>
 										</div>
 									</div>
 								</div>
-		
+
+<!--								 모달 -->
+<!--								<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="modalTitle"-->
+<!--									aria-hidden="true">-->
+<!--									<div class="modal-dialog">-->
+<!--										<div class="modal-content">-->
+<!--											<div class="modal-header">-->
+<!--												<h5 class="modal-title" id="modalTitle">상세보기</h5>-->
+<!--												<button type="button" class="btn-close" data-bs-dismiss="modal"-->
+<!--													aria-label="Close"></button>-->
+<!--											</div>-->
+<!--											<div class="modal-body">-->
+<!--												<p><strong>작성자:</strong> <span id="modalAuthor"></span></p>-->
+<!--												<p><strong>작성일:</strong> <span id="modalTime"></span></p>-->
+<!--												<div class="mb-3">-->
+<!--													<label for="noticeTitle" class="form-label">제목</label>-->
+<!--													<input type="text" class="form-control" id="noticeTitle" required>-->
+<!--												</div>-->
+<!--												<label for="noticeContent" class="form-label">내용</label>-->
+<!--												<textarea class="form-control" id="noticeContent" rows="4"-->
+<!--													required></textarea>-->
+<!--												<p id="modalContent"></p>-->
+<!--											</div>-->
+<!--											<div class="modal-footer">-->
+<!--												<button type="button" class="btn btn-secondary"-->
+<!--													data-bs-dismiss="modal">닫기</button>-->
+<!--											</div>-->
+<!--										</div>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!-- 모달 -->
+<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">상세보기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>작성자:</strong> <span id="modalAuthor"></span></p>
+                <p><strong>작성일:</strong> <span id="modalTime"></span></p>
+                <div class="mb-3">
+                    <label for="noticeTitle" class="form-label">제목</label>
+                    <input type="text" class="form-control" id="noticeTitle" required readonly>
+                </div>
+                <label for="noticeContent" class="form-label">내용</label>
+                <textarea class="form-control" id="noticeContent" rows="4" required readonly></textarea>
+                <p id="modalContent"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>									
+
 								<!-- /.card-header -->
 								<div class="card-body">
 									<table id="noticeTable" class="table table-bordered table-striped">
-										
+
 
 									</table>
 								</div>
@@ -177,13 +247,6 @@
 		}
 
 		function addNotice() {
-			const Admin = true; // 관리자 여부 (서버에서 가져온 데이터로 설정)
-			// 관리자 권한에 따라 작성 버튼 표시
-			if (Admin) {
-				$("#btnAddNotice").show();
-			}
-			
-			
 			// 공지사항 작성 로직 구현
 			alert("공지사항 작성 기능 구현.");
 		}
@@ -242,13 +305,13 @@
 			event.preventDefault(); // 기본 폼 제출 방지
 
 			// 폼 데이터 수집
-// 			var noticeAuthor = document.getElementById("noticeAuthor").value;
+			// 			var noticeAuthor = document.getElementById("noticeAuthor").value;
 			var noticeTitle = document.getElementById("noticeTitle").value;
 			var noticeContent = document.getElementById("noticeContent").value;
 
 			// 서버로 전송할 데이터 객체 만들기
 			var data = new FormData();
-// 			data.append("noticeAuthor", noticeAuthor);
+			// 			data.append("noticeAuthor", noticeAuthor);
 			data.append("noticeTitle", noticeTitle);
 			data.append("noticeContent", noticeContent);
 
@@ -279,11 +342,7 @@
 
 	<script th:inline="javascript">
 		$(function () {
-			const Admin = true; // 관리자 여부 (서버에서 가져온 데이터로 설정)
-			// 관리자 권한에 따라 작성 버튼 표시
-			if (Admin) {
-				$("#btnAddNotice").show();
-			}
+			handlingButtonRole();
 
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 			/*	let date = $("#reservation").val().split(' ~ ');*/
@@ -294,6 +353,26 @@
 			/*let date = $("#reservation").val().split(' ~ ');*/
 			dataTable('noticeTable', date, true);
 		});
+		
+		function handlingButtonRole() {
+			$.ajax({
+			            url: '/session', // 서버에 관리자 여부를 요청하는 엔드포인트
+			            method: 'GET',
+			            success: function (data) {
+			                const userRole = data.authority; // role 값 ("ADMIN" 또는 "USER" 등)
+
+			                // 관리자 권한이면 작성 버튼 표시
+			                if (userRole === "AD") {
+			                    $("#btnAddNotice").show();
+								
+								
+			                }
+			            },
+			            error: function () {
+			                console.error("사용자 세션 데이터를 가져오는 데 실패했습니다.");
+			            }
+			        });
+		}
 
 		function dataTable(tableId,
 			/*date,*/ isUpdate) {
@@ -318,9 +397,9 @@
 					},
 					zeroRecords: "검색 결과 없음" 
 				},*/
-				language : {
-					zeroRecords: "검색 결과 없음" 
-									},
+				language: {
+					zeroRecords: "검색 결과 없음"
+				},
 				ajax: {
 					url: "/getNoticeList",
 					type: "POST",
@@ -329,24 +408,53 @@
 						endDate : date[1]
 					},*/
 					"dataSrc": function (res) {
-							                return res;
-							            }
-					
+						return res;
+					}
+
 				},
 				columns: [
-//					{data: "NOTICE_ID", title: "ID", "defaultContent": ""},
-					{data: "NUM", title: "순번", "defaultContent": ""},
+					{data: "NOTICE_ID", title: "ID", "defaultContent": ""},
+				//	{data: "NUM", title: "순번", "defaultContent": ""},
 					{data: "NAME", title: "작성자", "defaultContent": ""},
 					{data: "SUBJECT", title: "제목", "defaultContent": ""},
-					{data: "CONTENT", title: "내용", "defaultContent": "", render: function (data, type, row) {
-	                    // 40자까지만 표시하고 "더보기" 링크 추가
-	                    return `<a href="#" class="content-link" data-id="${row.ID}">${data.slice(0, 40)}...</a>`;
-	                }},
+					{
+						data: "CONTENT", title: "내용", "defaultContent": "", render: function (data, type, row) {
+							// 40자까지만 표시하고 "더보기" 링크 추가
+							return `<a href="#" class="content-link" data-id="${row.ID}">${data.slice(0, 40)}...</a>`;
+						}
+					},
 					{data: "CREATE_TIME", title: "작성일", "defaultContent": ""}
 				]
-		
+
 			})
-			
+
+
+			$(document).on("click", ".content-link", function (e) {
+				e.preventDefault();
+				const noticeId = $(this).data("id");
+
+				$.ajax({
+					url: "/getNoticeList", // Spring Controller의 매핑 URL
+					type: "POST",
+					contentType: "application/json",
+					data: JSON.stringify({id: noticeId}),
+					success: function (data) {
+						// 모달 내용 설정
+						$("#modalTitle").text(data.subject);
+						$("#modalContent").text(data.content);
+						$("#modalAuthor").text(data.name);
+						$("#modalTime").text(data.createTime);
+
+						// 모달 열기
+						$("#noticeModal").modal("show");
+					},
+					error: function () {
+						alert("데이터를 불러오는데 실패했습니다.");
+					},
+				});
+			});
+
+
 		}
 	</script>
 </body>
