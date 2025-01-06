@@ -289,6 +289,21 @@
 				  .container()
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			});
+			
+	        $('#daterange').daterangepicker({
+	            opens: 'left',
+	            startDate: moment().startOf('month'),
+	            endDate: moment().endOf('month'),
+	            locale: {
+	                format: 'YYYY-MM'
+	            },
+	            singleDatePicker: true, // 단일 날짜 선택
+	            showDropdowns: true, // 드롭다운으로 연도 및 월 선택
+	            minYear: 1901, // 최소 연도
+	            maxYear: parseInt(moment().format('YYYY'), 10) // 최대 연도
+	        }, function(start, end) {
+	            $('#daterange').val(start.format('YYYY-MM'));
+	        });
 		});
 		
 		

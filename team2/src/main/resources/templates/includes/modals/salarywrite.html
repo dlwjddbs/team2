@@ -1,5 +1,3 @@
-
-<!-- 모달창 -->
 <div class="modal fade" id="modal-lg" th:fragment="salarywrite">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -22,12 +20,12 @@
 							<div class="col-md-12">
 								<div class="form-group">
 					              <label>귀속 연월</label>
-					                <div class="input-group date" id="reservationdate" data-target-input="nearest">
-					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
-					                    <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					                    </div>
-					                </div>
+									<div class="input-group date" id="reservationdate" data-target-input="nearest">
+									    <input type="text" class="form-control datetimepicker-input" id="daterange" placeholder="년-월 선택"  />
+									    <div class="input-group-append" data-target="#reservationdate" data-toggle="daterangepicker">
+									        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+									    </div>
+									</div>
 					            </div>
 				            </div>
 						 </div>
@@ -125,4 +123,4 @@
 		</div>
 	</div>
 </div>
-<!-- /.모달창 -->
+</html>
