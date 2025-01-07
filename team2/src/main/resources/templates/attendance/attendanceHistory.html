@@ -81,13 +81,27 @@
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				
-				<div class="card card-danger">
-					<div class="card-body">	
-						<canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+				<div class="row">
+					<div class="col-3">
+						<!-- DONUT CHART -->
+						<div class="card card-danger">
+							<div class="card-body">	
+								<canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+							</div>
+						</div>
+						<!-- /.DONUT CHART -->
 					</div>
-					<!-- /.card-body -->
+					<div class="col-9">
+						<!-- STACKED BAR CHART -->
+						<div class="card card-danger">
+							<div class="card-body">	
+								<canvas id="stackedBarChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+							</div>
+						</div>
+						<!-- /.STACKED BAR CHART -->
+					</div>
 				</div>
-				<!-- /.card -->
+				
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -160,14 +174,18 @@
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 			let date = $("#reservation").val().split(' ~ ');
 			let myDonutChart = '';
+			
 			donutChart('donutChart', date, false);
 			dataTable('example1', date, false);
+			stackedBarChart('stackedBarChart', date, false);
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
+			
 			dataTable('example1', date, true);
 			donutChart('donutChart', date, true);
+			stackedBarChart('stackedBarChart', date, true);
 		});
 		
 		function dateRangePicker() {
@@ -251,12 +269,17 @@
 		}
 
 		function donutChart(chartId, date, isUpdate) {
+			let deptCode = $("#DEP").val();
+			let rankCode = $("#RANK").val();
+			
 			$.ajax({
                 type : "POST",
                 url : "/getAttendanceHistoryDonutChart",
                 data : {
 					startDate : date[0],					
-					endDate : date[1]
+					endDate : date[1],
+					deptCode : deptCode,
+					rankCode : rankCode
 				},
                 success : function(res){
 					let labels = [];
@@ -298,7 +321,86 @@
                     console.log("pieChart() ajax 실패");
                 }
             });
-		};
+		}
+		
+		function stackedBarChart(chartId, date, isUpdate) {
+			let deptCode = $("#DEP").val();
+			let rankCode = $("#RANK").val();
+			
+			$.ajax({
+                type : "POST",
+                url : "/getAttendanceHistoryStackedBarChart",
+                data : {
+					startDate : date[0],					
+					endDate : date[1],
+					deptCode : deptCode,
+					rankCode : rankCode
+				},
+                success : function(res){
+                	let early_leave = [];
+        			let late = [];
+        			let normal = [];
+        			let name = [];
+                	
+                	res.forEach((el) => {
+                		normal.push(el.NORMAL_ATTENDANCE);
+                		late.push(el.LATE_ATTENDANCE);
+                		early_leave.push(el.EARLY_LEAVE_ATTENDANCE);
+                		name.push(el.MEMBER_NAME);
+                	});
+                	
+                	let stackedBarChartCanvas = $('#' + chartId).get(0).getContext('2d');
+        			let barChartData = {
+        		        labels: name,
+        		        datasets: [
+        		        	{
+        			            label: '정상출근',
+        			            data: normal,
+        			            backgroundColor: '#00a65a'
+        			        },
+        			        {
+        			            label: '조퇴',
+        			            data: early_leave,
+        			            backgroundColor: '#f39c12'
+        			        },
+        			        {
+        			            label: '지각',
+        			            data: late,
+        			            backgroundColor: '#f56954'
+        			        }
+        				]
+        			};
+        		    let stackedBarChartData = $.extend(true, {}, barChartData);
+
+        		    let stackedBarChartOptions = {
+        				responsive : true,
+        		      	maintainAspectRatio : false,
+        		      	scales: {
+        		        	xAxes: [{
+        			          	stacked : true,
+        			        }],
+        			        yAxes: [{
+        			          	stacked : true
+        			        }]
+        		      	}
+        		    };
+        		    
+        		 	// 차트 재생성 시 기존의 차트 삭제
+					if (isUpdate) {
+						myStackedBarChart.destroy();
+					} 
+
+        		    myStackedBarChart = new Chart(stackedBarChartCanvas, {
+        				type: 'bar',
+        		      	data: stackedBarChartData,
+        		      	options: stackedBarChartOptions
+        		    });
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("stackedBarChart() ajax 실패");
+                }
+            });
+		}
 		
 		// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
 		function selectBox(type) {

@@ -176,4 +176,8 @@ public class AttendanceService {
 	public List<Map<String, Object>> getUserInfo(Map<String, Object> map) {
 		return attendanceMapper.getUserInfo(map);
 	}
+
+	public List<Map<String, Object>> getAttendanceHistoryStackedBarChart(Map<String, Object> map) {
+		return attendanceMapper.getAttendanceHistoryStackedBarChart(map);
+	}
 }

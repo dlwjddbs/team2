@@ -45,4 +45,6 @@ public interface AttendanceMapper {
 	int insertCommuteTime(Map<String, Object> map);
 
 	List<Map<String, Object>> getUserInfo(Map<String, Object> map);
+
+	List<Map<String, Object>> getAttendanceHistoryStackedBarChart(Map<String, Object> map);
 }

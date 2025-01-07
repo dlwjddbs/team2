@@ -332,6 +332,14 @@ public class AttendanceController {
 		return attendanceHistoryDonut;
 	}
 	
+	@PostMapping("/getAttendanceHistoryStackedBarChart")
+	@ResponseBody
+	public List<Map<String, Object>> getAttendanceHistoryStackedBarChart(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> attendanceHistoryStackedBar = attendanceService.getAttendanceHistoryStackedBarChart(map);
+		
+		return attendanceHistoryStackedBar;
+	}
+	
 	/*====================================================================
 	 * 7. 메인 근태
 	 * ===================================================================
