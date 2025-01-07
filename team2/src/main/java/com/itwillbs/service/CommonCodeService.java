@@ -1,6 +1,7 @@
 package com.itwillbs.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,4 +46,82 @@ public class CommonCodeService {
         }
         return new ArrayList<>(groupedData.values());
     }
+
+	public List<Map<String, Object>> getGroupCommonCode(Map<String, Object> map) {
+		return commonCodeMapper.getGroupCommonCode(map);
+	}
+
+
+	public Map<String, Object> insertCommonCodeGroup(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "이미 등록된 코드입니다.";
+		String resultCode = "0";
+		
+		try {
+			int duplicateCnt = commonCodeMapper.isDuplicateCommonCodeGroup(map);
+			if (duplicateCnt == 0) {
+				int resultCnt = commonCodeMapper.insertCommonCodeGroup(map);
+				if (resultCnt > 0) {
+					result = "등록 되었습니다.";
+					resultCode = "1";
+				} else {
+					result = "등록 실패.";
+				}
+			}
+		} catch (Exception e) {
+			result = "등록 실패.";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> deleteCommonCodeGroup(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "";
+		String resultCode = "";
+		
+		try {
+			int resultCnt = commonCodeMapper.deleteCommonCodeGroup(map);
+			if (resultCnt > 0) {
+				result = "삭제 되었습니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			result = "삭제 실패.";
+			resultCode = "0";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> updateCommonCodeGroup(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "";
+		String resultCode = "";
+		
+		try {
+			int resultCnt = commonCodeMapper.updateCommonCodeGroup(map);
+			if (resultCnt > 0) {
+				result = "수정 되었습니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			result = "수정 실패.";
+			resultCode = "0";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
 }

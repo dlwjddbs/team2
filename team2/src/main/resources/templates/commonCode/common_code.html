@@ -30,8 +30,8 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 		
-		<!-- new member modal -->
-		<nav th:replace="~{includes/modals/new :: new}"></nav>
+		<nav th:replace="~{includes/modals/commonCodeGroup :: commonCodeGroup}"></nav>
+		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -62,14 +62,14 @@
 									<h3 class="card-title">대분류</h3>
 									<div class="card-tools">
 										<div class="d-flex">
-											<button type="button" class="btn btn-primary" id="btnAdd">등록</button>
-											<button type="button" class="btn btn-primary mx-1" id="btnUpdate">수정</button>
-											<button type="button" class="btn btn-primary" id="btnDelete">삭제</button>
+											<button type="button" class="btn btn-primary" id="btnAddGroup">등록</button>
+											<button type="button" class="btn btn-primary mx-1" id="btnUpdateGroup">수정</button>
+											<button type="button" class="btn btn-primary" id="btnDeleteGroup">삭제</button>
 										</div>
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="superClass" class="table table-bordered table-striped">
+									<table id="groupCode" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -148,17 +148,160 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
-			superClassDataTable(false);
-			subClassDataTable(false);
+			groupCodeDataTable(false);
+//			subClassDataTable(false);
 		});
-
-		function superClassDataTable(isUpdate) {
-			// 기존 테이블 삭제
-			if (isUpdate) {
-				$("#superClass").DataTable().destroy();
+		
+		$("#btnAddGroup").on("click", function() {
+			$("#GROUP_ID").val('');
+			$("#GROUP_NAME").val('');
+			$("#DESCRIPTION").val('');
+			
+			$('#modalGroupCode').modal();
+		});
+		
+		$("#btnDeleteGroup").on('click', function() {
+			let code = getSelectedRowCode();
+			if (code == null) {
+				return;
 			}
 			
-			let table = $("#superClass").DataTable({
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/deleteCommonCodeGroup",
+	            data : {
+	            	GROUP_ID : code,
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("deleteCommonCodeGroup() ajax 실패");
+	            }
+	        });
+		});
+		
+		$("#groupCodeSave").on('click', function() {
+			let GROUP_ID = $("#GROUP_ID").val();
+			let GROUP_NAME = $("#GROUP_NAME").val();
+			let DESCRIPTION = $("#DESCRIPTION").val();
+			
+			if (GROUP_ID == null || GROUP_ID == ''
+				|| GROUP_NAME == null || GROUP_NAME == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/addCommonCodeGroup",
+	            data : {
+	            	GROUP_ID : GROUP_ID.toUpperCase(),
+	            	GROUP_NAME : GROUP_NAME,
+	            	DESCRIPTION : DESCRIPTION
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("addCommonCodeGroup() ajax 실패");
+	            }
+	        });
+		});
+		
+		$("#btnUpdateGroup").on('click', function(e) {
+			let code = getSelectedRowCode();
+			if (code == null) {
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/getGroupCommonCode",
+	            data : {
+	            	GROUP_ID : code,
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+					
+					$("#GROUP_ID_UPDATE").val(res[0].GROUP_ID);
+					$("#GROUP_NAME_UPDATE").val(res[0].GROUP_NAME);
+					$("#DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
+	            },
+	            error : function(e){
+	                console.log("getGroupCommonCode() ajax 실패");
+	            }
+	        });
+			
+			$('#modalGroupCodeEdit').modal();
+		});
+		
+		$("#groupCodeUpdate").on('click', function() {
+			let GROUP_ID = $("#GROUP_ID_UPDATE").val();
+			let GROUP_NAME = $("#GROUP_NAME_UPDATE").val();
+			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
+
+			if (GROUP_NAME == null || GROUP_NAME == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/updateCommonCodeGroup",
+	            data : {
+					GROUP_ID : GROUP_ID,
+	            	GROUP_NAME : GROUP_NAME,
+	            	DESCRIPTION : DESCRIPTION
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("updateCommonCodeGroup() ajax 실패");
+	            }
+	        });
+		});
+		
+		function getSelectedRowCode() {
+			let table = $('#groupCode').DataTable();
+			if (table.row('.selected').length == 0) {
+				alert("행을 선택하세요.");
+				
+				return;
+			}
+			let code = table.rows('.selected').data()[0].GROUP_ID;
+			
+			return code;
+		}
+
+		function groupCodeDataTable(isUpdate) {
+			// 기존 테이블 삭제
+			if (isUpdate) {
+				$("#groupCode").DataTable().destroy();
+			}
+			
+			let table = $("#groupCode").DataTable({
 				aaSorting: [], // 초기 정렬 비활성화
 				select : {
 					style : 'single'
@@ -174,11 +317,10 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getCommonCode",
+					url : "/getGroupCommonCode",
 					type:"POST",
 					data : {},
 					"dataSrc": function (res) {
-						console.log(res);
 		                return res;
 		            }
 				},
@@ -190,18 +332,12 @@
 				lengthChange : false, 
 				autoWidth : false,
 			});
-			
-			$("#btnUpdate").on('click', function(e) {
-				if (table.row('.selected').length == 0) {
-					alert("행을 선택하세요.");
-					
-					return;
-				}
-				
-				let code = $('#superClass').DataTable().rows('.selected').data()[0].GROUP_ID;
-				console.log(code);
-			});
 		}
+		
+		
+		
+		
+		
 		
 		function subClassDataTable(isUpdate) {
 			// 기존 테이블 삭제
@@ -240,17 +376,6 @@
 				responsive : true, 
 				lengthChange : false, 
 				autoWidth : false,
-			});
-			
-			$("#btnUpdate").on('click', function(e) {
-				if (table.row('.selected').length == 0) {
-					alert("행을 선택하세요.");
-					
-					return;
-				}
-				
-				let code = $('#superClass').DataTable().rows('.selected').data()[0].GROUP_ID;
-				console.log(code);
 			});
 		}
 	</script>

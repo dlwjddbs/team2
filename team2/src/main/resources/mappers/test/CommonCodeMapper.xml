@@ -19,4 +19,54 @@
 	 		ON
 	 		   CC.GROUP_ID = CCG.GROUP_ID
 	</select>
+	
+	<select id="getGroupCommonCode" resultType="map">
+	<!-- getGroupCommonCode 공통코드 대분류 조회 -->
+		SELECT
+			   GROUP_ID 
+			 , GROUP_NAME 
+			 , DESCRIPTION
+		  FROM COMMON_CODE_GROUP
+		  <if test='GROUP_ID != null and GROUP_ID != ""'>
+		  		WHERE GROUP_ID = #{GROUP_ID}
+		  </if>
+	</select>
+	
+	<select id="isDuplicateCommonCodeGroup" resultType="Integer">
+	<!-- isDuplicateCommonCodeGroup 공통코드 대분류 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMON_CODE_GROUP
+		 WHERE GROUP_ID = #{GROUP_ID}
+	</select>
+	
+	<insert id="insertCommonCodeGroup">
+	<!-- insertCommonCodeGroup 공통코드 대분류 등록 -->
+		INSERT INTO COMMON_CODE_GROUP (
+			  GROUP_ID 
+			, GROUP_NAME
+			, DESCRIPTION 
+			, CREATE_DATE 
+		) VALUES (
+			  #{GROUP_ID}
+			, #{GROUP_NAME}
+			, #{DESCRIPTION}
+			, CURRENT_DATE
+		)
+	</insert>
+	
+	<delete id="deleteCommonCodeGroup">
+	<!-- deleteCommonCodeGroup 공통코드 대분류 삭제 -->
+		DELETE FROM COMMON_CODE_GROUP
+ 		 WHERE GROUP_ID = #{GROUP_ID}
+	</delete>
+	
+	<update id="updateCommonCodeGroup">
+	<!-- updateCommonCodeGroup 공통코드 대분류 수정 -->
+		UPDATE COMMON_CODE_GROUP 
+		   SET 
+			   GROUP_NAME = #{GROUP_NAME}
+			 , DESCRIPTION = #{DESCRIPTION}
+			 , UPDATE_DATE = CURRENT_DATE
+		 WHERE GROUP_ID = #{GROUP_ID}
+	</update>
 </mapper>

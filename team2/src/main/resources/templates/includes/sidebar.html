@@ -31,8 +31,27 @@
 		<!-- 메인 정보 -->
 		<nav class="mt-2">
 			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+				<!-- 시스템관리 --> 
+				<li class="nav-item">
 				
-					<!-- 인사 정보 --> 
+					<a href="#" class="nav-link">
+						<p>
+							시스템관리
+							<i class="fas fa-angle-left right"></i>
+						</p>
+					</a>
+					<ul class="nav nav-treeview">
+						<li class="nav-header">ㅡ  시스템관리</li>
+						<li class="nav-item">
+							<a th:href="@{/commonCode}" class="nav-link">
+								<p>공통코드</p>
+							</a>
+						</li>
+					</ul>
+				</li>
+				<!-- /.시스템관리 -->
+				
+				<!-- 인사 정보 --> 
 				<li class="nav-item">
 					<a href="#" class="nav-link">
 						<p>
