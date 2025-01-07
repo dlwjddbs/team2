@@ -25,21 +25,20 @@ public class NoticeService {
 	
 //	작성
 	public void createNotice(Map<String, Object> map) {
-		noticeMapper.createNotice(map);
-		
+		noticeMapper.createNotice(map);		
 	}
-
+// 상세
 	public Map<String, Object> getNoticeDetail(Map<String, Object> map) {
 		Map<String, Object> data = noticeMapper.detailNotice(map);
 		map.put("createTime", new Timestamp(System.currentTimeMillis()));
 		return data;
 	}
-
+//	수정
 	public void updateNotice(Map<String, Object> map) {
 		map.put("createTime", new Timestamp(System.currentTimeMillis()));
 		noticeMapper.updateNotice(map);
 	}
-
+// 삭제
 	public void deleteNotice(Map<String, Object> map) {
 		noticeMapper.deleteNotice(map);
 	}

@@ -26,7 +26,7 @@ public class NoticeController {
 	
 	private final NoticeService noticeService;
        
-	
+	// 목록 가져오기
     @GetMapping("/notice/noticeList")
     public String getNoticeList(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
     	
@@ -72,9 +72,8 @@ public class NoticeController {
 //        }
 //    	System.out.println("noticeList: " + noticeList);
     	return noticeList;
-    }
-    
-    
+    }    
+       
     @GetMapping("/session")
     public ResponseEntity<Map<String, Object>> getSessionData(HttpSession session) {
         // 세션에서 사용자 ID와 역할(role)을 가져옴
@@ -93,8 +92,7 @@ public class NoticeController {
         response.put("authority", userRole);
 
         return ResponseEntity.ok(response);
-    }   
-        
+    }          
     
     // 공지 수정 정보
     @PostMapping("/getNoticeDetail")
@@ -106,10 +104,7 @@ public class NoticeController {
     	    	
     	return notice;
     }
-    
-    
-    
-    
+      
 //  공지사항 작성 (관리자 전용)
     @PostMapping("/createNotice")
     @ResponseBody
@@ -142,35 +137,4 @@ public class NoticeController {
 		return "redirect:/notice/noticeList";
 	}
     
-// // 공지사항 수정 (관리자 전용)
-//    @PostMapping("/updateNotice")
-//    public String updateNotice(@RequestParam Map<String, Object> map) {
-//        String id = ADMIN_ID; // 하드코딩된 관리자 ID
-//        map.put("id", id);
-//
-//        if (!ADMIN_ID.equals(id)) {
-//            return "관리자만 공지사항을 수정할 수 있습니다.";
-//        }
-//
-//        noticeService.updateNotice(map);
-//        return "공지사항이 성공적으로 수정되었습니다.";
-//    }
-//
-//    // 공지사항 삭제 (관리자 전용)
-//    @PostMapping("/deleteNotice")
-//    public String deleteNotice(@RequestParam Map<String, Object> map) {
-//        String id = ADMIN_ID; // 하드코딩된 관리자 ID
-//        map.put("id", id);
-//
-//        if (!ADMIN_ID.equals(id)) {
-//            return "관리자만 공지사항을 삭제할 수 있습니다.";
-//        }
-//
-//        noticeService.deleteNotice(map);
-//        return "공지사항이 성공적으로 삭제되었습니다.";
-//    }
-//	
-	
-	
-	
 }

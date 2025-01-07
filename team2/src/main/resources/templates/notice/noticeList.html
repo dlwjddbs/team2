@@ -47,16 +47,6 @@
 
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				<!--				<section class="content">-->
-				<!--							<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">-->
-				<!--												<div class="d-flex">-->
-				<!--													<div class="d-flex ml-4">-->
-				<!--														 Date range -->
-				<!--														<div class="input-group">-->
-
-				<!--													</div>-->
-				<!--												</div>-->
-				<!--											</div>-->
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -64,6 +54,7 @@
 								<div class="card-header">
 									<div class="card-tools">
 										<!-- 관리자만 작성 버튼 표시 -->
+										<!--공지 등록 모달-->
 										<button id="btnAddNotice" class="btn btn-primary" style="display: none;"
 											onclick="addNotice()">작성</button>
 									</div>
@@ -103,7 +94,7 @@
 									</div>
 								</div>
 
-								<!-- 모달 -->
+								<!-- 내용 상세보기 모달 -->
 								<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeTitle"
 									aria-hidden="true">
 									<div class="modal-dialog">
@@ -117,22 +108,23 @@
 														class="form-control" id="noticeId" name="noticeId" readonly>
 												</p>
 												<div class="form-group">
-												<label for="Name">작성자</label> <input type="text"
-												class="form-control" id="Name" name="Name" readonly>
+													<label for="Name">작성자</label> <input type="text"
+														class="form-control" id="Name" name="Name" readonly>
 												</div>
-												<p>	
-												<label for="subject1">제목</label> <input type="text"
+												<p>
+													<label for="subject1">제목</label> <input type="text"
 														class="form-control" id="subject1" name="subject1" readonly>
 												</p>
 												<p>
 													<label for="createTime">작성시간</label> <input type="text"
 														class="form-control" id="createTime" name="createTime" readonly>
 												</p>
-												
+
 												<div class="mb-3">
-												          <label for="Content1" class="form-label">내용</label>
-												          <textarea class="form-control" id="Content1" name="Content1" rows="4" readonly></textarea>
-												        </div>
+													<label for="Content1" class="form-label">내용</label>
+													<textarea class="form-control" id="Content1" name="Content1"
+														rows="4" readonly></textarea>
+												</div>
 											</div>
 											<div class="modal-footer">
 												<button type="button" class="btn btn-secondary"
@@ -142,7 +134,7 @@
 									</div>
 								</div>
 
-								<!-- 모달 영역 -->
+								<!-- 수정 모달 영역 -->
 								<div class="modal fade" id="modal-lg" tabindex="-1" role="dialog"
 									aria-labelledby="modal-lg-label" aria-hidden="true">
 									<div class="modal-dialog modal-lg" role="document">
@@ -338,7 +330,7 @@
 					noticeId: noticeId      // 서버로 전달할 파라미터
 				},
 				success: function (noticeId) {
-	
+
 					if (noticeId != null) { // noticeId가 있을 경우 성공
 
 						dataTable('noticeTable', true);
@@ -403,14 +395,14 @@
 						data: "editable", defaultContent: "", title: '수정',
 						render: function (editable, type, row) {
 							if (editable) {
-							return `
+								return `
 				            <button type="button" class="btn btn-outline-primary updateNoticeBtn" id="btnUpdateNotice"
 				                            data-id="${row.NOTICE_ID}"
 				                            onclick="openUpdateModal('${row.NOTICE_ID}')">수정하기</button>`;
-											}
-												return "관리자 권한";
-											}
-						
+							}
+							return "관리자 권한";
+						}
+
 					},
 
 					{
@@ -419,16 +411,16 @@
 						title: "삭제",
 						render: function (deletable, type, row) {
 							if (deletable) {
-							return `
+								return `
 	                        <button type="button" class="btn btn-outline-danger deleteNoticeBtn"
 	                                data-id="${row.NOTICE_ID}"
 	                                onclick="confirmDeleteNotice('${row.NOTICE_ID}')">
 	                            삭제하기
 	                        </button>`;
+							}
+							return "관리자 권한"; // 일반 사용자는 빈 값
+
 						}
-						 return "관리자 권한"; // 일반 사용자는 빈 값
-						
-					  }
 					}
 				]
 
@@ -462,8 +454,8 @@
 
 		}
 	</script>
-	
-<!--	수정하기 모달창-->
+
+	<!--	수정하기 모달창-->
 	<script>
 		function openUpdateModal(notice_id) {
 			console.log("noticeID", notice_id)
@@ -495,34 +487,34 @@
 	</script>
 
 	<!--	상세보기 모달창-->
-		<script>
-			function openContentModal(notice_id) {
-				console.log("noticeID", notice_id)
-				// 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
-				$.ajax({
-					url: '/getNoticeDetail',
-					type: 'POST',
-					data: {NOTICE_ID: notice_id}, // ID 전달
-					success: function (notice) {
-						// 폼 속성 변경
+	<script>
+		function openContentModal(notice_id) {
+			console.log("noticeID", notice_id)
+			// 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
+			$.ajax({
+				url: '/getNoticeDetail',
+				type: 'POST',
+				data: {NOTICE_ID: notice_id}, // ID 전달
+				success: function (notice) {
+					// 폼 속성 변경
 
-						$("#noticeId").val(notice_id); //번호
-						$("#Name").val(notice.NAME || ""); // 이름이 null인 경우 빈칸
-						$("#createTime").val(notice.CREATE_TIME || ""); // 생성시간
-						$("#subject1").val(notice.SUBJECT || ""); // 제목
-						$("#Content1").val(notice.CONTENT || ""); // 내용
+					$("#noticeId").val(notice_id); //번호
+					$("#Name").val(notice.NAME || ""); // 이름이 null인 경우 빈칸
+					$("#createTime").val(notice.CREATE_TIME || ""); // 생성시간
+					$("#subject1").val(notice.SUBJECT || ""); // 제목
+					$("#Content1").val(notice.CONTENT || ""); // 내용
 
-						// 모달창 표시
-						$("#noticeModal").modal("show");
+					// 모달창 표시
+					$("#noticeModal").modal("show");
 
 
-					},
-					error: function (xhr, status, error) {
-						console.error("공지 조회 오류:", error);
-					}
-				});
-			}
-		</script>
+				},
+				error: function (xhr, status, error) {
+					console.error("공지 조회 오류:", error);
+				}
+			});
+		}
+	</script>
 
 </body>
 
