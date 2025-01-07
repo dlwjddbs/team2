@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.AdminLeaveMapper">
+
+	<!-- 전체 직원 연차 리스트 -->
+	<select id="selectLeaveList" resultType="map">
+		SELECT
+			   MEMBER_ID
+			 , 
+		  FROM
+		  	   ANNUAL_LEAVE
+	 LEFT JOIN
+	 		   MEMBER M  
+	   
+	</select>
+</mapper>

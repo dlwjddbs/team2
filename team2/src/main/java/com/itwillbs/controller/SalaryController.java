@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.SalaryService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -34,7 +35,13 @@ public class SalaryController {
 	// 관리자 급여입력 내역 조회
 	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
 	@GetMapping("/salaryInput")
-	public String salaryInput(Map<String, Object> map, Model model) {
+	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
+		
+		// 관리자 페이지라 관리자 로그인 필수
+//		if (session.getAttribute("id") == null) {
+//            return "redirect:/login"; 
+//        }
+//		
 		log.info("============= salaryInput =============");
 		
 		String id = "admin";
@@ -58,6 +65,7 @@ public class SalaryController {
 	@PostMapping("/salaryInput")
 	@ResponseBody
 	public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> map) {
+
 		log.info("============= salaryInput POST =============");
 		
 		map.put("id", "admin");
@@ -72,6 +80,7 @@ public class SalaryController {
 	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
 		log.info("============= writeSalary =============");
 		
+		log.info(param.toString());
 		
 		salaryService.writeSalary(param);
 //		System.out.println(insertCount);
@@ -81,7 +90,6 @@ public class SalaryController {
 //			System.out.println("insertCount: " + insertCount);
 //		
 //		}
-		
 		
 		return "급여 입력 성공!";
 	}
@@ -144,10 +152,10 @@ public class SalaryController {
     // 일단 코드 동작은 되나 좀 더 깔끔하게 수정 필요?
     @PostMapping("/editSalary")
     @ResponseBody
-    public String updateSalary(@RequestParam("id") String id, @RequestParam Map<String, Object> map) {
+    public String updateSalary(@RequestParam Map<String, Object> map) {
     	log.info("============= updateSalary POST start =============");
     	
-        log.info("id" +  id);
+        //log.info("id" +  id);
         
     	log.info(map.toString());
     	

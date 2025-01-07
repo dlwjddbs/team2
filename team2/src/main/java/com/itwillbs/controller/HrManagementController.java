@@ -32,12 +32,11 @@ public class HrManagementController {
 	
 	private final HrManagementService hrManagementService;
 	
+	// 신규 사원 추가
 	@PostMapping("/addMember")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
 		int insertCount = hrManagementService.addMember(param);
-		
-		
 		
 		/*		
 		if(insertCount > 0) {
@@ -59,19 +58,17 @@ public class HrManagementController {
 	// 사원 상세 정보 수정
 	@PostMapping("/updateMember")
 	public String updateMember(@RequestParam Map<String, Object> param) {
-		System.out.println("====================== 사원 상세 정보 수정 ======================");
-		System.out.println(param);
 		
 		int updateCount = hrManagementService.updateMember(param);
 		
+		// update 판별 추가 예정
 		
 		return "redirect:/memberList";
 	}
 	
 	// 사원 정보
 	@GetMapping("/memberList")
-	public String memberList(Map<String, Object> map, Model model) {
-		log.info("=============Meber List=============");
+	public String memberList() {
 		return "/HRManagement/member_list";
 	}
 	
@@ -81,7 +78,6 @@ public class HrManagementController {
 	@ResponseBody
 	public List<Map<String, Object>> getMemberList(@RequestParam Map<String, Object> param) {
 		List<Map<String, Object>> memberList = hrManagementService.getMemberList();
-		log.info(memberList.toString());
 		return memberList;
 	}	
 	
@@ -89,14 +85,7 @@ public class HrManagementController {
 	@PostMapping("/getMemberDetail")
 	@ResponseBody
 	public Map<String, Object> getMemberDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
-		System.out.println("====================== 사원 상세 정보 ======================");
-		System.out.println(param);
 		Map<String, Object> member = hrManagementService.getMemberDetail(param);
-		
-		/*
-		ObjectMapper mapper = new ObjectMapper();
-		String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(member);
-		*/
 		return member;
 	}
 
