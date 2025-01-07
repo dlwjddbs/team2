@@ -26,6 +26,7 @@ public class NoticeController {
 	
 	private final NoticeService noticeService;
        
+	
     @GetMapping("/notice/noticeList")
     public String getNoticeList(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
     	
@@ -39,7 +40,7 @@ public class NoticeController {
     	map.put("memberId", id);
     	List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
     	
-    	 // todayHistory가 null이면 확인
+    	 // noticeList가 null이면 확인
 	    if (noticeList == null) {
 	        System.out.println("noticeList is null");
 	    } else {
@@ -49,6 +50,30 @@ public class NoticeController {
     	
     	return "/notice/noticeList";
     }
+    
+    @PostMapping("/getNoticeList")
+    @ResponseBody
+    public List<Map<String, Object>> getNoticeList(HttpSession session, @RequestParam Map<String, Object> map) {
+    	String id = session.getAttribute("id").toString();
+    	String authority = session.getAttribute("authority").toString();
+    	
+    	map.put("memberId", id);
+    	List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
+    	
+    	// 관리자인 경우만 editable, deletable 필드 추가
+    	boolean isAdmin = "AD".equals(authority);
+        for (Map<String, Object> notice : noticeList) {
+            notice.put("editable", isAdmin);
+            notice.put("deletable", isAdmin);
+        }
+//        // 글 순번
+//        for(Map<String, Object> list : noticeList) {
+//        	list.put("NUM", list.get("NOTICE_ID"));
+//        }
+//    	System.out.println("noticeList: " + noticeList);
+    	return noticeList;
+    }
+    
     
     @GetMapping("/session")
     public ResponseEntity<Map<String, Object>> getSessionData(HttpSession session) {
@@ -68,35 +93,21 @@ public class NoticeController {
         response.put("authority", userRole);
 
         return ResponseEntity.ok(response);
-    }
-    
-    
- // 공지 상세 정보
- 	@PostMapping("/getNoticeDetail")
- 	@ResponseBody
- 	public Map<String, Object> getNoticeDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
- 		System.out.println("====================== 공지 상세 정보 ======================");
- 		System.out.println(param);
- 		Map<String, Object> notice = noticeService.getNoticeDetail(param);
- 		
- 		
- 		return notice;
- 	}
+    }   
         
-    @PostMapping("/getNoticeList")
+    
+    // 공지 수정 정보
+    @PostMapping("/getNoticeDetail")
     @ResponseBody
-    public List<Map<String, Object>> getNoticeList(HttpSession session, @RequestParam Map<String, Object> map) {
-    	String id = session.getAttribute("id").toString();
-        map.put("memberId", id);
-        List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
-        
-//        // 글 순번
-//        for(Map<String, Object> list : noticeList) {
-//        	list.put("NUM", list.get("NOTICE_ID"));
-//        }
-        System.out.println("noticeList: " + noticeList);
-        return noticeList;
+    public Map<String, Object> getNoticeDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
+    	System.out.println("====================== 공지 정보 ======================");
+    	System.out.println(param);
+    	Map<String, Object> notice = noticeService.getNoticeDetail(param);
+    	    	
+    	return notice;
     }
+    
+    
     
     
 //  공지사항 작성 (관리자 전용)

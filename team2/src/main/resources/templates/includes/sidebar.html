@@ -31,6 +31,27 @@
 		<!-- 메인 정보 -->
 		<nav class="mt-2">
 			<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+				
+				<!-- 공지사항 --> 
+								<li class="nav-item">
+								
+									<a href="#" class="nav-link">
+										<p>
+											공지사항
+											<i class="fas fa-angle-left right"></i>
+										</p>
+									</a>
+									<ul class="nav nav-treeview">
+										<li class="nav-header">ㅡ  공지사항</li>
+										<li class="nav-item">
+											<a th:href="@{/notice/noticeList}" class="nav-link">
+												<p>공지</p>
+											</a>
+										</li>
+									</ul>
+								</li>
+								<!-- /.공지사항 -->
+				
 				<!-- 시스템관리 --> 
 				<li class="nav-item">
 				

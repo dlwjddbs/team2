@@ -15,9 +15,8 @@
             SUBSTR(CONTENT, 1, 40) AS CONTENT
         FROM 
             NOTICE
-<!--         WHERE member_id = #{memberId} -->
        	 ORDER BY 
-          	  CREATE_TIME DESC
+          	  NOTICE_ID DESC
     </select>
 	
 	<select id="detailNotice" resultType="map">
@@ -25,44 +24,18 @@
             NOTICE_ID, 
             NAME, 
             SUBJECT, 
-            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
+            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME,
+            CONTENT
         FROM
             NOTICE
         WHERE
         	NOTICE_ID = #{NOTICE_ID}
     </select>
-	
-<!--	<select id="getNoticeListMinMaxDate" resultType="map">-->
-	
-<!--		SELECT-->
-<!--			MAX(CREATE_TIME) AS NOTICE_MAX_TIME-->
-<!--		  , MIN(CREATE_TIME) AS NOTICE_MIN_TIME-->
-<!--		 FROM -->
-<!--		 	 NOTICE-->
-<!--		 WHERE-->
-<!--			  1 = 1-->
-<!--		  <if test='id != "admin"'>-->
-<!--			   AND-->
-<!--				  member_id = #{memberId}-->
-<!--		  </if>	-->
-<!--	</select>-->
 
 	<insert id="createNotice" parameterType="map">
         INSERT INTO NOTICE (NAME, SUBJECT, MEMBER_ID, CONTENT)
         VALUES ((SELECT NAME FROM MEMBER WHERE MEMBER_ID = #{memberId}), #{noticeTitle}, #{memberId}, #{noticeContent})
     </insert>
-	
-	<select id="getNoticeById" parameterType="int" resultType="map">
-       SELECT
-            NOTICE_ID, 
-            NAME, 
-            SUBJECT, 
-            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
-        FROM
-            NOTICE
-        WHERE
-        	NOTICE_ID = #{NOTICE_ID}
-    </select>
 
 	<update id="updateNotice" parameterType="map">
 	UPDATE NOTICE
