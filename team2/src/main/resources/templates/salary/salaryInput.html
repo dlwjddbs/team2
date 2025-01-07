@@ -70,7 +70,7 @@
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				<div class="col-2">
-					<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
+					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg">
 						급여 정보 입력
 					</button>
 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
@@ -172,7 +172,6 @@
 					{data : "MEMBER_ID", title : "사원 번호", "defaultContent": "" },
 					{data : "NAME", title : "사원명", "defaultContent": "" },
 					{data : "GRADE_ID", title : "직급", "defaultContent": "" },
-					{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
 					{data : "DEPR_ID", title : "부서", "defaultContent": "" },
 					{data : "SALARY", title : "기본급", "defaultContent": "" },
 					{data : "POSITION_BONUS", title : "직책수당", "defaultContent": "" },
@@ -182,10 +181,10 @@
 					{data : "FULLSERVICE_BONUS", title : "만기근속자포상", "defaultContent": "" },
 					{data : "PERFORMANCE_BONUS", title : "실적우수자포상", "defaultContent": "" },
 					{data : "TOTAL", title : "실지급액", "defaultContent": "" },
-					{data : "ID", "defaultContent": "", title : '수정',
+					{data : "MEMBER_ID", "defaultContent": "", title : '수정',
 						render: function(data){
 							return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
-   							}
+						}
  					}
 
 			  	],
@@ -196,6 +195,13 @@
 			}).buttons()
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
+			  
+		  // DataTable에서 ID 클릭 시 Modal에 콘텐츠 로딩
+  			$('#example1').on('click', 'button', function() {
+  			  var id = $(this).attr('id');  // 클릭된 ID 값을 가져옴
+  			  console.log(id);
+  			  loadModalContent(id);  // 서버에서 해당 ID에 대한 콘텐츠를 로드
+  			});
 			
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 			let date = /*[[${salaryInputMinMaxDate}]]*/
@@ -255,7 +261,6 @@
 						{data : "MEMBER_ID", title : "사원 번호", "defaultContent": "" },
  						{data : "NAME", title : "사원명", "defaultContent": "" },
 						{data : "GRADE_ID", title : "직급", "defaultContent": "" },
-						{data : "PAYDAY", title : "귀속연월", "defaultContent": "" },
  						{data : "DEPR_ID", title : "부서", "defaultContent": "" },
  						{data : "SALARY", title : "기본급", "defaultContent": "" },
 						{data : "POSITION_BONUS", title : "직책수당", "defaultContent": "" },

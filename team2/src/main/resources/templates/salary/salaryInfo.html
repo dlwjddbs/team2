@@ -163,10 +163,14 @@
 		                return res;
 		            }
 				},
-				columns : [
-					// DB컬럼명 일치하게 작성
+				columns: [
 					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "" },
+					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
+						render: function(data, type, row) {
+							// MEMBER_ID를 클릭 가능한 링크로 설정
+							return `<a href="#" id="${data}" class="edit-link">${data}</a>`;
+						}
+					},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
 					{data: "GRADE_ID", title: "직급", "defaultContent": "" },
 					{data: "DEPR_ID", title: "부서", "defaultContent": "" },
@@ -177,13 +181,8 @@
 					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
 					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
 					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
-					{data : "MEMBER_ID", "defaultContent": "", title : '급여수정',
-							render: function(data){
-								return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
-  							}
-					}
-			  	],
+					{data: "TOTAL", title: "실지급액", "defaultContent": "" }
+				],
 				responsive : true, 
 				lengthChange : false, 
 				autoWidth : false,
@@ -192,65 +191,44 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
 			  
-			// DataTable에서 ID 클릭 시 Modal에 콘텐츠 로딩
-			$('#example1').on('click', 'button', function() {
-			  var id = $(this).attr('id');  // 클릭된 ID 값을 가져옴
-			  console.log(id);
-			  loadModalContent(id);  // 서버에서 해당 ID에 대한 콘텐츠를 로드
-			});
-
-			function loadModalContent(id) {
-			  // 서버에서 Modal 콘텐츠를 AJAX로 요청
-			  $.ajax({
-			    // 서버에서 Modal 내용을 처리
-			    url : "/getModalContent",  
-			    type : "POST",
-			    data : { id : id },
-			    success: function(salaryData) {
-			  		console.log(id);
-			  		console.log(salaryData);
-					
-					// 필드 이름과 salaryData의 키를 매핑
-					//const fields = [
-					//    { field: '#memberId', key: 'MEMBER_ID' },
-					//    { field: '#gradeId', key: 'GRADE_ID' },
-					//    { field: '#payday', key: 'PAYDAY' },
-					//    { field: '#positionBonus', key: 'POSITION_BONUS' },
-					//    { field: '#nightBonus', key: 'NIGHT_BONUS' },
-					//    { field: '#performanceBonus', key: 'PERFORMANCE_BONUS' },
-					//    { field: '#fullserviceBonus', key: 'FULLSERVICE_BONUS' },
-					//    { field: '#holidayBonus', key: 'HOLIDAY_BONUS' },
-					//    { field: '#yearendBonus', key: 'YEAREND_BONUS' },
-					//    { field: '#total', key: 'TOTAL' },
-					//];
-
-					// 반복문으로 각 필드에 데이터 설정
-					//fields.forEach(item => {
-					//    $(item.field).val(salaryData[item.key]);
-					//});
-			  		
-			        // 받은 데이터를 각 입력 필드에 설정
-					$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
-					$('#name').val(salaryData.NAME);							// 이름
-					$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
-					$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
-					$('#salary').val(salaryData.SALARY);						// 기본급
-					$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
-					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-					$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
-					$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
-					$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
-					$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
-					$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
-			  		
-			        // Modal을 띄우기
-			        $('#modal-lg').modal('show');
-			    },
-			    error: function() {
-			        alert("Modal 콘텐츠를 불러오는 데 실패했습니다.");
-			    }
+			  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
+			  $('#example1').on('click', 'a.edit-link', function(event) {
+			  	event.preventDefault(); // 기본 링크 동작 방지
+			  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
+			  	console.log("클릭된 사원 번호:", id);
+			  	loadModalContent(id); // 모달 콘텐츠 로드 함수 호출
 			  });
-			}
+
+			  function loadModalContent(id) {
+			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
+			  	$.ajax({
+			  		url: "/getModalContent",  
+			  		type: "POST",
+			  		data: { id: id },
+			  		success: function(salaryData) {
+			  			console.log("사원 번호:", id);
+			  			console.log("서버 데이터:", salaryData);
+			  			
+			  			// 받은 데이터를 각 입력 필드에 설정
+			  			$('#memberId').val(salaryData.MEMBER_ID);
+			  			$('#gradeId').val(salaryData.GRADE_ID);
+			  			$('#payday').val(salaryData.PAYDAY);
+			  			$('#positionBonus').val(salaryData.POSITION_BONUS);
+			  			$('#nightBonus').val(salaryData.NIGHT_BONUS);
+			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);
+			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);
+			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);
+			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);
+			  			$('#total').val(salaryData.TOTAL);
+			  			
+			  			// 모달 표시
+			  			$('#modal-lg').modal('show');
+			  		},
+			  		error: function() {
+			  			alert("Modal 콘텐츠를 불러오는 데 실패했습니다.");
+			  		}
+			  	});
+			  }
 			  
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 			let date = /*[[${salaryInfoMinMaxDate}]]*/
@@ -303,10 +281,14 @@
 			                return res;
 			            }
 					},
-					columns : [
-						// DB컬럼명 일치하게 작성
+					columns: [
 						{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "" },
+						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
+							render: function(data, type, row) {
+								// MEMBER_ID를 클릭 가능한 링크로 설정
+								return `<a href="#" id="${data}" class="edit-link">${data}</a>`;
+							}
+						},
 						{data: "NAME", title: "사원명", "defaultContent": "" },
 						{data: "GRADE_ID", title: "직급", "defaultContent": "" },
 						{data: "DEPR_ID", title: "부서", "defaultContent": "" },
@@ -314,16 +296,12 @@
 						{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
 						{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
 						{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-						{data: "YEAREND_BONUS", title: "연말결려수당", "defaultContent": "" },
+						{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
 						{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
 						{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-						{data: "TOTAL", title: "실지금액", "defaultContent": "" },
-						{data : "MEMBER_ID", "defaultContent": "", title : '급여수정',
-								render: function(data){
-									return "<button id='"+ data +"' type='button' class='btn btn-block btn-outline-primary'>수정하기</button>";
-	  							}
-						}
-				  	],
+						{data: "TOTAL", title: "실지급액", "defaultContent": "" }
+					],
+
 					responsive : true, 
 					lengthChange : false, 
 					autoWidth : false,
