@@ -35,7 +35,10 @@ public class SalaryService {
 
 	// 급여 수정
 	public void updateSalary(Map<String, Object> map) {
-		salaryMapper.updateSalary(map);
+		// 사원의 기본금 수정
+		salaryMapper.updateMemberSalary(map);
+		// 사원의 상여금 수정
+		salaryMapper.updateSalaryBonus(map);
 	}
 
 }

@@ -23,74 +23,92 @@
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
-					
 						<div class="row">
 							<div class="col-md-12">
 								<div class="form-group">
 					              <label>귀속 연월</label>
-					                <div class="input-group date" id="reservationdate" data-target-input="nearest">
-					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
-					                    <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					                    </div>
-					                </div>
+									<div class="input-group date" id="reservationdate" data-target-input="nearest">
+									    <input type="text" class="form-control datetimepicker-input" id="daterange" name="PAYDAY" placeholder="년-월 선택" readonly />
+									</div>
 					            </div>
 				            </div>
 						 </div>
 						<div class="row">
-							<div class="col-md-1">
-								<div class="icheck-primary d-inline">
-		                        	<input type="checkbox" id="checkboxPrimary1" checked>
-		                       			<label for="checkboxPrimary1"></label>
-		                    	</div>
+							<div class="col-md-5">
+								<div class="form-group">
+					              <label>사원 번호</label>
+				                    <input type="text" class="form-control" id="member" name="MEMBER_ID" data-target="#reservationdate"/>
+					            </div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-7">
+								<div class="form-group">
+					              <label>사원명</label>
+				                    <input type="text" class="form-control" id="name" name="NAME" placeholder="사원명을 입력하세요.">
+					            </div>
+				            </div>
+						 </div>
+ 						<div class="row"> 
+ 							<div class="col-md-6"> 
+								<div class="form-group">
+									<label for="exampleInputEmail1">부서명</label>
+									<select class="form-control select" id="department" name="DEPT_ID">
+										<option selected="selected" disabled>부서선택</option>
+										<option value="HR">인사팀</option>												
+										<option value="AC">회계팀</option>												
+										<option value="AD">총무팀</option>												
+										<option value="DN">국내영업팀</option>												
+										<option value="PL">영업기획팀</option>												
+										<option value="SRV">서버개발팀</option>												
+										<option value="WEB">웹개발팀</option>												
+										<option value="MOB">모바일개발팀</option>												
+										<option value="MNT">유지보수팀</option>												
+									</select>
+								</div>
+ 							</div> 
+ 							<div class="col-md-6"> 
+ 								<div class="form-group"> 
+									<label for="exampleInputEmail1">직급</label>
+									<select class="form-control select" id="grade" name="GRADE_ID">
+										<option selected="selected" disabled>직급선택</option>												
+										<option value="AS">대리</option>												
+										<option value="MG">과장</option>												
+										<option value="SM">차장</option>												
+										<option value="GM">부장</option>												
+										<option value="DR">이사</option>												
+										<option value="ED">상무</option>												
+										<option value="SD">전무</option>												
+										<option value="VP">부사장</option>												
+										<option value="PR">사장</option>												
+										<option value="ST">사원</option>												
+										<option value="AM">주임</option>												
+									</select>
+ 								</div> 
+ 							</div> 
+ 						</div> 
+						<div class="row">
+							<div class="col-md-4">
 				                <div class="form-group">
 				                  <label>급여 항목</label>
-				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="연말 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                 	<input type="text" readonly class="form-control" id="salary" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="position" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="holiday" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="night" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="yearend" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="fullservice" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="performance "placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
 							</div>
 							<div class="col-md-8">
 								<div class="form-group">
-				                  <label>금액</label>
-									<input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="positionBonus" name="positionBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="holidayBonus" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="nightBonus" name="nightBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="yearendBonus" name="yearendBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="fullserviceBonus" name="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="performanceBonus" name="performanceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-				                </div>
-							</div>
-						</div>
-							<div class="col-md-12">
-								<div class="form-group">
-					              <label>지급일</label>
-					                <div class="input-group date" id="reservationdate2" data-target-input="nearest">
-					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate2"/>
-					                    <div class="input-group-append" data-target="#reservationdate2" data-toggle="datetimepicker">
-					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					                    </div>
-					                </div>
-					            </div>
-							</div>
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-					              <label>지급 연월</label>
-					                <div class="input-group date" id="reservationdate3" data-target-input="nearest">
-					                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate3"/>
-					                    <div class="input-group-append" data-target="#reservationdate3" data-toggle="datetimepicker">
-					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					                    </div>
-					                </div>
-					            </div>
+								    <label>금액</label>
+								    <input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="position" name="positionBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="holiday" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="night" name="nightBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="yearend" name="yearendBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="fullservice" name="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="performance"  name="performanceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+								</div>
 							</div>
 						</div>
 					</div>

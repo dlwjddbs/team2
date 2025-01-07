@@ -179,18 +179,29 @@
     SELECT * FROM dual
 </insert>
  	
- 	<!-- 급여 수정 -->
- 	<update id="updateSalary" parameterType="map">
+ 	<!-- 급여 수정 - 사원의 기본금 수정 -->
+	<update id="updateMemberSalary" parameterType="map">
+		UPDATE MEMBER 
+	   	   SET 
+	   	   	   SALARY = #{salary}
+		WHERE 
+			 MEMBER_ID = #{id}
+	</update>
+	
+	<!-- 급여 수정 - 사원의 상여금(보너스) 수정 -->
+	<update id="updateSalaryBonus" parameterType="map">
 		UPDATE SALARY 
 	   	   SET 
-	   	   	   POSITION_BONUS = #{positionBonus}
+	   	   	   PAYDAY = #{payday}
+	   	   	 , POSITION_BONUS = #{positionBonus}
 	       	 , HOLIDAY_BONUS = #{holidayBonus}
 	       	 , NIGHT_BONUS = #{nightBonus}
 	       	 , YEAREND_BONUS = #{yearendBonus}
 	       	 , FULLSERVICE_BONUS = #{fullserviceBonus}
 	       	 , PERFORMANCE_BONUS = #{performanceBonus}
+	       	 , UPDATE_DATE = SYSDATE
 		WHERE 
-			 MEMBER_ID = #{memberId}
+			 MEMBER_ID = #{id}
 	</update>
 
 </mapper>
