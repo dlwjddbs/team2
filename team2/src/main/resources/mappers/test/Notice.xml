@@ -20,12 +20,16 @@
           	  CREATE_TIME DESC
     </select>
 	
-	<select id="getNoticeDetail" resultType="map">
+	<select id="detailNotice" resultType="map">
         SELECT
-            NOTICE_ID, NAME, SUBJECT, TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
+            NOTICE_ID, 
+            NAME, 
+            SUBJECT, 
+            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
         FROM
             NOTICE
         WHERE
+        	NOTICE_ID = #{NOTICE_ID}
     </select>
 	
 <!--	<select id="getNoticeListMinMaxDate" resultType="map">-->
@@ -49,15 +53,27 @@
     </insert>
 	
 	<select id="getNoticeById" parameterType="int" resultType="map">
-        SELECT 
+       SELECT
             NOTICE_ID, 
             NAME, 
             SUBJECT, 
-            CONTENT, 
-            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_TIME
-        FROM NOTICE
+            TO_CHAR(CREATE_TIME, 'YYYY-MM-DD') AS CREATE_TIME, CONTENT
+        FROM
+            NOTICE
+        WHERE
+        	NOTICE_ID = #{NOTICE_ID}
     </select>
 
-
+	<update id="updateNotice" parameterType="map">
+	UPDATE NOTICE
+	SET SUBJECT = #{subject},
+		CONTENT = #{content}
+	WHERE NOTICE_ID = #{noticeId, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteNotice" parameterType="map">
+		DELETE FROM NOTICE
+		WHERE NOTICE_ID = #{noticeId, jdbcType=INTEGER}
+	</delete>
 
 </mapper>

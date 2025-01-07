@@ -10,13 +10,15 @@ public interface NoticeMapper {
 
 	List<Map<String, Object>> getNoticeList(Map<String, Object> map);
 
-//	Map<String, Object> getNoticeListMinMaxDate(String id);
-
 	void createNotice(Map<String, Object> map);
 
-	List<Map<String, Object>> getNoticeDetail(Map<String, Object> map);
+	Map<String, Object> detailNotice(Map<String, Object> map);
 
+	void updateNotice(Map<String, Object> map);
 
+	void deleteNotice(Map<String, Object> map);
+
+	
 		
 	
 	

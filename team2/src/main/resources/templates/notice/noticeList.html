@@ -2,23 +2,28 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>공지사항</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공지사항</title>
 
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet"
-		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	href="../../plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables -->
+<link rel="stylesheet"
+	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="../../plugins/daterangepicker/daterangepicker.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -64,8 +69,8 @@
 								<div class="card-header">
 									<div class="card-tools">
 										<!-- 관리자만 작성 버튼 표시 -->
-										<button id="btnAddNotice" class="btn btn-primary" style="display:none;"
-											onclick="addNotice()">작성</button>
+										<button id="btnAddNotice" class="btn btn-primary"
+											style="display: none;" onclick="addNotice()">작성</button>
 									</div>
 								</div>
 
@@ -74,16 +79,17 @@
 									<div class="modal-dialog">
 										<div class="modal-content">
 											<div class="modal-header">
-												<h5 class="modal-title" id="addNoticeModalLabel">공지사항 작성</h5>
-												<button type="button" class="btn-close" data-bs-dismiss="modal"
+												<h5 class="modal-title" id="addNoticeModalLabel">공지사항
+													작성</h5>
+												<button type="button" class="close" data-dismiss="modal"
 													aria-label="Close"></button>
 											</div>
 											<div class="modal-body">
 												<form id="addNoticeForm">
 
 													<div class="mb-3">
-														<label for="noticeTitle" class="form-label">제목</label>
-														<input type="text" class="form-control" id="noticeTitle"
+														<label for="noticeTitle" class="form-label">제목</label> <input
+															type="text" class="form-control" id="noticeTitle"
 															required>
 													</div>
 													<div class="mb-3">
@@ -103,65 +109,123 @@
 									</div>
 								</div>
 
-<!--								 모달 -->
-<!--								<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="modalTitle"-->
-<!--									aria-hidden="true">-->
-<!--									<div class="modal-dialog">-->
-<!--										<div class="modal-content">-->
-<!--											<div class="modal-header">-->
-<!--												<h5 class="modal-title" id="modalTitle">상세보기</h5>-->
-<!--												<button type="button" class="btn-close" data-bs-dismiss="modal"-->
-<!--													aria-label="Close"></button>-->
-<!--											</div>-->
-<!--											<div class="modal-body">-->
-<!--												<p><strong>작성자:</strong> <span id="modalAuthor"></span></p>-->
-<!--												<p><strong>작성일:</strong> <span id="modalTime"></span></p>-->
-<!--												<div class="mb-3">-->
-<!--													<label for="noticeTitle" class="form-label">제목</label>-->
-<!--													<input type="text" class="form-control" id="noticeTitle" required>-->
-<!--												</div>-->
-<!--												<label for="noticeContent" class="form-label">내용</label>-->
-<!--												<textarea class="form-control" id="noticeContent" rows="4"-->
-<!--													required></textarea>-->
-<!--												<p id="modalContent"></p>-->
-<!--											</div>-->
-<!--											<div class="modal-footer">-->
-<!--												<button type="button" class="btn btn-secondary"-->
-<!--													data-bs-dismiss="modal">닫기</button>-->
-<!--											</div>-->
-<!--										</div>-->
-<!--									</div>-->
-<!--								</div>-->
+								<!--								 모달 -->
+								<!--								<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="modalTitle"-->
+								<!--									aria-hidden="true">-->
+								<!--									<div class="modal-dialog">-->
+								<!--										<div class="modal-content">-->
+								<!--											<div class="modal-header">-->
+								<!--												<h5 class="modal-title" id="modalTitle">상세보기</h5>-->
+								<!--												<button type="button" class="btn-close" data-bs-dismiss="modal"-->
+								<!--													aria-label="Close"></button>-->
+								<!--											</div>-->
+								<!--											<div class="modal-body">-->
+								<!--												<p><strong>작성자:</strong> <span id="modalAuthor"></span></p>-->
+								<!--												<p><strong>작성일:</strong> <span id="modalTime"></span></p>-->
+								<!--												<div class="mb-3">-->
+								<!--													<label for="noticeTitle" class="form-label">제목</label>-->
+								<!--													<input type="text" class="form-control" id="noticeTitle" required>-->
+								<!--												</div>-->
+								<!--												<label for="noticeContent" class="form-label">내용</label>-->
+								<!--												<textarea class="form-control" id="noticeContent" rows="4"-->
+								<!--													required></textarea>-->
+								<!--												<p id="modalContent"></p>-->
+								<!--											</div>-->
+								<!--											<div class="modal-footer">-->
+								<!--												<button type="button" class="btn btn-secondary"-->
+								<!--													data-bs-dismiss="modal">닫기</button>-->
+								<!--											</div>-->
+								<!--										</div>-->
+								<!--									</div>-->
+								<!--								</div>-->
 
-<!-- 모달 -->
-<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">상세보기</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>작성자:</strong> <span id="modalAuthor"></span></p>
-                <p><strong>작성일:</strong> <span id="modalTime"></span></p>
-                <div class="mb-3">
-                    <label for="noticeTitle" class="form-label">제목</label>
-                    <input type="text" class="form-control" id="noticeTitle" required readonly>
-                </div>
-                <label for="noticeContent" class="form-label">내용</label>
-                <textarea class="form-control" id="noticeContent" rows="4" required readonly></textarea>
-                <p id="modalContent"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            </div>
-        </div>
-    </div>
-</div>									
+								<!-- 모달 -->
+								<div class="modal fade" id="noticeModal" tabindex="-1"
+									aria-labelledby="modalTitle" aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title" id="modalTitle">상세보기</h5>
+												<button type="button" class="btn-close"
+													data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<p>
+													<strong>작성자:</strong> <span id="modalAuthor"></span>
+												</p>
+												<p>
+													<strong>작성일:</strong> <span id="modalTime"></span>
+												</p>
+												<div class="mb-3">
+													<label for="noticeTitle" class="form-label">제목</label> <input
+														type="text" class="form-control" id="noticeTitle" required
+														readonly>
+												</div>
+												<label for="noticeContent" class="form-label">내용</label>
+												<textarea class="form-control" id="noticeContent" rows="4"
+													required readonly></textarea>
+												<p id="modalContent"></p>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary"
+													data-bs-dismiss="modal">닫기</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- 모달 영역 -->
+								<div class="modal fade" id="modal-lg" tabindex="-1"
+									role="dialog" aria-labelledby="modal-lg-label"
+									aria-hidden="true">
+									<div class="modal-dialog modal-lg" role="document">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title" id="modal-lg-label">공지사항 수정</h5>
+											</div>
+											<div class="modal-body">
+												<!-- 공지사항 수정 폼 (updateNoticeForm) -->
+												<form id="updateNoticeForm" action="/updateNotice"
+													method="POST">
+													<div class="form-group">
+														<label for="notice_id">공지 번호</label> <input type="text"
+															class="form-control" id="notice_id" name="noticeId"
+															readonly>
+													</div>
+													<div class="form-group">
+														<label for="name">작성자</label> <input type="text"
+															class="form-control" id="name" name="name" readonly>
+													</div>
+													<div class="form-group">
+														<label for="create_time">작성시간</label> <input type="text"
+															class="form-control" id="create_time" name="create_time"
+															readonly>
+													</div>
+													<div class="form-group">
+														<label for="subject">제목</label> <input type="text"
+															class="form-control" id="subject" name="subject">
+													</div>
+													<div class="form-group">
+														<label for="content">내용</label>
+														<textarea class="form-control" id="content" name="content"
+															rows="4"></textarea>
+													</div>
+													<div class="modal-footer d-flex justify-content-end">
+														<button type="submit" class="btn btn-primary">수정</button>
+														<button type="button" class="btn btn-secondary"
+															data-bs-dismiss="modal">닫기</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+
 
 								<!-- /.card-header -->
 								<div class="card-body">
-									<table id="noticeTable" class="table table-bordered table-striped">
+									<table id="noticeTable"
+										class="table table-bordered table-striped">
 
 
 									</table>
@@ -189,85 +253,22 @@
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script
+		src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
 	<script src="../../dist/js/adminlte.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		const isAdmin = true; // 관리자 여부 (서버에서 가져온 데이터로 설정)
 		const notices = []; // 서버에서 공지사항 데이터를 가져올 배열
-
-		/* $(function () {
-			// 관리자 권한에 따라 작성 버튼 표시
-			if (isAdmin) {
-				$("#btnAddNotice").show();
-			}
-
-			// 공지사항 데이터 테이블 초기화
-			$("#noticeTable").DataTable({
-				data: notices,
-				columns: [
-					{data: "NOTICE_ID"},
-					{data: "NAME"},
-					{data: "SUBJECT"},
-					{data: "CONTENT"},
-					{
-						data: null,
-						render: function (data) {
-							return isAdmin ? `<button class="btn btn-warning btn-sm" onclick="editNotice('${data.noticeId}')">수정</button>` : "-";
-						}
-					},
-					{
-						data: null,
-						render: function (data) {
-							return isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteNotice('${data.noticeId}')">삭제</button>` : "-";
-						}
-					}
-				]
-			});
-
-			// 서버에서 공지사항 데이터 가져오기
-			fetchNotices();
-		}); */
-
-		function fetchNotices() {
-			// AJAX 요청으로 공지사항 데이터를 가져옵니다.
-			$.ajax({
-				url: '/api/notice',
-				method: 'GET',
-				success: function (data) {
-					const table = $("#noticeTable").DataTable();
-					table.clear().rows.add(data).draw();
-				}
-			});
-		}
-
-		function addNotice() {
-			// 공지사항 작성 로직 구현
-			alert("공지사항 작성 기능 구현.");
-		}
-
-		function editNotice(noticeId) {
-			// 공지사항 수정 로직 구현
-			alert("수정할 공지사항 ID: " + noticeId);
-		}
-
-		function deleteNotice(noticeId) {
-			if (confirm("정말 삭제하시겠습니까?")) {
-				// 공지사항 삭제 로직 구현
-				$.ajax({
-					url: `/api/notice/${noticeId}`,
-					method: 'DELETE',
-					success: function () {
-						fetchNotices();
-					}
-				});
-			}
-		}
 
 	</script>
 
@@ -298,9 +299,7 @@
 
 			});
 		});
-	</script>
-
-	<script>
+	
 		document.getElementById("addNoticeForm").addEventListener("submit", function (event) {
 			event.preventDefault(); // 기본 폼 제출 방지
 
@@ -344,13 +343,11 @@
 		$(function () {
 			handlingButtonRole();
 
-			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
-			/*	let date = $("#reservation").val().split(' ~ ');*/
+			
 			dataTable('noticeTable', false);
 		});
 
 		$("#btnSearch").on("click", function () {
-			/*let date = $("#reservation").val().split(' ~ ');*/
 			dataTable('noticeTable', date, true);
 		});
 		
@@ -364,8 +361,6 @@
 			                // 관리자 권한이면 작성 버튼 표시
 			                if (userRole === "AD") {
 			                    $("#btnAddNotice").show();
-								
-								
 			                }
 			            },
 			            error: function () {
@@ -373,7 +368,40 @@
 			            }
 			        });
 		}
-
+		
+		function deleteNotice(noticeId) {
+			console.info(noticeId);
+		    $.ajax({
+		        type: "POST",
+		        url: "/deleteNotice",       // 실제 삭제를 수행할 컨트롤러/라우트
+		        data: {
+		        	noticeId : noticeId      // 서버로 전달할 파라미터
+		        },
+		        success: function(noticeId) {
+		            // 서버에서 res.result나 res.resultCode와 같은 형태로 응답한다고 가정
+		            //alert(res.result);
+		            
+		            // resultCode == 1 이면 성공으로 간주
+		            //if (res.resultCode === 1) {
+		            if(noticeId != null){ // noticeId가 있을 경우 성공
+//			            let date = $("#reservation").val().split(' ~ ');
+		                dataTable('noticeTable', true);
+		            }
+		        },
+		        error: function(XMLHttpRequest, textStatus, errorThrown) {
+		            console.log("deleteNotice() ajax 실패", errorThrown);
+		        }
+		    });
+		}
+		
+		function confirmDeleteNotice(noticeId) {
+		if (confirm("삭제 하시겠습니까?")) {
+			deleteNotice(noticeId);
+    	}
+	}
+		
+		
+		
 		function dataTable(tableId,
 			/*date,*/ isUpdate) {
 			// 기존 테이블 삭제
@@ -383,37 +411,21 @@
 
 			$("#" + tableId).DataTable({
 				aaSorting: [], // 초기 정렬 비활성화
-				// 버튼 위치 조절
-				/*dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-					+ "<'row'<'col-sm-12'tr>>"
-					+ "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-				language: {
-					search: "검색",
-					paginate: {
-						"first": "처음",
-						"last": "마지막",
-						"next": "다음",
-						"previous": "이전"
-					},
-					zeroRecords: "검색 결과 없음" 
-				},*/
+				
 				language: {
 					zeroRecords: "검색 결과 없음"
 				},
 				ajax: {
 					url: "/getNoticeList",
 					type: "POST",
-					/*data : {
-						startDate : date[0],					
-						endDate : date[1]
-					},*/
+					
 					"dataSrc": function (res) {
 						return res;
 					}
 
 				},
 				columns: [
-					{data: "NOTICE_ID", title: "ID", "defaultContent": ""},
+					{data: "NOTICE_ID", title: "번호", "defaultContent": ""},
 				//	{data: "NUM", title: "순번", "defaultContent": ""},
 					{data: "NAME", title: "작성자", "defaultContent": ""},
 					{data: "SUBJECT", title: "제목", "defaultContent": ""},
@@ -423,11 +435,33 @@
 							return `<a href="#" class="content-link" data-id="${row.ID}">${data.slice(0, 40)}...</a>`;
 						}
 					},
-					{data: "CREATE_TIME", title: "작성일", "defaultContent": ""}
+					{data: "CREATE_TIME", title: "작성일", "defaultContent": ""},
+					{data : "", defaultContent: "", title : '수정',
+						render: function (data, type, row) {
+				            return `
+				            <button type="button" class="btn btn-outline-primary updateNoticeBtn" id="btnUpdateNotice"
+				                            data-id="${row.NOTICE_ID}"
+				                            onclick="openUpdateModal('${row.NOTICE_ID}')">수정하기</button>`;
+							}
+				},
+				
+				{data : "",
+	                defaultContent: "",
+	                title: "삭제",
+	                render: function (data, type, row) {
+	                    return `
+	                        <button type="button" class="btn btn-outline-danger deleteNoticeBtn"
+	                                data-id="${row.NOTICE_ID}"
+	                                onclick="confirmDeleteNotice('${row.NOTICE_ID}')">
+	                            삭제하기
+	                        </button>`;
+	                }
+	            }
 				]
 
 			})
-
+			
+			
 
 			$(document).on("click", ".content-link", function (e) {
 				e.preventDefault();
@@ -457,6 +491,38 @@
 
 		}
 	</script>
+
+	<script>
+		function openUpdateModal(notice_id) {
+			console.log("noticeID", notice_id)
+		    // 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
+		    $.ajax({
+		        url: '/getNoticeDetail',
+		        type: 'POST',
+		        data: { NOTICE_ID: notice_id }, // ID 전달
+		        success: function (notice) {
+					// 폼 속성 변경
+					$("#updateNoticeForm").attr('action', '/updateNotice');
+					
+					$("#notice_id").val(notice_id); //번호
+					$("#name").val(notice.NAME || ""); // 이름이 null인 경우 빈칸
+					$("#create_time").val(notice.CREATE_TIME || ""); // 생성시간
+					$("#subject").val(notice.SUBJECT || ""); // 제목
+					$("#content").val(notice.CONTENT || ""); // 내용
+					
+	                // 모달창 표시
+	                $("#modal-lg").modal("show");
+					
+					
+		        },
+		        error: function (xhr, status, error) {
+		            console.error("공지 조회 오류:", error);
+		        }
+		    });
+		}
+	</script>
+
+
 </body>
 
 </html>

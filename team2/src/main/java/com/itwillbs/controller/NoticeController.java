@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.itwillbs.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
@@ -70,18 +71,18 @@ public class NoticeController {
     }
     
     
-    
-    @GetMapping("/notice/noticeDetail")
-    public String getNoticeDetail(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
-    	String id = session.getAttribute("id").toString();
-    	map.put("memberId", id);
-    	List<Map<String, Object>> noticeDetail = noticeService.getNoticeDetail(map);
-    	model.addAttribute("noticeDetail", noticeDetail);
-    	
-        return "/notice/noticeDetail";
-    }
-    
-    
+ // 공지 상세 정보
+ 	@PostMapping("/getNoticeDetail")
+ 	@ResponseBody
+ 	public Map<String, Object> getNoticeDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
+ 		System.out.println("====================== 공지 상세 정보 ======================");
+ 		System.out.println(param);
+ 		Map<String, Object> notice = noticeService.getNoticeDetail(param);
+ 		
+ 		
+ 		return notice;
+ 	}
+        
     @PostMapping("/getNoticeList")
     @ResponseBody
     public List<Map<String, Object>> getNoticeList(HttpSession session, @RequestParam Map<String, Object> map) {
@@ -110,7 +111,25 @@ public class NoticeController {
         response.put("success", true);
         return response;
     }
+       
+//    공지사항 수정 (관리자 전용)
+    @PostMapping("/updateNotice")
+    public String updateNotice(HttpSession session,@RequestParam Map<String, Object> map, Model model) {
+		String id = session.getAttribute("id").toString();
+		map.put("memberId", id);
+	    noticeService.updateNotice(map);
+	    return "redirect:/notice/noticeList";
+    }
     
+//    공지사항 삭제 (관리자 전용)
+    @PostMapping("/deleteNotice")
+    public String deleteNotice(HttpSession session, @RequestParam Map<String, Object> map) {
+    	String id = session.getAttribute("id").toString();
+		map.put("memberId", id);
+		System.out.println(map);
+		noticeService.deleteNotice(map);
+		return "redirect:/notice/noticeList";
+	}
     
 // // 공지사항 수정 (관리자 전용)
 //    @PostMapping("/updateNotice")

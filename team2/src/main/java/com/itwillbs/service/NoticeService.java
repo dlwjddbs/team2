@@ -1,6 +1,7 @@
 package com.itwillbs.service;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,21 +23,28 @@ public class NoticeService {
 		return noticeMapper.getNoticeList(map);
 	}
 	
-//	public Map<String, Object> getNoticeListMinMaxDate(String id) {
-//
-//		return noticeMapper.getNoticeListMinMaxDate(id);
-//	}
-	
 //	작성
 	public void createNotice(Map<String, Object> map) {
 		noticeMapper.createNotice(map);
 		
 	}
 
-	public List<Map<String, Object>> getNoticeDetail(Map<String, Object> map) {
+	public Map<String, Object> getNoticeDetail(Map<String, Object> map) {
+		Map<String, Object> data = noticeMapper.detailNotice(map);
 		map.put("createTime", new Timestamp(System.currentTimeMillis()));
-		return noticeMapper.getNoticeDetail(map);
+		return data;
 	}
+
+	public void updateNotice(Map<String, Object> map) {
+		map.put("createTime", new Timestamp(System.currentTimeMillis()));
+		noticeMapper.updateNotice(map);
+	}
+
+	public void deleteNotice(Map<String, Object> map) {
+		noticeMapper.deleteNotice(map);
+	}
+
+	
 
 	
 	 
