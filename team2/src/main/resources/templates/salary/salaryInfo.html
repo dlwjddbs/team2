@@ -316,39 +316,27 @@
 		
 		// 급여 수정 버튼을 클릭시 이벤트 발생
 		$('#submitBtn').click(function () {
-		    // id로 값을 가져오기
-		    // const salary = $('#salary').val();
-			const id = $('#memberId').val();
-		    const positionBonus = $('#positionBonus').val();
-		    const holidayBonus = $('#holidayBonus').val();
-		    const nightBonus = $('#nightBonus').val();
-		    const yearendBonus = $('#yearendBonus').val();
-		    const fullserviceBonus = $('#fullserviceBonus').val();
-		    const performanceBonus = $('#performanceBonus').val();
+			//debugger;
 			
-			console.log(id);
-			console.log(positionBonus);
+			//return;
+			
+			var editSalaryForm = $("#editSalaryForm").serialize();
+			console.log(editSalaryForm); 
 			
 		    // AJAX로 서버에 데이터 전송
 		    $.ajax({
 		        url : '/editSalary', // 컨트롤러 매핑 URL
 		        type : 'POST',
-		        data : {
-					id : id,
-		            positionBonus: positionBonus,
-					holidayBonus: holidayBonus, 
-					nightBonus: holidayBonus, 
-					yearendBonus: holidayBonus, 
-					fullserviceBonus: holidayBonus, 
-					performanceBonus: performanceBonus 
-		        },
+		        data : $("#editSalaryForm").serialize(),
 		        success: function (response) {
 		            alert('급여 수정 성공!');
 		            console.log(response);
 					window.location.href = '/salaryInfo';
 		        },
 		        error: function (error) {
+		        	console.log(error);
 		            alert('급여 수정 실패');
+		            //window.location.href = '/salaryInfo';
 		        }
 		    });
 		});

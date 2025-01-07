@@ -82,31 +82,31 @@
 							<div class="col-md-4">
 				                <div class="form-group">
 				                  <label>급여 항목</label>
-				                 	<input type="text" readonly class="form-control" id="salary" name="salary" placeholder="기본급" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="position" name="position" placeholder="직책 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="holiday" name="holiday" placeholder="연휴 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="night" name="night" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="yearend" name="yearend" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="fullservice" name="fullservice" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="performance  " name="performance" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                 	<input type="text" readonly class="form-control" id="salary" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="position" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="holiday" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="night" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="yearend" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="fullservice" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" id="performance "placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
 							</div>
 							<div class="col-md-8">
 								<div class="form-group">
 								    <label>금액</label>
-								    <input type="text" id="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+								    <input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="position" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="position" name="position" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="holiday" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="holiday" name="holiday" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="night" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="night" name="night" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="yearend" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="yearend" name="yearend" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="fullservice" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="fullservice" name="fullservice" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 						            <br>
-						            <input type="text" id="performance" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="performance"  name="performance" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 								</div>
 							</div>
 						</div>
@@ -117,7 +117,8 @@
 				<div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-						<button type="submit" id="submitBtn" class="btn btn-primary">등록</button>
+						<!-- <button type="submit" id="submitBtn" class="btn btn-primary">급여 등록</button> -->
+						<button type="button" id="submitBtn" class="btn btn-primary">급여 등록</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->

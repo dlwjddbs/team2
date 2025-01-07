@@ -80,6 +80,7 @@ public class SalaryController {
 	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
 		log.info("============= writeSalary =============");
 		
+		log.info(param.toString());
 		
 		salaryService.writeSalary(param);
 //		System.out.println(insertCount);
@@ -89,7 +90,6 @@ public class SalaryController {
 //			System.out.println("insertCount: " + insertCount);
 //		
 //		}
-		
 		
 		return "급여 입력 성공!";
 	}
@@ -152,10 +152,10 @@ public class SalaryController {
     // 일단 코드 동작은 되나 좀 더 깔끔하게 수정 필요?
     @PostMapping("/editSalary")
     @ResponseBody
-    public String updateSalary(@RequestParam("id") String id, @RequestParam Map<String, Object> map) {
+    public String updateSalary(@RequestParam Map<String, Object> map) {
     	log.info("============= updateSalary POST start =============");
     	
-        log.info("id" +  id);
+        //log.info("id" +  id);
         
     	log.info(map.toString());
     	

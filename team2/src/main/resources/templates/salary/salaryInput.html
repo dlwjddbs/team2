@@ -332,7 +332,7 @@
 			// 급여 등록 버튼을 클릭시 이벤트 발생
 			$('#submitBtn').click(function () {
 			    // 입력 필드 값 가져오기
-			    var daterange = $('#daterange').val();
+/* 			    var daterange = $('#daterange').val();
 			    var member = $('#member').val(); // 사원 번호
 			    var name = $('#name').val(); // 사원명
 			    var department = $('#department').val(); // 부서
@@ -347,13 +347,18 @@
 			    
 			    console.log({
 			        daterange, member, name, department, grade, salary, position, holiday, night, yearend, fullservice, performance,
-			    });
+			    }); */
+			    
+				var writeSalaryForm = $("#writeSalaryForm").serialize();
+				console.log(writeSalaryForm);
+				console.log(decodeURIComponent(writeSalaryForm));
 
 			    // AJAX로 서버에 데이터 전송
 			    $.ajax({
 			        url: '/writeSalary', // 컨트롤러 매핑 URL
 			        type: 'POST',
-			        data: {
+			        data: $("#writeSalaryForm").serialize(),
+/* 			        {
 			        	PAYDAY: daterange,
 			        	MEMBER_ID: member,
 			        	NAME: name,
@@ -366,7 +371,7 @@
 			        	YEAREND_BONUS: yearend,
 			        	FULLSERVICE_BONUS: fullservice,
 			        	PERFORMANCE_BONUS: performance,
-			        },
+			        }, */
 			        success: function (response) {
 			            alert('급여 입력 성공!');
 			            window.location.href = '/salaryInput';

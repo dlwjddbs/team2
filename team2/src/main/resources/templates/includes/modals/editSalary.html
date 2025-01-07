@@ -18,8 +18,8 @@
 			<!-- /.모달창 헤더 -->
 			
 			<!-- form -->
-			<form th:action="@{/editSalary}" method="post" id="editSalaryForm">
-				<input type="hidden" id="memberId">
+			<form th:action="@{/editSalary}" method="post" name="editSalaryForm" id="editSalaryForm">
+				<input type="hidden" id="memberId" name="memberId">
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
@@ -59,13 +59,13 @@
 							<div class="col-md-8">
 								<div class="form-group">
 				                  <label>금액</label>
-									<input type="text" id="salary" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="positionBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="holidayBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="nightBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="yearendBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
-									<input type="text" id="performanceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="positionBonus" name="positionBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="holidayBonus" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="nightBonus" name="nightBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="yearendBonus" name="yearendBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="fullserviceBonus" name="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
+									<input type="text" id="performanceBonus" name="performanceBonus" class="form-control" placeholder="금액을 입력하세요."><br>
 				                </div>
 							</div>
 						</div>
