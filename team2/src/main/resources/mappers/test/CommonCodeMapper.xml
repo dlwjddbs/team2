@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.CommonCodeMapper">
+	<select id="selectCommonCode" resultType="map">
+		SELECT
+			   CC.GROUP_ID 
+			 , CCG.GROUP_NAME 
+			 , CC.CODE_ID 
+			 , CC.CODE_NAME 
+			 , CC.USE_YN 
+		  FROM
+			   COMMON_CODE CC 
+	 LEFT JOIN
+	 		   COMMON_CODE_GROUP CCG
+	 		ON
+	 		   CC.GROUP_ID = CCG.GROUP_ID
+	</select>
+</mapper>

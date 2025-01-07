@@ -36,12 +36,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>인사목록</h1>
+							<h1>공통코드</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">인사관리</a></li>
-								<li class="breadcrumb-item active">인사목록</li>
+								<li class="breadcrumb-item"><a href="#">설정</a></li>
+								<li class="breadcrumb-item active">공통코드</li>
 							</ol>
 						</div>
 					</div>
@@ -50,28 +50,43 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				<div class="col-2">
-					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-prepend">
-								<span class="input-group-text">
-									<i class="far fa-calendar-alt"></i>
-								</span>
-							</div>
-							<input type="text" class="form-control float-right" id="reservation">
-						</div>
-					</div>
-					<!-- new member modal -->
-					<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
-						생성
-					</button>
-					<nav th:replace="~{includes/modals/new :: new}"></nav>
-					<!-- new member modal -->
-				</div>
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-12">
+						<div class="col-6">
 							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">대분류</h3>
+									<div class="card-tools">
+										<!-- new member modal -->
+										<button type="button" class="btn btn-block btn-primary btn-sm float-right" id="newMember" data-toggle="modal" data-target="#modal-lg">
+											생성
+										</button>
+										<nav th:replace="~{includes/modals/new :: new}"></nav>
+										<!-- new member modal -->
+									</div>
+								</div>
+								<div class="card-body">
+									<table id="example1" class="table table-bordered table-striped">
+										<!-- dataTable Ajax -->
+									</table>
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+						<div class="col-6">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">소분류</h3>
+									<div class="card-tools">
+										<!-- new member modal -->
+										<button type="button" class="btn btn-block btn-primary btn-sm float-right" id="newMember" data-toggle="modal" data-target="#modal-lg">
+											생성
+										</button>
+										<nav th:replace="~{includes/modals/new :: new}"></nav>
+										<!-- new member modal -->
+									</div>
+								</div>
 								<div class="card-body">
 									<table id="example1" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
@@ -148,26 +163,21 @@
 			$("#example1").DataTable({
 				aaSorting: [], // 초기 정렬 비활성화
 				ajax : {
-					url : "/getMemberList",
+					url : "/getCommonCode",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (res) {
+						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data : "JOIN_DATE", title : "입사일", "defaultContent": "" },
-					{data : "MEMBER_ID", title : "사원번호", "defaultContent": "" },
-					{data : "NAME", title : "이름", "defaultContent": "" },
-					{data : "PHONE", title : "전화번호", "defaultContent": "" },
-					{data : "GRADE", title : "직급", "defaultContent": "" },
-					{data : "DEPARTMENT", title : "부서", "defaultContent": "" },
+					{data : "GROUP_ID", title : "입사일", "defaultContent": "" },
+					{data : "GROUP_NAME", title : "사원번호", "defaultContent": "" },
 					{data : "", "defaultContent": "", title : '수정',
 							render: function (data, type, row) {
-					            return `<button type="button" class="btn btn-outline-primary updateMemberBtn" 
-					                            data-id="${row.MEMBER_ID}" 
-					                            onclick="openUpdateModal('${row.MEMBER_ID}')">수정하기</button>`;
+					            return `<button type="button" class="btn btn-block btn-default btn-xs">수정하기</button>`;
 					        }
 					}
 
@@ -175,30 +185,8 @@
 				responsive : true, 
 				lengthChange : false, 
 				autoWidth : false,
-				buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
 			}).buttons()
-			  .container()
-			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
-			
-			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
-			let date = /*[[${commuteMinMaxDate}]]*/
-			$('#reservation').daterangepicker({
-				locale: {
-					"separator": " ~ ",
-					"format": 'YYYY-MM-DD',
-					"applyLabel": "조회",
-			     	"cancelLabel": "취소",
-			     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
-			     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-			      	"firstDay": 1
-			    },
-				startDate: date.COMMUTE_MIN_DATE,  // 초기 설정 값
-				endDate: date.COMMUTE_MAX_DATE,  // 초기 설정 값
-				minDate: date.COMMUTE_MIN_DATE,  // 선택 제한 값
-				maxDate: date.COMMUTE_MAX_DATE  // 선택 제한 값
-			});
-			$("#reservation").attr("readonly",true); 
-			
+			  .container();
 			$("#reservation").on("change", function() {
 				// 기존 테이블 삭제
 				$("#example1").DataTable().destroy();
@@ -208,18 +196,6 @@
 				$("#example1").DataTable({
 					aaSorting: [], // 초기 정렬 비활성화
 					// 버튼 위치 조절
-					dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-						  + "<'row'<'col-sm-12'tr>>"
-						  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-					language : {
-						search : "검색",
-						paginate: {
-			                "first" : "처음",
-			                "last" : "마지막",
-			                "next" : "다음",
-			                "previous" : "이전"
-			            }
-					},
 					ajax : {
 						url : "/getMemberList",
 						type:"POST",
@@ -233,28 +209,20 @@
 					},
 					columns : [
 					// DB컬럼명 일치하게 작성
-						{data : "JOIN_DATE", title : "입사일", "defaultContent": "" },
-						{data : "MEMBER_ID", title : "사원번호", "defaultContent": "" },
-						{data : "NAME", title : "이름", "defaultContent": "" },
-						{data : "PHONE", title : "전화번호", "defaultContent": "" },
-						{data : "GRADE", title : "직급", "defaultContent": "" },
-						{data : "DEPARTMENT", title : "부서", "defaultContent": "" },
-						{data : "", defaultContent: "", title : '수정',
-								render: function (data, type, row) {
-						            return `<button type="button" class="btn btn-outline-primary updateMemberBtn" 
-						                            data-id="${row.MEMBER_ID}" 
-						                            onclick="openUpdateModal('${row.MEMBER_ID}')">수정하기</button>`;
-						        }
-						}
+					{data : "GROUP_ID", title : "입사일", "defaultContent": "" },
+					{data : "GROUP_NAME", title : "사원번호", "defaultContent": "" },
+					{data : "", "defaultContent": "", title : '수정',
+							render: function (data, type, row) {
+					            return `<button type="button" class="btn btn-block btn-primary btn-xs">수정하기</button>`;
+					        }
+					}
 						
 					],
 					responsive : true, 
 					lengthChange : false, 
 					autoWidth : false,
-					buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]
 				}).buttons()
-				  .container()
-				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
+				  .container();
 			});
 		});
 		
