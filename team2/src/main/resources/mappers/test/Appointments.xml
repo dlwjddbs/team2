@@ -65,4 +65,26 @@
 		ORDER BY codeName ASC     		
     </select>
     
+   <select id="getOrgTree" resultType="map">
+	    SELECT 
+	        d.CODE_ID AS deptId,
+	        d.CODE_NAME AS deptName,
+	        e.MEMBER_ID AS memberId,
+	        e.NAME AS memberName,
+	        g.CODE_NAME AS gradeName
+	    FROM 
+	        COMMON_CODE d
+	    LEFT JOIN 
+	        MEMBER e ON (d.CODE_ID = e.DEPT_ID)
+	    LEFT JOIN 
+	        COMMON_CODE g ON (e.GRADE_ID = g.CODE_ID AND g.GROUP_ID = 'RANK')
+	    WHERE 
+	        d.GROUP_ID = 'DEP'
+	      AND d.USE_YN = 'Y'
+	      AND (e.USE_YN = 'Y' OR e.USE_YN IS NULL)
+	    ORDER BY 
+	        d.CODE_ID, g.CODE_NAME, e.NAME
+	</select>
+
+    
 </mapper>

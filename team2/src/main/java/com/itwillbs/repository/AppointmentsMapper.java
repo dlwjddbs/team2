@@ -19,4 +19,7 @@ public interface AppointmentsMapper {
 
     // 모든 직급 조회
 	List<Map<String, Object>> getAllRanks();
+
+	//조직도 조회
+	List<Map<String, Object>> getOrgTree();
 }

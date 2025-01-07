@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import com.itwillbs.repository.AppointmentsMapper;
 
@@ -33,5 +34,9 @@ public class AppointmentsService {
     
     public List<Map<String, Object>> getAllRanks(){
     	return appointMapper.getAllRanks();
+    }
+    
+    public List<Map<String, Object>> getOrgTree() {
+        return appointMapper.getOrgTree(); 
     }
 }

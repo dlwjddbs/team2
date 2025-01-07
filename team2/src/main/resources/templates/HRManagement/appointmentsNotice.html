@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdminLTE 3 | 인사발령 조회</title>
+
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/1.1.34/css/materialdesignicons.css">
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<!-- Font Awesome -->
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+	rel="stylesheet">
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="../../plugins/daterangepicker/daterangepicker.css">
+<!-- iCheck for checkboxes and radio inputs -->
+<link rel="stylesheet"
+	href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<!-- Bootstrap Color Picker -->
+<link rel="stylesheet"
+	href="../../plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+	href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+<!-- Select2 -->
+<link rel="stylesheet" href="../../plugins/select2/css/select2.min.css">
+<link rel="stylesheet"
+	href="../../plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<!-- Bootstrap4 Duallistbox -->
+<link rel="stylesheet"
+	href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+<!-- BS Stepper -->
+<link rel="stylesheet"
+	href="../../plugins/bs-stepper/css/bs-stepper.min.css">
+<!-- dropzonejs -->
+<link rel="stylesheet"
+	href="../../plugins/dropzone/min/dropzone.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<section class="content-header">
+				<div class="container-fluid">
+
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>인사발령</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">Home</a></li>
+								<li class="breadcrumb-item active">인사발령</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 헤더 (Page header) -->
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div
+					class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+					<div class="d-flex">
+						<div class="d-flex">
+							<label class="col-form-label mr-3" style="min-width: 70px">발령구분</label>
+							<select class="appointGubun form-control" name="appointGubun"
+								style="min-width: 120px">
+								<option selected="selected" disabled>발령구분</option>
+								<option>입사</option>
+								<option>퇴사</option>
+								<option>승진</option>
+								<option>부서이동</option>
+							</select>
+						</div>
+
+						<div class="d-flex mx-4">
+							<!-- Date range -->
+							<label for="" class="col-form-label mr-3"
+								style="min-width: 70px;">발령일자</label>
+
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text"> <i
+										class="far fa-calendar-alt"></i>
+									</span>
+								</div>
+								<input type="text" class="form-control float-right"
+									id="dateRange">
+							</div>
+						</div>
+					</div>
+					<div class="d-flex">
+						<button type="button" class="btn btn-dark" id="btnSearch">조회</button>
+					</div>
+				</div>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-body">
+										<p class="font-weight-bold">인사발령 현황</p>
+										
+											
+									<table id="appointments"
+										class="table table-bordered table-striped">
+										<tbody>
+											<!-- dataTable Ajax -->
+										</tbody>
+									</table>
+								</div>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+			<!-- Control sidebar content goes here -->
+		</aside>
+		<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- Select2 -->
+	<script src="../../plugins/select2/js/select2.full.min.js"></script>
+	<!-- Bootstrap4 Duallistbox -->
+	<script
+		src="../../plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/moment/moment.min.js"></script>
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- bootstrap color picker -->
+	<script
+		src="../../plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script
+		src="../../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+	<!-- Bootstrap Switch -->
+	<script src="../../plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+	<!-- BS-Stepper -->
+	<script src="../../plugins/bs-stepper/js/bs-stepper.min.js"></script>
+	<!-- dropzonejs -->
+	<script src="../../plugins/dropzone/min/dropzone.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="../../dist/js/demo.js"></script>
+	<!-- Page specific script -->
+	<!-- DataTables  & Plugins -->
+	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+	<script
+		src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script
+		src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script src="../../plugins/jszip/jszip.min.js"></script>
+	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
+
+
+	<script th:inline="javascript">
+    $(document).ready(function () {
+        // Select2 초기화
+        $('.appointGubun').select2();
+
+        // Datepicker 초기화
+        $('#reservationdate').datetimepicker({
+            format: 'YYYY-MM-DD',
+            locale: 'ko'
+        });
+
+        // 날짜 범위 선택기 설정 및 테이블 초기 로드
+        initializeDateRangePicker();
+        loadDataTable();
+        loadOrgTree();
+
+        $("#btnSearch").on("click", function () {
+            const appointGubun = $(".appointGubun").val();
+            const dateRange = $("#dateRange").val().split(' ~ ');
+            const startDate = dateRange[0];
+            const endDate = dateRange[1];
+            loadDataTable(appointGubun, startDate, endDate, true);
+        });
+    });
+
+    // 날짜 범위 선택기 초기화
+    function initializeDateRangePicker() {
+        $.ajax({
+            url: "/getMinMaxDate",
+            type: "GET",
+            success: function (data) {
+                const minDate = data.minDate || "2025-01-01";
+                const maxDate = data.maxDate || moment().format("YYYY-MM-DD");
+
+                $('#dateRange').daterangepicker({
+                    locale: {
+                        separator: " ~ ",
+                        format: 'YYYY-MM-DD',
+                        applyLabel: "선택",
+                        cancelLabel: "취소",
+                        daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                        monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                        firstDay: 1
+                    },
+                    startDate: minDate,
+                    endDate: maxDate,
+                    minDate: minDate,
+                    maxDate: maxDate
+                });
+                $("#dateRange").attr("readonly", false);
+            },
+            error: function (error) {
+                console.error("Error fetching date range:", error);
+            }
+        });
+    }
+
+    // 데이터 테이블 로드 함수
+    function loadDataTable(appointGubun = null, startDate = null, endDate = null, isUpdate = false) {
+        if (isUpdate) {
+            $("#appointments").DataTable().destroy();
+        }
+        
+        let deptOptions = [];
+        let rankOptions = [];
+
+        // 부서 및 직급 
+        $.when(
+            $.ajax({
+                url: '/getAllDepartments',
+                method: 'GET',
+                success: function (data) {
+                	 deptOptions = Array.isArray(data) ? data : [];
+                },
+                error: function (error) {
+                    console.error('Error fetching departments:', error);
+                }
+            }),
+            $.ajax({
+                url: '/getAllRanks',
+                method: 'GET',
+                async: false,
+                success: function (data) {
+                	 rankOptions = Array.isArray(data) ? data : [];
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching ranks:', error);
+                }
+            })
+        ).then(() => {$("#appointments").DataTable({
+            
+                aaSorting: [],
+                dom: "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                language: {
+                    search: "검색",
+                    paginate: {
+                        first: "처음",
+                        last: "마지막",
+                        next: "다음",
+                        previous: "이전"
+                    },
+                    zeroRecords: "검색 결과 없음"
+                },
+                ajax: {
+                    url: "/getAppointList",
+                    type: "POST",
+                    data: { appointGubun, startDate, endDate },
+                    dataSrc: (res) => res
+                },
+                columns: [                  
+                    { data: null, title: "No.", render: (data, type, row, meta) => meta.row + 1, orderable: false },
+                    {
+                        data: "MEMBER_ID",
+                        title: "사원번호",
+                        defaultContent: "",
+                    },
+                    {
+                        data: "NAME",
+                        title: "성명",
+                        defaultContent: "",
+                    },
+                    {
+                        data: "ASSIGNMENT_TYPE",
+                        title: "발령구분",
+                        defaultContent: ""
+                    },
+                    {
+                        data: "CHANGE_DATE",
+                        title: "발령일자",
+                        defaultContent: ""
+                    },                   
+                    {
+                        data: null,
+                        title: "직위/직급",
+                        defaultContent: "",
+                        render: function(data, type, row) { 
+                        	
+                            const oldGrade = rankOptions.find(rank => rank.CODEID === row.OLD_GRADE)?.CODENAME || "없음";
+
+                            const newGrade = rankOptions.find(rank => rank.CODEID === row.NEW_GRADE)?.CODENAME || "직급 선택";
+
+                            return `
+                                <div class="d-flex">
+                                    ${oldGrade} <span class="mx-2 mt-1"> → </span>
+                                    ${newGrade}
+                                </div>
+                            `;
+                        }                    
+                    },
+                    {
+                        data: null,
+                        title: "부서",
+                        defaultContent: "",
+                        render: function(data, type, row) { 
+                        	
+                            const oldDept = deptOptions.find(dept => dept.CODEID === row.OLD_DEPT)?.CODENAME || "없음";
+
+                            const newDept = deptOptions.find(dept => dept.CODEID === row.NEW_DEPT)?.CODENAME || "부서 선택";
+
+                            return `
+                                <div class="d-flex">
+                                    ${oldDept} <span class="mx-2 align-items-center"> → </span>
+                                    ${newDept}
+                                </div>
+                            `;
+                        }
+                    },
+                    {
+                        data: "ETC",
+                        title: "비고",
+                        defaultContent: ""
+                    }
+                ],
+                columnDefs: [
+                    { width: "40px", className: "text-center", targets: 0 },
+                    { width: "450px", targets: 7 },
+                ],
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#appointments_wrapper .col-md-6:eq(0)');
+        });      
+    }
+    
+	</script>
+</body>
+</html>

@@ -7,10 +7,14 @@
 
 <!-- Google Font: Source Sans Pro -->
 <link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/1.1.34/css/materialdesignicons.css">
+<link rel="stylesheet"
 	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 <!-- Font Awesome -->
-<link rel="stylesheet"
-	href="../../plugins/fontawesome-free/css/all.min.css">
+<!-- Font Awesome -->
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+	rel="stylesheet">
 <!-- daterange picker -->
 <link rel="stylesheet"
 	href="../../plugins/daterangepicker/daterangepicker.css">
@@ -55,8 +59,9 @@
 			<!-- 콘텐츠 헤더 (Page header) -->
 			<section class="content-header">
 				<div class="container-fluid">
+
 					<!-- 추가버튼 모달 -->
-					<div class="modal fade" id="modifyModal" tabindex="-1"
+					<div class="modal fade" id="addModal" tabindex="2"
 						role="dialog" aria-labelledby="confirmModalLabel"
 						aria-hidden="true">
 						<div class="modal-dialog" role="document">
@@ -69,58 +74,28 @@
 									</button>
 								</div>
 								<div class="modal-body">
+									<!-- 조직도 -->
+									<label class="col-form-label mt-3">발령대상자 선택</label>
+
 									<div class="row">
-										<div class="col-sm ">
-											<label class="col-form-label">발령구분 :</label> <select
-												class="appointGubun" name="appointGubun1">
-												<option selected="selected" disabled>발령구분</option>
-												<option>입사</option>
-												<option>퇴사</option>
-												<option>승진</option>
-												<option>부서이동</option>
-											</select>
+										<div class="col-6">
+											<div class="bg-white border rounded"
+												style="height: 300px; overflow-y: scroll;">
+												<ul id="orgTree"
+													class="nav nav-pills nav-sidebar flex-column nav-child-indent"
+													 data-widget="treeview" role="menu"></ul>
+											</div>
 										</div>
-										<!-- Date -->
-										<div class="col-sm">
-											<label class="col-form-label">발령일자 :</label>
-											<div class="input-group date" id="reservationdate"
-												data-target-input="nearest">
-												<input type="text" class="form-control datetimepicker-input"
-													data-target="#reservationdate" />
-												<div class="input-group-append"
-													data-target="#reservationdate" data-toggle="datetimepicker">
-													<div class="input-group-text">
-														<i class="fa fa-calendar"></i>
-													</div>
-												</div>
+										<div class="col-6">
+											<div class="bg-white border rounded"
+												style="height: 300px; overflow-y: scroll;">
+
+												<ul id="checkedEmployees">
+													<!-- 체크된 직원 목록 -->
+												</ul>
 											</div>
 										</div>
 									</div>
-									<div class="row my-3">
-										<div class="col-sm">
-											<label class="col-form-label mr-3">부서 :</label> <select
-												class="appointGubun" id="deptSelectBox" name="deptGubun"
-												style="min-width: 120px">
-												<option selected="selected" disabled>부서를 선택하세요</option>
-											</select>
-										</div>
-										<div class="col-sm">
-											<label class="col-form-label mr-3">직급 :</label> <select
-												class="appointGubun" id="rankSelectBox" name="gradeGubun"
-												style="min-width: 120px">
-												<option selected="selected" disabled>발령직급</option>
-											</select>
-										</div>
-									</div>
-
-									<div>
-										<label class="col-form-label mr-3">비고 :</label> <input
-											type="text" class="form-control" name="etc" placeholder="">
-									</div>
-
-									<!-- 조직도 -->
-
-
 								</div>
 
 								<div class="modal-footer">
@@ -133,6 +108,104 @@
 						</div>
 					</div>
 
+					<!-- 발령대상자 선택 버튼 모달 -->
+					<div class="modal fade" id="modifyModal2" tabindex="2"
+						role="dialog" aria-labelledby="confirmModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content" style="min-width: 700px;">
+								<div class="modal-header">
+									<h5 class="modal-title" id="confirmModalLabel">인사발령</h5>
+									<button type="button" class="close" data-dismiss="modal"
+										aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body py-0">
+									<div class="row">
+										<div class="col-4 py-3 px-2">
+											<!-- 클릭한 직원명, 부서, 직급 정보 -->
+											<div id="clickedEmployeeInfo">
+												<div class="p-2">
+													<p>
+														<strong class="mr-2">이름:</strong> <span id="employeeName"></span>
+													</p>
+													<p>
+														<strong class="mr-2">현재 부서:</strong> <span
+															id="employeeDept"></span>
+													</p>
+													<p>
+														<strong class="mr-2">현재 직급:</strong> <span
+															id="employeeGrade"></span>
+													</p>
+												</div>
+											</div>
+										</div>
+										<div class="col-8 pt-3 pl-4 pb-4"
+											style="border-left: 1px solid #e9ecef;">
+											<div class="row">
+												<div class="col-sm">
+													<label class="col-form-label">발령구분 :</label> <select
+														class="appointGubun" name="appointGubun1">
+														<option selected="selected" disabled>발령구분</option>
+														<option>입사</option>
+														<option>퇴사</option>
+														<option>승진</option>
+														<option>부서이동</option>
+													</select>
+												</div>
+												<!-- 발령일자 -->
+												<div class="col-sm">
+													<label class="col-form-label">발령일자 :</label>
+													<div class="input-group date" id="reservationdate"
+														data-target-input="nearest">
+														<input type="text"
+															class="form-control datetimepicker-input"
+															data-target="#reservationdate" />
+														<div class="input-group-append"
+															data-target="#reservationdate"
+															data-toggle="datetimepicker">
+															<div class="input-group-text">
+																<i class="fa fa-calendar"></i>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<!-- 발령부서, 발령직급 -->
+											<div class="row my-3">
+												<div class="col-sm">
+													<label class="col-form-label mr-3">발령부서 :</label> <select
+														class="appointGubun" id="deptSelectBox" name="deptGubun"
+														style="min-width: 120px">
+														<option selected="selected" disabled >부서를 선택하세요</option>
+													</select>
+												</div>
+												<div class="col-sm">
+													<label class="col-form-label mr-3">발령직급 :</label> <select
+														class="appointGubun" id="rankSelectBox" name="gradeGubun"
+														style="min-width: 120px">
+														<option selected="selected" disabled>직급을 선택하세요</option>
+													</select>
+												</div>
+											</div>
+											<!-- 비고 -->
+											<div>
+												<label class="col-form-label mr-3">비고 :</label> <input
+													type="text" class="form-control" name="etc" placeholder="">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary"
+										data-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-primary"
+										id="confirmSaveBtn">확인</button>
+								</div>
+							</div>
+						</div>
+					</div>
 
 
 					<div class="row mb-2">
@@ -155,8 +228,8 @@
 					class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
 						<div class="d-flex">
-							<label class="col-form-label mr-3">발령구분</label> <select
-								class="appointGubun" name="appointGubun"
+							<label class="col-form-label mr-3" style="min-width: 70px">발령구분</label>
+							<select class="appointGubun form-control" name="appointGubun"
 								style="min-width: 120px">
 								<option selected="selected" disabled>발령구분</option>
 								<option>입사</option>
@@ -183,9 +256,9 @@
 						</div>
 					</div>
 					<div class="d-flex">
-						<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
-						<button type="button" class="btn btn-primary mx-1" id="btnAdd">등록</button>
-						<button type="button" class="btn btn-primary" id="btnUpdate">수정</button>
+						<button type="button" class="btn btn-dark" id="btnSearch">조회</button>
+						<button type="button" class="btn btn-dark mx-1" id="btnAdd">등록</button>
+						<button type="button" class="btn btn-dark" id="btnSave">저장</button>
 					</div>
 				</div>
 				<div class="container-fluid">
@@ -193,7 +266,9 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-body">
-									<p class="font-weight-bold">인사발령 조회</p>
+										<p class="font-weight-bold">인사발령 관리</p>
+										
+											
 									<table id="appointments"
 										class="table table-bordered table-striped">
 										<tbody>
@@ -278,46 +353,53 @@
 
 
 	<script th:inline="javascript">
-	
-	// selectBox
-	 $(document).ready(function () {
-	        $('.appointGubun').select2();	    
-	    });
-	
-	// datepicker
-	 $(document).ready(function () {
-		    // Datetimepicker 초기화
-		    $('#reservationdate').datetimepicker({
-		        format: 'YYYY-MM-DD', // 형식 지정
-		        locale: 'ko' // 한국어 로케일 설정 (moment.js 로케일 필요)
-		    });
-		});
+    $(document).ready(function () {
+        // Select2 초기화
+        $('.appointGubun').select2();
 
-	//date range
-    $(function () {
-        dateRangePicker();
+        // Datepicker 초기화
+        $('#reservationdate').datetimepicker({
+            format: 'YYYY-MM-DD',
+            locale: 'ko'
+        });
 
-        // 페이지 로딩 시 모든 데이터를 조회
-        loadDataTable(null, null, null, false);
+        // 날짜 범위 선택기 설정 및 테이블 초기 로드
+        initializeDateRangePicker();
+        loadDataTable();
+        loadOrgTree();
+
+        // 버튼 이벤트
+        $('#btnAdd').on('click', function () {
+            $("#addModal").modal("show");
+        });
+
+        $("#btnSearch").on("click", function () {
+            const appointGubun = $(".appointGubun").val();
+            const dateRange = $("#dateRange").val().split(' ~ ');
+            const startDate = dateRange[0];
+            const endDate = dateRange[1];
+            loadDataTable(appointGubun, startDate, endDate, true);
+        });
     });
-    
-    function dateRangePicker() {
+
+    // 날짜 범위 선택기 초기화
+    function initializeDateRangePicker() {
         $.ajax({
             url: "/getMinMaxDate",
             type: "GET",
             success: function (data) {
-                let minDate = data.minDate || "2024-01-01";
-                let maxDate = data.maxDate || moment().format("YYYY-MM-DD");
+                const minDate = data.minDate || "2025-01-01";
+                const maxDate = data.maxDate || moment().format("YYYY-MM-DD");
 
                 $('#dateRange').daterangepicker({
                     locale: {
-                        "separator": " ~ ",
-                        "format": 'YYYY-MM-DD',
-                        "applyLabel": "선택",
-                        "cancelLabel": "취소",
-                        "daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"],
-                        "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-                        "firstDay": 1
+                        separator: " ~ ",
+                        format: 'YYYY-MM-DD',
+                        applyLabel: "선택",
+                        cancelLabel: "취소",
+                        daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                        monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                        firstDay: 1
                     },
                     startDate: minDate,
                     endDate: maxDate,
@@ -326,182 +408,365 @@
                 });
                 $("#dateRange").attr("readonly", false);
             },
-            error: function (xhr, status, error) {
-                console.error("날짜 정보를 가져오는 중 오류 발생:", error);
+            error: function (error) {
+                console.error("Error fetching date range:", error);
             }
         });
     }
 
-    
-    
-    ////////////////
-    // 데이터 테이블
-    ////////////////
-    
+    // 데이터 테이블 로드 함수
     function loadDataTable(appointGubun = null, startDate = null, endDate = null, isUpdate = false) {
-        // 기존 테이블 삭제
         if (isUpdate) {
             $("#appointments").DataTable().destroy();
         }
 
-        $("#appointments").DataTable({
-            aaSorting: [], // 초기 정렬 비활성화
-            dom: 
-/*             	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +*/
-                 "<'row'<'col-sm-12'tr>>" + 
-                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-            language: {
-                search: "검색",
-                paginate: {
-                    first: "처음",
-                    last: "마지막",
-                    next: "다음",
-                    previous: "이전"
+        let deptOptions = [];
+        let rankOptions = [];
+    
+        // 부서 및 직급 
+        $.when(
+            $.ajax({
+                url: '/getAllDepartments',
+                method: 'GET',
+                success: function (data) {
+                	 
+     	            const selectBox = $('#deptSelectBox'); 
+    	            selectBox.empty(); 
+    	            selectBox.append('<option selected disabled>부서를 선택하세요</option>'); 
+    	
+
+    	            data.forEach(function(dept) {
+    	                selectBox.append(`<option value="${dept.CODEID}">${dept.CODENAME}</option>`);
+    	            });
+    	            
+                	 deptOptions = Array.isArray(data) ? data : [];
                 },
-                zeroRecords: "검색 결과 없음"
-            },
-            ajax: {
-                url: "/getAppointList",
-                type: "POST",
-                data: {
-                    appointGubun: appointGubun,
-                    startDate: startDate,
-                    endDate: endDate
-                },
-                "dataSrc" : function (res) {
-                    console.log("Server Response:", res); // 서버 응답 확인
-                    return res; // 데이터 반환
+                error: function (error) {
+                    console.error('Error fetching departments:', error);
                 }
+            }),
+            $.ajax({
+                url: '/getAllRanks',
+                method: 'GET',
+                async: false,
+                success: function (data) {
+                	
+                	 const rankSelect = $('#rankSelectBox'); 
+     	            rankSelect.empty(); 
+     	            rankSelect.append('<option selected disabled>직급을 선택하세요</option>'); 
+     	
+     	            data.forEach(function(rank) {
+     	            	rankSelect.append(`<option value="${rank.CODEID}">${rank.CODENAME}</option>`);
+     	            });
+     	            
+                	 rankOptions = Array.isArray(data) ? data : [];
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching ranks:', error);
+                }
+            })
+        ).then(() => {
+            $("#appointments").DataTable({
+            
+                aaSorting: [],
+                dom: "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                language: {
+                    search: "검색",
+                    paginate: {
+                        first: "처음",
+                        last: "마지막",
+                        next: "다음",
+                        previous: "이전"
+                    },
+                    zeroRecords: "검색 결과 없음"
+                },
+                ajax: {
+                    url: "/getAppointList",
+                    type: "POST",
+                    data: { appointGubun, startDate, endDate },
+                    dataSrc: (res) => res
+                },
+                columns: [
+                    {
+                        data: null,
+                        title: '<input type="checkbox" id="checkAll" />',
+                        orderable: false,
+                        render: (data, type, row) => `<input type="checkbox" class="row-checkbox" value="${row.MEMBER_ID}" />`
+                    },
+                    { data: null, title: "No.", render: (data, type, row, meta) => meta.row + 1, orderable: false },
+                    {
+                        data: "MEMBER_ID",
+                        title: "사원번호",
+                        defaultContent: "",
+                        render: (data) => `<input type="text" class="form-control-custom2" value="${data || ''}" readonly />`
+                    },
+                    {
+                        data: "NAME",
+                        title: "성명",
+                        defaultContent: "",
+                        render: (data) => `<input type="text" class="form-control-custom2" value="${data || ''}" readonly />`
+                    },
+                    {
+                        data: "ASSIGNMENT_TYPE",
+                        title: "발령구분",
+                        defaultContent: "",
+                        render: (data) => `
+                            <select class="form-control-custom appointGubun">
+                                <option ${data === "입사" ? "selected" : ""}>입사</option>
+                                <option ${data === "퇴사" ? "selected" : ""}>퇴사</option>
+                                <option ${data === "승진" ? "selected" : ""}>승진</option>
+                                <option ${data === "부서이동" ? "selected" : ""}>부서이동</option>
+                            </select>`
+                    },
+                    {
+                        data: "CHANGE_DATE",
+                        title: "발령일자",
+                        defaultContent: "",
+                        render: (data) => `<input type="date" class="form-control-custom editable-field" value="${data || ''}" />`
+                    },                   
+                    {
+                        data: null,
+                        title: "직위/직급",
+                        defaultContent: "",
+                        render: function(data, type, row) { 
+                        	
+                            const oldGrade = rankOptions.find(rank => rank.CODEID === row.OLD_GRADE)?.CODENAME || "없음";
+
+                            const newGradeSelected = rankOptions.find(rank => rank.CODEID === row.NEW_GRADE)?.CODENAME || "직급 선택";
+
+                            const currentGradeSelect = `
+                                <select class="form-control-custom2 current-grade" disabled>
+                                    <option selected>${oldGrade}</option>
+                                </select>
+                            `;
+
+                            const newGradeSelect = `
+                                <select class="form-control-custom new-grade">
+                                    <option disabled ${!row.NEW_GRADE ? "selected" : ""}>직급 선택</option>
+                                    ${rankOptions.map(rank => `
+                                        <option value="${rank.CODEID}" ${rank.CODEID === row.NEW_GRADE ? "selected" : ""}>
+                                            ${rank.CODENAME}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            `;
+
+                            return `
+                                <div class="d-flex">
+                                    ${currentGradeSelect} <span class="mx-2 mt-1"> → </span>
+                                    ${newGradeSelect}
+                                </div>
+                            `;
+                        }                    
+                    },
+                    {
+                        data: null,
+                        title: "부서",
+                        defaultContent: "",
+                        render: function(data, type, row) { 
+                        	
+                            const oldDept = deptOptions.find(dept => dept.CODEID === row.OLD_DEPT)?.CODENAME || "없음";
+
+                            const newDeptSelected = deptOptions.find(dept => dept.CODEID === row.NEW_DEPT)?.CODENAME || "부서 선택";
+
+                            const currentDeptSelect = `
+                                <select class="form-control-custom2 current-dept" disabled>
+                                    <option selected>${oldDept}</option>
+                                </select>
+                            `;
+
+                            const newDeptSelect = `
+                                <select class="form-control-custom new-dept">
+                                    <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
+                                    ${deptOptions.map(dept => `
+                                        <option value="${dept.CODEID}" ${dept.CODEID === row.NEW_DEPT ? "selected" : ""}>
+                                            ${dept.CODENAME}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            `;
+
+                            return `
+                                <div class="d-flex">
+                                    ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
+                                    ${newDeptSelect}
+                                </div>
+                            `;
+                        }
+                    },
+                    {
+                        data: "ETC",
+                        title: "비고",
+                        defaultContent: "",
+                        render: (data) => `<input type="text" class="form-control-custom editable-field" value="${data || ''}" />`
+                    }
+                ],
+                columnDefs: [
+                    { width: "40px", className: "text-center", targets: [0, 1] },
+                    { width: "150px", targets: [2, 3, 4, 5] },
+                    { width: "250px", targets: 8 },
+                ],
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#appointments_wrapper .col-md-6:eq(0)');
+        });      
+        
+    }
+
+    $("#appointments").on("change", "#checkAll", function () {
+        $(".row-checkbox").prop("checked", this.checked);
+    });
+
+    // 필드 수정 시 체크박스 활성화
+    $('#appointments tbody').on('change', 'input.editable-field, select.appointGubun, select.new-dept, select.new-grade', function () {
+        const $row = $(this).closest('tr');
+        const checkbox = $row.find('.row-checkbox');
+        checkbox.prop('checked', true);
+    });
+    
+    
+
+
+    // 조직도 데이터 로드
+    function loadOrgTree() {
+        $.ajax({
+            url: "/getOrgTree",
+            method: "GET",
+            success: function (data) {
+                renderOrgTree(data);
             },
-            columns: [
-            	 {
-                     data: null,
-                     title: '<input type="checkbox" id="checkAll" />',
-                     orderable: false,
-                     render: function (data, type, row) {
-                         return `<input type="checkbox" class="row-checkbox" value="${row.MEMBER_ID}" />`;
-                     }
-                 },
-                { data: null, title : "No.", render: (data, type, row, meta) => meta.row + 1, orderable: false },
-                { data: "ASSIGNMENT_TYPE", title : "발령구분", defaultContent: "" },
-                { data: "CHANGE_DATE", title : "발령일자", defaultContent: "" },
-                { data: "MEMBER_ID", title : "사원번호", defaultContent: "" },
-                { data: "NAME", title : "성명", defaultContent: "" },
-                {
-                    data: null,
-                    title: "직위/직급",
-                    render: function (data, type, row) {
-                        const oldGrade = row.OLD_GRADE || "없음"; 
-                        const newGrade = row.NEW_GRADE || "없음"; 
-                        return `${oldGrade} → ${newGrade}`;
-                    },
-                    defaultContent: ""
-                },
-                {
-                    data: null,
-                    title: "부서",
-                    render: function (data, type, row) {
-                        const oldDept = row.OLD_DEPT || "없음"; 
-                        const newDept = row.NEW_DEPT || "없음"; 
-                        return `${oldDept} → ${newDept}`; 
-                    },
-                    defaultContent: ""
-                },
-                { data: "ETC", title : "비고",  defaultContent: "" }
-            ],
-            columnDefs: [
-            	{  width: "40px", className: "text-center", targets: [0, 1] }, 
-                { width: "350px", targets: 8 },
-            ],
-            responsive: true,
-            lengthChange: false,
-            autoWidth: false,
-            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#appointments_wrapper .col-md-6:eq(0)'); 
-     
-        $("#appointments").on("change", "#checkAll", function () {
-            $(".row-checkbox").prop("checked", this.checked);
+            error: function (error) {
+                console.error("Error fetching org tree:", error);
+            }
         });
     }
-    
- /*           */   
- /* 조회 조건 */   
- /* btn event */
- /*           */   
-    
- // 조회 버튼
-    $("#btnSearch").on("click", function () {
-        let appointGubun = $(".appointGubun").val(); 
-        let date = $("#dateRange").val().split(' ~ ');
-        loadDataTable(appointGubun, date[0], date[1], true);
-    });
-    
- // 추가 버튼
-    $('#btnAdd').on("click", function(){
-        const modalBtn = document.getElementById("confirmSaveBtn");
-        modalBtn.setAttribute("data-target", "add");
-        $("#modifyModal").modal("show");    	
-    });
 
-    // 수정 버튼
-    $('#btnUpdate').on("click", function(){
-        const modalBtn = document.getElementById("confirmSaveBtn");
-        modalBtn.setAttribute("data-target", "update"); 
-        $("#modifyModal").modal("show");    	
-    });
-    
-    /*       */
-    /* POPUP */
-    /*       */
-    
-    $(document).ready(function() {
-    loadDepartments(); 
-    loadRanks();
-	});
+    // 조직도 렌더링
+    function renderOrgTree(data) {
+        const treeContainer = $("#orgTree");
+        treeContainer.empty();
+
+        const groupedData = data.reduce((acc, item) => {
+            if (!acc[item.DEPTID]) {
+                acc[item.DEPTID] = {
+                    deptName: item.DEPTNAME,
+                    members: []
+                };
+            }
+            if (item.MEMBERNAME) {
+                acc[item.DEPTID].members.push({
+                    memberName: item.MEMBERNAME,
+                    memberId: item.MEMBERID,
+                    gradeName: item.GRADENAME
+                });
+            }
+            return acc;
+        }, {});
+
+        Object.keys(groupedData).forEach(deptId => {
+            const dept = groupedData[deptId];
+            const memberCount = dept.members.length;
+
+            const deptHtml = `
+                <li class="nav-item">
+                    <a class="nav-link text-reset rounded-0 orgNav" href="#" data-dept-id="${deptId}">
+                    	<div class="mdi mdi-folder-account"></div>
+                        <p style="font-size: 0.95rem; font-weight: bold;">${dept.deptName} <span class="text-blue">(${memberCount})</span>
+                      	  <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    ${dept.members.length > 0 ? `
+                    <ul class="nav nav-treeview" id="members-${deptId}" style="display: none;">
+                        ${dept.members.map(member => `
+                            <li class="nav-item">
+                                <a class="nav-link text-reset rounded-0 orgNav" href="#" 
+                                   data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
+                                   data-grade-name="${member.gradeName}" data-dept-name="${dept.deptName}">
+                                   <div class="mdi mdi-account ml-2"></div>
+                                    <p style="font-size: 0.88rem; font-weight: bold;">${member.memberName} <span class="text-gray" style="font-size: 0.8rem;">(${member.gradeName})</span></p>
+                                </a>
+                            </li>`).join('')}
+                    </ul>` : ''}
+                </li>
+            `;
+            treeContainer.append(deptHtml);
+        });
+
+        $(".nav-link").on("click", function (e) {
+            e.preventDefault();
+            $(".nav-link").removeClass("activeToggle");
+            $(this).addClass("activeToggle");
+        });
 
 
-    // 부서 select
-	function loadDepartments() {
-	    $.ajax({
-	        url: '/getAllDepartments', 
-	        method: 'GET',
-	        success: function(data) {
-	            const selectBox = $('#deptSelectBox'); 
-	            selectBox.empty(); 
-	            selectBox.append('<option selected disabled>부서를 선택하세요</option>'); 
-	
+ /*        $("#addModal.nav-treeview.nav-link").on("click", function (e) {
+            e.preventDefault();
+            const memberId = $(this).data("member-id");
+            const memberName = $(this).data("member-name");
+            const gradeName = $(this).data("grade-name");
+            const deptName = $(this).data("dept-name");
 
-	            data.forEach(function(dept) {
-	                selectBox.append(`<option value="${dept.CODEID}">${dept.CODENAME}</option>`);
-	            });
-	        },
-	        error: function(xhr, status, error) {
-	            console.error('Error fetching departments:', error);
-	        }
-	    });
-	}
-
-
-    // 직급 select
- 	 function loadRanks() {
-	    $.ajax({
-	        url: '/getAllRanks', 
-	        method: 'GET',
-	        success: function(data) {
-	            const rankSelect = $('#rankSelectBox'); 
-	            rankSelect.empty(); 
-	            rankSelect.append('<option selected disabled>직급을 선택하세요</option>'); 
-	
-	            data.forEach(function(rank) {
-	            	rankSelect.append(`<option value="${rank.CODEID}">${rank.CODENAME}</option>`);
-	            });
-	        },
-	        error: function(xhr, status, error) {
-	            console.error('Error fetching ranks:', error);
-	        }
-	    });
-	} 
+            $("#employeeName").text(memberName);
+            $("#employeeDept").text(deptName);
+            $("#employeeGrade").text(gradeName);
+            $("#modifyModal2").modal("show");
+        }); */
+    }
 
 	</script>
+	<style>
+.form-control-custom {
+	display: block;
+	width: 100%;
+	height: 2rem;
+	padding: .375rem .75rem;
+	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: #495057;
+	outline-color: #80bdff;
+	background-color: #ffffff00;
+	background-clip: padding-box;
+	border: 1px solid #ced4daa3;
+	border-radius: .25rem;
+	box-shadow: inset 0 0 0 transparent;
+	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.form-control-custom2{
+	display: block;
+	width: 100%;
+	height: 2rem;
+	padding: .375rem .75rem;
+	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: #495057;
+	outline: none;
+	background-color: #ffffff00;
+	background-clip: padding-box;
+	border: none;
+	box-shadow: inset 0 0 0 transparent;
+    -o-appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.form-control-custom:focus {
+	outline: 0.5px solid #80bdff;
+}
+
+.orgNav:hover {
+	background: #ebebeb;
+}
+
+.activeToggle {
+	background: #e8eff9;
+}
+</style>
 </body>
 </html>

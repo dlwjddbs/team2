@@ -53,5 +53,18 @@ public class AppointmentsController {
     	List<Map<String, Object>> ranks = appointmentsService.getAllRanks();
     	return ResponseEntity.ok(ranks);
     }
+    
+    @GetMapping("/getOrgTree")
+    @ResponseBody
+    public List<Map<String, Object>> getOrgTree() {
+        return appointmentsService.getOrgTree();
+    }
+    
+	@GetMapping("/appointmentsNotice")
+	public String getAppointList2(@RequestParam Map<String, Object> map, Model model) {
+	List<Map<String, Object>> list = appointmentsService.getAppointList(map);
+	model.addAttribute("appointList", list);
+	return "HRManagement/appointmentsNotice"; 
+	}
 
 }
