@@ -332,40 +332,48 @@
 			// 급여 등록 버튼을 클릭시 이벤트 발생
 			$('#submitBtn').click(function () {
 			    // 입력 필드 값 가져오기
-			    var datarange = $('#daterange').val();
-			    var member = $('#memberId').val(); // 사원 번호
+			    var daterange = $('#daterange').val();
+			    var member = $('#member').val(); // 사원 번호
 			    var name = $('#name').val(); // 사원명
 			    var department = $('#department').val(); // 부서
-			    var salary = $('#salary').val(); // 급여
-			    var position = $('#position').val(); // 직책
+			    var grade = $('#grade').val(); // 직급
+			    var salary = $('#salary').val(); // 기본급
+			    var position = $('#position').val(); // 직책 수당
 			    var holiday = $('#holiday').val(); // 연휴 수당
 			    var night = $('#night').val(); // 야근 수당
 			    var yearend = $('#yearend').val(); // 연말 격려 수당
 			    var fullservice = $('#fullservice').val(); // 만기 근속자 포상
 			    var performance = $('#performance').val(); // 실적 우수자 포상
+			    
+			    console.log({
+			        daterange, member, name, department, grade, salary, position, holiday, night, yearend, fullservice, performance,
+			    });
 
 			    // AJAX로 서버에 데이터 전송
 			    $.ajax({
 			        url: '/writeSalary', // 컨트롤러 매핑 URL
 			        type: 'POST',
 			        data: {
-			            daterange: datarange,
-			            member: member,
-			            name: name,
-			            department: department,
-			            salary: salary,
-			            position: position,
-			            holiday: holiday,
-			            night: night,
-			            yearend: yearend,
-			            fullservice: fullservice,
-			            performance: performance,
+			        	PAYDAY: daterange,
+			        	MEMBER_ID: member,
+			        	NAME: name,
+			        	DEPARTMENT: department,
+			        	GRADE_ID: grade,
+			        	SALARY: salary,
+			        	POSITION_BONUS: position,
+			        	HOLIDAY_BONUS: holiday,
+			        	NIGHT_BONUS: night,
+			        	YEAREND_BONUS: yearend,
+			        	FULLSERVICE_BONUS: fullservice,
+			        	PERFORMANCE_BONUS: performance,
 			        },
 			        success: function (response) {
 			            alert('급여 입력 성공!');
+			            window.location.href = '/salaryInput';
 			        },
 			        error: function (error) {
 			            alert('급여 입력 실패');
+// 			            window.location.href = '/salaryInput';
 			        }
 			    });
 			});

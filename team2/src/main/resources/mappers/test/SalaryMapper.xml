@@ -89,40 +89,40 @@
     </select>
     
     <!-- 사원별 급여 입력(관리자) -->
-	<insert id="insertSalary"> 
+	<insert id="insertSalary" parameterType="map"> 
 		INSERT ALL
-        INTO SALARY (
-			<if test="PAYDAY != null"> PAYDAY </if>
-		  , <if test="MEMBER_ID != null"> MEMBER_ID </if>
-		  , <if test="GRADE != null"> GRADE </if>
-		  , <if test="POSITION_BONUS != null"> POSITION_BONUS </if>
-		  , <if test="HOLIDAY_BONUS != null"> HOLIDAY_BONUS </if>
-		  , <if test="NIGHT_BONUS != null"> NIGHT_BONUS </if>
-		  , <if test="YEAREND_BONUS != null"> YEAREND_BONUS </if>
-		  , <if test="FULLSERVICE_BONUS != null"> FULLSERVICE_BONUS </if>
-		  , <if test="PERFORMANCE_BONUS != null"> PERFORMANCE_BONUS </if>
-		 	 )
-        VALUES (
-			<if test="PAYDAY != null"> #{PAYDAY} </if>
-		  , <if test="MEMBER_ID != null"> #{MEMBER_ID} </if>
-		  , <if test="GRADE != null"> #{GRADE} </if>
-		  , <if test="POSITION_BONUS != null"> #{POSITION_BONUS} </if>
-		  , <if test="HOLIDAY_BONUS != null"> #{HOLIDAY_BONUS} </if>
-		  , <if test="NIGHT_BONUS != null"> #{NIGHT_BONUS} </if>
-		  , <if test="YEAREND_BONUS != null"> #{YEAREND_BONUS} </if>
-		  , <if test="FULLSERVICE_BONUS != null"> #{FULLSERVICE_BONUS} </if>
-		  , <if test="PERFORMANCE_BONUS != null"> #{PERFORMANCE_BONUS} </if>
-			  )
-        INTO MEMBER (
-			<if test="NAME != null"> NAME </if>
-		  , <if test="DEPARTMENT != null"> DEPARTMENT </if>
-		  , <if test="SALARY != null"> SALARY </if>
-			  )
-        VALUES (
-			<if test="NAME != null"> #{NAME} </if>
-	  	  , <if test="DEPARTMENT != null"> #{DEPARTMENT} </if>
-		  , <if test="SALARY != null"> #{SALARY} </if>
-		  	 )
+	        INTO SALARY (
+				<if test="PAYDAY != null"> PAYDAY </if>
+			  , <if test="MEMBER_ID != null"> MEMBER_ID </if>
+			  , <if test="GRADE != null"> GRADE_ID </if>
+			  , <if test="POSITION_BONUS != null"> POSITION_BONUS </if>
+			  , <if test="HOLIDAY_BONUS != null"> HOLIDAY_BONUS </if>
+			  , <if test="NIGHT_BONUS != null"> NIGHT_BONUS </if>
+			  , <if test="YEAREND_BONUS != null"> YEAREND_BONUS </if>
+			  , <if test="FULLSERVICE_BONUS != null"> FULLSERVICE_BONUS </if>
+			  , <if test="PERFORMANCE_BONUS != null"> PERFORMANCE_BONUS </if>
+			 	 )
+	        VALUES (
+				<if test="PAYDAY != null"> #{daterange} </if>
+			  , <if test="MEMBER_ID != null"> #{member} </if>
+			  , <if test="GRADE != null"> #{grade} </if>
+			  , <if test="POSITION_BONUS != null"> #{position} </if>
+			  , <if test="HOLIDAY_BONUS != null"> #{holiday} </if>
+			  , <if test="NIGHT_BONUS != null"> #{night} </if>
+			  , <if test="YEAREND_BONUS != null"> #{yearend} </if>
+			  , <if test="FULLSERVICE_BONUS != null"> #{fullservice} </if>
+			  , <if test="PERFORMANCE_BONUS != null"> #{performance} </if>
+				  )
+	        INTO MEMBER (
+				<if test="NAME != null"> NAME </if>
+			  , <if test="DEPARTMENT != null"> DEPT_ID </if>
+			  , <if test="SALARY != null"> SALARY </if>
+				  )
+	        VALUES (
+				<if test="NAME != null"> #{name} </if>
+		  	  , <if test="DEPARTMENT != null"> #{department} </if>
+			  , <if test="SALARY != null"> #{salary_basic} </if>
+			  	 )
     	SELECT * FROM dual
  	</insert> 
  	
