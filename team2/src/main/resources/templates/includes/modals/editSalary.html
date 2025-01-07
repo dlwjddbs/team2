@@ -19,7 +19,7 @@
 			
 			<!-- form -->
 			<form th:action="@{/editSalary}" method="post" name="editSalaryForm" id="editSalaryForm">
-				<input type="hidden" id="memberId" name="memberId">
+				<!-- <input type="hidden" id="memberId" name="memberId"> -->
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
@@ -27,9 +27,12 @@
 							<div class="col-md-12">
 								<div class="form-group">
 					              <label>귀속 연월</label>
-									<div class="input-group date" id="reservationdate" data-target-input="nearest">
-									    <input type="text" class="form-control datetimepicker-input" id="daterange" name="PAYDAY" placeholder="년-월 선택" readonly />
-									</div>
+								  <div class="input-group date" id="reservationdate" data-target-input="nearest">
+								      <input type="text" class="form-control datetimepicker-input" id="payday" name="payday" data-target="#reservationdate"/>
+								      <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+								          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+								      </div>
+								  </div>
 					            </div>
 				            </div>
 						 </div>
@@ -37,13 +40,13 @@
 							<div class="col-md-5">
 								<div class="form-group">
 					              <label>사원 번호</label>
-				                    <input type="text" class="form-control" id="member" name="MEMBER_ID" data-target="#reservationdate"/>
+				                    <input type="text" class="form-control" id="memberId" name="memberId" readonly data-target="#reservationdate"/>
 					            </div>
 							</div>
 							<div class="col-md-7">
 								<div class="form-group">
 					              <label>사원명</label>
-				                    <input type="text" class="form-control" id="name" name="NAME" placeholder="사원명을 입력하세요.">
+				                    <input type="text" class="form-control" id="name" name="name" readonly placeholder="사원명을 입력하세요.">
 					            </div>
 				            </div>
 						 </div>
@@ -51,7 +54,7 @@
  							<div class="col-md-6"> 
 								<div class="form-group">
 									<label for="exampleInputEmail1">부서명</label>
-									<select class="form-control select" id="department" name="DEPT_ID">
+									<select class="form-control select" id="department" name="department">
 										<option selected="selected" disabled>부서선택</option>
 										<option value="HR">인사팀</option>												
 										<option value="AC">회계팀</option>												
@@ -68,7 +71,7 @@
  							<div class="col-md-6"> 
  								<div class="form-group"> 
 									<label for="exampleInputEmail1">직급</label>
-									<select class="form-control select" id="grade" name="GRADE_ID">
+									<select class="form-control select" id="gradeId" name="gradeId">
 										<option selected="selected" disabled>직급선택</option>												
 										<option value="AS">대리</option>												
 										<option value="MG">과장</option>												
@@ -89,25 +92,25 @@
 							<div class="col-md-4">
 				                <div class="form-group">
 				                  <label>급여 항목</label>
-				                 	<input type="text" readonly class="form-control" id="salary" placeholder="기본급" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="position" placeholder="직책 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="holiday" placeholder="연휴 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="night" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="yearend" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="fullservice" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="performance "placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연말 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
 							</div>
 							<div class="col-md-8">
 								<div class="form-group">
 								    <label>금액</label>
 								    <input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="position" name="positionBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="holiday" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="night" name="nightBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="yearend" name="yearendBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="fullservice" name="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
-						            <input type="text" id="performance"  name="performanceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
+						            <input type="text" id="positionBonus" name="positionBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="holidayBonus" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="nightBonus" name="nightBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="yearendBonus" name="yearendBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="fullserviceBonus" name="fullserviceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+						            <input type="text" id="performanceBonus"  name="performanceBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)">
 								</div>
 							</div>
 						</div>

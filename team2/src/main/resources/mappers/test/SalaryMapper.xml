@@ -185,7 +185,7 @@
 	   	   SET 
 	   	   	   SALARY = #{salary}
 		WHERE 
-			 MEMBER_ID = #{id}
+			 MEMBER_ID = #{memberId}
 	</update>
 	
 	<!-- 급여 수정 - 사원의 상여금(보너스) 수정 -->
@@ -201,7 +201,7 @@
 	       	 , PERFORMANCE_BONUS = #{performanceBonus}
 	       	 , UPDATE_DATE = SYSDATE
 		WHERE 
-			 MEMBER_ID = #{id}
+			 MEMBER_ID = #{memberId}
 	</update>
 
 </mapper>

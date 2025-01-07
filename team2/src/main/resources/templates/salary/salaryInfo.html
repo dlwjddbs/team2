@@ -207,14 +207,34 @@
 			    type : "POST",
 			    data : { id : id },
 			    success: function(salaryData) {
-			    	
 			  		console.log(id);
 			  		console.log(salaryData);
+					
+					// 필드 이름과 salaryData의 키를 매핑
+					//const fields = [
+					//    { field: '#memberId', key: 'MEMBER_ID' },
+					//    { field: '#gradeId', key: 'GRADE_ID' },
+					//    { field: '#payday', key: 'PAYDAY' },
+					//    { field: '#positionBonus', key: 'POSITION_BONUS' },
+					//    { field: '#nightBonus', key: 'NIGHT_BONUS' },
+					//    { field: '#performanceBonus', key: 'PERFORMANCE_BONUS' },
+					//    { field: '#fullserviceBonus', key: 'FULLSERVICE_BONUS' },
+					//    { field: '#holidayBonus', key: 'HOLIDAY_BONUS' },
+					//    { field: '#yearendBonus', key: 'YEAREND_BONUS' },
+					//    { field: '#total', key: 'TOTAL' },
+					//];
+
+					// 반복문으로 각 필드에 데이터 설정
+					//fields.forEach(item => {
+					//    $(item.field).val(salaryData[item.key]);
+					//});
 			  		
 			        // 받은 데이터를 각 입력 필드에 설정
 					$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
+					$('#name').val(salaryData.NAME);							// 이름
 					$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
 					$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
+					$('#salary').val(salaryData.SALARY);						// 기본급
 					$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
 					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
 					$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
@@ -222,10 +242,6 @@
 					$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
 					$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
 					$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
-			  		
-			  		// 서버에서 받아온 HTML을 Modal 본문에 삽입
-			    	//$('#modalBody').html(response); 
-			  		//console.log("response 가져옴");
 			  		
 			        // Modal을 띄우기
 			        $('#modal-lg').modal('show');
@@ -343,7 +359,6 @@
             return true; // 숫자인 경우 true 반환
         }
 
-		
 		$(document).ready(function() {
 		    // 금액 입력 필드에만 이벤트를 설정
 		    $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
@@ -351,7 +366,9 @@
 		        
 		        // 숫자 형식으로 변환
 		        if (value && !isNaN(value)) {
-		            value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+					// db에 쉼표도 들어가는 문제 발생 (10,000 이런식으로 db에 그대로 들어감) (ORA-01722: 수치가 부적합합니다)
+					// 임시 비활성화
+		            //value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
 		        } else if (value) {
 		            alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
 		            $(this).val(''); // 입력 필드 초기화
