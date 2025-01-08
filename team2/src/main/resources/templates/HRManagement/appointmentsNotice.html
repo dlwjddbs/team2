@@ -216,7 +216,6 @@
         // 날짜 범위 선택기 설정 및 테이블 초기 로드
         initializeDateRangePicker();
         loadDataTable();
-        loadOrgTree();
 
         $("#btnSearch").on("click", function () {
             const appointGubun = $(".appointGubun").val();
@@ -346,7 +345,7 @@
 
                             return `
                                 <div class="d-flex">
-                                    ${oldGrade} <span class="mx-2 mt-1"> → </span>
+                                    ${oldGrade} <span class="mx-2"> → </span>
                                     ${newGrade}
                                 </div>
                             `;

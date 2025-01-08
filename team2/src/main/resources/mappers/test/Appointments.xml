@@ -4,87 +4,159 @@
 
 <mapper namespace="com.itwillbs.repository.AppointmentsMapper">
 
-    <select id="getAppointList" parameterType="map" resultType="map">
+	<select id="getAppointList" parameterType="map" resultType="map">
 		SELECT
-		mh.ASSIGNMENT_TYPE AS ASSIGNMENT_TYPE,
-		TO_CHAR(mh.CHANGE_DATE, 'YYYY-MM-DD') AS CHANGE_DATE,
+		mh.HISTORY_ID AS HISTORY_ID,
+		mh.ASSIGNMENT_TYPE AS
+		ASSIGNMENT_TYPE,
+		TO_CHAR(mh.CHANGE_DATE,
+		'YYYY-MM-DD') AS CHANGE_DATE,
 		mh.MEMBER_ID AS MEMBER_ID,
 		m.NAME AS NAME,
 		mh.OLD_GRADE AS OLD_GRADE,
 		mh.NEW_GRADE AS NEW_GRADE,
-		mh.OLD_DEPT AS OLD_DEPT,
-		mh.NEW_DEPT AS NEW_DEPT,
+		mh.OLD_DEPT AS
+		OLD_DEPT,
+		mh.NEW_DEPT AS
+		NEW_DEPT,
 		mh.ETC AS ETC
 		FROM MEMBER_HISTORY mh
 		LEFT JOIN MEMBER m
-		ON mh.member_id = m.member_id
+		ON
+		mh.member_id = m.member_id
 		WHERE 1=1
-	<if test="startDate != null and startDate != ''">
-		AND mh.change_date <![CDATA[>=]]>
-		#{startDate}
-	</if>
-	<if test="endDate != null and endDate != ''">
-		AND mh.change_date <![CDATA[<=]]>
-		#{endDate}
-	</if>
-	<if test="appointGubun != null and appointGubun != ''">
-		AND mh.assignment_type = #{appointGubun}
-	</if>
-    </select>
-
-    <select id="getMinMaxDate" resultType="map">
-        SELECT 
-            TO_CHAR(NVL(MIN(CHANGE_DATE), TO_DATE('2024-01-01', 'YYYY-MM-DD')), 'YYYY-MM-DD') AS minDate,
-            TO_CHAR(NVL(MAX(CHANGE_DATE), SYSDATE), 'YYYY-MM-DD') AS maxDate
-        FROM MEMBER_HISTORY
-    </select>
-    
- 	<!-- 모든 부서 조회 -->
-    <select id="getAllDepartments" resultType="map">
-        SELECT 
-            CODE_ID AS codeId,
-            CODE_NAME AS codeName
-        FROM 
-            COMMON_CODE
-        WHERE 
-            GROUP_ID = 'DEP'
-            AND USE_YN = 'Y'
-        ORDER BY codeName ASC
-    </select>
-    
-    <!-- 모든 직급 조회 -->
-    <select id="getAllRanks" resultType="map">
-    	SELECT
-    		CODE_ID AS codeId,
-    		CODE_NAME AS codeName
-   		FROM
-   			COMMON_CODE
-		WHERE
-			GROUP_ID = 'RANK'
-			AND USE_YN = 'Y'	
-		ORDER BY codeName ASC     		
-    </select>
-    
-   <select id="getOrgTree" resultType="map">
-	    SELECT 
-	        d.CODE_ID AS deptId,
-	        d.CODE_NAME AS deptName,
-	        e.MEMBER_ID AS memberId,
-	        e.NAME AS memberName,
-	        g.CODE_NAME AS gradeName
-	    FROM 
-	        COMMON_CODE d
-	    LEFT JOIN 
-	        MEMBER e ON (d.CODE_ID = e.DEPT_ID)
-	    LEFT JOIN 
-	        COMMON_CODE g ON (e.GRADE_ID = g.CODE_ID AND g.GROUP_ID = 'RANK')
-	    WHERE 
-	        d.GROUP_ID = 'DEP'
-	      AND d.USE_YN = 'Y'
-	      AND (e.USE_YN = 'Y' OR e.USE_YN IS NULL)
-	    ORDER BY 
-	        d.CODE_ID, g.CODE_NAME, e.NAME
+		<if test="startDate != null and startDate != ''">
+			AND mh.change_date <![CDATA[>=]]>
+			#{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND mh.change_date <![CDATA[<=]]>
+			#{endDate}
+		</if>
+		<if test="appointGubun != null and appointGubun != ''">
+			AND mh.assignment_type = #{appointGubun}
+		</if>
+		ORDER BY HISTORY_ID ASC
 	</select>
 
-    
+	<select id="getMinMaxDate" resultType="map">
+		SELECT
+		TO_CHAR(NVL(MIN(CHANGE_DATE), TO_DATE('2024-01-01', 'YYYY-MM-DD')),
+		'YYYY-MM-DD') AS minDate,
+		TO_CHAR(NVL(MAX(CHANGE_DATE), SYSDATE),
+		'YYYY-MM-DD') AS maxDate
+		FROM MEMBER_HISTORY
+	</select>
+
+	<!-- 모든 부서 조회 -->
+	<select id="getAllDepartments" resultType="map">
+		SELECT
+		CODE_ID AS
+		codeId,
+		CODE_NAME AS codeName
+		FROM
+		COMMON_CODE
+		WHERE
+		GROUP_ID = 'DEP'
+		AND
+		USE_YN = 'Y'
+		ORDER BY codeName ASC
+	</select>
+
+	<!-- 모든 직급 조회 -->
+	<select id="getAllRanks" resultType="map">
+		SELECT
+		CODE_ID AS codeId,
+		CODE_NAME AS codeName
+		FROM
+		COMMON_CODE
+		WHERE
+		GROUP_ID = 'RANK'
+		AND USE_YN =
+		'Y'
+		ORDER BY codeName ASC
+	</select>
+
+	<select id="getOrgTree" resultType="map">
+		SELECT
+		d.CODE_ID AS deptId,
+		d.CODE_NAME AS deptName,
+		e.MEMBER_ID AS memberId,
+		e.NAME AS memberName,
+		g.CODE_NAME AS gradeName
+		FROM
+		COMMON_CODE d
+		LEFT JOIN
+		MEMBER e ON
+		(d.CODE_ID = e.DEPT_ID)
+		LEFT JOIN
+		COMMON_CODE g ON (e.GRADE_ID =
+		g.CODE_ID AND g.GROUP_ID = 'RANK')
+		WHERE
+		d.GROUP_ID = 'DEP'
+		AND d.USE_YN
+		= 'Y'
+		AND (e.USE_YN = 'Y' OR e.USE_YN IS NULL)
+		ORDER BY
+		d.CODE_ID,
+		g.CODE_NAME, e.NAME
+	</select>
+
+	<!-- MEMBER_HISTORY에 변경 이력 삽입 -->
+	<insert id="insertMemberHistory">
+		INSERT INTO MEMBER_HISTORY (
+		MEMBER_ID,
+		ASSIGNMENT_TYPE, OLD_DEPT, NEW_DEPT, OLD_GRADE, NEW_GRADE,
+		CHANGE_DATE, ETC
+		) VALUES (
+		#{MEMBER_ID}, #{ASSIGNMENT_TYPE},
+		#{OLD_DEPT}, #{NEW_DEPT}, #{OLD_GRADE},
+		#{NEW_GRADE}, #{CHANGE_DATE},
+		#{ETC}
+		)
+	</insert>
+
+	<!-- MEMBER 퇴사 처리 -->
+	<update id="updateMemberForResign">
+		UPDATE MEMBER
+		<!-- SET USE_YN = 'N', -->
+		RESIGN_DATE = #{CHANGE_DATE}
+		WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
+
+	<!-- 일반 발령 처리 -->
+	<update id="updateMember">
+		UPDATE MEMBER
+		SET DEPT_ID = #{NEW_DEPT},
+		GRADE_ID =
+		#{NEW_GRADE},
+		UPDATE_DATE = CURRENT_TIMESTAMP
+		WHERE MEMBER_ID =
+		#{MEMBER_ID}
+	</update>
+
+	<update id="updateChangedColumns">
+		UPDATE MEMBER_HISTORY
+		<set>
+			<!-- 조건에 따라 컬럼 업데이트 -->
+			<if test="ASSIGNMENT_TYPE != null">
+				ASSIGNMENT_TYPE = #{ASSIGNMENT_TYPE},
+			</if>
+			<if test="CHANGE_DATE != null">
+				CHANGE_DATE = #{CHANGE_DATE},
+			</if>
+			<if test="NEW_DEPT != null">
+				NEW_DEPT = #{NEW_DEPT},
+			</if>
+			<if test="NEW_GRADE != null">
+				NEW_GRADE = #{NEW_GRADE},
+			</if>
+			<if test="ETC != null">
+				ETC = #{ETC},
+			</if>
+		</set>
+		WHERE HISTORY_ID = #{HISTORY_ID}
+	</update>
+
+
 </mapper>

@@ -60,10 +60,10 @@
 			<section class="content-header">
 				<div class="container-fluid">
 
+
 					<!-- 추가버튼 모달 -->
-					<div class="modal fade" id="addModal" tabindex="2"
-						role="dialog" aria-labelledby="confirmModalLabel"
-						aria-hidden="true">
+					<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+						aria-labelledby="confirmModalLabel" aria-hidden="true">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content" style="min-width: 800px;">
 								<div class="modal-header">
@@ -78,21 +78,21 @@
 									<label class="col-form-label mt-3">발령대상자 선택</label>
 
 									<div class="row">
-										<div class="col-6">
+										<div class="col-4">
 											<div class="bg-white border rounded"
 												style="height: 300px; overflow-y: scroll;">
 												<ul id="orgTree"
 													class="nav nav-pills nav-sidebar flex-column nav-child-indent"
-													 data-widget="treeview" role="menu"></ul>
+													data-widget="treeview" role="menu"></ul>
 											</div>
 										</div>
-										<div class="col-6">
-											<div class="bg-white border rounded"
+										<div class="col-8">
+											<div class="bg-white border rounded p-2"
 												style="height: 300px; overflow-y: scroll;">
 
-												<ul id="checkedEmployees">
+												<div id="checkedEmployees">
 													<!-- 체크된 직원 목록 -->
-												</ul>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -101,21 +101,19 @@
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary"
 										data-dismiss="modal">취소</button>
-									<button type="button" class="btn btn-primary"
-										id="confirmSaveBtn" data-target="">확인</button>
+									<button type="button" class="btn btn-primary" id="confirmOkBtn">확인</button>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<!-- 발령대상자 선택 버튼 모달 -->
-					<div class="modal fade" id="modifyModal2" tabindex="2"
-						role="dialog" aria-labelledby="confirmModalLabel"
-						aria-hidden="true">
+					<div class="modal fade" id="addModal2" tabindex="-1" role="dialog"
+						aria-labelledby="confirmModalLabel" aria-hidden="true">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content" style="min-width: 700px;">
 								<div class="modal-header">
-									<h5 class="modal-title" id="confirmModalLabel">인사발령</h5>
+									<h5 class="modal-title font-weight-bold" id="confirmModalLabel">인사발령</h5>
 									<button type="button" class="close" data-dismiss="modal"
 										aria-label="Close">
 										<span aria-hidden="true">&times;</span>
@@ -127,16 +125,17 @@
 											<!-- 클릭한 직원명, 부서, 직급 정보 -->
 											<div id="clickedEmployeeInfo">
 												<div class="p-2">
-													<p>
-														<strong class="mr-2">이름:</strong> <span id="employeeName"></span>
+													<p class="custom-label" style="display: none">
+														<strong class="mr-2">아이디:</strong><span id="memberId"></span>
 													</p>
-													<p>
-														<strong class="mr-2">현재 부서:</strong> <span
-															id="employeeDept"></span>
+													<p class="custom-label">
+														<strong class="mr-2">이름:</strong><span id="memberName"></span>
 													</p>
-													<p>
-														<strong class="mr-2">현재 직급:</strong> <span
-															id="employeeGrade"></span>
+													<p class="custom-label">
+														<strong class="mr-2">현재 부서:</strong><span id="oldDept"></span>
+													</p>
+													<p class="custom-label">
+														<strong class="mr-2">현재 직급:</strong><span id="oldGrade"></span>
 													</p>
 												</div>
 											</div>
@@ -146,7 +145,8 @@
 											<div class="row">
 												<div class="col-sm">
 													<label class="col-form-label">발령구분 :</label> <select
-														class="appointGubun" name="appointGubun1">
+														id="appointGubun" class="appointGubun"
+														name="appointGubun1">
 														<option selected="selected" disabled>발령구분</option>
 														<option>입사</option>
 														<option>퇴사</option>
@@ -178,7 +178,7 @@
 													<label class="col-form-label mr-3">발령부서 :</label> <select
 														class="appointGubun" id="deptSelectBox" name="deptGubun"
 														style="min-width: 120px">
-														<option selected="selected" disabled >부서를 선택하세요</option>
+														<option selected="selected" disabled>부서를 선택하세요</option>
 													</select>
 												</div>
 												<div class="col-sm">
@@ -200,8 +200,31 @@
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary"
 										data-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-primary" id="confirmBtn">확인</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 확인 모달 -->
+					<div class="modal fade" id="confirmModal" tabindex="-1"
+						role="dialog" aria-labelledby="confirmModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="confirmModalLabel">인사발령 확인</h5>
+									<button type="button" class="close" data-dismiss="modal"
+										aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">변경된 정보로 등록 하시겠습니까?</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary"
+										data-dismiss="modal">취소</button>
 									<button type="button" class="btn btn-primary"
-										id="confirmSaveBtn">확인</button>
+										id="confirmSaveBtn" data-target="">확인</button>
 								</div>
 							</div>
 						</div>
@@ -266,9 +289,9 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-body">
-										<p class="font-weight-bold">인사발령 관리</p>
-										
-											
+									<p class="font-weight-bold">인사발령 관리</p>
+
+
 									<table id="appointments"
 										class="table table-bordered table-striped">
 										<tbody>
@@ -353,6 +376,9 @@
 
 
 	<script th:inline="javascript">
+    let deptMapping = {};
+    let gradeMapping = {};
+    
     $(document).ready(function () {
         // Select2 초기화
         $('.appointGubun').select2();
@@ -360,7 +386,9 @@
         // Datepicker 초기화
         $('#reservationdate').datetimepicker({
             format: 'YYYY-MM-DD',
-            locale: 'ko'
+            locale: 'ko',
+            defaultDate: moment(),
+            minDate: moment()
         });
 
         // 날짜 범위 선택기 설정 및 테이블 초기 로드
@@ -437,6 +465,7 @@
 
     	            data.forEach(function(dept) {
     	                selectBox.append(`<option value="${dept.CODEID}">${dept.CODENAME}</option>`);
+    	                deptMapping[dept.CODENAME] = dept.CODEID; 
     	            });
     	            
                 	 deptOptions = Array.isArray(data) ? data : [];
@@ -457,6 +486,7 @@
      	
      	            data.forEach(function(rank) {
      	            	rankSelect.append(`<option value="${rank.CODEID}">${rank.CODENAME}</option>`);
+     	            	gradeMapping[rank.CODENAME] = rank.CODEID; 
      	            });
      	            
                 	 rankOptions = Array.isArray(data) ? data : [];
@@ -467,7 +497,7 @@
             })
         ).then(() => {
             $("#appointments").DataTable({
-            
+            	destroy: true,
                 aaSorting: [],
                 dom: "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
@@ -485,7 +515,10 @@
                     url: "/getAppointList",
                     type: "POST",
                     data: { appointGubun, startDate, endDate },
-                    dataSrc: (res) => res
+                    dataSrc: (res) => {
+                        console.log(res); 
+                        return res;
+                    }
                 },
                 columns: [
                     {
@@ -499,13 +532,13 @@
                         data: "MEMBER_ID",
                         title: "사원번호",
                         defaultContent: "",
-                        render: (data) => `<input type="text" class="form-control-custom2" value="${data || ''}" readonly />`
+                        render: (data) => `<input type="text" class="form-control-custom2 memberId" value="${data || ''}" readonly />`
                     },
                     {
                         data: "NAME",
                         title: "성명",
                         defaultContent: "",
-                        render: (data) => `<input type="text" class="form-control-custom2" value="${data || ''}" readonly />`
+                        render: (data) => `<input type="text" class="form-control-custom2 memberName" value="${data || ''}" readonly />`
                     },
                     {
                         data: "ASSIGNMENT_TYPE",
@@ -523,7 +556,7 @@
                         data: "CHANGE_DATE",
                         title: "발령일자",
                         defaultContent: "",
-                        render: (data) => `<input type="date" class="form-control-custom editable-field" value="${data || ''}" />`
+                        render: (data) => `<input type="date" class="form-control-custom editable-field changeDate" value="${data || ''}" />`
                     },                   
                     {
                         data: null,
@@ -599,8 +632,15 @@
                         data: "ETC",
                         title: "비고",
                         defaultContent: "",
-                        render: (data) => `<input type="text" class="form-control-custom editable-field" value="${data || ''}" />`
-                    }
+                        render: (data) => `<input type="text" class="form-control-custom editable-field etc" value="${data || ''}" />`
+                    },
+                    {
+                        data: "HISTORY_ID", 
+                        defaultContent: "",
+                        visible: false,    
+                        searchable: false, 
+                        render: (data) => `<input type="text" class="form-control-custom editable-field historyId" value="${data || ''}" />`
+                    },
                 ],
                 columnDefs: [
                     { width: "40px", className: "text-center", targets: [0, 1] },
@@ -626,10 +666,7 @@
         const checkbox = $row.find('.row-checkbox');
         checkbox.prop('checked', true);
     });
-    
-    
-
-
+        
     // 조직도 데이터 로드
     function loadOrgTree() {
         $.ajax({
@@ -694,28 +731,244 @@
             `;
             treeContainer.append(deptHtml);
         });
+        
+        $("#confirmBtn").on("click", function () {
+            const selectedData = {
+                MEMBER_ID: $("#memberId").text().trim(),
+                MEMBER_NAME: $("#memberName").text().trim(),
+                OLD_DEPT: deptMapping[$("#oldDept").text().trim()],
+                OLD_DEPT_NAME: $("#oldDept").text().trim(),
+                OLD_GRADE: gradeMapping[$("#oldGrade").text().trim()],
+                OLD_GRADE_NAME: $("#oldGrade").text().trim(),
+                ASSIGNMENT_TYPE: $("#appointGubun").val(),
+                CHANGE_DATE: $("#reservationdate input").val(),
+                NEW_DEPT_NAME: $("#deptSelectBox option:selected").text(),
+                NEW_DEPT: deptMapping[$("#deptSelectBox option:selected").text()],
+                NEW_GRADE_NAME: $("#rankSelectBox option:selected").text(),
+                NEW_GRADE: gradeMapping[$("#rankSelectBox option:selected").text()],
+                ETC: $("input[name='etc']").val()
+            };
 
-        $(".nav-link").on("click", function (e) {
+            if (selectedData.ASSIGNMENT_TYPE === '퇴사') {
+                if (!selectedData.CHANGE_DATE) {
+                    alert("퇴사일자를 입력해주세요.");
+                    return;
+                }
+            } else {
+                if (!selectedData.ASSIGNMENT_TYPE) {
+                    alert("발령 구분을 선택해주세요.");
+                    return;
+                }
+                if (!selectedData.CHANGE_DATE) {
+                    alert("발령일자를 입력해주세요.");
+                    return;
+                }
+                
+                if (!selectedData.NEW_DEPT) {
+                    alert("발령 부서를 선택해주세요.");
+                    return;
+                }
+                if (!selectedData.NEW_GRADE) {
+                    alert("발령 직급을 선택해주세요.");
+                    return;
+                }
+            }
+
+
+            $("#addModal2").data("selectedData", selectedData);
+
+            $("#addModal2").modal("hide");
+        });
+        
+        
+        
+        $("#addModal2").on("hidden.bs.modal", function () {        	
+        	
+            const selectedData = $(this).data("selectedData");
+
+            if (selectedData) {
+                const employeeItem = `
+                       <div class="d-flex align-items-start newPosition" data-appoint-id="${selectedData.employeeName}-${selectedData.appointDate}">     
+		              	  <div>
+			              	  <div class="d-flex">
+		                         <p class="text-red memberId" style="display:none;">${selectedData.MEMBER_ID}</p>
+
+		                         <p class="text-red assignmentType">[${selectedData.ASSIGNMENT_TYPE}]</p>
+		
+		                         <p class="mx-1 oldDept">${selectedData.OLD_DEPT_NAME}</p>
+		                           
+		                         <p class="oldGrade">${selectedData.OLD_GRADE_NAME}</p>
+		                          
+		                         <p class="memberName font-weight-bold ml-1">${selectedData.MEMBER_NAME}</p>  
+		
+		                         <p class="mx-1"> → </p>                           
+		                           
+		                         <p class="newDept">${selectedData.NEW_DEPT_NAME}</p>
+		                          
+		                         <p class="mx-1 newGrade">${selectedData.NEW_GRADE_NAME}</p>
+		
+		                         <p>(<span class="changeDate">${selectedData.CHANGE_DATE}</span>)</p>
+	                      	  </div>
+                         	  <p class="text-gray ml-1 etc">${selectedData.ETC}</p>
+                      	  </div>
+                         <button id="memberDelete" class="btn btn-outlined-primary btn-sm p-0 ml-3"><div class="mdi-close-circle-outline mdi"></div></button>
+                       </div>
+                `;
+                $("#checkedEmployees").append(employeeItem);
+                
+                $(this).attr("aria-hidden", "true"); // aria-hidden 추가
+                $(this).find("input, select, button").attr("tabindex", "-1");
+
+                // 데이터 초기화
+                $(this).removeData("selectedData");
+            }
+            
+         // 발령 구분 초기화
+            $("#appointGubun").val("발령구분").trigger("change");
+            $("#reservationdate input").val(moment().format("YYYY-MM-DD")); // 오늘 날짜로 설정
+            $("#deptSelectBox").val("부서를 선택하세요").trigger("change");
+            $("#rankSelectBox").val("직급을 선택하세요").trigger("change");
+            $("input[name='etc']").val("");
+        });
+        
+        
+     // 삭제 버튼 이벤트 처리
+        $("#checkedEmployees").on("click", "#memberDelete", function () {
+            $(this).closest(".newPosition").remove(); // 해당 직원 정보 삭제
+        });
+
+
+        $(".orgNav").on("click", function (e) {
             e.preventDefault();
-            $(".nav-link").removeClass("activeToggle");
+            $(".orgNav").removeClass("activeToggle");
             $(this).addClass("activeToggle");
         });
 
 
- /*        $("#addModal.nav-treeview.nav-link").on("click", function (e) {
+         $("#addModal .nav-treeview .nav-link").on("click", function (e) {
             e.preventDefault();
             const memberId = $(this).data("member-id");
             const memberName = $(this).data("member-name");
             const gradeName = $(this).data("grade-name");
             const deptName = $(this).data("dept-name");
 
-            $("#employeeName").text(memberName);
-            $("#employeeDept").text(deptName);
-            $("#employeeGrade").text(gradeName);
-            $("#modifyModal2").modal("show");
-        }); */
+            $("#memberId").text(memberId);
+            $("#memberName").text(memberName);
+            $("#oldDept").text(deptName);
+            $("#oldGrade").text(gradeName);
+            $("#addModal2").modal("show");
+            $("#addModal2").attr("aria-hidden", "false"); // aria-hidden 제거
+            $("#addModal2").find("input, select, button").attr("tabindex", "0");
+        }); 
     }
+    
+    // 재확인 팝업
+    $('#confirmOkBtn').on('click', function () {
+        $("#confirmModal").modal("show");
+    });
 
+    
+    $("#confirmSaveBtn").on("click", function () {
+        const checkedEmployees = [];
+        $("#checkedEmployees .newPosition").each(function () {
+            const employeeData = {
+                ASSIGNMENT_TYPE: $(this).find(".assignmentType").text().replace(/\[|\]/g, ""),
+                MEMBER_ID: $(this).find(".memberId").text().trim(),      
+                MEMBER_NAME: $(this).find(".memberName").text().trim(),  
+                OLD_DEPT: deptMapping[$(this).find(".oldDept").text().trim()], 
+                OLD_GRADE: gradeMapping[$(this).find(".oldGrade").text().trim()], 
+                NEW_DEPT: deptMapping[$(this).find(".newDept").text().trim()], 
+                NEW_GRADE: gradeMapping[$(this).find(".newGrade").text().trim()], 
+                CHANGE_DATE: $(this).find(".changeDate").text().trim(), 
+                ETC: $(this).find(".etc").text().trim()                  
+            };
+            checkedEmployees.push(employeeData);
+        });
+
+        if (checkedEmployees.length === 0) {
+            alert("저장할 데이터가 없습니다.");
+            return;
+        }
+        
+        console.log("checkedEmployees", checkedEmployees)
+
+         $.ajax({
+            url: "/updateAppointments", // 백엔드 API 엔드포인트
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(checkedEmployees),
+            success: function (response) {
+                alert("발령 정보가 성공적으로 저장되었습니다.");
+                $("#confirmModal").modal("hide");
+                $("#addModal").modal("hide");
+                loadDataTable();
+            },
+            error: function (error) {
+                console.error("발령 정보 저장 중 오류 발생:", error);
+                alert("발령 정보 저장에 실패했습니다.");
+                $("#confirmModal").modal("hide");
+                $("#addModal").modal("hide");
+            }
+        });       
+    });
+    
+    // btnSave 클릭 이벤트
+	$("#btnSave").on("click", function () {
+	    const updatedRows = []; // 변경된 행 데이터를 저장
+	
+	    // 체크된 행만 처리
+	    $("#appointments tbody .row-checkbox:checked").each(function () {
+	        const $row = $(this).closest("tr");
+	        const rowData = $("#appointments").DataTable().row($row).data(); // DataTable에서 행 데이터 가져오기
+	
+	        // 변경된 데이터만 수집
+	        const updatedData = {
+	            HISTORY_ID: rowData.HISTORY_ID, // 숨겨진 데이터도 포함
+	            MEMBER_ID: rowData.MEMBER_ID,
+	            ASSIGNMENT_TYPE: $row.find(".appointGubun option:selected").val(),
+	            OLD_DEPT: $row.find(".current-dept").val(),
+	            NEW_DEPT: $row.find(".new-dept option:selected").val(),
+	            OLD_GRADE: $row.find(".current-grade").val(),
+	            NEW_GRADE: $row.find(".new-grade option:selected").val(),
+	            CHANGE_DATE: $row.find(".changeDate").val(),
+	            ETC: $row.find(".etc").val()
+	        };
+	
+	        const changes = {};
+	        for (const key in updatedData) {
+	            if (updatedData[key] !== rowData[key]) {
+	                changes[key] = updatedData[key];
+	            }
+	        }
+	
+	        // 변경된 데이터가 있는 경우 HISTORY_ID 추가
+	        if (Object.keys(changes).length > 0) {
+	            changes.HISTORY_ID = rowData.HISTORY_ID; // 기본 키
+	            updatedRows.push(changes);
+	        }
+	    });
+	
+	    if (updatedRows.length === 0) {
+	        alert("변경된 데이터가 없습니다.");
+	        return;
+	    }
+	
+	    // 서버로 데이터 전송
+	    $.ajax({
+	        url: "/updateChangedColumns",
+	        type: "POST",
+	        contentType: "application/json",
+	        data: JSON.stringify(updatedRows),
+	        success: function () {
+	            alert("변경 사항이 저장되었습니다.");
+	            $("#appointments").DataTable().ajax.reload(); // 테이블 갱신
+	        },
+	        error: function (error) {
+	            console.error("저장 중 오류 발생:", error);
+	            alert("저장 중 오류가 발생했습니다.");
+	        }
+	    });
+	});
 	</script>
 	<style>
 .form-control-custom {
@@ -736,7 +989,7 @@
 	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.form-control-custom2{
+.form-control-custom2 {
 	display: block;
 	width: 100%;
 	height: 2rem;
@@ -750,10 +1003,10 @@
 	background-clip: padding-box;
 	border: none;
 	box-shadow: inset 0 0 0 transparent;
-    -o-appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+	-o-appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
 }
 
 .form-control-custom:focus {
@@ -766,6 +1019,24 @@
 
 .activeToggle {
 	background: #e8eff9;
+}
+
+.custom-label {
+	font-size: 0.95rem;
+}
+
+.newPosition {
+	font-size: 0.82rem;
+}
+
+.newPosition p {
+	margin-bottom: 4px;
+}
+
+.modal-dialog {
+	position: relateive;
+	top: 50%;
+	transform: translateY(-60%) !important;
 }
 </style>
 </body>

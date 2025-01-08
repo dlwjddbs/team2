@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import com.itwillbs.repository.AppointmentsMapper;
 
@@ -39,4 +38,45 @@ public class AppointmentsService {
     public List<Map<String, Object>> getOrgTree() {
         return appointMapper.getOrgTree(); 
     }
+    
+    public void updateAppointments(List<Map<String, Object>> employeeData) {
+        for (Map<String, Object> employee : employeeData) {
+        	
+        	System.out.println("OLD_DEPT: " + employee.get("OLD_DEPT"));
+        	
+            String assignmentType = (String) employee.get("ASSIGNMENT_TYPE");
+
+            // OLD_DEPT 처리 (입사 시)
+            if ("입사".equals(assignmentType) && employee.get("OLD_DEPT") == null) {
+                employee.put("OLD_DEPT", "");
+            }
+            if ("입사".equals(assignmentType) && employee.get("OLD_GRADE") == null) {
+                employee.put("OLD_GRADE", ""); // 빈 문자열로 대체
+            }
+
+            // MEMBER_HISTORY 삽입
+            appointMapper.insertMemberHistory(employee);
+
+            if ("퇴사".equals(assignmentType)) {
+                // 퇴사 처리
+                appointMapper.updateMemberForResign(
+                    (String) employee.get("MEMBER_ID"),
+                    (String) employee.get("CHANGE_DATE")
+                );
+            } else {
+                // 일반 발령 처리
+                appointMapper.updateMember(employee);
+            }
+        }
+    }
+    
+    public void updateChangedAppointments(List<Map<String, Object>> employeeData) {
+        for (Map<String, Object> employee : employeeData) {
+            System.out.println("HISTORY_ID: " + employee.get("HISTORY_ID"));
+
+            appointMapper.updateChangedColumns(employee);
+        }
+    }
+
+
 }
