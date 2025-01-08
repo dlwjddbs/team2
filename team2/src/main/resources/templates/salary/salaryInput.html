@@ -222,6 +222,7 @@
 			  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
 						$('#name').val(salaryData.NAME);							// 이름
 			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
+			  			$('#deptId').val(salaryData.DEPT_ID);						// 직급 ID
 			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
 						$('#salary').val(salaryData.SALARY);						// 기본급
 			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
@@ -379,7 +380,8 @@
 					});
 					
 			// 급여 등록 버튼을 클릭시 이벤트 발생
-			$('#submitBtn').click(function () {
+			$('#submitBtn2').click(function () {
+				
 			    // 입력 필드 값 가져오기
 /* 			    var daterange = $('#daterange').val();
 			    var member = $('#member').val(); // 사원 번호
@@ -454,7 +456,7 @@
 			        error: function (error) {
 			        	console.log(error);
 			            alert('급여 수정 실패');
-			            //window.location.href = '/salaryInputsr';
+			            //window.location.href = '/salaryInput';
 			        }
 			    });
 			});			
