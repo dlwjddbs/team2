@@ -52,9 +52,10 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				
+			
 				<nav th:replace="~{includes/modals/editSalary :: editSalary}"></nav>
 				
+				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
 						<div class="d-flex ml-4">
@@ -73,7 +74,7 @@
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
 				<div class="col-2">
-					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg">
+					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1">
 						급여 정보 입력
 					</button>
 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
@@ -139,6 +140,7 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- date-picker -->
 	<script src="../../plugins/datepicker/datepicker.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
@@ -169,7 +171,7 @@
 		                return abc;
 		            }
 				},
-				columns: [
+				columns : [
 					// DB컬럼명 일치하게 작성
 					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
@@ -198,47 +200,46 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
 			  
-		  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
-		  $('#example1').on('click', 'a.edit-link', function(event) {
-		  	event.preventDefault(); // 기본 링크 동작 방지
-		  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
-		  	console.log("클릭된 사원 번호:", id);
-		  	loadModalContent(id); // 모달 콘텐츠 로드 함수 호출
-		  });
-		  
+			  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
+			  $('#example1').on('click', 'a.edit-link', function(event) {
+			  	event.preventDefault(); // 기본 링크 동작 방지
+			  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
+			  	console.log("클릭된 사원 번호:", id);
+			  	loadModalContent(id); // 모달 콘텐츠 로드 함수 호출
+			  });
+			  
 		  function loadModalContent(id) {
-		  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
-		  	$.ajax({
-		  		url: "/getModalContent",  
-		  		type: "POST",
-		  		data: { id: id },
-		  		success: function(salaryData) {
-		  			console.log("사원 번호:", id);
-		  			console.log("서버 데이터:", salaryData);
-		  			
-		  			// 받은 데이터를 각 입력 필드에 설정
-		  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
-		  			$('#name').val(salaryData.NAME);							// 이름
-		  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
-		  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
-		  			$('#salary').val(salaryData.SALARY);						// 기본급
-		  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
-		  			$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-		  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
-		  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
-		  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
-		  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
-		  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
-		  			
-		  			// 모달 표시
-		  			$('#modal-lg').modal('show');
-		  		},
-		  		error: function() {
-		  			alert("Modal 콘텐츠를 불러오는 데 실패했습니다.");
-		  		}
-		  	});
-		  }
-		  
+			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
+			  	$.ajax({
+			  		url: "/getModalContent",  
+			  		type: "POST",
+			  		data: { id: id },
+			  		success: function(salaryData) {
+			  			console.log("사원 번호:", id);
+			  			console.log("서버 데이터:", salaryData);
+			  			
+			  			// 받은 데이터를 각 입력 필드에 설정
+			  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
+						$('#name').val(salaryData.NAME);							// 이름
+			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
+			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
+						$('#salary').val(salaryData.SALARY);						// 기본급
+			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
+	  					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
+			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
+			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
+			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
+			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
+			  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
+			  			
+			  			// 모달 표시
+			  			$('#modal-lg').modal('show');
+			  		},
+			  		error: function() {
+			  			alert("Modal 콘텐츠를 불러오는 데 실패했습니다.");
+			  		}
+			  	});
+			  }
 			
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 			let date = /*[[${salaryInputMinMaxDate}]]*/
@@ -294,7 +295,6 @@
 					},
 					columns : [
 						// DB컬럼명 일치하게 작성
-						// 날짜 필터로 조회했을 때 나오는 목록
 						{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
 							render: function(data, type, row) {
@@ -325,16 +325,23 @@
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			});
 			
+	        
 	        $(document).ready(function () {
+	            // 현재 날짜 계산
+	            const currentDate = new Date();
+	            
 	            $('#daterange').datepicker({
 	                format: "yyyy-mm",
 	                autoclose: true,
 	                startView: "months", // 월 선택 모드
-	                minViewMode: "months" // 선택할 수 있는 최소 뷰 모드
-	            }).on('changeDate', function(e) {
+	                minViewMode: "months", // 선택할 수 있는 최소 뷰 모드
+	                language: "ko", // 한글 로케일 설정
+	                startDate: "1960-01", // 시작 날짜 설정
+	                endDate: currentDate, // 종료 날짜 설정
+	            }).on('changeDate', function (e) {
 	                $('#daterange').val(e.format());
 	            });
-	            
+
 	            // 모달이 열릴 때마다 입력 필드 초기화
 	            $('#modal-lg').on('show.bs.modal', function () {
 	                $('#daterange').val(''); // 입력 필드 초기화
@@ -447,10 +454,10 @@
 			        error: function (error) {
 			        	console.log(error);
 			            alert('급여 수정 실패');
-			            //window.location.href = '/salaryInput';
+			            //window.location.href = '/salaryInputsr';
 			        }
 			    });
-			});
+			});			
 		
 	</script>
 </body>
