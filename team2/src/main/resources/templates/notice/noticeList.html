@@ -116,7 +116,7 @@
 														class="form-control" id="subject1" name="subject1" readonly>
 												</p>
 												<p>
-													<label for="createTime">작성시간</label> <input type="text"
+													<label for="createTime">작성일</label> <input type="text"
 														class="form-control" id="createTime" name="createTime" readonly>
 												</p>
 
@@ -155,7 +155,7 @@
 															class="form-control" id="name" name="name" readonly>
 													</div>
 													<div class="form-group">
-														<label for="create_time">작성시간</label> <input type="text"
+														<label for="create_time">작성일</label> <input type="text"
 															class="form-control" id="create_time" name="create_time"
 															readonly>
 													</div>
@@ -361,6 +361,11 @@
 				aaSorting: [], // 초기 정렬 비활성화
 
 				language: {
+						search : "검색",
+						paginate: {
+			                "next" : "다음",
+			                "previous" : "이전"
+			            },
 					zeroRecords: "검색 결과 없음"
 				},
 				ajax: {
