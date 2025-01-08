@@ -2,36 +2,30 @@
 <html lang="en">
 
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>공지사항</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>공지사항</title>
 
-<!-- Google Font: Source Sans Pro -->
-<link rel="stylesheet"
-	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome -->
-<link rel="stylesheet"
-	href="../../plugins/fontawesome-free/css/all.min.css">
-<!-- DataTables -->
-<link rel="stylesheet"
-	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet"
-	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-<link rel="stylesheet"
-	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-<!-- Theme style -->
-<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-<!-- summernote -->
-<link rel="stylesheet"
-	href="../../plugins/summernote/summernote-bs4.min.css">
-<!-- daterange picker -->
-<link rel="stylesheet"
-	href="../../plugins/daterangepicker/daterangepicker.css">
-<!-- CodeMirror -->
-<link rel="stylesheet" href="../../plugins/codemirror/codemirror.css">
-<link rel="stylesheet" href="../../plugins/codemirror/theme/monokai.css">
-<!-- SimpleMDE -->
-<link rel="stylesheet" href="../../plugins/simplemde/simplemde.min.css">
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- summernote -->
+	<link rel="stylesheet" href="../../plugins/summernote/summernote-bs4.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- CodeMirror -->
+	<link rel="stylesheet" href="../../plugins/codemirror/codemirror.css">
+	<link rel="stylesheet" href="../../plugins/codemirror/theme/monokai.css">
+	<!-- SimpleMDE -->
+	<link rel="stylesheet" href="../../plugins/simplemde/simplemde.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -68,23 +62,10 @@
 									<div class="card-tools">
 										<!-- 관리자만 작성 버튼 표시 -->
 										<!--공지 등록 모달-->
-										<button id="btnAddNotice" class="btn btn-primary"
-											style="display: none;" onclick="addNotice()">작성</button>
+										<button id="btnAddNotice" class="btn btn-primary" style="display: none;"
+											onclick="addNotice()">작성</button>
 									</div>
 								</div>
-
-
-
-
-
-
-
-
-								<!-- 											
-<div class="wrapper">
-
-  <!-- Content Wrapper. Contains page content -->
-
 
 								<!-- Main content -->
 								<section class="content">
@@ -99,178 +80,137 @@
 																<h2 class="card-title">공지사항 등록</h2>
 															</div>
 															<form id="addNoticeForm">
-															<!-- /.card-header -->
-															<div class="card-body" >
-															<div class="mb-3">  
-							  														<label for="noticeTitle" class="form-label">제목</label> <input  
-							  															type="text" class="form-control" id="noticeTitle" required>  
-																				</div>  
-																<textarea id="noticeContent" ></textarea>
-<!-- 																<div class="mb-3">  -->
-<!-- 							 														<label for="noticeContent" class="form-label">내용</label>  -->
-<!-- 							 														<textarea class="form-control" id="noticeContent" rows="4"  -->
-<!-- 							 															required></textarea>  -->
-<!--  							 													</div> -->
-																
-																<div class="modal-footer">
-																	<button type="submit" class="btn btn-primary">저장</button>
-																	<button type="button" class="btn btn-secondary"
-																		data-bs-dismiss="modal">닫기</button>
-																</div>
-																</form>
-															</div>
+																<!-- /.card-header -->
+																<div class="card-body">
+																	<div class="mb-3">
+																		<label for="noticeTitle"
+																			class="form-label">제목</label> <input
+																			type="text" class="form-control"
+																			id="noticeTitle" required>
+																	</div>
+
+																	<label for="noticeTitle"
+																		class="form-label">내용</label>
+
+																	<textarea id="noticeContent"></textarea>
+																	<div class="modal-footer">
+																		<button type="submit"
+																			class="btn btn-primary">저장</button>
+																		<button type="button" class="btn btn-secondary"
+																			data-bs-dismiss="modal">닫기</button>
+																	</div>
+															</form>
 														</div>
 													</div>
-<!-- 													/.col -->
 												</div>
 											</div>
 										</div>
 									</div>
-									<!-- ./row -->
-									<!-- ./row -->
-								</section>
-								<!-- /.content -->
 							</div>
-							<!-- /.content-wrapper -->
+			</section>
+		</div>
+	</div>
 
-							<!-- Control Sidebar -->
-							<aside class="control-sidebar control-sidebar-dark">
-								<!-- Control sidebar content goes here -->
-							</aside>
-							<!-- /.control-sidebar -->
-							<!-- ./wrapper -->
-
-
-							<!-- 													<div class="modal-header"> -->
-							<!-- 												<h5 class="modal-title" id="addNoticeModalLabel">공지사항 -->
-							<!-- 													작성</h5> -->
-							<!-- 												<button type="button" class="close" data-dismiss="modal" -->
-							<!-- 													aria-label="Close"></button> -->
-							<!-- 											</div> -->
-							<!-- 											<div class="modal-body"> -->
-
-							<!--  												<form id="addNoticeForm"> -->
-
-							<!--  													<div class="mb-3">  -->
-							<!--  														<label for="noticeTitle" class="form-label">제목</label> <input  -->
-							<!--  															type="text" class="form-control" id="noticeTitle" required>  -->
-							<!-- 													</div>  -->
-							<!--  													<div class="mb-3">  -->
-							<!--  														<label for="noticeContent" class="form-label">내용</label>  -->
-							<!--  														<textarea class="form-control" id="noticeContent" rows="4"  -->
-							<!--  															required></textarea>  -->
-							<!--  													</div>  -->
-							<!-- 													<div class="modal-footer">  -->
-							<!-- 														<button type="submit" class="btn btn-primary">저장</button>  -->
-							<!-- 														<button type="button" class="btn btn-secondary"  															 -->
-							<!-- 														data-bs-dismiss="modal">닫기</button> -->
-							<!-- 													</div>  -->
-
-							<!-- 												</form>   -->
-							<!-- 											</div> -->
-							<!-- 										</div> -->
-						</div>
+	<!-- 내용 상세보기 모달 -->
+	<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeTitle" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitle">상세보기</h5>
+				</div>
+				<div class="modal-body">
+					<p>
+						<label for="noticeId">공지 번호</label> <input type="text" class="form-control" id="noticeId"
+							name="noticeId" readonly>
+					</p>
+					<div class="form-group">
+						<label for="Name">작성자</label> <input type="text" class="form-control" id="Name" name="Name"
+							readonly>
 					</div>
+					<p>
+						<label for="subject1">제목</label> <input type="text" class="form-control" id="subject1"
+							name="subject1" readonly>
+					</p>
+					<p>
+						<label for="createTime">작성일</label> <input type="text" class="form-control" id="createTime"
+							name="createTime" readonly>
+					</p>
 
-					<!-- 내용 상세보기 모달 -->
-					<div class="modal fade" id="noticeModal" tabindex="-1"
-						aria-labelledby="noticeTitle" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalTitle">상세보기</h5>
-								</div>
-								<div class="modal-body">
-									<p>
-										<label for="noticeId">공지 번호</label> <input type="text"
-											class="form-control" id="noticeId" name="noticeId" readonly>
-									</p>
-									<div class="form-group">
-										<label for="Name">작성자</label> <input type="text"
-											class="form-control" id="Name" name="Name" readonly>
-									</div>
-									<p>
-										<label for="subject1">제목</label> <input type="text"
-											class="form-control" id="subject1" name="subject1" readonly>
-									</p>
-									<p>
-										<label for="createTime">작성일</label> <input type="text"
-											class="form-control" id="createTime" name="createTime"
-											readonly>
-									</p>
-
-									<div class="mb-3">
-										<label for="Content1" class="form-label">내용</label>
-										<textarea class="form-control" id="Content1" name="Content1"
-											rows="4" readonly></textarea>
-									</div>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-bs-dismiss="modal">닫기</button>
-								</div>
-							</div>
-						</div>
+					<div class="mb-3">
+						<label for="Content1" class="form-label">내용</label>
+						<div id="Content1" style="border: 1px solid #ddd; padding: 10px; margin-top: 10px;"></div>
 					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-					<!-- 수정 모달 영역 -->
-					<div class="modal fade" id="modal-lg" tabindex="-1" role="dialog"
-						aria-labelledby="modal-lg-label" aria-hidden="true">
-						<div class="modal-dialog modal-lg" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modal-lg-label">공지사항 수정</h5>
+
+	<!-- 수정 모달 영역 -->
+	<section class="content">
+		<div class="modal fade" id="updateNoticeModal" tabindex="-1" aria-labelledby="updateNoticeModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content" style="width: 180%">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-outline card-info">
+								<div class="card-header">
+									<h2 class="card-title">공지사항 수정</h2>
 								</div>
-								<div class="modal-body">
-									<!-- 공지사항 수정 폼 (updateNoticeForm) -->
-									<form id="updateNoticeForm" action="/updateNotice"
-										method="POST">
-										<div class="form-group">
-											<label for="notice_id">공지 번호</label> <input type="text"
-												class="form-control" id="notice_id" name="noticeId" readonly>
-										</div>
-										<div class="form-group">
-											<label for="name">작성자</label> <input type="text"
-												class="form-control" id="name" name="name" readonly>
-										</div>
-										<div class="form-group">
-											<label for="create_time">작성일</label> <input type="text"
-												class="form-control" id="create_time" name="create_time"
+								<form id="updateNoticeForm" action="/updateNotice" method="POST">
+									<!-- /.card-header -->
+									<div class="card-body">
+										<div class="mb-3">
+											<label for="notice_id" class="form-label">공지 번호</label>
+											<input type="text" class="form-control" id="notice_id" name="noticeId"
 												readonly>
 										</div>
-										<div class="form-group">
-											<label for="subject">제목</label> <input type="text"
-												class="form-control" id="subject" name="subject">
+										<div class="mb-3">
+											<label for="name" class="form-label">작성자</label>
+											<input type="text" class="form-control" id="name" name="name" readonly>
 										</div>
-										<div class="form-group">
-											<label for="content">내용</label>
-											<textarea class="form-control" id="content" name="content"
-												rows="4"></textarea>
+										<div class="mb-3">
+											<label for="create_time" class="form-label">작성일</label>
+											<input type="text" class="form-control" id="create_time" name="create_time"
+												readonly>
 										</div>
-										<div class="modal-footer d-flex justify-content-end">
+										<div class="mb-3">
+											<label for="subject" class="form-label">제목</label>
+											<input type="text" class="form-control" id="subject" name="subject">
+										</div>
+										<label for="content" class="form-label">내용</label>
+										<textarea id="content" class="form-control" name="content" rows="4"></textarea>
+										<div class="modal-footer">
 											<button type="submit" class="btn btn-primary">수정</button>
 											<button type="button" class="btn btn-secondary"
 												data-bs-dismiss="modal">닫기</button>
 										</div>
-									</form>
-								</div>
+									</div>
+								</form>
 							</div>
 						</div>
+						<!-- /.col -->
 					</div>
-
-
-					<!-- /.card-header -->
-					<div class="card-body">
-						<table id="noticeTable" class="table table-bordered table-striped">
-
-
-						</table>
-					</div>
-					<!-- /.card-body -->
 				</div>
-				<!-- /.card -->
+			</div>
 		</div>
-		<!-- /.col -->
+	</section>
+
+	<!-- /.card-header -->
+	<div class="card-body">
+		<table id="noticeTable" class="table table-bordered table-striped">
+
+		</table>
+	</div>
+	<!-- /.card-body -->
+	</div>
+	<!-- /.card -->
+	</div>
+	<!-- /.col -->
 	</div>
 	<!-- /.row -->
 	</div>
@@ -297,38 +237,33 @@
 	<!-- AdminLTE for demo purposes -->
 	<script src="../../dist/js/demo.js"></script>
 	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-	<script
-		src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script
-		src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script
-		src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script
-		src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
+	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 	<!-- 공지사항 모달창 -->
 	<script src="../../bower_components/ckeditor/ckeditor.js"></script>
 
 	<script>
-  $(function () {
-    // Summernote
-    $('#noticeContent').summernote()
-    const div = document.querySelector(".note-editable");
-    div.style.height="300px";
-    div.innerHTML = '';
-
-    // CodeMirror
-    CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
-      mode: "htmlmixed",
-      theme: "monokai"
-    });
-  })
-</script>
+		$(function () {
+			// Summernote 초기화 시 높이 설정
+			$('#noticeContent').summernote({
+				height: 300, // 편집기 높이를 300px로 설정
+				focus: true, // 포커스 자동 설정 (선택 사항)
+			});
+		});
 
 
+		$(function () {
+			// Summernote 초기화 시 높이 설정
+			$('#content').summernote({
+				height: 250, // 편집기 높이를 300px로 설정
+				focus: true, // 포커스 자동 설정 (선택 사항)
+			});
+		});
+	</script>
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
@@ -372,8 +307,7 @@
 			// 			var noticeAuthor = document.getElementById("noticeAuthor").value;
 			var noticeTitle = document.getElementById("noticeTitle").value;
 			var noticeContent = document.getElementById("noticeContent").value;
-			
-			
+
 
 			// 서버로 전송할 데이터 객체 만들기
 			var data = new FormData();
@@ -402,8 +336,6 @@
 				});
 		});
 	</script>
-
-
 
 
 	<script th:inline="javascript">
@@ -463,8 +395,6 @@
 			}
 		}
 
-
-
 		function dataTable(tableId,
 			/*date,*/ isUpdate) {
 			// 기존 테이블 삭제
@@ -476,11 +406,11 @@
 				aaSorting: [], // 초기 정렬 비활성화
 
 				language: {
-						search : "검색",
-						paginate: {
-			                "next" : "다음",
-			                "previous" : "이전"
-			            },
+					search: "검색",
+					paginate: {
+						"next": "다음",
+						"previous": "이전"
+					},
 					zeroRecords: "검색 결과 없음"
 				},
 				ajax: {
@@ -496,26 +426,22 @@
 					{data: "NOTICE_ID", title: "번호", "defaultContent": ""},
 					//	{data: "NUM", title: "순번", "defaultContent": ""},
 					{data: "NAME", title: "작성자", "defaultContent": ""},
-					{data: "SUBJECT", title: "제목", "defaultContent": "", 
-						 render: function (data, type, row) {
-						        // 제목이 40자 이상이면 40자까지만 보여주고 "..." 처리
-						        const Subject = data.length > 10 ? data.slice(0, 10) + "..." : data;
-						        return Subject;
-						    }	
-					},
 					{
-						data: "CONTENT", title: "내용", "defaultContent": "", render: function (data, type, row) {
-							// 내용이 40자 이상이면 40자까지만 보여주고 "..." 처리
-							const shortContent = data.length > 15 ? data.slice(0, 15) + "..." : data;
-							return `
-							            <a href="#" class="content-link" 
-							               data-id="${row.NOTICE_ID}" 
-							               onclick="openContentModal('${row.NOTICE_ID}')">
-							                ${shortContent}
-							            </a>
-							`;
+						data: "SUBJECT", title: "제목", "defaultContent": "",
+						render: function (data, type, row) {
+							// 제목이 40자 이상이면 40자까지만 보여주고 "..." 처리
+							if (data) {
+								const shortSubject = data.length > 30 ? data.slice(0, 30) + "..." : data;
+								return `
+							<a href="#" class="subject-link" 
+							 data-id="${row.NOTICE_ID}" 
+							onclick="openSubjectModal('${row.NOTICE_ID}')">
+							 ${shortSubject}
+							 </a>`;
+							}
 						}
 					},
+
 					{data: "CREATE_TIME", title: "작성일", "defaultContent": ""},
 					{
 						data: "editable", defaultContent: "", title: '수정',
@@ -552,7 +478,7 @@
 
 			})
 
-			$(document).on("click", ".content-link", function (e) {
+			$(document).on("click", ".subject-link", function (e) {
 				e.preventDefault();
 				const noticeId = $(this).data("id");
 
@@ -577,7 +503,6 @@
 				});
 			});
 
-
 		}
 	</script>
 
@@ -598,10 +523,10 @@
 					$("#name").val(notice.NAME || ""); // 이름이 null인 경우 빈칸
 					$("#create_time").val(notice.CREATE_TIME || ""); // 생성시간
 					$("#subject").val(notice.SUBJECT || ""); // 제목
-					$("#content").val(notice.CONTENT || ""); // 내용
+					$('#content').summernote('code', notice.CONTENT || ""); // 내용
 
 					// 모달창 표시
-					$("#modal-lg").modal("show");
+					$("#updateNoticeModal").modal("show");
 
 
 				},
@@ -614,7 +539,7 @@
 
 	<!--	상세보기 모달창-->
 	<script>
-		function openContentModal(notice_id) {
+		function openSubjectModal(notice_id) {
 			console.log("noticeID", notice_id)
 			// 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
 			$.ajax({
@@ -624,6 +549,7 @@
 				success: function (notice) {
 					// 폼 속성 변경
 
+					console.log(notice);
 					$("#noticeId").val(notice_id); //번호
 					$("#Name").val(notice.NAME || ""); // 이름이 null인 경우 빈칸
 					$("#createTime").val(notice.CREATE_TIME || ""); // 생성시간
@@ -632,7 +558,6 @@
 
 					// 모달창 표시
 					$("#noticeModal").modal("show");
-
 
 				},
 				error: function (xhr, status, error) {

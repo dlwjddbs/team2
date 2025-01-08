@@ -40,7 +40,7 @@
 	<update id="updateNotice" parameterType="map">
 	UPDATE NOTICE
 	SET SUBJECT = #{subject},
-		CONTENT = #{content}
+		CONTENT = #{content, jdbcType=VARCHAR}
 	WHERE NOTICE_ID = #{noticeId, jdbcType=INTEGER}
 	</update>
 	
