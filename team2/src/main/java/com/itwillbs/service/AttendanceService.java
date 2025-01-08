@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import com.itwillbs.repository.AttendanceMapper;
@@ -179,5 +180,14 @@ public class AttendanceService {
 
 	public List<Map<String, Object>> getAttendanceHistoryStackedBarChart(Map<String, Object> map) {
 		return attendanceMapper.getAttendanceHistoryStackedBarChart(map);
+	}
+
+	public List<Map<String, Object>> setHoliday(Map<String, Object> map) {
+		List<Map<String, Object>> holidays = attendanceMapper.getWeekend(map);
+		System.out.println("+++++++++++++++++++++++++++");
+		System.out.println(holidays);
+		int resultCnt = attendanceMapper.insertHoliday(holidays);
+		
+		return attendanceMapper.getWeekend(map);
 	}
 }

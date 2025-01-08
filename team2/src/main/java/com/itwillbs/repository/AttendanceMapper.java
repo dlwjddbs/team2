@@ -47,4 +47,8 @@ public interface AttendanceMapper {
 	List<Map<String, Object>> getUserInfo(Map<String, Object> map);
 
 	List<Map<String, Object>> getAttendanceHistoryStackedBarChart(Map<String, Object> map);
+
+	List<Map<String, Object>> getWeekend(Map<String, Object> map);
+
+	int insertHoliday(List<Map<String, Object>> map);
 }

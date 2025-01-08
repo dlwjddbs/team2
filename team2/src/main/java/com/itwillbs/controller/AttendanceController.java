@@ -392,13 +392,22 @@ public class AttendanceController {
 	 * ===================================================================
 	 * */
 	
-	@PostMapping("/Holiday")
+	@GetMapping("/setHoliday")
+	public String setHoliday() {
+		return "attendance/setHoliday";
+	}
+	
+	@PostMapping("/setHoliday")
 	@ResponseBody
-	public String postMethodName(@RequestBody Map<String, String> param) {
+	public String setHoliday(@RequestBody List<Map<String, Object>> map) {
+		// TODO
+		// API에서 중복된 값 넘어올 때 처리해야됨.
+		Map<String, Object> map2 = new HashMap<>();
+		map2.put("list", map);
+		map2.put("year", "2025");
+		List<Map<String, Object>> result = attendanceService.setHoliday(map2);
 		
-		System.out.println(param);
-		
-		return "";
+	    return "데이터 수신 성공!";
 	}
 
 	@PostMapping("/selectBox")

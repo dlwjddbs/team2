@@ -238,19 +238,59 @@
 		 ORDER BY STARTING_DATE DESC
     </select>
     
-    <select id="getWeekend" resultType="map">
+    <select id="getWeekend" resultType="map" parameterType="map">
     <!-- getWeekend 주말 조회 -->
-		SELECT TO_CHAR(TO_DATE(DT, 'YYYY-MM-DD'), 'YYYY-MM-DD')	AS DATE_TIME
-			 , CASE WHEN TO_CHAR(TO_DATE(DT),'D') IN ('1','7')
-		  			THEN '주말'
-		            ELSE '평일' 
-				END 											AS WEEK_DAY
-		  FROM (SELECT TO_CHAR(TO_DATE(ST_DT, 'YYYYMMDD') + LEVEL - 1, 'YYYYMMDD') AS DT
-				  FROM (SELECT '20241201' AS ST_DT
-							  ,'20241231' AS END_DT
-		            	  FROM DUAL)
-		CONNECT BY LEVEL <![CDATA[<=]]> TO_DATE(END_DT, 'YYYYMMDD') - TO_DATE(ST_DT, 'YYYYMMDD') + 1)
+		WITH HOLIDAY AS (
+			<foreach collection="list" item="holiday" separator="UNION ALL">
+				SELECT 
+						#{holiday.DATE_TIME} AS DATE_TIME
+					  , #{holiday.DATE_NAME} AS DATE_NAME 
+				FROM DUAL
+			</foreach>
+		),
+		DATE_INFO AS (
+		    SELECT TO_CHAR(TO_DATE(DT, 'YYYY-MM-DD'), 'YYYY-MM-DD') 			AS DATE_TIME,
+		           CASE WHEN TO_CHAR(TO_DATE(DT), 'D') IN ('1', '7') THEN 'Y'
+		                ELSE 'N'
+		           END 															AS IS_WEEKEND
+		     FROM (SELECT TO_CHAR(TO_DATE(ST_DT, 'YYYYMMDD') + LEVEL - 1, 'YYYYMMDD') AS DT
+		          	 FROM (SELECT #{year} || '0101' AS ST_DT, #{year} || '1231' AS END_DT FROM DUAL)
+				  CONNECT BY LEVEL <![CDATA[<=]]> TO_DATE(END_DT, 'YYYYMMDD') - TO_DATE(ST_DT, 'YYYYMMDD') + 1
+		     )
+		)
+		SELECT
+			   DI.DATE_TIME
+			 , DI.IS_WEEKEND
+<!-- 			 , H.DATE_NAME		AS HOLIDAY_NAME -->
+			 , NVL(H.DATE_NAME, 0)		AS HOLIDAY_NAME
+		 	 , CASE 
+		 			WHEN DI.IS_WEEKEND = 'Y' OR H.DATE_NAME IS NOT null THEN 'N' 
+		 			ELSE 'Y'
+				END				AS IS_BUSINESS_DAY
+		  FROM DATE_INFO DI
+			   LEFT JOIN HOLIDAY H 
+			   		  ON DI.DATE_TIME = H.DATE_TIME
+		 ORDER BY DI.DATE_TIME
     </select>
+	
+	<insert id="insertHoliday">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO HOLIDAY (
+				  DATE_TIME
+				, IS_WEEKEND
+				, HOLIDAY_NAME
+				, IS_BUSINESS_DAY
+			)
+			VALUES (
+				  #{item.DATE_TIME}
+	            , #{item.IS_WEEKEND}
+	            , #{item.HOLIDAY_NAME}
+	            , #{item.IS_BUSINESS_DAY}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
     
     <select id="isDeletableAttendanceTime" resultType="Boolean">
     <!-- isDeletableAttendanceTime 출퇴근 시간 적용 일자 오늘부터 이전까진 삭제 불가 -->
