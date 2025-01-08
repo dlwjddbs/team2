@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-select/css/select.bootstrap4.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- daterange picker -->
@@ -32,6 +32,8 @@
 		
 		<nav th:replace="~{includes/modals/commonCodeGroup :: commonCodeGroup}"></nav>
 		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>
+		<nav th:replace="~{includes/modals/modalCommonCode :: modalCommonCode}"></nav>
+		<nav th:replace="~{includes/modals/modalCommonCodeEdit :: modalCommonCodeEdit}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -82,14 +84,15 @@
 								<div class="card-header">
 									<h3 class="card-title">소분류</h3>
 									<div class="card-tools">
-										<!-- new member modal -->
-										<button type="button" class="btn btn-block btn-primary btn-sm float-right" id="newMember" data-toggle="modal" data-target="#modal-lg">
-											생성
-										</button>
+										<div class="d-flex">
+											<button type="button" class="btn btn-primary" id="btnAddCode">등록</button>
+											<button type="button" class="btn btn-primary mx-1" id="btnUpdateCode">수정</button>
+											<button type="button" class="btn btn-primary" id="btnDeleteCode">삭제</button>
+										</div>
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="subClass" class="table table-bordered table-striped">
+									<table id="commonCode" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -134,7 +137,7 @@
 	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
 	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
 	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-	<script src="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js"></script>
+	<script src="../../plugins/datatables-select/js/dataTables.select.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
 	<!-- AdminLTE for demo purposes -->
@@ -147,9 +150,10 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+		var isUpdate = false;
+		
 		$(function () {
-			groupCodeDataTable(false);
-//			subClassDataTable(false);
+			groupCodeDataTable();
 		});
 		
 		$("#btnAddGroup").on("click", function() {
@@ -161,7 +165,7 @@
 		});
 		
 		$("#btnDeleteGroup").on('click', function() {
-			let code = getSelectedRowCode();
+			let code = getSelectedRowGroup();
 			if (code == null) {
 				return;
 			}
@@ -222,7 +226,7 @@
 		});
 		
 		$("#btnUpdateGroup").on('click', function(e) {
-			let code = getSelectedRowCode();
+			let code = getSelectedRowGroup();
 			if (code == null) {
 				return;
 			}
@@ -283,10 +287,11 @@
 	        });
 		});
 		
-		function getSelectedRowCode() {
+		function getSelectedRowGroup() {
 			let table = $('#groupCode').DataTable();
-			if (table.row('.selected').length == 0) {
-				alert("행을 선택하세요.");
+			if (!$.fn.dataTable.isDataTable("#groupCode") 
+				|| table.row('.selected').length == 0) {
+				alert("대분류 코드를 선택하세요.");
 				
 				return;
 			}
@@ -294,10 +299,28 @@
 			
 			return code;
 		}
+		
+		function getSelectedRowCode() {
+			if (!$.fn.dataTable.isDataTable("#commonCode")) {
+				alert("대분류 코드를 선택하세요.");
+				
+				return;
+			}
+			
+			let table = $('#commonCode').DataTable();
+			if (table.row('.selected').length == 0) {
+				alert("소분류 코드를 선택하세요.");
+				
+				return;
+			}
+			let code = table.rows('.selected').data()[0].CODE_ID;
+			
+			return code;
+		}
 
-		function groupCodeDataTable(isUpdate) {
+		function groupCodeDataTable() {
 			// 기존 테이블 삭제
-			if (isUpdate) {
+			if ($.fn.dataTable.isDataTable("#groupCode")) {
 				$("#groupCode").DataTable().destroy();
 			}
 			
@@ -335,17 +358,35 @@
 		}
 		
 		
+		$('#groupCode').on('click', 'tbody tr', function() {
+			// dataTables select적용 시간보다 늦어야함.
+			setTimeout(function(){
+				let table = $('#groupCode').DataTable();
+				
+				// 대분류 선택 해제할 시 소분류 테이블 삭제
+				if (table.row('.selected').length == 0) {
+					$("#commonCode").DataTable().destroy();
+					$("#commonCode").empty();
+					isUpdate = false;
+					
+					return;
+				}
+				
+				let code = table.rows('.selected').data()[0].GROUP_ID;
+				commonCodeDataTable(code);
+				if (!isUpdate) {
+					isUpdate = true;
+				}
+			}, 10);
+		});
 		
-		
-		
-		
-		function subClassDataTable(isUpdate) {
+		function commonCodeDataTable(code) {
 			// 기존 테이블 삭제
-			if (isUpdate) {
-				$("#subClass").DataTable().destroy();
+			if ($.fn.dataTable.isDataTable("#commonCode")) {
+				$("#commonCode").DataTable().destroy();
 			}
 			
-			let table = $("#subClass").DataTable({
+			let table = $("#commonCode").DataTable({
 				aaSorting: [], // 초기 정렬 비활성화
 				select : {
 					style : 'single'
@@ -363,21 +404,202 @@
 				ajax : {
 					url : "/getCommonCode",
 					type:"POST",
-					data : {},
+					data : {
+						GROUP_ID : code
+					},
 					"dataSrc": function (res) {
-						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
-					{data : "GROUP_ID", title : "코드", "defaultContent": "" },
-					{data : "GROUP_NAME", title : "코드명", "defaultContent": "" }
+					{data : "CODE_ID", title : "코드", "defaultContent": "" },
+					{data : "CODE_NAME", title : "코드명", "defaultContent": "" },
+					{data : "USE_YN", title : "사용여부", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
 				autoWidth : false,
 			});
 		}
+		
+		$("#btnAddCode").on("click", function() {
+			let code = getSelectedRowGroup();
+			if (code == null) {
+				return;
+			}
+			
+			$("#CODE_GROUP_ID").val(code);
+			$("#CODE_ID").val('');
+			$("#CODE_NAME").val('');
+			$("#CODE_DESCRIPTION").val('');
+			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked',true);
+			
+			$('#modalCommonCode').modal();
+		});
+		
+		$("#commonCodeSave").on('click', function() {
+			let CODE_GROUP_ID = $("#CODE_GROUP_ID").val();
+			let CODE_ID = $("#CODE_ID").val();
+			let CODE_NAME = $("#CODE_NAME").val();
+			let CODE_DESCRIPTION = $("#CODE_DESCRIPTION").val();
+			let CODE_USE_YN = $('input[name="use_yn"]:checked').val();
+			
+			if (CODE_ID == null || CODE_ID == ''
+				|| CODE_NAME == null || CODE_NAME == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/addCommonCode",
+	            data : {
+	            	CODE_ID : CODE_ID.toUpperCase(),
+	            	GROUP_ID : CODE_GROUP_ID.toUpperCase(),
+	            	CODE_NAME : CODE_NAME,
+	            	DESCRIPTION : CODE_DESCRIPTION,
+	            	USE_YN : CODE_USE_YN
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("addCommonCode() ajax 실패");
+	            }
+	        });
+		});
+		
+		$("#btnDeleteCode").on('click', function() {
+			let code = getSelectedRowCode();
+			if (code == null) {
+				return;
+			}
+			
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/deleteCommonCode",
+	            data : {
+	            	CODE_ID : code,
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("deleteCommonCode() ajax 실패");
+	            }
+	        });
+		});
+		
+		$("#groupCodeUpdate").on('click', function() {
+			let GROUP_ID = $("#GROUP_ID_UPDATE").val();
+			let GROUP_NAME = $("#GROUP_NAME_UPDATE").val();
+			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
+
+			if (GROUP_NAME == null || GROUP_NAME == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/updateCommonCodeGroup",
+	            data : {
+					GROUP_ID : GROUP_ID,
+	            	GROUP_NAME : GROUP_NAME,
+	            	DESCRIPTION : DESCRIPTION
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("updateCommonCodeGroup() ajax 실패");
+	            }
+	        });
+		});
+
+		$("#btnUpdateCode").on('click', function(e) {
+			let code = getSelectedRowCode();
+			if (code == null) {
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/getCommonCode",
+	            data : {
+	            	CODE_ID : code
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+					
+					$("#CODE_GROUP_ID_UPDATE").val(res[0].GROUP_ID);
+					$("#CODE_ID_UPDATE").val(res[0].CODE_ID);
+					$("#CODE_NAME_UPDATE").val(res[0].CODE_NAME);
+					$("#CODE_DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
+					$("#USE_YN_" + res[0].USE_YN).prop("checked", true);
+	            },
+	            error : function(e){
+	                console.log("getCommonCode() ajax 실패");
+	            }
+	        });
+			
+			$('#modalCommonCodeEdit').modal();
+		});
+		
+		$("#commonCodeUpdate").on('click', function() {
+			let CODE_GROUP_ID = $("#CODE_GROUP_ID_UPDATE").val();
+			let CODE_ID = $("#CODE_ID_UPDATE").val();
+			let CODE_NAME = $("#CODE_NAME_UPDATE").val();
+			let CODE_DESCRIPTION = $("#CODE_DESCRIPTION_UPDATE").val();
+			let CODE_USE_YN = $('input[name="use_yn_update"]:checked').val();
+
+			if (CODE_NAME == null || CODE_NAME == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/updateCommonCode",
+	            data : {
+	            	GROUP_ID : CODE_GROUP_ID,
+					CODE_ID : CODE_ID,
+					CODE_NAME : CODE_NAME,
+					DESCRIPTION : CODE_DESCRIPTION,
+					USE_YN : CODE_USE_YN
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("commonCodeUpdate() ajax 실패");
+	            }
+	        });
+		});
 	</script>
 </body>
 </html>

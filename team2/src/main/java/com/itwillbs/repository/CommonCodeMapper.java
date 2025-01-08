@@ -20,4 +20,16 @@ public interface CommonCodeMapper {
 
 	public int updateCommonCodeGroup(Map<String, Object> map);
 
+	public List<Map<String, Object>> getCommonCode(Map<String, Object> map);
+
+	public int isDuplicateCommonCode(Map<String, Object> map);
+
+	public int insertCommonCode(Map<String, Object> map);
+
+	public int deleteCommonCode(Map<String, Object> map);
+
+	public int updateCommonCode(Map<String, Object> map);
+
+	public int isExistCommonCodeGroupChild(Map<String, Object> map);
+
 }

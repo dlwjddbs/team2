@@ -47,9 +47,9 @@ public class CommonCodeController {
 	@PostMapping("getGroupCommonCode")
 	@ResponseBody
 	public List<Map<String, Object>> getGroupCommonCode(@RequestParam Map<String, Object> map) {
-		List<Map<String, Object>> Code = commonCodeService.getGroupCommonCode(map);
+		List<Map<String, Object>> codeList = commonCodeService.getGroupCommonCode(map);
 		
-		return Code;
+		return codeList;
 	}
 	
 	@PostMapping("addCommonCodeGroup")
@@ -70,11 +70,42 @@ public class CommonCodeController {
 	
 	@PostMapping("/updateCommonCodeGroup")
 	@ResponseBody
-	public Map<String, Object> updateCommonCodeGroup(HttpSession session, @RequestParam Map<String, Object> map) {
+	public Map<String, Object> updateCommonCodeGroup(@RequestParam Map<String, Object> map) {
 		Map<String, Object> message = commonCodeService.updateCommonCodeGroup(map);
 		
 		return message;
 	}
 	
+	@PostMapping("getCommonCode")
+	@ResponseBody
+	public List<Map<String, Object>> getCommonCode(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> codeList = commonCodeService.getCommonCode(map);
+		
+		return codeList;
+	}
+	
+	@PostMapping("addCommonCode")
+	@ResponseBody
+	public Map<String, Object> addCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = commonCodeService.insertCommonCode(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/deleteCommonCode")
+	@ResponseBody
+	public Map<String, Object> deleteCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = commonCodeService.deleteCommonCode(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/updateCommonCode")
+	@ResponseBody
+	public Map<String, Object> updateCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = commonCodeService.updateCommonCode(map);
+		
+		return message;
+	}
 }
 
