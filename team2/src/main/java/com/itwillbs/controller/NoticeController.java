@@ -137,4 +137,8 @@ public class NoticeController {
 		return "redirect:/notice/noticeList";
 	}
     
+    @GetMapping("/test")
+    public String test(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
+    	return "/editors";
+    }
 }

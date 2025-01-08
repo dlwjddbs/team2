@@ -25,6 +25,9 @@ public class NoticeService {
 	
 //	작성
 	public void createNotice(Map<String, Object> map) {
+//		String noticeContent = (String) map.get("noticeContent");
+//		String noticeContentStr = noticeContent.replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
+//		map.put("noticeContent", noticeContentStr);
 		noticeMapper.createNotice(map);		
 	}
 // 상세
