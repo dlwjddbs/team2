@@ -74,6 +74,48 @@ public class SalaryController {
 		return salaryInputData;
 	}
 	
+	// 관리자 급여입력 내역 조회
+	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
+//	@GetMapping("/salaryInputList")
+//	public String salaryInputList(Map<String, Object> map, Model model, HttpSession session) {
+		
+		// 관리자 페이지라 관리자 로그인 필수
+//		if (session.getAttribute("id") == null) {
+//            return "redirect:/login"; 
+//        }
+//		
+//		log.info("============= salaryInput =============");
+		
+//		String id = "admin";
+//		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
+		
+//		if (salaryInputMinMaxDate == null) {
+//			LocalDate now = LocalDate.now();
+			
+//			salaryInputMinMaxDate = new HashMap<>();
+//			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
+//			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
+//		}
+		
+//		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
+		
+//		return "/salary/salaryInput";
+//	}
+	
+	// 관리자 급여입력 내역 조회 (POST)
+	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
+//	@PostMapping("/salaryInput")
+//	@ResponseBody
+//	public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> map) {
+//		
+//		log.info("============= salaryInput POST =============");
+//		
+//		map.put("id", "admin");
+//		List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
+//		
+//		return salaryInputData;
+//	}
+	
 	// 관리자 급여입력
 	@PostMapping("/writeSalary")
 	@ResponseBody
