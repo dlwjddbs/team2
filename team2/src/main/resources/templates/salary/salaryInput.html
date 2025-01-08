@@ -181,8 +181,60 @@
 						}
 					},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
-					{data: "GRADE_ID", title: "직급", "defaultContent": "" },
-					{data: "DEPR_ID", title: "부서", "defaultContent": "" },
+					{data: "GRADE_ID", title: "직급", "defaultContent": "",
+						render: function(data, type, row) {
+				            if (data === "AS") {
+				                return "대리";
+				            } else if (data === "MG") {
+				                return "과장";
+				            } else if (data === "SM") {
+				                return "차장";
+				            } else if (data === "GM") {
+				                return "부장";
+				            } else if (data === "DR") {
+				                return "이사";
+				            } else if (data === "ED") {
+				                return "상무";
+				            } else if (data === "SD") {
+				                return "전무";
+				            } else if (data === "VP") {
+				                return "부사장";
+				            } else if (data === "PR") {
+				                return "사장";
+				            } else if (data === "ST") {
+				                return "사원";
+				            } else if (data === "AM") {
+				                return "주임";
+				            } else {
+				                return data; // 매칭되지 않는 경우 원래 데이터를 반환
+				            }
+				        }
+					 },
+					{data: "DEPT_ID", title: "부서", "defaultContent": "",
+						render: function(data, type, row) {
+				            if (data === "HR") {
+				                return "인사팀";
+				            } else if (data === "AC") {
+				                return "회계팀";
+				            } else if (data === "AD") {
+				                return "총무팀";
+				            } else if (data === "DN") {
+				                return "국내영업팀";
+				            } else if (data === "PL") {
+				                return "영업기획팀";
+				            } else if (data === "SRV") {
+				                return "서버개발팀";
+				            } else if (data === "WEB") {
+				                return "웹개발팀";
+				            } else if (data === "MOB") {
+				                return "모바일개발팀";
+				            } else if (data === "MNT") {
+				                return "유지보수팀";
+				            } else {
+				                return data; // 매칭되지 않는 경우 원래 데이터를 반환
+				            }
+				        }
+				    },
 					{data: "SALARY", title: "기본급", "defaultContent": "" },
 					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
 					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
@@ -305,7 +357,7 @@
 						},
 						{data: "NAME", title: "사원명", "defaultContent": "" },
 						{data: "GRADE_ID", title: "직급", "defaultContent": "" },
-						{data: "DEPR_ID", title: "부서", "defaultContent": "" },
+						{data: "DEPT_ID", title: "부서", "defaultContent": "" },
 						{data: "SALARY", title: "기본급", "defaultContent": "" },
 						{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
 						{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
