@@ -53,32 +53,33 @@
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
 			
-				<nav th:replace="~{includes/modals/editSalary :: editSalary}"></nav>
+				<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
 				
-				<!-- 검색 필터 -->
-				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
-					<div class="d-flex">
-						<div class="d-flex ml-4">
-							<!-- Date range -->
-							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
-							<div class="input-group">
-								<div class="input-group-prepend">
-									<span class="input-group-text">
-										<i class="far fa-calendar-alt"></i>
-									</span>
-								</div>
-								<input type="text" class="form-control float-right" id="reservation">
-							</div>
-						</div>
-					</div>
-					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
-				</div>
-				<div class="col-2">
-					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1">
-						급여 정보 입력
-					</button>
-					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
-				</div>
+<!-- 				검색 필터 -->
+<!-- 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2"> -->
+<!-- 					<div class="d-flex"> -->
+<!-- 						<div class="d-flex ml-4"> -->
+<!-- 							Date range -->
+<!-- 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label> -->
+<!-- 							<div class="input-group"> -->
+<!-- 								<div class="input-group-prepend"> -->
+<!-- 									<span class="input-group-text"> -->
+<!-- 										<i class="far fa-calendar-alt"></i> -->
+<!-- 									</span> -->
+<!-- 								</div> -->
+<!-- 								<input type="text" class="form-control float-right" id="reservation"> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-2" > -->
+<!-- 					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1"> -->
+<!-- 						급여 정보 입력 -->
+<!-- 					</button> -->
+<!-- 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav> -->
+<!-- 				</div> -->
+				<br>
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -173,7 +174,6 @@
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
 						render: function(data, type, row) {
 							// MEMBER_ID를 클릭 가능한 링크로 설정
@@ -236,13 +236,13 @@
 				        }
 				    },
 					{data: "SALARY", title: "기본급", "defaultContent": "" },
-					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" }
+// 					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
+// 					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
+// 					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
+// 					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
+// 					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
+// 					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
+// 					{data: "TOTAL", title: "실지급액", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -274,16 +274,8 @@
 			  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
 						$('#name').val(salaryData.NAME);							// 이름
 			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
-			  			$('#deptId').val(salaryData.DEPT_ID);						// 직급 ID
-			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
+			  			$('#deptId').val(salaryData.DEPT_ID);						// 부서 ID
 						$('#salary').val(salaryData.SALARY);						// 기본급
-			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
-	  					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
-			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
-			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
-			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
-			  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
 			  			
 			  			// 모달 표시
 			  			$('#modal-lg').modal('show');
@@ -486,32 +478,6 @@
 			    });
 			});
 			
-			// 급여 수정 버튼을 클릭시 이벤트 발생
-			$('#submitBtn').click(function () {
-				//debugger;
-				
-				//return;
-				
-				var editSalaryForm = $("#editSalaryForm").serialize();
-				console.log(editSalaryForm); 
-				
-			    // AJAX로 서버에 데이터 전송
-			    $.ajax({
-			        url : '/editSalary', // 컨트롤러 매핑 URL
-			        type : 'POST',
-			        data : $("#editSalaryForm").serialize(),
-			        success: function (response) {
-			            alert('급여 수정 성공!');
-			            console.log(response);
-						window.location.href = '/salaryInput';
-			        },
-			        error: function (error) {
-			        	console.log(error);
-			            alert('급여 수정 실패');
-			            //window.location.href = '/salaryInput';
-			        }
-			    });
-			});			
 		
 	</script>
 </body>

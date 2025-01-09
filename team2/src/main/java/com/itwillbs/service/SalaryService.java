@@ -14,6 +14,11 @@ import lombok.RequiredArgsConstructor;
 public class SalaryService {
 	private final SalaryMapper salaryMapper;
 	
+	// 사원 조회(관리자)
+	public List<Map<String, Object>> getSalaryMember() {
+		return salaryMapper.selectSalaryMember();
+	}
+
 	// 입력된 급여 조회(관리자)
 	public List<Map<String, Object>> getSalaryList(Map<String, Object> map) {
 		return salaryMapper.selectSalaryList(map);
@@ -39,6 +44,7 @@ public class SalaryService {
 		salaryMapper.updateMemberSalary(map);
 		// 사원의 상여금 수정
 		salaryMapper.updateSalaryBonus(map);
+
 	}
 
 }

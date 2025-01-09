@@ -144,6 +144,11 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+		$(document).ready(function () {
+		    $('#example1').on('draw.dt', function () {
+		        $('#example1 thead th').css('font-size', '15px'); // 원하는 글자 크기 설정
+		    });
+		});
 		$(function () {
 			// 페이지 첫 로딩 시 테이블 출력
 			$("#example1").DataTable({
@@ -162,7 +167,7 @@
 		            }
 				},
 				ajax : {
-					url : "/salaryInput",
+					url : "/salaryInputList",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (abc) {
@@ -274,15 +279,15 @@
 			  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
 						$('#name').val(salaryData.NAME);							// 이름
 			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
-			  			$('#deptId').val(salaryData.DEPT_ID);						// 직급 ID
+			  			$('#deptId').val(salaryData.DEPT_ID);						// 부서 ID
 			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
 						$('#salary').val(salaryData.SALARY);						// 기본급
 			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
+			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 연휴 수당
 	  					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 성과급
-			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 근속수당
-			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 휴가 보너스
-			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 보너스
+			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 수당
+			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 만기근속자포상
+			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 실적우수자포상
 			  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
 			  			
 			  			// 모달 표시
@@ -335,7 +340,7 @@
 			            }
 					},
 					ajax : {
-						url : "/salaryInput",
+						url : "/salaryInputList",
 						type:"POST",
 						data : {
 							startDate : date[0],					
@@ -460,7 +465,7 @@
 			    $.ajax({
 			        url: '/writeSalary', // 컨트롤러 매핑 URL
 			        type: 'POST',
-			        data: $("#writeSalaryForm").serialize(),
+			        data: $("#writeSa/laryForm").serialize(),
 /* 			        {
 			        	PAYDAY: daterange,
 			        	MEMBER_ID: member,

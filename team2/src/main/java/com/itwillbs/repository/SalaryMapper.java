@@ -10,6 +10,9 @@ public interface SalaryMapper {
 	
 	// xml의 id값과 동일한 메서드명 사용 필수
 	
+	// 사원 조회
+	List<Map<String, Object>> selectSalaryMember();
+
 	// 급여 조회
 	List<Map<String, Object>> selectSalaryList(Map<String, Object> map);
 	
@@ -27,4 +30,5 @@ public interface SalaryMapper {
 	
 	// 급여 수정 - 사원의 상여금(보너스) 수정
 	void updateSalaryBonus(Map<String, Object> map);
+
 }
