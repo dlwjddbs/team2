@@ -28,7 +28,7 @@ public class EmailController {
 	
 	// 급여명세서 전송 test용 페이지
 	// 전송 기능 구현 완료시 삭제 예정
-	@GetMapping("/salaryEmailTest")
+	@GetMapping("/salarySendTest")
 	public String salaryEmailTest(Map<String, Object> map, Model model) {
 		log.info("============= salaryEmailTest =============");
 		
@@ -45,7 +45,7 @@ public class EmailController {
 		
 		model.addAttribute("salaryInfoMinMaxDate", salaryInfoMinMaxDate);
 		
-		return "/salary/salaryEmailTest";
+		return "/salary/salarySendTest";
 	}
 	
 	@PostMapping("/sendEmail")

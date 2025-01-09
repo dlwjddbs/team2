@@ -70,11 +70,13 @@
 					</div>
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
-				<div class="col-2">
-					<button type="button" class="btn btn-primary" id="mailSend" data-toggle="modal" data-target="#modal-lg">
+				<div class="col-2 d-flex justify-content-between">
+					<button type="button" class="btn btn-primary" id="mailSend">
 						메일 전송(Test)
 					</button>
-					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
+					<button type="button" class="btn btn-primary" id="smsSend">
+						SMS 전송(Test)
+					</button>
 				</div>
 				<div class="container-fluid">
 					<div class="row">
@@ -403,7 +405,7 @@
 			$.ajax({
 				url : "/sendEmail",
 				type : "POST",
-				dataType : "TEXT",
+				//dataType : "TEXT",
 				//contentType : "application/json; charset=utf-8",
 				data : {
 					to : to, 
