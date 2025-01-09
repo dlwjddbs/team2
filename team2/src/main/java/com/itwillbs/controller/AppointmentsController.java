@@ -97,4 +97,19 @@ public class AppointmentsController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 사항 저장 중 오류가 발생했습니다.");
 		}
 	}
+	
+	 @PostMapping("/delete")
+	    public ResponseEntity<?> deleteHistory(@RequestBody List<String> historyIds) {
+	        if (historyIds == null || historyIds.isEmpty()) {
+	            return ResponseEntity.badRequest().body("삭제할 내역이 없습니다.");
+	        }
+
+	        int deletedCount = appointmentsService.deleteHistories(historyIds);
+
+	        if (deletedCount > 0) {
+	            return ResponseEntity.ok("성공적으로 " + deletedCount + "개의 내역이 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제된 내역이 없습니다.");
+	        }
+	    }
 }

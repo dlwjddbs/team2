@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.itwillbs.repository.AppointmentsMapper;
 
@@ -78,5 +79,13 @@ public class AppointmentsService {
         }
     }
 
+    public int deleteHistories(List<String> historyIds) {
+        int deletedCount = 0;
 
+        for (String historyId : historyIds) {
+            deletedCount += appointMapper.deleteHistoryById(historyId);
+        }
+
+        return deletedCount;
+    }
 }

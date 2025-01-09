@@ -34,5 +34,11 @@ public interface AppointmentsMapper {
     void updateMemberForResign(@Param("MEMBER_ID") String memberId, @Param("CHANGE_DATE") String changeDate);
 
     void updateChangedColumns(Map<String, Object> changes);
+
+    int deleteHistoryById(String historyId);
+
+	Map<String, Object> getPreviousHistory(String memberId);
+
+	int updateMemberDeptAndGrade(Map<String, Object> memberData);
 	
 }

@@ -158,5 +158,27 @@
 		WHERE HISTORY_ID = #{HISTORY_ID}
 	</update>
 
+	 <delete id="deleteHistoryById">
+        DELETE FROM MEMBER_HISTORY
+        WHERE HISTORY_ID = #{historyId}
+    </delete>
+    
+    <update id="updateMemberDeptAndGrade">
+        UPDATE MEMBER
+        SET 
+            DEPT_ID = #{deptId},
+            GRADE_ID = #{gradeId}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+    
+     <select id="getPreviousHistory" resultType="map">
+        SELECT 
+            DEPT_ID,
+            GRADE_ID
+        FROM MEMBER_HISTORY
+        WHERE MEMBER_ID = #{memberId}
+        ORDER BY CHANGE_DATE DESC
+        OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY
+    </select>
 
 </mapper>
