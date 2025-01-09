@@ -37,6 +37,8 @@ public class AttendanceController {
 	 * 5. 관리자 출퇴근 기준 시간 관리
 	 * 6. 관리자 지각/조퇴/결근 내역 관리
 	 * 7. 메인 근태
+	 * 8. 공휴일 달력
+	 * 9. ...
 	 * ===================================================================
 	 * */
 	
@@ -388,12 +390,24 @@ public class AttendanceController {
 	}
 	
 	/*====================================================================
-	 * 8. .....
+	 * 8. 공휴일 달력
 	 * ===================================================================
 	 * */
 	
 	@GetMapping("/setHoliday")
-	public String setHoliday() {
+	public String setHoliday(Model model, Map<String, Object> map) {
+		Map<String, Object> holidayMinMaxDate = attendanceService.getHolidayMinMaxDate(map);
+		
+		if (holidayMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			holidayMinMaxDate = new HashMap<>();
+			holidayMinMaxDate.put("HOLIDAY_MIN_DATE", now);
+			holidayMinMaxDate.put("HOLIDAY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("holidayMinMaxDate", holidayMinMaxDate);
+		
 		return "attendance/setHoliday";
 	}
 	
@@ -404,6 +418,19 @@ public class AttendanceController {
 		
 	    return message;
 	}
+	
+	@PostMapping("/getHoliday")
+	@ResponseBody
+	public List<Map<String, Object>> getHoliday(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> holidayList = attendanceService.getHoliday(map);
+		
+		return holidayList;
+	}
+	
+	/*====================================================================
+	 * 9. ...
+	 * ===================================================================
+	 * */
 
 	@PostMapping("/selectBox")
 	@ResponseBody

@@ -210,4 +210,12 @@ public class AttendanceService {
 		
 		return message;
 	}
+
+	public List<Map<String, Object>> getHoliday(Map<String, Object> map) {
+		return attendanceMapper.getHoliday(map);
+	}
+
+	public Map<String, Object> getHolidayMinMaxDate(Map<String, Object> map) {
+		return attendanceMapper.getHolidayMinMaxDate(map);
+	}
 }

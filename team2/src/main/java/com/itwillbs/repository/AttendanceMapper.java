@@ -53,4 +53,8 @@ public interface AttendanceMapper {
 	int insertHoliday(List<Map<String, Object>> map);
 
 	int isDuplicateHoliday(String year);
+
+	List<Map<String, Object>> getHoliday(Map<String, Object> map);
+
+	Map<String, Object> getHolidayMinMaxDate(Map<String, Object> map);
 }

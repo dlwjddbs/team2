@@ -297,11 +297,42 @@
 		SELECT * FROM DUAL
 	</insert>
 	
+	<select id="getHoliday" resultType="map">
+	<!-- getHoliday 공휴일 조회 -->
+		SELECT
+		   DATE_TIME 
+		 , IS_WEEKEND 
+		 , HOLIDAY_NAME 
+		 , IS_HOLIDAY_DAY 
+		 , IS_BUSINESS_DAY 
+	  FROM holiday
+	 WHERE 
+	 	   1 = 1
+<!-- 	   AND IS_WEEKEND = 'Y' -->
+	   AND IS_HOLIDAY_DAY = 'Y'
+	   AND IS_BUSINESS_DAY = 'N'
+	   <if test='startDate != null and startDate != ""
+  			 				and endDate != null and endDate != ""'>
+			AND DATE_TIME BETWEEN #{startDate} 
+							  AND #{endDate}   
+  	 	</if>
+	 ORDER BY DATE_TIME DESC
+	</select>
+	
 	<select id="isDuplicateHoliday" parameterType="String" resultType="Integer">
 	<!-- isDuplicateHoliday 공휴일 insert전 중복 확인 -->
 		SELECT COUNT(*) AS EXIST_COUNT
 		  FROM HOLIDAY
 		 WHERE DATE_TIME LIKE CONCAT(#{year}, '%') 
+	</select>
+	
+	<select id="getHolidayMinMaxDate" resultType="map">
+	<!-- getHolidayMinMaxDate 공휴일 데이터 최대, 최소일 조회 -->
+		SELECT 
+		     MAX(DATE_TIME)		AS HOLIDAY_MAX_DATE
+		   , MIN(DATE_TIME) 	AS HOLIDAY_MIN_DATE
+		 FROM
+		     HOLIDAY
 	</select>
     
     <select id="isDeletableAttendanceTime" resultType="Boolean">
@@ -345,17 +376,17 @@
 	
 	<select id="getSelectBoxList" resultType="map">
     <!-- getSelectBoxList 셀렉트박스 목록 조회 -->
-	SELECT 
-	 		CODE_ID 	AS CODE
-	 	  , CODE_NAME 	AS NAME
-	 	  , GROUP_ID	AS GROUP_ID
-	  FROM  COMMON_CODE
-	 WHERE 
-			1 = 1
-	   AND  USE_YN = 'Y'
-	   <if test='type != null and type != ""'>
-			AND  GROUP_ID = #{type}
-	   </if>
+		SELECT 
+		 		CODE_ID 	AS CODE
+		 	  , CODE_NAME 	AS NAME
+		 	  , GROUP_ID	AS GROUP_ID
+		  FROM  COMMON_CODE
+		 WHERE 
+				1 = 1
+		   AND  USE_YN = 'Y'
+		   <if test='type != null and type != ""'>
+				AND  GROUP_ID = #{type}
+		   </if>
     </select>
     
 	<select id="getMemberSelectBoxList" resultType="map">
