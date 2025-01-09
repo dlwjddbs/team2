@@ -182,12 +182,32 @@ public class AttendanceService {
 		return attendanceMapper.getAttendanceHistoryStackedBarChart(map);
 	}
 
-	public List<Map<String, Object>> setHoliday(Map<String, Object> map) {
-		List<Map<String, Object>> holidays = attendanceMapper.getWeekend(map);
-		System.out.println("+++++++++++++++++++++++++++");
-		System.out.println(holidays);
-		int resultCnt = attendanceMapper.insertHoliday(holidays);
+	public Map<String, Object> setHoliday(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
 		
-		return attendanceMapper.getWeekend(map);
+		String result = "이미 등록된 날짜입니다.";
+		String resultCode = "0";
+		
+		try {
+			int duplicateCnt = attendanceMapper.isDuplicateHoliday(map.get("year").toString());
+			if (duplicateCnt == 0) {
+				List<Map<String, Object>> holidays = attendanceMapper.getWeekend(map);
+				int resultCnt = attendanceMapper.insertHoliday(holidays);
+				if (resultCnt > 0) {
+					result = "등록 되었습니다.";
+					resultCode = "1";
+				} else {
+					result = "등록 실패.";
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			result = "등록 실패.";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
 	}
 }

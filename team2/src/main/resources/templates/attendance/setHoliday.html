@@ -17,6 +17,8 @@
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- daterange picker -->
 	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- Tempusdominus Bootstrap 4 -->
+  	<link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -53,16 +55,6 @@
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
-<!--						<div class="d-flex">-->
-<!--							<label class="col-form-label mr-3">발령구분</label> <select class="appointGubun" name="appointGubun"-->
-<!--								style="min-width: 120px">-->
-<!--								<option selected="selected" disabled>발령구분</option>-->
-<!--								<option>승진</option>-->
-<!--								<option>부서이동</option>-->
-<!--								<option>퇴사</option>-->
-<!--							</select>-->
-<!--						</div>-->
-					
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
@@ -76,8 +68,33 @@
 							</div>
 						</div>
 					</div>
-					<button type="button" class="btn btn-primary" id="btnAPI">apiTest</button>
-					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
+					<div class="card-tools">
+						<div class="d-flex">
+							<button type="button" class="btn btn-primary mx-1" id="">조회</button>
+						</div>
+					</div>
+				</div>
+				<!-- 검색 필터 -->
+				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+					<div class="d-flex">
+						<div class="d-flex ml-4">
+						<!-- Date -->
+							<label for="" class="col-form-label mr-3" style="min-width: 70px;">등록년도</label>
+	                    	<div class="input-group date" id="reservationdate" data-target-input="nearest">
+	                        	<input type="text" id="calYear" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+	                        	<div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+		                            <div class="input-group-text">
+		                            	<i class="fa fa-calendar"></i>
+		                            </div>
+		                        </div>
+		                    </div>
+						</div>
+					</div>
+					<div class="card-tools">
+						<div class="d-flex">
+							<button type="button" class="btn btn-primary mx-1" id="btnAPI">달력등록</button>
+						</div>
+					</div>
 				</div>
 				
 				<!-- /.card -->
@@ -142,20 +159,28 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- ChartJS -->
 	<script src="../../plugins/chart.js/Chart.min.js"></script>
+	<!-- Tempusdominus Bootstrap 4 -->
+	<script src="../../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		$(function () {
+			datePicker();
 		});
 		
 		$("#btnAPI").on("click", function () {
-		    let holidayList = [];
+			let year = $("#calYear").val();
+			if (year == null || year == '') {
+				alert("등록년도를 선택하세요.");
+				return;
+			}
+			
+		    let list = [];
 
-		    var xhr = new XMLHttpRequest();
-		    var url = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'; /* URL */
-		    var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + 'Kzk%2FzP8JrAlHgSZ%2B2U4glzgw0FQf3e780Ekifo2Tt7EeGVIuXj1QuokxdkZx%2Brm7wg5Dcc71116nLS6Z4O8KLg%3D%3D'; /* Service Key */
-		    queryParams += '&' + encodeURIComponent('solYear') + '=' + encodeURIComponent('2025'); /* 년 */
-// 		    queryParams += '&' + encodeURIComponent('solMonth') + '=' + encodeURIComponent('01'); /*월*/
+		    let xhr = new XMLHttpRequest();
+		    let url = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'; /* URL */
+		    let queryParams = '?' + encodeURIComponent('serviceKey') + '=' + 'Kzk%2FzP8JrAlHgSZ%2B2U4glzgw0FQf3e780Ekifo2Tt7EeGVIuXj1QuokxdkZx%2Brm7wg5Dcc71116nLS6Z4O8KLg%3D%3D'; /* Service Key */
+		    queryParams += '&' + encodeURIComponent('solYear') + '=' + encodeURIComponent(year); /* 년 */
 		    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('100'); /* 한 페이지 출력 개수 */
 
 		    xhr.open('GET', url + queryParams);
@@ -163,32 +188,58 @@
 		    xhr.onreadystatechange = function () {
 		        if (this.readyState == 4) {
 		            if (this.status == 200) {
-		                var parser = new DOMParser();
-		                var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
+		                let parser = new DOMParser();
+		                let xmlDoc = parser.parseFromString(this.responseText, "text/xml");
 
-		                var items = xmlDoc.getElementsByTagName("item");
-		                for (var i = 0; i < items.length; i++) {
-		                    var locdate = items[i].getElementsByTagName("locdate")[0].textContent;
-		                    var dateName = items[i].getElementsByTagName("dateName")[0].textContent;
-		                    var formattedDate = `${locdate.substring(0, 4)}-${locdate.substring(4, 6)}-${locdate.substring(6, 8)}`;
+		                let items = xmlDoc.getElementsByTagName("item");
 
-		                    // 배열 형태로 저장
-		                    holidayList.push({
-		                    	DATE_TIME: formattedDate,
-		                    	DATE_NAME: dateName
-		                    });
+		                let tempMap = new Map(); // 중복 체크용 Map
+
+		                for (let i = 0; i < items.length; i++) {
+		                    let locdate = items[i].getElementsByTagName("locdate")[0].textContent;
+		                    let dateName = items[i].getElementsByTagName("dateName")[0].textContent;
+		                    let formattedDate = `${locdate.substring(0, 4)}-${locdate.substring(4, 6)}-${locdate.substring(6, 8)}`;
+
+		                    // 중복 날짜 확인 및 DATE_NAME 병합 처리
+		                    if (tempMap.has(formattedDate)) {
+		                        let existingName = tempMap.get(formattedDate);
+		                        tempMap.set(formattedDate, existingName + ", " + dateName);
+		                    } else {
+		                        tempMap.set(formattedDate, dateName);
+		                    }
+		                }
+		                
+		                if (tempMap.size == 0) {
+		                	alert("API에서 업데이트 되지 않은 년도입니다.");
+		                	
+		                	return;
 		                }
 
-		                console.log(holidayList);
-
-		                // JSON 형태로 서버에 전송
+		                // Map을 holidayList 배열로 변환
+		                tempMap.forEach((value, key) => {
+		                    list.push({
+		                        DATE_TIME: key,
+		                        DATE_NAME: value
+		                    });
+		                });
+		                
+		                // year 값과 holidayList를 함께 전송
+		                let requestData = {
+		                    year: year,
+		                    list: list
+		                };
+		                
 		                $.ajax({
 		                    type: "POST",
 		                    url: "/setHoliday",
 		                    contentType: "application/json",
-		                    data: JSON.stringify(holidayList),
+		                    data: JSON.stringify(requestData),
 		                    success: function (res) {
-		                        console.log("setHoliday() 성공:", res);
+		                    	alert(res.result);
+		    	           		
+		    	            	if (res.resultCode == 1) {
+		    						location.reload();
+		    	            	}
 		                    },
 		                    error: function (e) {
 		                        console.log("setHoliday() ajax 실패");
@@ -201,6 +252,7 @@
 		    };
 		    xhr.send('');
 		});
+		
 		
 // 		$("#btnAPI").on("click", function() {
 // 			getHolidayAPI().then(data => {
@@ -316,6 +368,17 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 		}
+		
+		function datePicker() {
+			let nowYear = new Date().getFullYear();
+			//Date picker
+		    $('#reservationdate').datetimepicker({
+	            format: 'YYYY',
+	            minDate: (nowYear - 2).toString(),
+				maxDate: (nowYear + 1).toString()
+		    });
+		}
+	    
 	</script>
 </body>
 </html>

@@ -51,4 +51,6 @@ public interface AttendanceMapper {
 	List<Map<String, Object>> getWeekend(Map<String, Object> map);
 
 	int insertHoliday(List<Map<String, Object>> map);
+
+	int isDuplicateHoliday(String year);
 }

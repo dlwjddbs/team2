@@ -399,15 +399,10 @@ public class AttendanceController {
 	
 	@PostMapping("/setHoliday")
 	@ResponseBody
-	public String setHoliday(@RequestBody List<Map<String, Object>> map) {
-		// TODO
-		// API에서 중복된 값 넘어올 때 처리해야됨.
-		Map<String, Object> map2 = new HashMap<>();
-		map2.put("list", map);
-		map2.put("year", "2025");
-		List<Map<String, Object>> result = attendanceService.setHoliday(map2);
+	public Map<String, Object> setHoliday(@RequestBody Map<String, Object> map) {
+		Map<String, Object> message = attendanceService.setHoliday(map);
 		
-	    return "데이터 수신 성공!";
+	    return message;
 	}
 
 	@PostMapping("/selectBox")
