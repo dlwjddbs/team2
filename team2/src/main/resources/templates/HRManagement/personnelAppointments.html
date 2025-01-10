@@ -261,9 +261,9 @@
 					</div>
 					<div class="d-flex">
 						<button type="button" class="btn btn-dark" id="btnSearch">조회</button>
-						<button type="button" class="btn btn-dark mx-1" id="btnAdd">등록</button>
-						<button type="button" class="btn btn-dark" id="btnSave">저장</button>
-						<button type="button" class="btn btn-dark" id="btnDelete">저장</button>
+						<button type="button" class="btn btn-dark ml-1" id="btnAdd">등록</button>
+						<button type="button" class="btn btn-dark ml-1" id="btnSave">저장</button>
+						<button type="button" class="btn btn-dark ml-1" id="btnDelete">삭제</button>
 					</div>
 				</div>
 				<div class="container-fluid">
@@ -275,7 +275,7 @@
 
 
 									<table id="appointments"
-										class="table table-bordered table-striped">
+										class="table table-bordered table-striped table-valign-middle">
 										<tbody>
 											<!-- dataTable Ajax -->
 										</tbody>
@@ -344,13 +344,15 @@
     $(document).ready(function () {
         // Select2 초기화
         $('.appointGubun').select2();
+        
+        let defaultDate = moment(); // 오늘 날짜로 moment 객체 생성
+        console.log("Initial Default Date (as moment):", defaultDate);
 
-        // Datepicker 초기화
         $('#reservationdate').datetimepicker({
             format: 'YYYY-MM-DD',
             locale: 'ko',
-            defaultDate: moment(),
-            minDate: moment()
+            defaultDate: defaultDate, // moment 객체 전달
+            minDate: moment() // 최소 날짜 설정
         });
 
         // 날짜 범위 선택기 설정 및 테이블 초기 로드
@@ -546,7 +548,7 @@
 
                             return `
                                 <div class="d-flex">
-                                    ${currentGradeSelect} <span class="mx-2 mt-1"> → </span>
+                                    ${currentGradeSelect} <span class="mr-2 mt-1">→ </span>
                                     ${newGradeSelect}
                                 </div>
                             `;
@@ -591,7 +593,15 @@
                         data: "ETC",
                         title: "비고",
                         defaultContent: "",
-                        render: (data) => `<input type="text" class="form-control-custom editable-field etc" value="${data || ''}" />`
+                        render: (data) => ` <textarea 
+                        class="form-control-custom3 editable-field etc" 
+                    >${data || ''}</textarea>`
+                    },                    
+                    {
+                        data: "CREATE_AT", 
+                        title: "작성일자", 
+                        defaultContent: "", 
+                        render: (data) => `<div type="text" class="form-control-custom2">${data || ''}</div>` 
                     },
                     {
                         data: "HISTORY_ID", 
@@ -604,7 +614,7 @@
                 columnDefs: [
                     { width: "40px", className: "text-center", targets: [0, 1] },
                     { width: "150px", targets: [2, 3, 4, 5] },
-                    { width: "250px", targets: 8 },
+                    { width: "220px", targets: 8 },
                 ],
                 responsive: true,
                 lengthChange: false,
@@ -930,33 +940,39 @@
 	});
     
 	 // btnDelete 클릭 이벤트
-	$("#deleteBtn").on("click", function () {
-	    const selectedIds = [];
-	
-	    $("#appointments tbody .row-checkbox:checked").each(function () {
-	        selectedIds.push($(this).val()); // 체크된 행의 MEMBER_ID 추가
-	    });
-	
-	    if (selectedIds.length === 0) {
-	        alert("삭제할 항목을 선택하세요.");
-	        return;
-	    }
-	
-	    $.ajax({
-	        url: "/appointments/delete",
-	        type: "POST",
-	        contentType: "application/json",
-	        data: JSON.stringify(selectedIds),
-	        success: function (response) {
-	            alert(response);
-	            $("#appointments").DataTable().ajax.reload(); // 테이블 갱신
-	        },
-	        error: function (error) {
-	            console.error("삭제 오류:", error);
-	            alert("삭제 중 오류가 발생했습니다.");
-	        }
-	    });
-	});
+	$("#btnDelete").on("click", function () {
+    const selectedIds = [];
+
+    // 선택된 체크박스에서 HISTORY_ID 추출
+    $("#appointments tbody .row-checkbox:checked").each(function () {
+        const data = JSON.parse($(this).val()); // JSON.parse로 객체 복원
+        if (data && data.HISTORY_ID) {
+            selectedIds.push(data.HISTORY_ID); // HISTORY_ID만 추출
+        }
+    });
+
+    if (selectedIds.length === 0) {
+        alert("삭제할 항목을 선택하세요.");
+        return;
+    }
+
+    // AJAX 호출
+    $.ajax({
+        url: "/deleteAppointments",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(selectedIds), // List<String> 형식으로 전송
+        success: function (response) {
+            alert(response);
+            $("#appointments").DataTable().ajax.reload(); // 테이블 갱신
+        },
+        error: function (error) {
+            console.error("삭제 오류:", error);
+            alert("삭제 중 오류가 발생했습니다.");
+        }
+    });
+});
+
 
 	</script>
 	<style>
@@ -998,6 +1014,25 @@
 	appearance: none;
 }
 
+.form-control-custom3 {
+	display: block;
+	width: 100%;
+	height: auto;
+	padding: .375rem .75rem;
+	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 0.7;
+	color: #495057;
+	outline-color: #80bdff;
+	background-color: #ffffff00;
+	background-clip: padding-box;
+	border: 1px solid #ced4daa3;
+	border-radius: .25rem;
+	box-shadow: inset 0 0 0 transparent;
+	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+	resize: none;
+}
+
 .form-control-custom:focus {
 	outline: 0.5px solid #80bdff;
 }
@@ -1027,6 +1062,7 @@
 	top: 50%;
 	transform: translateY(-60%) !important;
 }
+
 .pagination {
 	justify-content: end;
 }

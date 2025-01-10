@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.itwillbs.service.AppointmentsService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class AppointmentsController {
 
 	private final AppointmentsService appointmentsService;
@@ -97,19 +97,27 @@ public class AppointmentsController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 사항 저장 중 오류가 발생했습니다.");
 		}
 	}
-	
-	 @PostMapping("/delete")
-	    public ResponseEntity<?> deleteHistory(@RequestBody List<String> historyIds) {
-	        if (historyIds == null || historyIds.isEmpty()) {
-	            return ResponseEntity.badRequest().body("삭제할 내역이 없습니다.");
-	        }
 
-	        int deletedCount = appointmentsService.deleteHistories(historyIds);
+	@PostMapping("/deleteAppointments")
+	public ResponseEntity<?> deleteHistory(@RequestBody List<String> historyIds) {
+	    if (historyIds == null || historyIds.isEmpty()) {
+	        return ResponseEntity.badRequest().body("삭제할 내역이 없습니다.");
+	    }
+
+	    try {
+	        System.out.println("Received IDs: " + historyIds);
+
+	        int deletedCount = appointmentsService.deleteHistories(historyIds); // 서비스 호출
 
 	        if (deletedCount > 0) {
 	            return ResponseEntity.ok("성공적으로 " + deletedCount + "개의 내역이 삭제되었습니다.");
 	        } else {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제된 내역이 없습니다.");
 	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 처리 중 오류가 발생했습니다.");
 	    }
+	}
+
 }

@@ -22,11 +22,6 @@ public class AppointmentsService {
         return appointMapper.getMinMaxDate();
     }
 
-    public List<Map<String, Object>> getAppointList(Map<String, Object> params) {
-        List<Map<String, Object>> results = appointMapper.getAppointList(params);
-//        System.out.println("Results: " + results);
-        return results;
-    }
     
     public List<Map<String, Object>> getAllDepartments() {
         return appointMapper.getAllDepartments();
@@ -40,6 +35,13 @@ public class AppointmentsService {
         return appointMapper.getOrgTree(); 
     }
     
+    // 조회
+    public List<Map<String, Object>> getAppointList(Map<String, Object> params) {
+    	List<Map<String, Object>> results = appointMapper.getAppointList(params);
+    	return results;
+    }
+    
+    // 등록
     public void updateAppointments(List<Map<String, Object>> employeeData) {
         for (Map<String, Object> employee : employeeData) {
         	
@@ -71,6 +73,7 @@ public class AppointmentsService {
         }
     }
     
+    // 수정저장
     public void updateChangedAppointments(List<Map<String, Object>> employeeData) {
         for (Map<String, Object> employee : employeeData) {
             System.out.println("HISTORY_ID: " + employee.get("HISTORY_ID"));
@@ -78,14 +81,28 @@ public class AppointmentsService {
             appointMapper.updateChangedColumns(employee);
         }
     }
-
+        
+    //삭제
+    @Transactional
     public int deleteHistories(List<String> historyIds) {
-        int deletedCount = 0;
+        int totalDeleted = 0;
 
         for (String historyId : historyIds) {
-            deletedCount += appointMapper.deleteHistoryById(historyId);
+        	
+            Map<String, Object> memberData = appointMapper.getMemberDataByHistoryId(historyId);
+
+            if (memberData != null) {
+                String memberId = (String) memberData.get("MEMBER_ID");
+                String oldDept = (String) memberData.get("OLD_DEPT");
+                String oldGrade = (String) memberData.get("OLD_GRADE");
+
+                appointMapper.restoreMemberData(memberId, oldDept, oldGrade);
+            }
+
+            totalDeleted += appointMapper.deleteHistoryById(historyId);
         }
 
-        return deletedCount;
+        return totalDeleted;
     }
+
 }
