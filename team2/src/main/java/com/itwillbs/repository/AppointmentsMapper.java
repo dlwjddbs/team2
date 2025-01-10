@@ -35,10 +35,14 @@ public interface AppointmentsMapper {
 
     void updateChangedColumns(Map<String, Object> changes);
 
-    int deleteHistoryById(String historyId);
+    Map<String, Object> getMemberDataByHistoryId(@Param("historyId") String historyId);
 
-	Map<String, Object> getPreviousHistory(String memberId);
+    void restoreMemberData(
+        @Param("memberId") String memberId,
+        @Param("oldDept") String oldDept,
+        @Param("oldGrade") String oldGrade
+    );
 
-	int updateMemberDeptAndGrade(Map<String, Object> memberData);
-	
+    int deleteHistoryById(@Param("historyId") String historyId);
+
 }

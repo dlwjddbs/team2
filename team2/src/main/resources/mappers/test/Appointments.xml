@@ -19,7 +19,9 @@
 		OLD_DEPT,
 		mh.NEW_DEPT AS
 		NEW_DEPT,
-		mh.ETC AS ETC
+		mh.ETC AS ETC,
+		TO_CHAR(mh.CREATE_AT,
+		'YYYY-MM-DD') AS CREATE_AT
 		FROM MEMBER_HISTORY mh
 		LEFT JOIN MEMBER m
 		ON
@@ -36,7 +38,7 @@
 		<if test="appointGubun != null and appointGubun != ''">
 			AND mh.assignment_type = #{appointGubun}
 		</if>
-		ORDER BY HISTORY_ID ASC
+		ORDER BY mh.CREATE_AT DESC
 	</select>
 
 	<select id="getMinMaxDate" resultType="map">
@@ -77,6 +79,7 @@
 		ORDER BY codeName ASC
 	</select>
 
+	<!-- 조직도 조회 -->
 	<select id="getOrgTree" resultType="map">
 		SELECT
 		d.CODE_ID AS deptId,
@@ -158,27 +161,29 @@
 		WHERE HISTORY_ID = #{HISTORY_ID}
 	</update>
 
-	 <delete id="deleteHistoryById">
-        DELETE FROM MEMBER_HISTORY
-        WHERE HISTORY_ID = #{historyId}
-    </delete>
-    
-    <update id="updateMemberDeptAndGrade">
-        UPDATE MEMBER
-        SET 
-            DEPT_ID = #{deptId},
-            GRADE_ID = #{gradeId}
-        WHERE MEMBER_ID = #{memberId}
-    </update>
-    
-     <select id="getPreviousHistory" resultType="map">
-        SELECT 
-            DEPT_ID,
-            GRADE_ID
-        FROM MEMBER_HISTORY
-        WHERE MEMBER_ID = #{memberId}
-        ORDER BY CHANGE_DATE DESC
-        OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY
-    </select>
+	<select id="getMemberDataByHistoryId" parameterType="string"
+		resultType="map">
+		SELECT
+		MEMBER_ID,
+		OLD_DEPT,
+		OLD_GRADE
+		FROM
+		MEMBER_HISTORY
+		WHERE
+		HISTORY_ID = #{historyId}
+	</select>
 
+	<update id="restoreMemberData">
+		UPDATE MEMBER
+		SET
+		DEPT_ID = #{oldDept},
+		GRADE_ID = #{oldGrade}
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+
+	<delete id="deleteHistoryById">
+		DELETE FROM MEMBER_HISTORY
+		WHERE HISTORY_ID =
+		#{historyId}
+	</delete>
 </mapper>

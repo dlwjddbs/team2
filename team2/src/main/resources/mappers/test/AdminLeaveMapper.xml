@@ -9,12 +9,22 @@
 	<!-- 전체 직원 연차 리스트 -->
 	<select id="selectLeaveList" resultType="map">
 		SELECT
-			   MEMBER_ID
-			 , 
-		  FROM
-		  	   ANNUAL_LEAVE
-	 LEFT JOIN
-	 		   MEMBER M  
-	   
+			   LH.MEMBER_ID
+			 , M.NAME 
+			 , REQUEST_ID 
+			 , CC.CODE_ID AS TYPE
+			 , START_DATE 
+			 , END_DATE  
+			 , USED_DAYS
+		 FROM
+		 	   LEAVE_HISTORY LH 
+	LEFT JOIN
+			   MEMBER M
+			   					ON
+			   					   LH.MEMBER_ID = M.MEMBER_ID 
+	LEFT JOIN
+			   COMMON_CODE CC
+			   					ON
+			   					   LH.LEAVE_TYPE_ID  = CC.CODE_ID
 	</select>
 </mapper>

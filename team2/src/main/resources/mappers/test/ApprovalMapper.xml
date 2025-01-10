@@ -5,7 +5,60 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.ApprovalMapper">
-<!--     <insert id="insertApprovalRequest"> -->
-    	
-<!--     </insert> -->
+    <insert id="insertApprovalRequest">
+    	INSERT INTO APPROVAL_REQUEST (
+			  REQUEST_ID
+			, APPROVAL_TYPE
+			, TITLE
+			, CONTENT
+			, MEMBER_ID
+			, START_DATE
+			, END_DATE
+			, REQUEST_FILE
+			, CREATE_DATE
+		) VALUES (
+			  (SELECT 'AR' || LPAD(NVL(MAX(SUBSTR(REQUEST_ID, 3)), 0) + 1, 10, 0) FROM APPROVAL_REQUEST)
+			, #{APPROVAL_TYPE}
+			, #{TITLE}
+			, #{CONTENT}
+			, #{MEMBER_ID}
+			, #{START_DATE}
+			, #{END_DATE}
+			, #{REQUEST_FILE, jdbcType=VARCHAR}
+			, CURRENT_DATE
+		)
+		
+	    <selectKey keyProperty="request_id" resultType="String" order="AFTER">
+	        SELECT 'AR' || LPAD(NVL(MAX(SUBSTR(REQUEST_ID, 3)), 0), 10, 0) FROM APPROVAL_REQUEST
+	    </selectKey>
+    </insert>
+    
+    <select id="selectApprovalLine" parameterType="String" resultType="map">
+	    SELECT 
+			   DEPT_ID
+			 , MEMBER_ID		AS APPROVER_ID
+			 , LEVEL			AS HIERARCHY_LEVEL
+		  FROM DEPARTMENT
+		 START WITH DEPT_ID = (SELECT DEPT_ID FROM MEMBER WHERE MEMBER_ID = #{MEMBER_ID})
+		CONNECT BY PRIOR PARENT_DEPT_ID = DEPT_ID
+		 ORDER SIBLINGS BY DEPT_ID
+	</select>
+	
+	<insert id="insertApprovalStep" parameterType="map">
+	    INSERT INTO APPROVAL_STEP (
+			  STEP_ID
+			, REQUEST_ID
+			, APPROVER_ID
+			, STEP_ORDER
+			, STATUS
+			, CREATE_DATE
+		) VALUES (
+			  (SELECT 'AS' || LPAD(NVL(MAX(SUBSTR(STEP_ID, 3)), 0) + 1, 10, 0) FROM APPROVAL_STEP)
+			, #{REQUEST_ID}
+			, #{APPROVER_ID}
+			, #{STEP_ORDER}
+			, #{STATUS}
+			, CURRENT_DATE
+		)
+	</insert>
 </mapper>
