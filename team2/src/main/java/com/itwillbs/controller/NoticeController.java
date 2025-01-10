@@ -61,7 +61,7 @@ public class NoticeController {
     	List<Map<String, Object>> noticeList = noticeService.getNoticeList(map);
     	
     	// 관리자인 경우만 editable, deletable 필드 추가
-    	boolean isAdmin = "AD".equals(authority);
+    	boolean isAdmin = "ADM".equals(authority);
         for (Map<String, Object> notice : noticeList) {
             notice.put("editable", isAdmin);
             notice.put("deletable", isAdmin);
