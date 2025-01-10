@@ -61,4 +61,34 @@
 			, CURRENT_DATE
 		)
 	</insert>
+	
+	<select id="selectApprovalPendingList" resultType="map">
+		SELECT 
+			   r.REQUEST_ID 
+<!-- 			 , cc.CODE_ID  -->
+			 , cc.CODE_NAME 
+			 , r.TITLE 
+			 , r.CONTENT 
+			 , r.MEMBER_ID 
+			 , m.NAME
+<!-- 			 , cc2.CODE_ID  -->
+			 , cc2.CODE_NAME
+			 , r.START_DATE 
+			 , r.END_DATE 
+			 , r.REQUEST_FILE 
+			 , TO_CHAR(r.CREATE_DATE, 'YYYY-MM-DD')		AS CREATE_DATE
+		  FROM APPROVAL_REQUEST r
+			   INNER JOIN APPROVAL_STEP s
+			   		   ON r.REQUEST_ID = s.REQUEST_ID
+			   INNER JOIN COMMON_CODE cc 
+			   		   ON r.APPROVAL_TYPE = cc.CODE_ID 
+			   INNER JOIN MEMBER m
+			   		   ON r.MEMBER_ID = m.MEMBER_ID 
+			   INNER JOIN COMMON_CODE cc2
+			   		   ON m.DEPT_ID = cc2.CODE_ID 
+		 WHERE 
+		 	   1 = 1
+		   AND s.APPROVER_ID = #{id}
+		   AND s.STATUS = 'PENDING'
+	</select>
 </mapper>

@@ -13,5 +13,7 @@ public interface ApprovalMapper {
 	List<Map<String, Object>> selectApprovalLine(String request_id);
 
 	int insertApprovalStep(Map<String, String> tmpMap);
+
+	List<Map<String, Object>> selectApprovalPendingList(Map<String, Object> map);
 	
 }

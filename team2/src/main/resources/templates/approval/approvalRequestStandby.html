@@ -191,7 +191,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getApprovalRequestStandby",
+					url : "/selectApprovalPendingList",
 					type:"POST",
 					data : {
 // 						startDate : date[0],					
@@ -203,16 +203,15 @@
 		            }
 				},
 				columns : [
-// 					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
-// 					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
-// 					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
-// 					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
-// 					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
-// 					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
-// 					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-// 					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
-// 					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
-// 					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
+					// 상세보기 화면 만들어야됨 임시 출력
+					{data : "REQUEST_ID", title : "결재ID", "defaultContent": ""},
+					{data : "CREATE_DATE", title : "생성일", "defaultContent": ""},
+					{data : "CODE_NAME", title : "결재종류", "defaultContent": ""},
+					{data : "TITLE", title : "제목", "defaultContent": ""},
+					{data : "CONTENT", title : "내용", "defaultContent": ""},
+					{data : "START_DATE", title : "시작일", "defaultContent": ""},
+					{data : "END_DATE", title : "종료일", "defaultContent": ""},
+					{data : "NAME", title : "요청자명", "defaultContent": ""},
 				],
 				responsive : true, 
 				lengthChange : false, 

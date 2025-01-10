@@ -2,6 +2,7 @@ package com.itwillbs.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -74,6 +75,17 @@ public class ApprovalController {
 //		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
 		
 		return "/approval/approvalRequestStandby";
+	}
+	
+	@PostMapping("selectApprovalPendingList")
+	@ResponseBody
+	public List<Map<String, Object>> selectApprovalPending(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		List<Map<String, Object>> approvalList = approvalService.selectApprovalPendingList(map);
+		
+		return approvalList;
 	}
 	
 	@GetMapping("/approvalRequestCompletion")

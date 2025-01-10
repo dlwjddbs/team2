@@ -64,5 +64,9 @@ public class ApprovalService {
 		
 		return message;
 	}
+
+	public List<Map<String, Object>> selectApprovalPendingList(Map<String, Object> map) {
+		return approvalMapper.selectApprovalPendingList(map);
+	}
 	
 }
