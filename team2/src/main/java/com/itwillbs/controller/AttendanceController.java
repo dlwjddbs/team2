@@ -190,7 +190,7 @@ public class AttendanceController {
 		map.put("id", id);
 		
         // 관리자 아닐 시 뒤로 보내기
-//        else if (!authority.equals("AD") && request.getHeader("Referer") != null) {
+//        else if (!authority.equals("ADM") && request.getHeader("Referer") != null) {
 //        	return "redirect:" + request.getHeader("Referer");
 //        }
 		
