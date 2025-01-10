@@ -221,7 +221,7 @@
 		            }
 				},
 				columns : [
-					{data : "CREATE_DATE", title : "일자", "defaultContent": ""},
+					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
 					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
 					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
 					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
@@ -248,7 +248,7 @@
                 success : function(res){
 					let labels = [];
 					let data = [];
-					
+					console.log(res)
 					res.forEach((element) => {
 						labels.push(element.ATTENDANCE_TEXT);
 						data.push(element.PIE_CHART_VALUE);
