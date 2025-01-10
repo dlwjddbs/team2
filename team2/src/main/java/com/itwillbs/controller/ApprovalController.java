@@ -1,8 +1,11 @@
 package com.itwillbs.controller;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.ApprovalService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -21,12 +25,11 @@ public class ApprovalController {
 	
 	private final ApprovalService approvalService;
 	
-	@GetMapping("/approvalRequestList")
-	public String approvalRequestList(HttpSession session) {
+	@GetMapping("/createApprovalRequest")
+	public String createApprovalRequest(HttpSession session) {
 		
-		return "/approval/approvalRequestList";
+		return "/approval/createApprovalRequest";
 	}
-	
 	
 	@PostMapping("createApprovalRequest")
 	@ResponseBody
@@ -43,4 +46,40 @@ public class ApprovalController {
 		
 		return message;
 	}
+	
+	@GetMapping("/approvalRequestStandby")
+	public String approvalRequestStandby(HttpServletRequest request, HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+		
+		if (!session.getAttribute("authority").toString().equals("ADM") 
+        			&& request.getHeader("Referer") != null) {
+        	return "redirect:" + request.getHeader("Referer");
+        }
+		
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+//		Map<String, Object> commuteMinMaxDate = approvalService.getMyCommuteHistoryMinMaxDate(map);
+//		
+//		if (commuteMinMaxDate == null) {
+//			LocalDate now = LocalDate.now();
+//			
+//			commuteMinMaxDate = new HashMap<>();
+//			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
+//			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
+//		}
+//		
+//		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		
+		return "/approval/approvalRequestStandby";
+	}
+	
+	@GetMapping("/approvalRequestCompletion")
+	public String approvalRequestCompletion(HttpSession session) {
+		
+		return "/approval/approvalRequestCompletion";
+	}
+	
 }

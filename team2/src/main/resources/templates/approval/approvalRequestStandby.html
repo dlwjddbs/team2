@@ -67,7 +67,6 @@
 						</div>
 					</div>
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
-					<button type="button" class="btn btn-primary" id="btnTest">test</button>
 				</div>
 				
 				<div class="container-fluid">
@@ -140,32 +139,13 @@
 // 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 // 			let date = $("#reservation").val().split(' ~ ');
 			
-// 			dataTable('example1', date);
+			dataTable('example1');
 		});
 		
 // 		$("#btnSearch").on("click", function() {
 // 			let date = $("#reservation").val().split(' ~ ');
 // 			dataTable('example1', date);
 // 		});
-
-		$("#btnTest").on("click", function() {
-			$.ajax({
-	            type : "POST",
-	            url : "/createApprovalRequest",
-	            data : {
-				},
-	            success : function(res){
-	           		alert(res.result);
-	           		
-	            	if (res.resultCode == 1) {
-						location.reload();
-	            	}
-	            },
-	            error : function(e){
-	                console.log("insertApprovalRequest() ajax 실패");
-	            }
-	        });
-		});
 		
 		function dateRangePicker() {
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
@@ -188,7 +168,7 @@
 			$("#reservation").attr("readonly",true); 
 		}
 		
-		function dataTable(tableId, date) {
+		function dataTable(tableId) {
 			// 기존 테이블 삭제
 			if ($.fn.dataTable.isDataTable("#" + tableId)) {
 				$("#" + tableId).DataTable().destroy();
@@ -211,27 +191,28 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getAttendanceHistory",
+					url : "/getApprovalRequestStandby",
 					type:"POST",
 					data : {
-						startDate : date[0],					
-						endDate : date[1]
+// 						startDate : date[0],					
+// 						endDate : date[1]
 					},
 					"dataSrc": function (res) {
+						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
-					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
-					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
-					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
-					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
-					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
-					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
-					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
-					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
-					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
+// 					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
+// 					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
+// 					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
+// 					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
+// 					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
+// 					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
+// 					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
+// 					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
+// 					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
+// 					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
 				],
 				responsive : true, 
 				lengthChange : false, 
