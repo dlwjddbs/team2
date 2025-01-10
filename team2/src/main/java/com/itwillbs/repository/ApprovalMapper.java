@@ -8,8 +8,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ApprovalMapper {
 
-//	int insertApprovalRequest(Map<String, Object> map);
+	void insertApprovalRequest(Map<String, Object> map);
 
-//	List<Map<String, Object>> getMyAttendanceHistory(Map<String, Object> map);
+	List<Map<String, Object>> selectApprovalLine(String request_id);
+
+	int insertApprovalStep(Map<String, String> tmpMap);
 	
 }

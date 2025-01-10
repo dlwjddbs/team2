@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.itwillbs.repository.ApprovalMapper;
 
@@ -16,26 +17,46 @@ public class ApprovalService {
 
 	private final ApprovalMapper approvalMapper;
 
-	public Map<String, Object> insertApprovalRequest(Map<String, Object> map) {
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> createApprovalRequest(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 		
 		String result = "이미 등록된 코드입니다.";
 		String resultCode = "0";
 		
 		try {
-			// 나중에 휴가 중복처리 해야할 듯...
-//			int duplicateCnt = commonCodeMapper.isDuplicateCommonCodeGroup(map);
-//			if (duplicateCnt == 0) {
-//				int resultCnt = approvalMapper.insertApprovalRequest(map);
-//				if (resultCnt > 0) {
-//					result = "등록 되었습니다.";
-//					resultCode = "1";
-//				} else {
-//					result = "등록 실패.";
-//				}
-//			}
+			// 1. Approval Request INSERT 및 REQUEST_ID 반환
+			approvalMapper.insertApprovalRequest(map);
+			String REQUEST_ID = map.get("request_id").toString();
+			
+			// 2. 결재 라인 SELECT
+	        List<Map<String, Object>> approvalSteps = approvalMapper.selectApprovalLine(map.get("MEMBER_ID").toString());
+	        
+	        // 3. Approval Step INSERT 반복
+	        for (Map<String, Object> step : approvalSteps) {
+	        	Map<String, String> tmpMap = new HashMap<>();
+	        	
+	        	String STEP_ORDER = step.get("HIERARCHY_LEVEL").toString();
+	        	// 첫번째 순서만 PENDING, 나머진 DEACTIVATION, PENDING이 결재 진행중 단계
+	        	// DEACTIVATION, PENDING, APPROVED, REJECTED, PREV_STEP_REJECTED
+	        	String STATUS = "DEACTIVATION";
+	        	if (STEP_ORDER.equals("1")) {
+	        		STATUS = "PENDING";
+	        	}
+	        	
+	        	tmpMap.put("REQUEST_ID", REQUEST_ID);
+	        	tmpMap.put("APPROVER_ID", step.get("APPROVER_ID").toString());
+	        	tmpMap.put("STEP_ORDER", STEP_ORDER);
+	        	tmpMap.put("STATUS", STATUS);
+	        	
+	        	int resultCnt = approvalMapper.insertApprovalStep(tmpMap);
+	        }
+	        
+	        result = "등록 성공";
+			resultCode = "1";
 		} catch (Exception e) {
 			result = "등록 실패.";
+			throw e;
 		}
 		
 		message.put("result", result);
@@ -43,9 +64,5 @@ public class ApprovalService {
 		
 		return message;
 	}
-	
-//	public List<Map<String, Object>> getGroupCommonCode(Map<String, Object> map) {
-//		return commonCodeMapper.getGroupCommonCode(map);
-//	}
 	
 }
