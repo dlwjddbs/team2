@@ -29,8 +29,13 @@ public class SalaryService {
 	}
 	
 	// 급여 조회 - 사원 ID의 급여 정보를 조회
-	public Map<String, Object> findSalaryById(String id) {
-		return salaryMapper.selectSalaryListById(id);
+//	public Map<String, Object> findSalaryById(String id) {
+//		return salaryMapper.selectSalaryListById(id);
+//	}
+	
+	// 급여 조회 - 사원 ID의 급여 정보를 조회 (귀속연월 추가)
+	public Map<String, Object> findSalaryById(Map<String, Object> salaryMap) {
+		return salaryMapper.selectSalaryListById(salaryMap);
 	}
 	
 	// 급여 입력 - 입력된 날짜 조회

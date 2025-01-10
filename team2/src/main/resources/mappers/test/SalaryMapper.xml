@@ -71,14 +71,15 @@
     </select>
     
     <select id="selectSalaryListById" resultType="map">
-    <!-- 사원ID에 해당하는 급여정보를 조회 -->
-		 SELECT
-            S.PAYDAY,
+    <!-- 사원ID와 귀속연월에 해당하는 급여정보를 조회 -->
+    <!-- 만약 귀속연월이 없으면 사원ID에 해당하는 급여정보를 조회 -->
+		SELECT
             M.MEMBER_ID,
             M.NAME,
             M.GRADE_ID,
             M.DEPT_ID,
             M.SALARY,
+            S.PAYDAY,
             S.POSITION_BONUS,
             S.HOLIDAY_BONUS,
             S.NIGHT_BONUS,
@@ -90,14 +91,17 @@
 		FROM 
 			MEMBER M
 		LEFT JOIN SALARY S
-          ON M.MEMBER_ID = S.MEMBER_ID
+          	   ON M.MEMBER_ID = S.MEMBER_ID
 		WHERE
 			1 = 1
-		AND
-			M.MEMBER_ID = #{id}
+			AND
+				M.MEMBER_ID = #{id}
+			<if test='payday != null'>
+				AND 
+					S.PAYDAY = #{payday}
+			</if>
 		ORDER BY
-			PAYDAY DESC
-		
+			S.PAYDAY DESC
     </select>
     
     <!-- 사원별 급여 입력(관리자) -->
@@ -170,35 +174,33 @@
 
 		    
 		INSERT INTO salary (
-		MEMBER_ID,
-		GRADE_ID,
-		PAYDAY,
-		POSITION_BONUS,
-		HOLIDAY_BONUS,
-		NIGHT_BONUS,
-		YEAREND_BONUS,
-		FULLSERVICE_BONUS,
-		PERFORMANCE_BONUS
-		)
-        SELECT 
-            m.member_id,
-            m.grade_id,
-            #{PAYDAY},  
-            #{POSITION_BONUS}, 
-            #{HOLIDAY_BONUS},    
-	    #{NIGHT_BONUS},
-            #{YEAREND_BONUS},
-            #{FULLSERVICE_BONUS},
-            #{PERFORMANCE_BONUS}
-        FROM member m
-        WHERE m.member_id = #{MEMBER_ID}
-        AND NOT EXISTS (
-            SELECT 1
-            FROM salary s
-            WHERE s.member_id = m.member_id
-        )
-		    
-		    
+				MEMBER_ID,
+				GRADE_ID,
+				PAYDAY,
+				POSITION_BONUS,
+				HOLIDAY_BONUS,
+				NIGHT_BONUS,
+				YEAREND_BONUS,
+				FULLSERVICE_BONUS,
+				PERFORMANCE_BONUS
+				)
+		        SELECT 
+		            m.member_id,
+		            m.grade_id,
+		            #{PAYDAY},  
+		            #{POSITION_BONUS}, 
+		            #{HOLIDAY_BONUS},    
+			    #{NIGHT_BONUS},
+		            #{YEAREND_BONUS},
+		            #{FULLSERVICE_BONUS},
+		            #{PERFORMANCE_BONUS}
+		        FROM member m
+		        WHERE m.member_id = #{MEMBER_ID}
+<!--         AND NOT EXISTS ( -->
+<!--             SELECT 1 -->
+<!--             FROM salary s -->
+<!--             WHERE s.member_id = m.member_id -->
+<!--         ) -->	    
 	</insert>
  	
  	<!-- 급여 수정 - 사원의 기본금 수정 -->

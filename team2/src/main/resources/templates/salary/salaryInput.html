@@ -177,7 +177,7 @@
 					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
 						render: function(data, type, row) {
 							// MEMBER_ID를 클릭 가능한 링크로 설정
-							return `<a href="#" id="${data}" class="edit-link">${data}</a>`;
+							return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
 						}
 					},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
@@ -269,10 +269,8 @@
 			  			$('#department').val(salaryData.DEPT_ID);					// 부서 ID
 			  			$('#grade').val(salaryData.GRADE_ID);						// 직급 ID
 						$('#salary').val(salaryData.SALARY);						// 기본급
-			  			
 						
-						
-			  			// 모달 표시
+						// 모달 표시
 			  			$('#modal-lg').modal('show');
 			  		},
 			  		error: function() {

@@ -38,12 +38,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>급여 등록 현황</h1>
+							<h1>급여 입력</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">급여 등록 현황</li>
+								<li class="breadcrumb-item active">급여 입력</li>
 							</ol>
 						</div>
 					</div>
@@ -52,33 +52,7 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-			
-				<nav th:replace="~{includes/modals/editSalary :: editSalary}"></nav>
-				
-				<!-- 검색 필터 -->
-				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
-					<div class="d-flex">
-						<div class="d-flex ml-4">
-							<!-- Date range -->
-							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
-							<div class="input-group">
-								<div class="input-group-prepend">
-									<span class="input-group-text">
-										<i class="far fa-calendar-alt"></i>
-									</span>
-								</div>
-								<input type="text" class="form-control float-right" id="reservation">
-							</div>
-						</div>
-					</div>
-					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
-				</div>
-<!-- 				<div class="col-2"> -->
-<!-- 					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1"> -->
-<!-- 						급여 정보 입력 -->
-<!-- 					</button> -->
-<!-- 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav> -->
-<!-- 				</div> -->
+				<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -144,11 +118,6 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		$(document).ready(function () {
-		    $('#example1').on('draw.dt', function () {
-		        $('#example1 thead th').css('font-size', '15px'); // 원하는 글자 크기 설정
-		    });
-		});
 		$(function () {
 			// 페이지 첫 로딩 시 테이블 출력
 			$("#example1").DataTable({
@@ -167,7 +136,7 @@
 		            }
 				},
 				ajax : {
-					url : "/salaryInputList",
+					url : "/salaryInput",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (abc) {
@@ -178,11 +147,10 @@
 				},
 				columns : [
 					// DB컬럼명 일치하게 작성
-					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
 						render: function(data, type, row) {
 							// MEMBER_ID를 클릭 가능한 링크로 설정
-							return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
+							return `<a href="#" id="${data}" class="edit-link">${data}</a>`;
 						}
 					},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
@@ -241,13 +209,13 @@
 				        }
 				    },
 					{data: "SALARY", title: "기본급", "defaultContent": "" },
-					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" }
+// 					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
+// 					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
+// 					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
+// 					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
+// 					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
+// 					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
+// 					{data: "TOTAL", title: "실지급액", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -259,20 +227,18 @@
 			  
 			  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
 			  $('#example1').on('click', 'a.edit-link', function(event) {
-				  	event.preventDefault(); // 기본 링크 동작 방지
-				  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
-			        var payday = $(this).data('payday') ?? null; // 귀속연월 가져오기 (값이 없으면 null)
-				  	console.log("클릭된 사원 번호:", id);
-				  	console.log("클릭된 귀속연월:", payday);
-				  	loadModalContent(id, payday); // 모달 콘텐츠 로드 함수 호출
+			  	event.preventDefault(); // 기본 링크 동작 방지
+			  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
+			  	console.log("클릭된 사원 번호:", id);
+			  	loadModalContent(id); // 모달 콘텐츠 로드 함수 호출
 			  });
 			  
-		  function loadModalContent(id, payday) {
+		  function loadModalContent(id) {
 			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
 			  	$.ajax({
 			  		url: "/getModalContent",  
 			  		type: "POST",
-			  		data: { id: id, payday: payday },
+			  		data: { id: id },
 			  		success: function(salaryData) {
 			  			console.log("사원 번호:", id);
 			  			console.log("서버 데이터:", salaryData);
@@ -282,15 +248,7 @@
 						$('#name').val(salaryData.NAME);							// 이름
 			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
 			  			$('#deptId').val(salaryData.DEPT_ID);						// 부서 ID
-			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
 						$('#salary').val(salaryData.SALARY);						// 기본급
-			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
-			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 연휴 수당
-	  					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 수당
-			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 만기근속자포상
-			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 실적우수자포상
-			  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
 			  			
 			  			// 모달 표시
 			  			$('#modal-lg').modal('show');
@@ -342,7 +300,7 @@
 			            }
 					},
 					ajax : {
-						url : "/salaryInputList",
+						url : "/salaryInput",
 						type:"POST",
 						data : {
 							startDate : date[0],					
@@ -359,7 +317,7 @@
 						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
 							render: function(data, type, row) {
 								// MEMBER_ID를 클릭 가능한 링크로 설정
-								return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
+								return `<a href="#" id="${data}" class="edit-link">${data}</a>`;
 							}
 						},
 						{data: "NAME", title: "사원명", "defaultContent": "" },
@@ -377,7 +335,9 @@
 					responsive : true, 
 					lengthChange : false, 
 					autoWidth : false,
-					buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]        
+					buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]
+					
+	                
 				}).buttons()
 				  .container()
 				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
@@ -407,6 +367,7 @@
 	        });
 
 		});
+		
 
 			function isNumberKey(evt) {
 			            // 숫자만 입력되도록 제한
@@ -416,7 +377,8 @@
 			            }
 			            return true; // 숫자인 경우 true 반환
 			        }
-				
+			
+					
 					$(document).ready(function() {
 					    // 금액 입력 필드에만 이벤트를 설정
 					    $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
@@ -436,8 +398,6 @@
 					
 			// 급여 등록 버튼을 클릭시 이벤트 발생
 			$('#submitBtn2').click(function () {
-				
-			    // 입력 필드 값 가져오기	    
 				var writeSalaryForm = $("#writeSalaryForm").serialize();
 				console.log(writeSalaryForm);
 				console.log(decodeURIComponent(writeSalaryForm));
@@ -446,7 +406,8 @@
 			    $.ajax({
 			        url: '/writeSalary', // 컨트롤러 매핑 URL
 			        type: 'POST',
-			        data: $("#writeSa/laryForm").serialize(),
+			        data: $("#writeSalaryForm").serialize(),
+
 			        success: function (response) {
 			            alert('급여 입력 성공!');
 			            window.location.href = '/salaryInput';
@@ -457,31 +418,6 @@
 			    });
 			});
 			
-			// 급여 수정 버튼을 클릭시 이벤트 발생
-			$('#submitBtn').click(function () {
-				//debugger;
-				
-				//return;
-				
-				var editSalaryForm = $("#editSalaryForm").serialize();
-				console.log(editSalaryForm); 
-				
-			    // AJAX로 서버에 데이터 전송
-			    $.ajax({
-			        url : '/editSalary', // 컨트롤러 매핑 URL
-			        type : 'POST',
-			        data : $("#editSalaryForm").serialize(),
-			        success: function (response) {
-			            alert('급여 수정 성공!');
-			            console.log(response);
-						window.location.href = '/salaryInput';
-			        },
-			        error: function (error) {
-			        	console.log(error);
-			            alert('급여 수정 실패');
-			        }
-			    });
-			});			
 		
 	</script>
 </body>

@@ -167,28 +167,34 @@ public class SalaryController {
 		return salaryInfoData;
 	}
 	
-	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴 (Test)
+	// 입력, 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
     @PostMapping("/getModalContent")
     @ResponseBody
-    public Map<String, Object> getModalContent(@RequestParam("id") String id) {
+    public Map<String, Object> getModalContent(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
     	log.info("============= getModalContent POST start =============");
     	
     	log.info(id);
+    	log.info(payday);
     	
-        // ID에 해당하는 데이터를 가져와서 model에 추가
-    	Map<String, Object> salaryData = salaryService.findSalaryById(id); // DB에서 ID에 맞는 정보를 가져옴
+    	Map<String, Object> salaryMap = new HashMap<>();
+    	salaryMap.put("id", id);
     	
-    	log.info("Salary Data : " + salaryData.toString());
+    	// payday가 없으면 null로 들어가야하는데 빈 문자열로 인식하는 문제
+    	// 파라미터를 명확히 null로 처리
+    	salaryMap.put("payday", payday == null || payday.trim().isEmpty() ? null : payday);
+
+        // DB에서 ID에 해당하는 데이터를 가져와서 model에 추가
+    	//Map<String, Object> salaryData = salaryService.findSalaryById(id);
+    	Map<String, Object> salaryData = salaryService.findSalaryById(salaryMap);
+    	
+    	log.info("Salary Data : " + salaryData);
     	
     	log.info("============= getModalContent POST end =============");
     	
     	return salaryData;
     }
     
-    // 수정 버튼을 클릭시 해당 멤버의 급여 정보를 수정 (Test)
-    // 현재 해당 멤버의 SALARY 테이블의 정보만 수정 가능, MEMBER 테이블의 기본급도 수정 추가 예정
-    // 현재 상여금만 수정 가능, 날짜도 수정되게 추가 필요
-    // 일단 코드 동작은 되나 좀 더 깔끔하게 수정 필요?
+    // 수정 버튼을 클릭시 해당 멤버의 급여 정보를 수정
     @PostMapping("/editSalary")
     @ResponseBody
     public String updateSalary(@RequestParam Map<String, Object> map) {

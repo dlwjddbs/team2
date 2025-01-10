@@ -17,7 +17,10 @@ public interface SalaryMapper {
 	List<Map<String, Object>> selectSalaryList(Map<String, Object> map);
 	
 	// 급여 조회 - 사원ID에 해당하는 급여정보를 조회
-	Map<String, Object> selectSalaryListById(String id);
+//	Map<String, Object> selectSalaryListById(String id);
+	
+	// 급여 조회 - 사원ID에 해당하는 급여정보를 조회 (귀속연월 추가)
+	Map<String, Object> selectSalaryListById(Map<String, Object> salaryMap);
 	
 	// 급여 입력 - 급여조회에서 최대최소일 조회
 	Map<String, Object> getSalaryListMinMaxDate(String id);
