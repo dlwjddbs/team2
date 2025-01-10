@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AdminLTE 3 | Calendar</title>
-
-<!-- Google Font: Source Sans Pro -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome -->
-<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-<!-- Ion Slider -->
-<link rel="stylesheet" href="../plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
-<!-- fullCalendar -->
-<link rel="stylesheet" href="../plugins/fullcalendar/main.css">
-<!-- Theme style -->
-<link rel="stylesheet" href="../dist/css/adminlte.min.css">
-<style>
-	.ui-front { z-index:9999996 !important; }
-	.ui-dialog { z-index:9999997 !important; }
-</style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AdminLTE 3 | Calendar</title>
+	
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+	<!-- Ion Slider -->
+	<link rel="stylesheet" href="../plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
+	<!-- fullCalendar -->
+	<link rel="stylesheet" href="../plugins/fullcalendar/main.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../dist/css/adminlte.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -29,6 +27,8 @@
 	
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		
+		<nav th:replace="~{includes/modals/leaveRequest :: leave_request}"></nav>
 	
 		<div class="content-wrapper">
 			<!-- 콘텐츠 해더 -->
@@ -95,7 +95,6 @@
 											data-toggle="modal" data-target="#modal-xl">
 										휴가 신청
 									</button>
-									<nav th:replace="~{includes/modals/leaveRequest :: leave_request}"></nav>
 								</div>
 							</div>
 							<!-- /.유저 프로필 -->
@@ -168,45 +167,41 @@
 	<!-- Ion Slider -->
 	<script src="../plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
 	<!-- bs-custom-file-input -->
-	<scripts src="../../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+	<script src="../../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 	<!-- InputMask -->
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>	
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<script th:inline="javascript">
-		$(document).ready(function () {
-			$('#modal-xl').on('shown.bs.modal', function () {
-				debugger;
-		        dateRangePicker(); // 데이터 피커 초기화 호출
-		    });
-			function dateRangePicker() {
-				console.log("datePicker");
-				// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
-				$('#reservation').daterangepicker({
-					locale: {
-						"separator": " ~ ",
-						"format": 'YYYY-MM-DD',
-						"applyLabel": "선택",
-				     	"cancelLabel": "취소",
-				     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
-				     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-				      	"firstDay": 1,
-						"minDate": "-1M",
-						"maxDate": "+1M"
-				    },
-				});
-				$("#reservation").attr("readonly",true); 
-				console.log("datePicker");
-			}
-		});	
 		$(function () {
 			calendar();
 			slider();
-		    setInterval(updateDateTime, 1000);
+// 		    setInterval(updateDateTime, 1000);
 			checkInOutBtnInit();
 			event();
 			getUserInfo();
+			
+			dateRangePicker();
 		});
+		
+		function dateRangePicker() {
+			console.log('dateRangePicker');
+			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
+			$('#reservation').daterangepicker({
+				locale: {
+					"separator": " ~ ",
+					"format": 'YYYY-MM-DD',
+					"applyLabel": "선택",
+			     	"cancelLabel": "취소",
+			     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
+			     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+			      	"firstDay": 1
+// 					"minDate": "-1M",
+// 					"maxDate": "+1M"
+			    },
+			});
+			$("#reservation").attr("readonly",true); 
+		}
 
 		function event() {
 			$("#checkInBtn").on("click", function() {
