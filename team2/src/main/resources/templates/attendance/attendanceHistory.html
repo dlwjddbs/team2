@@ -248,7 +248,7 @@
 		            }
 				},
 				columns : [
-					{data : "CREATE_DATE", title : "일자", "defaultContent": ""},
+					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
 					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
 					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
 					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
@@ -340,12 +340,14 @@
                 	let early_leave = [];
         			let late = [];
         			let normal = [];
+        			let absence = [];
         			let name = [];
-                	
+        			
                 	res.forEach((el) => {
                 		normal.push(el.NORMAL_ATTENDANCE);
                 		late.push(el.LATE_ATTENDANCE);
                 		early_leave.push(el.EARLY_LEAVE_ATTENDANCE);
+                		absence.push(el.ABSENCE_ATTENDANCE);
                 		name.push(el.MEMBER_NAME);
                 	});
                 	
@@ -367,6 +369,11 @@
         			            label: '지각',
         			            data: late,
         			            backgroundColor: '#f56954'
+        			        },
+        			        {
+        			            label: '결근',
+        			            data: absence,
+        			            backgroundColor: 'blue'
         			        }
         				]
         			};
