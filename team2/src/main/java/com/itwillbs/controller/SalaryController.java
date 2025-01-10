@@ -211,5 +211,32 @@ public class SalaryController {
     	//return "redirect:/salaryInfo";
     	return "급여 수정 성공!";
     }
+    
+	// 관리자 급여 이체 현황 조회
+	@GetMapping("/salaryTransferList")
+	public String salaryTransferList(Map<String, Object> map, Model model, HttpSession session) {	
+		// 관리자 페이지라 관리자 로그인 필수
+//		if (session.getAttribute("id") == null) {
+//            return "redirect:/login"; 
+//        }
+		
+		log.info("============= salaryTransferList =============");
+		
+		String id = "admin";
+		Map<String, Object> salaryTransferMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
+		
+		if (salaryTransferMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			salaryTransferMinMaxDate = new HashMap<>();
+			salaryTransferMinMaxDate.put("SALARY_MIN_DATE", now);
+			salaryTransferMinMaxDate.put("SALARY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("salaryTransferMinMaxDate", salaryTransferMinMaxDate);
+		
+		return "/salary/salaryTransferList";
+	}
+	
 	
 }
