@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.HrManagementMapper">
+    <select id="selectLeave" resultType="map">
+    	SELECT
+    		   L.MEMBER_ID
+			 , M.NAME
+			 , L.TOTAL_DAYS 
+			 , L.USED_DAYS
+			 , L.REMAINING_DAYS
+		  FROM
+			   LEAVE L
+	 LEFT JOIN
+	 		   MEMBER M
+	 		   			ON
+	 		   			   L.MEMBER_ID = M.MEMBER_ID 
+		 WHERE
+		 	   YEAR = TO_CHAR(SYSDATE, 'YYYY')
+    </select>
+</mapper>

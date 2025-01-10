@@ -38,19 +38,6 @@ public class HrManagementController {
 		
 		int insertCount = hrManagementService.addMember(param);
 		
-		/*		
-		if(insertCount > 0) {
-			System.out.println("========insert 성공");
-			System.out.println("insertCount: " + insertCount);
-			
-			Object val = param.get("ID");
-			
-			System.out.println("id 타입: " + val.getClass().getName());
-//			hrManagementService.addHistory(param, "GRADE_HISTORY");
-//			hrManagementService.addHistory(param, "DEPARTMENT_HISTORY");
-		}
-		*/
-		
 		return "redirect:/memberList";
 	}
 //======================================================================================================
