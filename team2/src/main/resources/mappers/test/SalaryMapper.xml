@@ -25,8 +25,14 @@
             S.PAYDAY,
             M.MEMBER_ID,
             M.NAME,
-            S.GRADE_ID,
+            M.GRADE_ID,
+            (SELECT CODE_NAME
+            	FROM COMMON_CODE CC
+            	WHERE M.GRADE_ID = CC.CODE_ID) AS GRADE_NAME,
             M.DEPT_ID,
+            (SELECT CODE_NAME
+        		FROM COMMON_CODE CC
+        		WHERE M.DEPT_ID = CC.CODE_ID) AS DEPT_NAME,
             M.SALARY,
             S.POSITION_BONUS,
             S.HOLIDAY_BONUS,
@@ -52,7 +58,7 @@
 					AND #{endDate} 
 			</if>
 		ORDER BY
-			PAYDAY DESC
+			S.PAYDAY DESC
     </select>
     
     <select id="getSalaryListMinMaxDate" resultType="map">
@@ -105,97 +111,32 @@
     </select>
     
     <!-- 사원별 급여 입력(관리자) -->
-	<insert id="insertSalary" parameterType="map">
-<!-- 	    INSERT ALL -->
-<!-- 	        INTO SALARY ( -->
-<!-- 	            <trim prefix="" suffix="" suffixOverrides=","> -->
-<!-- 	                <if test="PAYDAY != null"> PAYDAY, </if> -->
-<!-- 	                <if test="MEMBER_ID != null"> MEMBER_ID, </if> -->
-<!-- 	                <if test="GRADE_ID != null"> GRADE_ID, </if> -->
-<!-- 	                <if test="POSITION_BONUS != null"> POSITION_BONUS, </if> -->
-<!-- 	                <if test="HOLIDAY_BONUS != null"> HOLIDAY_BONUS, </if> -->
-<!-- 	                <if test="NIGHT_BONUS != null"> NIGHT_BONUS, </if> -->
-<!-- 	                <if test="YEAREND_BONUS != null"> YEAREND_BONUS, </if> -->
-<!-- 	                <if test="FULLSERVICE_BONUS != null"> FULLSERVICE_BONUS, </if> -->
-<!-- 	                <if test="PERFORMANCE_BONUS != null"> PERFORMANCE_BONUS </if> -->
-<!-- 	            </trim> -->
-<!-- 	        ) -->
-<!-- 	        VALUES ( -->
-<!-- 	            <trim prefix="" suffix="" suffixOverrides=","> -->
-<!-- 	                <if test="PAYDAY != null"> #{PAYDAY}, </if> -->
-<!-- 	                <if test="MEMBER_ID != null"> #{MEMBER_ID}, </if> -->
-<!-- 	                <if test="GRADE_ID != null"> #{GRADE_ID}, </if> -->
-<!-- 	                <if test="POSITION_BONUS != null"> #{POSITION_BONUS}, </if> -->
-<!-- 	                <if test="HOLIDAY_BONUS != null"> #{HOLIDAY_BONUS}, </if> -->
-<!-- 	                <if test="NIGHT_BONUS != null"> #{NIGHT_BONUS}, </if> -->
-<!-- 	                <if test="YEAREND_BONUS != null"> #{YEAREND_BONUS}, </if> -->
-<!-- 	                <if test="FULLSERVICE_BONUS != null"> #{FULLSERVICE_BONUS}, </if> -->
-<!-- 	                <if test="PERFORMANCE_BONUS != null"> #{PERFORMANCE_BONUS} </if> -->
-<!-- 	            </trim> -->
-<!-- 	        ) -->
-<!-- 	        INTO MEMBER ( -->
-<!-- 	            <trim prefix="" suffix="" suffixOverrides=","> -->
-<!-- 	                <if test="NAME != null"> NAME, </if> -->
-<!-- 	                <if test="DEPT_ID != null"> DEPT_ID, </if> -->
-<!-- 	                <if test="SALARY != null"> SALARY </if> -->
-<!-- 	            </trim> -->
-<!-- 	        ) -->
-<!-- 	        VALUES ( -->
-<!-- 	            <trim prefix="" suffix="" suffixOverrides=","> -->
-<!-- 	                <if test="NAME != null"> #{NAME}, </if> -->
-<!-- 	                <if test="DEPT_ID != null"> #{DEPT_ID}, </if> -->
-<!-- 	                <if test="SALARY != null"> #{SALARY} </if> -->
-<!-- 	            </trim> -->
-<!-- 	        ) -->
-<!-- 	    SELECT * FROM dual -->
-
-<!-- 		INSERT INTO salary ( -->
-<!-- 		        PAYDAY, -->
-<!-- 		        MEMBER_ID, -->
-<!-- 		        GRADE_ID, -->
-<!-- 		        POSITION_BONUS, -->
-<!-- 		        HOLIDAY_BONUS, -->
-<!-- 		        NIGHT_BONUS, -->
-<!-- 		        YEAREND_BONUS, -->
-<!-- 		        FULLSERVICE_BONUS, -->
-<!-- 		        PERFORMANCE_BONUS -->
-<!-- 		    ) -->
-<!-- 		    SELECT  -->
-<!-- 		        #{PAYDAY} -->
-<!-- 		        m.member_id, -->
-<!-- 		        m.grade_id, -->
-<!-- 		        #{POSITION_BONUS} -->
-<!-- 		        #{HOLIDAY_BONUS} -->
-<!-- 		        #{NIGHT_BONUS} -->
-<!-- 		        #{YEAREND_BONUS} -->
-<!-- 		        #{FULLSERVICE_BONUS} -->
-<!-- 		        #{PERFORMANCE_BONUS} -->
-<!-- 		    FROM member m; -->
-
-		    
-		INSERT INTO salary (
-				MEMBER_ID,
-				GRADE_ID,
-				PAYDAY,
-				POSITION_BONUS,
-				HOLIDAY_BONUS,
-				NIGHT_BONUS,
-				YEAREND_BONUS,
-				FULLSERVICE_BONUS,
-				PERFORMANCE_BONUS
-				)
-		        SELECT 
-		            m.member_id,
-		            m.grade_id,
-		            #{PAYDAY},  
-		            #{POSITION_BONUS}, 
-		            #{HOLIDAY_BONUS},    
-			    #{NIGHT_BONUS},
-		            #{YEAREND_BONUS},
-		            #{FULLSERVICE_BONUS},
-		            #{PERFORMANCE_BONUS}
-		        FROM member m
-		        WHERE m.member_id = #{MEMBER_ID}
+	<insert id="insertSalary" parameterType="map">	    
+		INSERT INTO SALARY (
+			MEMBER_ID,
+			GRADE_ID,
+			PAYDAY,
+			POSITION_BONUS,
+			HOLIDAY_BONUS,
+			NIGHT_BONUS,
+			YEAREND_BONUS,
+			FULLSERVICE_BONUS,
+			PERFORMANCE_BONUS
+			)
+	        SELECT 
+	            m.member_id,
+	            m.grade_id,
+	            #{PAYDAY},  
+	            #{POSITION_BONUS}, 
+	            #{HOLIDAY_BONUS},    
+		    	#{NIGHT_BONUS},
+	            #{YEAREND_BONUS},
+	            #{FULLSERVICE_BONUS},
+	            #{PERFORMANCE_BONUS}
+	        FROM 
+	        	member m
+	        WHERE 
+	        	m.member_id = #{MEMBER_ID}
 <!--         AND NOT EXISTS ( -->
 <!--             SELECT 1 -->
 <!--             FROM salary s -->
