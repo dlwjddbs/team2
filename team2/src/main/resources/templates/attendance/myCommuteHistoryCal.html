@@ -15,6 +15,10 @@
 <link rel="stylesheet" href="../plugins/fullcalendar/main.css">
 <!-- Theme style -->
 <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+<style>
+	.ui-front { z-index:9999996 !important; }
+	.ui-dialog { z-index:9999997 !important; }
+</style>
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -86,6 +90,12 @@
 											</div>
 										</div>
 									</div>
+									<hr>
+									<button type="button" class="btn btn-block btn-outline-primary mt-3"
+											data-toggle="modal" data-target="#modal-xl">
+										휴가 신청
+									</button>
+									<nav th:replace="~{includes/modals/leaveRequest :: leave_request}"></nav>
 								</div>
 							</div>
 							<!-- /.유저 프로필 -->
@@ -157,8 +167,38 @@
 	<script src="../dist/js/demo.js"></script>
 	<!-- Ion Slider -->
 	<script src="../plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
-	
+	<!-- bs-custom-file-input -->
+	<scripts src="../../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>	
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<script th:inline="javascript">
+		$(document).ready(function () {
+			$('#modal-xl').on('shown.bs.modal', function () {
+				debugger;
+		        dateRangePicker(); // 데이터 피커 초기화 호출
+		    });
+			function dateRangePicker() {
+				console.log("datePicker");
+				// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
+				$('#reservation').daterangepicker({
+					locale: {
+						"separator": " ~ ",
+						"format": 'YYYY-MM-DD',
+						"applyLabel": "선택",
+				     	"cancelLabel": "취소",
+				     	"daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"], 
+				     	"monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				      	"firstDay": 1,
+						"minDate": "-1M",
+						"maxDate": "+1M"
+				    },
+				});
+				$("#reservation").attr("readonly",true); 
+				console.log("datePicker");
+			}
+		});	
 		$(function () {
 			calendar();
 			slider();
