@@ -76,7 +76,7 @@
             S.PAYDAY,
             M.MEMBER_ID,
             M.NAME,
-            S.GRADE_ID,
+            M.GRADE_ID,
             M.DEPT_ID,
             M.SALARY,
             S.POSITION_BONUS,

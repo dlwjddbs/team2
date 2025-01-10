@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-lg1" th:fragment="salarywrite">
+<div class="modal fade" id="modal-lg" th:fragment="salarywrite">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
@@ -46,6 +46,7 @@
 									<label for="exampleInputEmail1">부서명</label>
 									<select class="form-control select" id="department" name="DEPT_ID">
 										<option selected="selected" disabled>부서선택</option>
+										<option value="DEV">개발부</option>												
 										<option value="HR">인사팀</option>												
 										<option value="AC">회계팀</option>												
 										<option value="AD">총무팀</option>												
@@ -55,6 +56,8 @@
 										<option value="WEB">웹개발팀</option>												
 										<option value="MOB">모바일개발팀</option>												
 										<option value="MNT">유지보수팀</option>												
+										<option value="MS">경영지원부</option>												
+										<option value="SA">영업부</option>												
 									</select>
 								</div>
  							</div> 
@@ -82,13 +85,13 @@
 							<div class="col-md-4">
 				                <div class="form-group">
 				                  <label>급여 항목</label>
-				                 	<input type="text" readonly class="form-control" id="salary" placeholder="기본급" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="position" placeholder="직책 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="holiday" placeholder="연휴 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="night" placeholder="야근 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="yearend" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="fullservice" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
-				                	<input type="text" readonly class="form-control" id="performance "placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
 				                </div>
 							</div>
 							<div class="col-md-8">
