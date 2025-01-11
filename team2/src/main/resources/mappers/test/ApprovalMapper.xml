@@ -93,6 +93,7 @@
 				AND TO_CHAR(s.CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
 									  						 AND #{endDate} 
 			</if>
+		 ORDER BY r.START_DATE DESC 
 	</select>
 	
 	<select id="getMyCommuteHistoryMinMaxDate" parameterType="map">
@@ -151,10 +152,10 @@
 		 ORDER BY as1.STEP_ORDER ASC
 	</select>
 	
-	<update id="approveApprovalRequest">
+	<update id="updateApprovalRequest">
 		UPDATE APPROVAL_STEP 
 		   SET 
-		   	   STATUS = 'APPROVED'
+		   	   STATUS = #{STATUS}
 		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
 		     , UPDATE_DATE = CURRENT_DATE
 		 WHERE STEP_ID = (
@@ -187,22 +188,6 @@
 				 	   1 = 1
 				   AND REQUEST_ID = #{REQUEST_ID}
 				   AND STEP_ORDER = #{step} + 1
-		)
-	</update>
-	
-	<update id="returnApprovalRequest">
-		UPDATE APPROVAL_STEP 
-		   SET 
-		   	   STATUS = 'REJECTED'
-		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
-		     , UPDATE_DATE = CURRENT_DATE
-		 WHERE STEP_ID = (
-				SELECT STEP_ID 
-				  FROM APPROVAL_STEP
-				 WHERE 
-				 	   1 = 1
-				   AND REQUEST_ID = #{REQUEST_ID}
-				   AND APPROVER_ID = #{APPROVER_ID}
 		)
 	</update>
 	

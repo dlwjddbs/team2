@@ -39,8 +39,8 @@ public class ApprovalController {
 		map.put("TITLE", "휴가신청");
 		map.put("CONTENT", "개인사유");
 		map.put("MEMBER_ID", "2025010052");
-		map.put("START_DATE", "2025-01-20");
-		map.put("END_DATE", "2025-01-22");
+		map.put("START_DATE", "2025-01-27");
+		map.put("END_DATE", "2025-01-27");
 		map.put("REQUEST_FILE", null);
 		
 		Map<String, Object> message = approvalService.createApprovalRequest(map);

@@ -27,5 +27,7 @@ public interface ApprovalMapper {
 	void psRejectedApprovalRequest(Map<String, Object> map);
 
 	Map<String, Object> getMyCommuteHistoryMinMaxDate(Map<String, Object> map);
+
+	void updateApprovalRequest(Map<String, Object> map);
 	
 }

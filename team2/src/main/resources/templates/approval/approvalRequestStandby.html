@@ -211,7 +211,8 @@
 	            type : "POST",
 	            url : "/returnApprovalRequest",
 	            data : {
-	            	REQUEST_ID : $("#REQUEST_ID").text()
+	            	REQUEST_ID : $("#REQUEST_ID").text(),
+					STATUS : 'REJECTED'
 				},
 	            success : function(res){
 					alert(res.result);
@@ -231,7 +232,8 @@
 	            type : "POST",
 	            url : "/approveApprovalRequest",
 	            data : {
-	            	REQUEST_ID : $("#REQUEST_ID").text()
+	            	REQUEST_ID : $("#REQUEST_ID").text(),
+					STATUS : 'APPROVED'
 				},
 	            success : function(res){
 					alert(res.result);

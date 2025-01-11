@@ -30,7 +30,8 @@ public class ApprovalService {
 			String REQUEST_ID = map.get("request_id").toString();
 			
 			// 2. 결재 라인 SELECT
-	        List<Map<String, Object>> approvalSteps = approvalMapper.selectApprovalLine(map.get("MEMBER_ID").toString());
+			String MEMBER_ID = map.get("MEMBER_ID").toString();
+	        List<Map<String, Object>> approvalSteps = approvalMapper.selectApprovalLine(MEMBER_ID);
 	        
 	        // 3. Approval Step INSERT 반복
 	        for (Map<String, Object> step : approvalSteps) {
@@ -50,6 +51,22 @@ public class ApprovalService {
 	        	tmpMap.put("STATUS", STATUS);
 	        	
 	        	int resultCnt = approvalMapper.insertApprovalStep(tmpMap);
+	        }
+	        
+	        // 4. 자신이 결재권자일 경우 자동 승인
+	        if (approvalSteps.size() != 0) {
+	        	if (MEMBER_ID.equals(approvalSteps.get(0).get("APPROVER_ID").toString())) {
+	        		Map<String, Object> tmpMap = new HashMap<>();
+	        		tmpMap.put("REQUEST_ID", REQUEST_ID);
+		        	tmpMap.put("APPROVER_ID", MEMBER_ID);
+		        	tmpMap.put("STATUS", "APPROVED");
+	        		
+	        		// 1. 현재 단계 승인처리
+	    			approvalMapper.updateApprovalRequest(tmpMap);
+	    			
+	    			// 2. 다음단계 대기 처리
+	    			approvalMapper.pendingApprovalRequest(tmpMap);
+	        	}
 	        }
 	        
 	        result = "등록 성공";
@@ -82,7 +99,7 @@ public class ApprovalService {
 		
 		try {
 			// 1. 현재 단계 승인처리
-			approvalMapper.approveApprovalRequest(map);
+			approvalMapper.updateApprovalRequest(map);
 			
 			// 2. 다음단계 대기 처리
 			approvalMapper.pendingApprovalRequest(map);
@@ -99,6 +116,7 @@ public class ApprovalService {
 		return message;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> returnApprovalRequest(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 	
@@ -107,7 +125,7 @@ public class ApprovalService {
 		
 		try {
 			// 1. 현재 단계 반려처리
-			approvalMapper.returnApprovalRequest(map);
+			approvalMapper.updateApprovalRequest(map);
 			
 			// 2. 다음의 모든 단계 PREV_STEP_REJECTED 처리
 			approvalMapper.psRejectedApprovalRequest(map);
