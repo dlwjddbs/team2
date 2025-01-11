@@ -143,7 +143,30 @@ public class ApprovalService {
 	}
 
 	public Map<String, Object> getApprovalRequestStandbyMinMaxDate(Map<String, Object> map) {
-		return approvalMapper.getMyCommuteHistoryMinMaxDate(map);
+		return approvalMapper.getApprovalRequestStandbyMinMaxDate(map);
+	}
+
+	public Map<String, Object> cancelApprovalRequest(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "취소 실패.";
+		String resultCode = "0";
+		
+		try {
+			// 미처리된 모든 단계 취소 처리
+			int resultCnt = approvalMapper.cancelApprovalRequest(map);
+			if (resultCnt > 0) {
+				result = "취소 되었습니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
 	}
 	
 }

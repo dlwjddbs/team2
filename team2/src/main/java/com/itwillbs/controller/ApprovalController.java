@@ -38,7 +38,7 @@ public class ApprovalController {
 		map.put("APPROVAL_TYPE", "AN");
 		map.put("TITLE", "휴가신청");
 		map.put("CONTENT", "개인사유");
-		map.put("MEMBER_ID", "2025010052");
+		map.put("MEMBER_ID", "2025010050");
 		map.put("START_DATE", "2025-01-27");
 		map.put("END_DATE", "2025-01-27");
 		map.put("REQUEST_FILE", null);
@@ -104,6 +104,14 @@ public class ApprovalController {
 		map.put("APPROVER_ID", id);
 		
 		Map<String, Object> message = approvalService.returnApprovalRequest(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/cancelApprovalRequest")
+	@ResponseBody
+	public Map<String, Object> cancelApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
+		Map<String, Object> message = approvalService.cancelApprovalRequest(map);
 		
 		return message;
 	}

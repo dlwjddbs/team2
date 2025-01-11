@@ -96,7 +96,7 @@
 		 ORDER BY r.START_DATE DESC 
 	</select>
 	
-	<select id="getMyCommuteHistoryMinMaxDate" parameterType="map">
+	<select id="getApprovalRequestStandbyMinMaxDate" parameterType="map">
 		SELECT 
 		       MAX(TO_CHAR(CREATE_DATE, 'YYYY-MM-DD'))	AS APPROVAL_STEP_MAX_DATE
     		 , MIN(TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')) 	AS APPROVAL_STEP_MIN_DATE
@@ -105,6 +105,7 @@
 	     WHERE
 			   1 = 1
 		   AND APPROVER_ID = #{id}
+		   AND STATUS = 'PENDING'
 	</select>
 	
 	<select id="approvalRequestDetail" resultType="map">
@@ -213,5 +214,19 @@
 				   AND REQUEST_ID = #{REQUEST_ID}
 				   AND STEP_ORDER > #{step}
 		)
+	</update>
+	
+	<update id="cancelApprovalRequest">
+		UPDATE APPROVAL_STEP 
+		   SET STATUS = 'CANCELED'
+		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID IN (
+			 SELECT STEP_ID 
+			  FROM APPROVAL_STEP
+			 WHERE 1 = 1
+			   AND REQUEST_ID = #{REQUEST_ID}
+			   AND DECISION_DATE IS NULL
+		 )
 	</update>
 </mapper>
