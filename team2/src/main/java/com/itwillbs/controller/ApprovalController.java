@@ -62,17 +62,17 @@ public class ApprovalController {
 		String id = session.getAttribute("id").toString();
 		map.put("id", id);
 		
-//		Map<String, Object> commuteMinMaxDate = approvalService.getMyCommuteHistoryMinMaxDate(map);
-//		
-//		if (commuteMinMaxDate == null) {
-//			LocalDate now = LocalDate.now();
-//			
-//			commuteMinMaxDate = new HashMap<>();
-//			commuteMinMaxDate.put("COMMUTE_MIN_DATE", now);
-//			commuteMinMaxDate.put("COMMUTE_MAX_DATE", now);
-//		}
-//		
-//		model.addAttribute("commuteMinMaxDate", commuteMinMaxDate);
+		Map<String, Object> approvalRequestMinMaxDate = approvalService.getApprovalRequestStandbyMinMaxDate(map);
+		
+		if (approvalRequestMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			approvalRequestMinMaxDate = new HashMap<>();
+			approvalRequestMinMaxDate.put("APPROVAL_STEP_MAX_DATE", now);
+			approvalRequestMinMaxDate.put("APPROVAL_STEP_MIN_DATE", now);
+		}
+		
+		model.addAttribute("approvalRequestMinMaxDate", approvalRequestMinMaxDate);
 		
 		return "/approval/approvalRequestStandby";
 	}
@@ -97,6 +97,17 @@ public class ApprovalController {
 		return message;
 	}
 	
+	@PostMapping("/returnApprovalRequest")
+	@ResponseBody
+	public Map<String, Object> returnApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("APPROVER_ID", id);
+		
+		Map<String, Object> message = approvalService.returnApprovalRequest(map);
+		
+		return message;
+	}
+	
 	@PostMapping("selectApprovalPendingList")
 	@ResponseBody
 	public List<Map<String, Object>> selectApprovalPending(HttpSession session, @RequestParam Map<String, Object> map) {
@@ -110,7 +121,6 @@ public class ApprovalController {
 	
 	@GetMapping("/approvalRequestCompletion")
 	public String approvalRequestCompletion(HttpSession session) {
-		
 		return "/approval/approvalRequestCompletion";
 	}
 	

@@ -81,7 +81,10 @@ public class ApprovalService {
 		String resultCode = "0";
 		
 		try {
+			// 1. 현재 단계 승인처리
 			approvalMapper.approveApprovalRequest(map);
+			
+			// 2. 다음단계 대기 처리
 			approvalMapper.pendingApprovalRequest(map);
 			
 			result = "승인 되었습니다.";
@@ -94,6 +97,35 @@ public class ApprovalService {
 		message.put("resultCode", resultCode);
 		
 		return message;
+	}
+
+	public Map<String, Object> returnApprovalRequest(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+	
+		String result = "반려 실패.";
+		String resultCode = "0";
+		
+		try {
+			// 1. 현재 단계 반려처리
+			approvalMapper.returnApprovalRequest(map);
+			
+			// 2. 다음의 모든 단계 PREV_STEP_REJECTED 처리
+			approvalMapper.psRejectedApprovalRequest(map);
+			
+			result = "반려 되었습니다.";
+			resultCode = "1";
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> getApprovalRequestStandbyMinMaxDate(Map<String, Object> map) {
+		return approvalMapper.getMyCommuteHistoryMinMaxDate(map);
 	}
 	
 }

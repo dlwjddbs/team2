@@ -21,5 +21,11 @@ public interface ApprovalMapper {
 	int approveApprovalRequest(Map<String, Object> map);
 
 	int pendingApprovalRequest(Map<String, Object> map);
+
+	void returnApprovalRequest(Map<String, Object> map);
+
+	void psRejectedApprovalRequest(Map<String, Object> map);
+
+	Map<String, Object> getMyCommuteHistoryMinMaxDate(Map<String, Object> map);
 	
 }
