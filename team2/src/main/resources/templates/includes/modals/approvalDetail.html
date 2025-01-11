@@ -1,0 +1,86 @@
+<!-- 모달창 -->
+<div class="modal fade" id="approvalDetail" th:fragment="approvalDetail">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">결재 상세</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-5">
+								<table border="1">
+					                <tbody>
+					                    <tr>
+					                        <td>기안자</td>
+					                        <td><span id="NAME"></span></td>
+					                    </tr>
+					                    <tr>
+					                        <td>소속</td>
+					                        <td><span id="DEPT"></span></td>
+					                    </tr>
+					                    <tr>
+					                        <td>기안일</td>
+					                        <td><span id="APPROVAL_CREATE_DATE"></span></td>
+					                    </tr>
+					                    <tr>
+					                        <td>문서번호</td>
+					                        <td><span id="REQUEST_ID"></span></td>
+					                    </tr>
+					                </tbody>
+					            </table>
+							</div>
+							<div class="col-7 d-flex justify-content-end">
+								<div class="row">
+									<table border="1">
+						                <tbody id="tbody1">
+											<!-- ajax -->
+						                </tbody>
+						            </table>
+								</div>
+							</div>
+						</div>
+						
+						<table border="1" style="margin-top : 10px; width : 100%;">
+			                <tbody>
+								<tr>
+			                        <td style="width: 100px;">휴가종류</td>
+			                        <td><span id="LEAVE_NAME"></span></td>
+			                    </tr>
+			                    <tr>
+			                        <td>기간</td>
+			                        <td><span id="LEAVE_DATE"></span></td>
+			                    </tr>
+			                    <tr style="height: 100px;">
+			                        <td>사유</td>
+			                        <td><span id="CONTENT"></span></td>
+			                    </tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<div class="d-flex">
+						<button type="submit" class="btn btn-primary" id="return">반려</button>
+						<button type="submit" class="btn btn-primary ml-1" id="approve">승인</button>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->

@@ -77,6 +77,26 @@ public class ApprovalController {
 		return "/approval/approvalRequestStandby";
 	}
 	
+	@PostMapping("approvalRequestDetail")
+	@ResponseBody
+	public List<Map<String, Object>> approvalRequestDetail(@RequestParam Map<String, Object> map) {
+		
+		List<Map<String, Object>> approvalDetail = approvalService.approvalRequestDetail(map);
+		
+		return approvalDetail;
+	}
+	
+	@PostMapping("/approveApprovalRequest")
+	@ResponseBody
+	public Map<String, Object> approveApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("APPROVER_ID", id);
+		
+		Map<String, Object> message = approvalService.approveApprovalRequest(map);
+		
+		return message;
+	}
+	
 	@PostMapping("selectApprovalPendingList")
 	@ResponseBody
 	public List<Map<String, Object>> selectApprovalPending(HttpSession session, @RequestParam Map<String, Object> map) {

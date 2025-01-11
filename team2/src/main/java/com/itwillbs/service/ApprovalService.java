@@ -68,5 +68,32 @@ public class ApprovalService {
 	public List<Map<String, Object>> selectApprovalPendingList(Map<String, Object> map) {
 		return approvalMapper.selectApprovalPendingList(map);
 	}
+
+	public List<Map<String, Object>> approvalRequestDetail(Map<String, Object> map) {
+		return approvalMapper.approvalRequestDetail(map);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> approveApprovalRequest(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "승인 실패.";
+		String resultCode = "0";
+		
+		try {
+			approvalMapper.approveApprovalRequest(map);
+			approvalMapper.pendingApprovalRequest(map);
+			
+			result = "승인 되었습니다.";
+			resultCode = "1";
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
 	
 }

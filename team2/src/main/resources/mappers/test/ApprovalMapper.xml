@@ -91,4 +91,88 @@
 		   AND s.APPROVER_ID = #{id}
 		   AND s.STATUS = 'PENDING'
 	</select>
+	
+	<select id="approvalRequestDetail" resultType="map">
+		SELECT 
+			   ar.REQUEST_ID 								AS REQUEST_ID 
+			 , ar.TITLE 									AS TITLE 
+			 , ar.CONTENT 									AS CONTENT 
+			 , ar.START_DATE								AS LEAVE_START_DATE 
+			 , ar.END_DATE 									AS LEAVE_END_DATE 
+			 , ar.REQUEST_FILE 								AS REQUEST_FILE 
+			 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 		AS APPROVAL_CREATE_DATE
+			 , m.NAME 										AS NAME
+			 , cc.CODE_NAME									AS DEPT
+			 , cc2.CODE_NAME								AS GRADE
+			 , cc3.CODE_NAME								AS LEAVE_NAME
+			 , as1.STEP_ORDER 								AS STEP_ORDER
+			 , as1.STATUS 									AS STATUS
+			 , NVL(as1.DECISION_DATE, ' ') 					AS DECISION_DATE
+			 , m2.NAME 										AS APPROVER_NAME
+			 , cc4.CODE_NAME								AS APPROVER_DEPT
+			 , cc5.CODE_NAME								AS APPROVER_GRADE
+			 , cc6.CODE_NAME								AS APPROVER_STATUS
+		  FROM APPROVAL_REQUEST ar
+		  	   INNER JOIN MEMBER m
+		  	   		   ON ar.MEMBER_ID = m.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc 
+		  	   		   ON m.DEPT_ID = cc.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc2 
+		  	   		   ON m.GRADE_ID = cc2.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc3 
+		  	   		   ON ar.APPROVAL_TYPE = cc3.CODE_ID 
+		  	   INNER JOIN APPROVAL_STEP as1 
+		  	   		   ON ar.REQUEST_ID = as1.REQUEST_ID 
+		  	   INNER JOIN MEMBER m2 
+		  	   		   ON as1.APPROVER_ID = m2.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc4 
+		  	   		   ON m2.DEPT_ID = cc4.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc5 
+		  	   		   ON m2.GRADE_ID = cc5.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc6 
+		  	   		   ON as1.STATUS = cc6.CODE_ID 
+		 WHERE 
+		 	   1 = 1
+		   AND ar.REQUEST_ID = #{REQUEST_ID}
+		 ORDER BY as1.STEP_ORDER ASC
+	</select>
+	
+	<update id="approveApprovalRequest">
+		UPDATE APPROVAL_STEP 
+		   SET 
+		   	   STATUS = 'APPROVED'
+		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID = (
+				SELECT STEP_ID 
+				  FROM APPROVAL_STEP
+				 WHERE 
+				 	   1 = 1
+				   AND REQUEST_ID = #{REQUEST_ID}
+				   AND APPROVER_ID = #{APPROVER_ID}
+		)
+	</update>
+	
+	<update id="pendingApprovalRequest">
+		<selectKey keyProperty="step" resultType="Integer" order="BEFORE">
+	        SELECT STEP_ORDER 
+			  FROM APPROVAL_STEP
+			 WHERE 
+			 	   REQUEST_ID = #{REQUEST_ID}
+			   AND APPROVER_ID = #{APPROVER_ID}
+	    </selectKey>
+	    
+	    UPDATE APPROVAL_STEP 
+		   SET 
+		   	   STATUS = 'PENDING'
+	   	     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID = (
+				SELECT STEP_ID 
+				  FROM APPROVAL_STEP
+				 WHERE 
+				 	   1 = 1
+				   AND REQUEST_ID = #{REQUEST_ID}
+				   AND STEP_ORDER = #{step} + 1
+		)
+	</update>
 </mapper>

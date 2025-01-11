@@ -28,6 +28,9 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
+		
+		<!-- 모달 -->
+		<nav th:replace="~{includes/modals/approvalDetail :: approvalDetail}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -142,6 +145,93 @@
 			dataTable('example1');
 		});
 		
+		function approvalRequestDetail(id) {
+			$.ajax({
+	            type : "POST",
+	            url : "/approvalRequestDetail",
+	            data : {
+	            	REQUEST_ID : id,
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+					
+					$("#tbody1").empty();
+					
+					$("#NAME").text(res[0].NAME);
+					$("#DEPT").text(res[0].DEPT);
+					$("#APPROVAL_CREATE_DATE").text(res[0].APPROVAL_CREATE_DATE);
+					$("#REQUEST_ID").text(res[0].REQUEST_ID);
+					$("#LEAVE_NAME").text(res[0].LEAVE_NAME);
+					$("#LEAVE_DATE").text(res[0].LEAVE_START_DATE + ' ~ ' + res[0].LEAVE_END_DATE);
+					$("#CONTENT").text(res[0].CONTENT);
+					
+					let table = '';
+					table += '<tr>';
+					table += '<td rowspan="3">신청</td>';
+					table += '<td>' + res[0].DEPT + ' ' + res[0].GRADE + '</td>';
+					table += '<td rowspan="3">결재</td>';
+					
+					res.forEach(function(data) {
+						table += '<td>' + data.APPROVER_DEPT + ' ' + data.APPROVER_GRADE + '</td>';
+					});
+					
+					table += '</tr>';
+					table += '<tr>';
+					table += '<td>' + res[0].NAME + '</td>';
+					
+					res.forEach(function(data) {
+						table += '<td>' + data.APPROVER_NAME + '</td>';
+					});
+					
+					table += '</tr>';
+					table += '<tr>';
+					table += '<td>' + res[0].APPROVAL_CREATE_DATE + '</td>';
+					
+					res.forEach(function(data) {
+						table += '<td>' + data.DECISION_DATE + '</td>';
+					});
+					
+					table += '</tr>';
+					
+					$("#tbody1").append(table);				                    
+	            },
+	            error : function(e){
+	                console.log("approvalRequestDetail() ajax 실패");
+	            }
+	        });
+			
+			$('#approvalDetail').modal();
+		}
+		
+		$("#return").on("click", function() {
+			alert('test');
+		});
+		
+		$("#approve").on("click", function() {
+			$.ajax({
+	            type : "POST",
+	            url : "/approveApprovalRequest",
+	            data : {
+	            	REQUEST_ID : $("#REQUEST_ID").text()
+				},
+	            success : function(res){
+					alert(res.result);
+						           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("approveApprovalRequest() ajax 실패");
+	            }
+	        });
+		});
+		
+		
 // 		$("#btnSearch").on("click", function() {
 // 			let date = $("#reservation").val().split(' ~ ');
 // 			dataTable('example1', date);
@@ -198,20 +288,20 @@
 // 						endDate : date[1]
 					},
 					"dataSrc": function (res) {
-						console.log(res);
 		                return res;
 		            }
 				},
 				columns : [
 					// 상세보기 화면 만들어야됨 임시 출력
-					{data : "REQUEST_ID", title : "결재ID", "defaultContent": ""},
-					{data : "CREATE_DATE", title : "생성일", "defaultContent": ""},
+					{data: "REQUEST_ID", title: "문서번호", "defaultContent": "",
+						render: function(data, type, row) {
+							return '<a onclick="approvalRequestDetail(`' + data + '`)" class="edit-link">' + data + '</a>';
+						}
+					},
+					{data : "CREATE_DATE", title : "기안일", "defaultContent": ""},
 					{data : "CODE_NAME", title : "결재종류", "defaultContent": ""},
 					{data : "TITLE", title : "제목", "defaultContent": ""},
-					{data : "CONTENT", title : "내용", "defaultContent": ""},
-					{data : "START_DATE", title : "시작일", "defaultContent": ""},
-					{data : "END_DATE", title : "종료일", "defaultContent": ""},
-					{data : "NAME", title : "요청자명", "defaultContent": ""},
+					{data : "NAME", title : "기안자", "defaultContent": ""},
 				],
 				responsive : true, 
 				lengthChange : false, 

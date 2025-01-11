@@ -15,5 +15,11 @@ public interface ApprovalMapper {
 	int insertApprovalStep(Map<String, String> tmpMap);
 
 	List<Map<String, Object>> selectApprovalPendingList(Map<String, Object> map);
+
+	List<Map<String, Object>> approvalRequestDetail(Map<String, Object> map);
+
+	int approveApprovalRequest(Map<String, Object> map);
+
+	int pendingApprovalRequest(Map<String, Object> map);
 	
 }
