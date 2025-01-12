@@ -168,5 +168,70 @@
 		WHERE 
 			 MEMBER_ID = #{memberId}
 	</update>
+    
+    <select id="selectNightBonusById" resultType="map">
+    <!-- 야간 근무 시간 계산 -->
+	<!-- 사원 달별 출퇴근 및 연장,야간 근무 시간 조회 및 연장,야간근무수당 계산 -->
+		WITH DAILY_COMMUTE AS (
+		    SELECT
+		        C.MEMBER_ID,
+		        TO_CHAR(TO_DATE(C.CHECK_IN_DATE, 'YYYY-MM-DD'), 'YYYY-MM') AS COMMUTE_MONTH, -- 출근 월
+		        C.CHECK_IN_DATE, -- 출근 날짜
+		        CASE
+		            WHEN C.CHECK_OUT_TIME IS NOT NULL THEN
+		                (TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS') - TO_DATE(C.CHECK_IN_TIME, 'HH24:MI:SS')) * 24
+		            ELSE
+		                0
+		        END AS DAILY_WORK_HOURS, -- 일별 근무 시간
+		        -- 연장근무 시간 계산
+		        CASE
+		            WHEN TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS') > TO_DATE('18:00:00', 'HH24:MI:SS') THEN
+		                (LEAST(TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS'), TO_DATE('06:00:00', 'HH24:MI:SS') + 1) 
+		                - GREATEST(TO_DATE(C.CHECK_IN_TIME, 'HH24:MI:SS'), TO_DATE('18:00:00', 'HH24:MI:SS'))) * 24
+		            ELSE
+		                0
+		        END AS OVERTIME_HOURS -- 연장근무 시간
+		    FROM
+		        COMMUTE C
+		),
+		MONTHLY_COMMUTE AS (
+		    SELECT
+		        DC.MEMBER_ID,
+		        DC.COMMUTE_MONTH,
+		        COUNT(DISTINCT DC.CHECK_IN_DATE) AS WORK_DAYS, -- 월별 고유 날짜 수
+		        SUM(DC.DAILY_WORK_HOURS) AS TOTAL_WORK_HOURS, -- 월별 총 근무 시간
+		        SUM(DC.OVERTIME_HOURS) AS TOTAL_OVERTIME_HOURS -- 월별 총 연장근무 시간
+		    FROM
+		        DAILY_COMMUTE DC
+		    GROUP BY
+		        DC.MEMBER_ID,
+		        DC.COMMUTE_MONTH
+		),
+		CALCULATED_BONUS AS (
+		    SELECT
+		        MC.MEMBER_ID,
+		        MC.COMMUTE_MONTH,
+		        MC.TOTAL_OVERTIME_HOURS,
+		        M.SALARY,
+		        -- 연장근무 수당 계산 (10단위 올림 적용)
+		        CEIL((M.SALARY / 209) * 1.5 * NVL(MC.TOTAL_OVERTIME_HOURS, 0) / 10) * 10 AS OVERTIME_BONUS,
+		        -- 연장근무 수당 원본 값
+		        (M.SALARY / 209) * 1.5 * NVL(MC.TOTAL_OVERTIME_HOURS, 0) AS OVERTIME_BONUS_ORIGIN
+		    FROM
+		        MONTHLY_COMMUTE MC
+		        JOIN MEMBER M ON MC.MEMBER_ID = M.MEMBER_ID
+		)
+		SELECT
+		    CB.MEMBER_ID,
+		    CB.COMMUTE_MONTH,
+		    CB.TOTAL_OVERTIME_HOURS,
+		    CB.OVERTIME_BONUS,
+		    CB.OVERTIME_BONUS_ORIGIN
+		FROM
+		    CALCULATED_BONUS CB
+		ORDER BY
+		    CB.MEMBER_ID,
+		    CB.COMMUTE_MONTH;
+	</select>
 
 </mapper>
