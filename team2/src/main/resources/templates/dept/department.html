@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-select/css/select.bootstrap4.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+</head>
+
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<nav th:replace="~{includes/modals/upperDept :: upperDept}"></nav>
+		<!--		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>-->
+		<!--		<nav th:replace="~{includes/modals/modalCommonCode :: modalCommonCode}"></nav>-->
+		<!--		<nav th:replace="~{includes/modals/modalCommonCodeEdit :: modalCommonCodeEdit}"></nav>-->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>부서관리</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">설정</a></li>
+								<li class="breadcrumb-item active">부서관리</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 헤더 (Page header) -->
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-6">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">상위부서</h3>
+									<div class="card-tools">
+										<div class="d-flex">
+											<button type="button" class="btn btn-primary" id="btnAddUpper">등록</button>
+											<button type="button" class="btn btn-primary mx-1"
+												id="btnUpdateGroup">수정</button>
+											<button type="button" class="btn btn-primary"
+												id="btnDeleteGroup">삭제</button>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<table id="upperDept" class="table table-bordered table-striped">
+										<!-- dataTable Ajax -->
+									</table>
+								</div>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+						</div>
+						<div class="col-6">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">하위부서</h3>
+									<div class="card-tools">
+										<div class="d-flex">
+											<button type="button" class="btn btn-primary" id="btnAddCode">등록</button>
+											<button type="button" class="btn btn-primary mx-1"
+												id="btnUpdateCode">수정</button>
+											<button type="button" class="btn btn-primary" id="btnDeleteCode">삭제</button>
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<table id="commonCode" class="table table-bordered table-striped">
+										<!-- dataTable Ajax -->
+									</table>
+								</div>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+			<!-- Control sidebar content goes here -->
+		</aside>
+		<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- DataTables  & Plugins -->
+	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script src="../../plugins/jszip/jszip.min.js"></script>
+	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<script src="../../plugins/datatables-select/js/dataTables.select.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="../../dist/js/demo.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/moment/moment.min.js"></script>
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		var isUpdate = false;
+
+		$(function () {
+			upperDeptDataTable();
+		});
+
+		function upperDeptDataTable() {
+			// 기존 테이블 삭제
+			if ($.fn.dataTable.isDataTable("#upperDept")) {
+				$("#upperDept").DataTable().destroy();
+			}
+
+			let table = $("#upperDept").DataTable({
+				aaSorting: [], // 초기 정렬 비활성화
+				select: {
+					style: 'single'
+				},
+				language: {
+					search: "검색",
+					paginate: {
+						"first": "처음",
+						"last": "마지막",
+						"next": "다음",
+						"previous": "이전"
+					},
+					zeroRecords: "검색 결과 없음"
+				},
+				ajax: {
+					url: "/getUpperDept",
+					type: "POST",
+					data: {},
+					"dataSrc": function (res) {
+						return res;
+					}
+				},
+				columns: [
+					{data: "PARENT_DEPT_ID", title: "부서", "defaultContent": ""},
+					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""}
+				],
+				responsive: true,
+				lengthChange: false,
+				autoWidth: false,
+			});
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/*	$(function () {
+				upperDeptDataTable();
+			});
+	
+			$("#btnAddUpper").on("click", function () {
+				$("#PARENT_DEPT_ID").val('');
+				$("#MEMBER_ID").val('');
+				$("#USE_YN").val('');
+	
+				$('#modalUpperDept').modal();
+			});
+			
+			$("#upperDeptSave").on('click', function() {
+						let PARENT_DEPT_ID = $("#PARENT_DEPT_ID").val();
+						let MEMBER_ID = $("#GROUP_NAME").val();
+						let DESCRIPTION = $("#DESCRIPTION").val();
+						
+						if (PARENT_DEPT_ID == null || PARENT_DEPT_ID == ''
+							|| MEMBER_ID == null || MEMBER_ID == '') {
+							alert("값을 입력해 주세요.");
+							return;
+						}
+						
+							$.ajax({
+							type : "POST",
+							url : "/addCommonCodeGroup",
+							data : {
+								GROUP_ID : GROUP_ID.toUpperCase(),
+								GROUP_NAME : GROUP_NAME,
+								DESCRIPTION : DESCRIPTION
+							},
+							success : function(res){
+										alert(res.result);
+								  	
+								if (res.resultCode == 1) {
+									location.reload();
+								}
+							},
+							error : function(e){
+								console.log("addCommonCodeGroup() ajax 실패");
+							}
+						});
+					});		*/
+
+
+
+	</script>
