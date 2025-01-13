@@ -61,7 +61,7 @@
 									<div class="row">
 										<div class="col-4">
 											<div class="bg-white border rounded"
-												style="height: 300px; overflow-y: scroll;">
+												style="height: 500px; overflow-y: scroll;">
 												<ul id="orgTree"
 													class="nav nav-pills nav-sidebar flex-column nav-child-indent"
 													data-widget="treeview" role="menu"></ul>
@@ -69,7 +69,7 @@
 										</div>
 										<div class="col-8">
 											<div class="bg-white border rounded p-2"
-												style="height: 300px; overflow-y: scroll;">
+												style="height: 500px; overflow-y: scroll;">
 
 												<div id="checkedEmployees">
 													<!-- 체크된 직원 목록 -->
@@ -685,24 +685,23 @@
         });
     }
 
- 	// 조직도 렌더링
+    // 조직도 렌더링
     function renderOrgTree(data) {
         const treeContainer = $("#orgTree");
         treeContainer.empty();
 
         // 데이터를 부서와 팀으로 그룹화
         const groupedData = data.reduce((acc, item) => {
-            const parentDept = item.PARENTDEPTNAME || item.DEPTNAME; // 상위 부서 이름이 없으면 자체 부서 이름 사용
+            const parentDept = item.PARENTDEPTNAME || item.DEPTNAME;
 
             if (!acc[parentDept]) {
                 acc[parentDept] = {
                     deptName: parentDept,
-                    teams: [] // 팀 정보를 저장할 배열
+                    teams: []
                 };
             }
 
             if (item.PARENTDEPTNAME) {
-                // 팀 데이터를 추가
                 const existingTeam = acc[parentDept].teams.find(t => t.teamId === item.DEPTID);
                 if (!existingTeam) {
                     acc[parentDept].teams.push({
@@ -715,7 +714,6 @@
             return acc;
         }, {});
 
-        // 멤버 데이터를 팀에 추가
         data.forEach(item => {
             if (item.MEMBERNAME && item.PARENTDEPTNAME) {
                 const parentDept = groupedData[item.PARENTDEPTNAME];
@@ -735,14 +733,14 @@
             const parentDept = groupedData[parentDeptName];
             const deptHtml = `
                 <li class="nav-item">
-                    <a class="nav-link text-reset rounded-0 orgNav deptNav" href="#" data-dept-id="${parentDeptName}">
+                    <a class="nav-link text-reset rounded-0" href="#" data-dept-id="${parentDeptName}">
                         <div class="mdi mdi-folder-account"></div>
                         <p style="font-size: 0.95rem; font-weight: bold;">${parentDept.deptName}</p>
                     </a>
                     <ul class="nav nav-treeview">
                         ${parentDept.teams.map(team => `
                             <li class="nav-item">
-                                <a class="nav-link text-reset rounded-0 orgNav teamNav" href="#" data-team-id="${team.teamId}" data-team-name="${team.teamName}">
+                                <a class="nav-link text-reset rounded-0" href="#" data-team-id="${team.teamId}" data-team-name="${team.teamName}">
                                     <div class="mdi mdi-folder-star"></div>
                                     <p style="font-size: 0.88rem; font-weight: bold;">${team.teamName}</p>
                                 </a>
@@ -750,7 +748,7 @@
                                 <ul class="nav nav-treeview">
                                     ${team.members.map(member => `
                                         <li class="nav-item">
-                                            <a class="nav-link text-reset rounded-0 orgNav employeeNav" href="#" 
+                                            <a class="nav-link text-reset rounded-0 employeeNav" href="#" 
                                                data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
                                                data-grade-name="${member.gradeName}" data-team-name="${team.teamName}">
                                                <div class="mdi mdi-account ml-2"></div>
@@ -767,51 +765,26 @@
             treeContainer.append(deptHtml);
         });
 
-     // 이벤트 위임 방식으로 클릭 이벤트 추가
-        $(document).on("click", ".orgNav", function (e) {
-            e.preventDefault();
-
-            // 직원(3-depth) 클릭 시: 팝업 처리
-            if ($(this).hasClass("employeeNav")) {
-                const memberId = $(this).data("member-id");
-                const memberName = $(this).data("member-name");
-                const gradeName = $(this).data("grade-name");
-                const deptName = $(this).data("team-name");
-
-                if (memberId && memberName && gradeName && deptName) {
-                    // 팝업에 데이터 설정
-                    $("#memberId").text(memberId);
-                    $("#memberName").text(memberName);
-                    $("#oldDept").text(deptName);
-                    $("#oldGrade").text(gradeName);
-
-                    // 모달 열기
-                    $("#addModal2").modal("show");
-                    $("#addModal2").attr("aria-hidden", "false");
-                    $("#addModal2").find("input, select, button").attr("tabindex", "0");
-                }
-                return; // employeeNav 처리 후 종료
-            }
-
-            // 팀 클릭 시: 하위 직원 트리 열기/닫기
-            if ($(this).hasClass("teamNav")) {
-                const subTree = $(this).next("ul.nav-treeview"); // 바로 아래 하위 트리 선택
-                if (subTree.length > 0) {
-                    subTree.slideToggle(); // 열기/닫기 처리
-                }
-                return; // teamNav 처리 후 종료
-            }
-
-            // 부서 클릭 시: 하위 팀 트리 열기/닫기
-            if ($(this).hasClass("deptNav")) {
-                const subTree = $(this).next("ul.nav-treeview"); // 바로 아래 하위 트리 선택
-                if (subTree.length > 0) {
-                    subTree.slideToggle(); // 열기/닫기 처리
-                }
-                return; // deptNav 처리 후 종료
-            }
-        });
-
+       $(document).on("click", ".employeeNav", function (e) {
+    	   e.preventDefault();
+		    const memberId = $(this).data("member-id");
+		    const memberName = $(this).data("member-name");
+		    const gradeName = $(this).data("grade-name");
+		    const deptName = $(this).data("team-name");
+		
+		    if (memberId && memberName && gradeName && deptName) {
+		        // 팝업에 데이터 설정
+		        $("#memberId").text(memberId);
+		        $("#memberName").text(memberName);
+		        $("#oldDept").text(deptName);
+		        $("#oldGrade").text(gradeName);
+		
+		        // 모달 열기
+		        $("#addModal2").modal("show");
+		        $("#addModal2").attr("aria-hidden", "false");
+		        $("#addModal2").find("input, select, button").attr("tabindex", "0");
+		    }
+		});
 
 		 
         $("#confirmBtn").on("click", function () {
@@ -1177,6 +1150,11 @@
 
 .pagination {
 	justify-content: end;
+}
+
+.nav-sidebar .menu-open>.nav-treeview{
+	display: block;
+	height: 100% !important;
 }
 </style>
 </body>
