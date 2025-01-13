@@ -229,4 +229,43 @@
 			   AND DECISION_DATE IS NULL
 		 )
 	</update>
+	
+	<select id="getApprovalRequestCompletionMinMaxDate" parameterType="map">
+		SELECT
+			   MAX(DECISION_DATE) AS APPROVAL_STEP_MAX_DATE
+			 , MIN(DECISION_DATE) AS APPROVAL_STEP_MIN_DATE
+		  FROM APPROVAL_STEP as1
+		 WHERE 1 = 1
+		   AND APPROVER_ID = #{id}
+		   AND DECISION_DATE IS NOT NULL 
+	</select>
+	
+	<select id="selectApprovalCompletionList" resultType="map">
+		SELECT 
+			   ar.REQUEST_ID 							AS REQUEST_ID
+			 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE 
+			 , cc1.CODE_NAME							AS APPROVAL_TYPE
+			 , ar.TITLE 								AS TITLE
+			 , m.NAME 									AS MEMBER_NAME
+			 , as1.DECISION_DATE 						AS DECISION_DATE
+			 , cc2.CODE_NAME 							AS STATUS
+		  FROM APPROVAL_STEP as1
+		  	   INNER JOIN APPROVAL_REQUEST ar 
+		  	   		   ON as1.REQUEST_ID = ar.REQUEST_ID 
+			   INNER JOIN MEMBER m 
+			   		   ON ar.MEMBER_ID = m.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc1 
+		  	   		   ON ar.APPROVAL_TYPE = cc1.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc2 
+		  	   		   ON as1.STATUS = cc2.CODE_ID 
+		 WHERE 1 = 1
+		   AND APPROVER_ID = #{id}
+		   AND DECISION_DATE IS NOT NULL
+		   <if test='startDate != null and startDate != ""
+		 		and endDate != null and endDate != ""'>
+				AND DECISION_DATE BETWEEN #{startDate} 
+									  AND #{endDate} 
+		   </if>
+	     ORDER BY as1.DECISION_DATE DESC
+	</select>
 </mapper>

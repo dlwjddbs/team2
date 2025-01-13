@@ -168,5 +168,13 @@ public class ApprovalService {
 		
 		return message;
 	}
+
+	public Map<String, Object> getApprovalRequestCompletionMinMaxDate(Map<String, Object> map) {
+		return approvalMapper.getApprovalRequestCompletionMinMaxDate(map);
+	}
+
+	public List<Map<String, Object>> selectApprovalCompletionList(Map<String, Object> map) {
+		return approvalMapper.selectApprovalCompletionList(map);
+	}
 	
 }

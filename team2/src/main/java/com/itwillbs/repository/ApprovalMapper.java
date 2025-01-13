@@ -31,5 +31,9 @@ public interface ApprovalMapper {
 	void updateApprovalRequest(Map<String, Object> map);
 
 	int cancelApprovalRequest(Map<String, Object> map);
+
+	Map<String, Object> getApprovalRequestCompletionMinMaxDate(Map<String, Object> map);
+
+	List<Map<String, Object>> selectApprovalCompletionList(Map<String, Object> map);
 	
 }

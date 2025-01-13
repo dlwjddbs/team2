@@ -128,8 +128,43 @@ public class ApprovalController {
 	}
 	
 	@GetMapping("/approvalRequestCompletion")
-	public String approvalRequestCompletion(HttpSession session) {
+	public String approvalRequestCompletion(HttpServletRequest request, HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+		
+		if (!session.getAttribute("authority").toString().equals("ADM") 
+        			&& request.getHeader("Referer") != null) {
+        	return "redirect:" + request.getHeader("Referer");
+        }
+		
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		Map<String, Object> approvalRequestMinMaxDate = approvalService.getApprovalRequestCompletionMinMaxDate(map);
+		
+		if (approvalRequestMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			approvalRequestMinMaxDate = new HashMap<>();
+			approvalRequestMinMaxDate.put("APPROVAL_STEP_MAX_DATE", now);
+			approvalRequestMinMaxDate.put("APPROVAL_STEP_MIN_DATE", now);
+		}
+		
+		model.addAttribute("approvalRequestMinMaxDate", approvalRequestMinMaxDate);
+		
 		return "/approval/approvalRequestCompletion";
+	}
+	
+	@PostMapping("selectApprovalCompletionList")
+	@ResponseBody
+	public List<Map<String, Object>> selectApprovalCompletionList(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		List<Map<String, Object>> approvalList = approvalService.selectApprovalCompletionList(map);
+		
+		return approvalList;
 	}
 	
 }
