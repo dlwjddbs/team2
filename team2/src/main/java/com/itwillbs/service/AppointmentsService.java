@@ -1,5 +1,8 @@
 package com.itwillbs.service;
 
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.itwillbs.repository.AppointmentsMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentsService {
@@ -88,20 +93,31 @@ public class AppointmentsService {
         int totalDeleted = 0;
 
         for (String historyId : historyIds) {
-        	
+            System.out.println("Processing historyId: " + historyId);
+
             Map<String, Object> memberData = appointMapper.getMemberDataByHistoryId(historyId);
+            System.out.println("Fetched memberData: " + memberData);
 
             if (memberData != null) {
                 String memberId = (String) memberData.get("MEMBER_ID");
                 String oldDept = (String) memberData.get("OLD_DEPT");
                 String oldGrade = (String) memberData.get("OLD_GRADE");
+                String assignmentType = (String) memberData.get("ASSIGNMENT_TYPE");
+                String todayDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                if ("입사".equals(assignmentType)) {
+                    System.out.printf("Resigning MEMBER_ID=%s with CHANGE_DATE=%s%n", memberId, todayDate);
+                    appointMapper.updateMemberForResign(memberId, todayDate);
+                }
 
                 appointMapper.restoreMemberData(memberId, oldDept, oldGrade);
+                System.out.printf("Restored member data: MEMBER_ID=%s, DEPT_ID=%s, GRADE_ID=%s%n", memberId, oldDept, oldGrade);
             }
 
             totalDeleted += appointMapper.deleteHistoryById(historyId);
         }
 
+        System.out.println("Total deleted records: " + totalDeleted);
         return totalDeleted;
     }
 

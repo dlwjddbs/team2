@@ -122,8 +122,7 @@
 	<!-- MEMBER 퇴사 처리 -->
 	<update id="updateMemberForResign">
 		UPDATE MEMBER
-		<!-- SET USE_YN = 'N', -->
-		RESIGN_DATE = #{CHANGE_DATE}
+		SET USE_YN = 'N', RESIGN_DATE = #{CHANGE_DATE}
 		WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 
@@ -134,8 +133,7 @@
 		GRADE_ID =
 		#{NEW_GRADE},
 		UPDATE_DATE = CURRENT_TIMESTAMP
-		WHERE MEMBER_ID =
-		#{MEMBER_ID}
+		WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 
 	<update id="updateChangedColumns">
@@ -166,7 +164,8 @@
 		SELECT
 		MEMBER_ID,
 		OLD_DEPT,
-		OLD_GRADE
+		OLD_GRADE,
+		ASSIGNMENT_TYPE
 		FROM
 		MEMBER_HISTORY
 		WHERE
@@ -183,7 +182,6 @@
 
 	<delete id="deleteHistoryById">
 		DELETE FROM MEMBER_HISTORY
-		WHERE HISTORY_ID =
-		#{historyId}
+		WHERE HISTORY_ID = #{historyId}
 	</delete>
 </mapper>

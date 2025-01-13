@@ -362,6 +362,7 @@
 
         // 버튼 이벤트
         $('#btnAdd').on('click', function () {
+        	 resetModalFields();
             $("#addModal").modal("show");
         });
 
@@ -374,6 +375,27 @@
         });
     });
 
+    function resetModalFields() {
+        // 텍스트 입력 필드 초기화
+        $('#addModal input[type="text"]').val('');
+        $('#addModal input[type="date"]').val('');
+        $('#addModal textarea').val('');
+        
+        // 선택 필드 초기화
+        $('#addModal select').prop('selectedIndex', 0).trigger('change');
+
+        // 체크박스 초기화
+        $('#addModal input[type="checkbox"]').prop('checked', false);
+
+        // 커스텀 필드 초기화 (필요한 경우)
+        $('#checkedEmployees').empty(); // 체크된 직원 목록 초기화
+        $('#memberId').text('');
+        $('#memberName').text('');
+        $('#oldDept').text('');
+        $('#oldGrade').text('');
+    }
+
+    
     // 날짜 범위 선택기 초기화
     function initializeDateRangePicker() {
         $.ajax({

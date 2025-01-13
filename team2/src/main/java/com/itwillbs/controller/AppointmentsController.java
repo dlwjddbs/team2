@@ -107,7 +107,9 @@ public class AppointmentsController {
 	    try {
 	        System.out.println("Received IDs: " + historyIds);
 
-	        int deletedCount = appointmentsService.deleteHistories(historyIds); // 서비스 호출
+	        int deletedCount = appointmentsService.deleteHistories(historyIds);
+
+	        System.out.println("Deleted Count: " + deletedCount);
 
 	        if (deletedCount > 0) {
 	            return ResponseEntity.ok("성공적으로 " + deletedCount + "개의 내역이 삭제되었습니다.");
@@ -115,6 +117,7 @@ public class AppointmentsController {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제된 내역이 없습니다.");
 	        }
 	    } catch (Exception e) {
+	        System.err.println("Error during delete operation: " + e.getMessage());
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 처리 중 오류가 발생했습니다.");
 	    }
