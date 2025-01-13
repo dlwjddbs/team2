@@ -170,9 +170,9 @@
 					
 					let table = '';
 					table += '<tr>';
-					table += '<td rowspan="3">신청</td>';
+					table += '<td rowspan="4">신청</td>';
 					table += '<td>' + res[0].DEPT + ' ' + res[0].GRADE + '</td>';
-					table += '<td rowspan="3">결재</td>';
+					table += '<td rowspan="4">결재</td>';
 					
 					res.forEach(function(data) {
 						table += '<td>' + data.APPROVER_DEPT + ' ' + data.APPROVER_GRADE + '</td>';
@@ -195,6 +195,14 @@
 					});
 					
 					table += '</tr>';
+					table += '<tr>';
+					table += '<td></td>';
+					
+					res.forEach(function(data) {
+						table += '<td>' + data.APPROVER_STATUS + '</td>';
+					});
+					
+					table += '</tr>';
 					
 					$("#tbody1").append(table);				                    
 	            },
@@ -205,6 +213,7 @@
 			
 			$("#approve").hide();
 			$("#return").hide();
+			$("#cancel").hide();
 			
 			$('#approvalDetail').modal();
 		}

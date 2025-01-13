@@ -288,6 +288,30 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 		}
+		
+		$("#cancel").on("click", function() {
+			if (!confirm("결재를 취소 하시겠습니까?")) {
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/cancelApprovalRequest",
+	            data : {
+					REQUEST_ID : $("#REQUEST_ID").text()
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("cancelApprovalRequest() ajax 실패");
+	            }
+	        });
+		});
 	</script>
 </body>
 </html>
