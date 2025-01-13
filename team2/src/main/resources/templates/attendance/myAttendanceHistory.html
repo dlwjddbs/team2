@@ -210,7 +210,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getMyAttendanceHistory",
+					url : "/attendance/getMyAttendanceHistory",
 					type:"POST",
 					data : {
 						startDate : date[0],					
@@ -240,7 +240,7 @@
 		function donutChart(chartId, date, isUpdate) {
 			$.ajax({
                 type : "POST",
-                url : "/getMyAttendanceHistoryDonutChart",
+                url : "/attendance/getMyAttendanceHistoryDonutChart",
                 data : {
 					startDate : date[0],					
 					endDate : date[1]

@@ -200,7 +200,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getHoliday",
+					url : "/attendance/getHoliday",
 					type:"POST",
 					data : {
 						startDate : date[0],					
@@ -321,7 +321,7 @@
 		                
 		                $.ajax({
 		                    type: "POST",
-		                    url: "/setHoliday",
+		                    url: "/attendance/setHoliday",
 		                    contentType: "application/json",
 		                    data: JSON.stringify(requestData),
 		                    success: function (res) {

@@ -34,7 +34,7 @@ public class SecurityConfig {
 						.authenticated()
 						)
 			    .csrf(csrf -> csrf
-			            .ignoringRequestMatchers("/appoint/**") // 특정 경로 CSRF 비활성화
+			            .ignoringRequestMatchers("/appoint/**", "/attendance/**") // 특정 경로 CSRF 비활성화
 			        )				
 				.formLogin(formLoginCustomizer
 						-> formLoginCustomizer

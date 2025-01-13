@@ -235,7 +235,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getAttendanceHistory",
+					url : "/attendance/getAttendanceHistory",
 					type:"POST",
 					data : {
 						startDate : date[0],					
@@ -274,7 +274,7 @@
 			
 			$.ajax({
                 type : "POST",
-                url : "/getAttendanceHistoryDonutChart",
+                url : "/attendance/getAttendanceHistoryDonutChart",
                 data : {
 					startDate : date[0],					
 					endDate : date[1],
@@ -329,7 +329,7 @@
 			
 			$.ajax({
                 type : "POST",
-                url : "/getAttendanceHistoryStackedBarChart",
+                url : "/attendance/getAttendanceHistoryStackedBarChart",
                 data : {
 					startDate : date[0],					
 					endDate : date[1],
@@ -413,7 +413,7 @@
 		function selectBox(type) {
 			$.ajax({
                 type : "POST",
-                url : "/selectBox",
+                url : "/attendance/selectBox",
                 data : {
                 	type : type
                 },
