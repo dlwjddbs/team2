@@ -268,4 +268,116 @@
 		   </if>
 	     ORDER BY as1.DECISION_DATE DESC
 	</select>
+	
+		<select id="getMyApprovalRequestCompletionMinMaxDate" parameterType="map">
+ 		SELECT
+ 			   MAX(CREATE_DATE) AS MAX_CREATE_DATE
+	 		 , MIN(CREATE_DATE) AS MIN_CREATE_DATE
+		  FROM (
+				SELECT 
+					   ar.REQUEST_ID							AS REQUEST_ID
+				   	 , cc.CODE_NAME								AS APPROVAL_TYPE
+					 , ar.TITLE 								AS TITLE
+					 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE
+				     , CASE 
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'REJECTED'
+				           ) THEN '반려'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'CANCELED'
+				           ) THEN '취소'
+				           WHEN NOT EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS NOT IN ('APPROVED')
+				           ) THEN '승인'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS IN ('DEACTIVATION', 'PENDING')
+				           ) THEN '진행중'
+				           ELSE '기타'
+				       END AS TOTAL_STATUS
+				  FROM APPROVAL_REQUEST ar
+					   INNER JOIN COMMON_CODE cc 
+						   	   ON ar.APPROVAL_TYPE = cc.CODE_ID 
+				 WHERE 1 = 1
+				   AND ar.MEMBER_ID = #{id}   
+		)
+		WHERE 1 = 1
+		<choose>
+			<when test='status != null and status.equals("completion")'>
+				AND TOTAL_STATUS != '진행중'
+			</when>
+			<when test='status != null and status.equals("pending")'>
+				AND TOTAL_STATUS = '진행중'
+			</when>
+		</choose>
+	</select>
+	
+	<select id="selectMyApprovalList" parameterType="map">
+		SELECT *
+		  FROM (
+				SELECT 
+					   ar.REQUEST_ID							AS REQUEST_ID
+				   	 , cc.CODE_NAME								AS APPROVAL_TYPE
+					 , ar.TITLE 								AS TITLE
+					 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE
+				     , CASE 
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'REJECTED'
+				           ) THEN '반려'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'CANCELED'
+				           ) THEN '취소'
+				           WHEN NOT EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS NOT IN ('APPROVED')
+				           ) THEN '승인'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS IN ('DEACTIVATION', 'PENDING')
+				           ) THEN '진행중'
+				           ELSE '기타'
+				       END AS TOTAL_STATUS
+				  FROM APPROVAL_REQUEST ar
+					   INNER JOIN COMMON_CODE cc 
+						   	   ON ar.APPROVAL_TYPE = cc.CODE_ID 
+				 WHERE 1 = 1
+				   AND ar.MEMBER_ID = #{id}   
+		)
+		WHERE 1 = 1
+		<choose>
+			<when test='status != null and status.equals("completion")'>
+				AND TOTAL_STATUS != '진행중'
+			</when>
+			<when test='status != null and status.equals("pending")'>
+				AND TOTAL_STATUS = '진행중'
+			</when>
+		</choose>
+		<if test='startDate != null and startDate != ""
+		 		and endDate != null and endDate != ""'>
+				AND CREATE_DATE BETWEEN #{startDate} 
+									AND #{endDate} 
+	    </if>
+	    ORDER BY CREATE_DATE DESC
+	</select>
 </mapper>

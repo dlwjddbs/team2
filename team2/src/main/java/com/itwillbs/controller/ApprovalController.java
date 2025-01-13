@@ -56,7 +56,8 @@ public class ApprovalController {
 		
 		if (!session.getAttribute("authority").toString().equals("ADM") 
         			&& request.getHeader("Referer") != null) {
-        	return "redirect:" + request.getHeader("Referer");
+//        	return "redirect:" + request.getHeader("Referer");
+        	return "redirect:/login";
         }
 		
 		String id = session.getAttribute("id").toString();
@@ -135,7 +136,8 @@ public class ApprovalController {
 		
 		if (!session.getAttribute("authority").toString().equals("ADM") 
         			&& request.getHeader("Referer") != null) {
-        	return "redirect:" + request.getHeader("Referer");
+//        	return "redirect:" + request.getHeader("Referer");
+        	return "redirect:/login";
         }
 		
 		String id = session.getAttribute("id").toString();
@@ -167,4 +169,64 @@ public class ApprovalController {
 		return approvalList;
 	}
 	
+	@GetMapping("/myApprovalRequestCompletion")
+	public String myApprovalRequestCompletion(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+		
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		map.put("status", "completion");
+		
+		Map<String, Object> approvalRequestMinMaxDate = approvalService.getMyApprovalRequestCompletionMinMaxDate(map);
+		
+		if (approvalRequestMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			approvalRequestMinMaxDate = new HashMap<>();
+			approvalRequestMinMaxDate.put("MAX_CREATE_DATE", now);
+			approvalRequestMinMaxDate.put("MIN_CREATE_DATE", now);
+		}
+		
+		model.addAttribute("approvalRequestMinMaxDate", approvalRequestMinMaxDate);
+		
+		return "/approval/myApprovalRequestCompletion";
+	}
+	
+	@PostMapping("selectMyApprovalList")
+	@ResponseBody
+	public List<Map<String, Object>> selectMyApprovalList(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		List<Map<String, Object>> approvalList = approvalService.selectMyApprovalList(map);
+		
+		return approvalList;
+	}
+	
+	@GetMapping("/myApprovalRequestStandby")
+	public String myApprovalRequestStandby(HttpSession session, Model model, Map<String, Object> map) {
+		if (session.getAttribute("id") == null) {
+            return "redirect:/login"; 
+        }
+		
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		map.put("status", "pending");
+		
+		Map<String, Object> approvalRequestMinMaxDate = approvalService.getMyApprovalRequestCompletionMinMaxDate(map);
+		
+		if (approvalRequestMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			approvalRequestMinMaxDate = new HashMap<>();
+			approvalRequestMinMaxDate.put("MAX_CREATE_DATE", now);
+			approvalRequestMinMaxDate.put("MIN_CREATE_DATE", now);
+		}
+		
+		model.addAttribute("approvalRequestMinMaxDate", approvalRequestMinMaxDate);
+		
+		return "/approval/myApprovalRequestStandby";
+	}
 }

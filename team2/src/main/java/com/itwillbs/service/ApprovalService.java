@@ -177,4 +177,12 @@ public class ApprovalService {
 		return approvalMapper.selectApprovalCompletionList(map);
 	}
 	
+	public Map<String, Object> getMyApprovalRequestCompletionMinMaxDate(Map<String, Object> map) {
+		return approvalMapper.getMyApprovalRequestCompletionMinMaxDate(map);
+	}
+
+	public List<Map<String, Object>> selectMyApprovalList(Map<String, Object> map) {
+		return approvalMapper.selectMyApprovalList(map);
+	}
+	
 }

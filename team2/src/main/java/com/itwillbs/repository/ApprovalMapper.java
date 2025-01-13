@@ -36,4 +36,7 @@ public interface ApprovalMapper {
 
 	List<Map<String, Object>> selectApprovalCompletionList(Map<String, Object> map);
 	
+	Map<String, Object> getMyApprovalRequestCompletionMinMaxDate(Map<String, Object> map);
+
+	List<Map<String, Object>> selectMyApprovalList(Map<String, Object> map);
 }
