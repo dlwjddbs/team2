@@ -127,7 +127,8 @@
 			NIGHT_BONUS,
 			YEAREND_BONUS,
 			FULLSERVICE_BONUS,
-			PERFORMANCE_BONUS
+			PERFORMANCE_BONUS,
+			TOTAL
 			)
 	        SELECT 
 	            m.member_id,
@@ -138,7 +139,15 @@
 		    	#{NIGHT_BONUS},
 	            #{YEAREND_BONUS},
 	            #{FULLSERVICE_BONUS},
-	            #{PERFORMANCE_BONUS}
+	            #{PERFORMANCE_BONUS},
+	            (
+		            NVL(#{positionBonus}, 0)
+		          + NVL(#{holidayBonus}, 0)
+		          + NVL(#{nightBonus}, 0)
+		          + NVL(#{yearendBonus}, 0)
+		          + NVL(#{fullserviceBonus}, 0)
+		          + NVL(#{performanceBonus}, 0)
+		        ) AS TOTAL
 	        FROM 
 	        	member m
 	        WHERE 

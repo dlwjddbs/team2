@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -95,8 +97,8 @@ public class SalaryController {
 	
 	// 관리자 급여입력 내역 조회
 	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
-	@GetMapping("/salaryInputList")
-	public String salaryInputList(Map<String, Object> map, Model model, HttpSession session) {
+	@GetMapping("/salary/salaryInputList")
+	public String salaryInputList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {
 		
 		// 관리자 페이지라 관리자 로그인 필수
 //		if (session.getAttribute("id") == null) {
@@ -105,9 +107,17 @@ public class SalaryController {
 		
 		log.info("============= salaryInputList =============");
 		
-		String id = "admin";
+        if (user == null) {
+            return "redirect:/login"; 
+        }
+        
+		//String id = "admin";
+        String id = user.getUsername();
+        log.info("test1");
+
 		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
 		
+		log.info(id);
 		if (salaryInputMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
 			
@@ -117,19 +127,27 @@ public class SalaryController {
 		}
 		
 		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
-		
+		log.info("test2");
 		return "/salary/salaryInputList";
 	}
 	
 	// 관리자 급여입력 내역 조회 (POST)
 	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
-	@PostMapping("/salaryInputList")
+	@PostMapping("/salary/salaryInputList")
 	@ResponseBody
-	public List<Map<String, Object>> getSalaryInputList(@RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getSalaryInputList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
 		
 		log.info("============= salaryInputList POST =============");
 		
-		map.put("id", "admin");
+        if (user == null) {
+            //return "redirect:/login"; 
+        }
+        
+		//String id = "admin";
+        String id = user.getUsername();
+        log.info(id);
+        
+		map.put("id", user.getUsername());
 		List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
 		
 		return salaryInputData;
