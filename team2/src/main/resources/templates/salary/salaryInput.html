@@ -163,7 +163,7 @@
 		            }
 				},
 				ajax : {
-					url : "/salaryInput",
+					url : "/salary/salaryInput",
 					type :"POST",
 					data : {},
 					"dataSrc" : function (abc) {
@@ -204,7 +204,7 @@
 		  function loadModalContent(id) {
 			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
 			  	$.ajax({
-			  		url: "/getModalContent",  
+			  		url: "/salary/getModalContent",  
 			  		type: "POST",
 			  		data: { id: id },
 			  		success: function(salaryData) {
@@ -307,7 +307,7 @@
 
 			    // AJAX로 서버에 데이터 전송
 			    $.ajax({
-			        url: '/writeSalary', // 컨트롤러 매핑 URL
+			        url: '/salary/writeSalary', // 컨트롤러 매핑 URL
 			        type: 'POST',
 			        data: $("#writeSalaryForm").serialize(),
 /* 			        {

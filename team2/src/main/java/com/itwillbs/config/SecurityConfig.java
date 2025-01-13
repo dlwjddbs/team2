@@ -29,12 +29,12 @@ public class SecurityConfig {
 						-> authorizeHttpRequestsCutomizer
 						.requestMatchers("/", "/login/**", "/dist/**", "/build/**", "/docs/**", "/examples/**", "/forms/**", "/images/**", "/layout/**", "/plugins/**").permitAll()
 						.requestMatchers("/mypage/**",  "/appoint/**").authenticated()
-						.requestMatchers("/admin/**").hasAnyRole("ADMIN")
+						.requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
 						.anyRequest()
 						.authenticated()
 						)
 			    .csrf(csrf -> csrf
-			            .ignoringRequestMatchers("/appoint/**") // 특정 경로 CSRF 비활성화
+			            .ignoringRequestMatchers("/appoint/**", "/salary/**") // 특정 경로 CSRF 비활성화
 			        )				
 				.formLogin(formLoginCustomizer
 						-> formLoginCustomizer
