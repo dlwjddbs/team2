@@ -20,6 +20,9 @@
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 	<!-- daterange picker -->
 	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -33,7 +36,7 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 
-		<nav th:replace="~{includes/modals/upperDept :: upperDept}"></nav>
+		<!--		<nav th:replace="~{includes/modals/upperDept :: upperDept}"></nav>-->
 		<!--		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>-->
 		<!--		<nav th:replace="~{includes/modals/modalCommonCode :: modalCommonCode}"></nav>-->
 		<!--		<nav th:replace="~{includes/modals/modalCommonCodeEdit :: modalCommonCodeEdit}"></nav>-->
@@ -67,7 +70,8 @@
 									<h3 class="card-title">상위부서</h3>
 									<div class="card-tools">
 										<div class="d-flex">
-											<button type="button" class="btn btn-primary" id="btnAddUpper">등록</button>
+											<button type="button" class="btn btn-primary" id="btnAddUpper"
+												data-bs-target="#modalUpperDept" data-bs-toggle="modal">등록</button>
 											<button type="button" class="btn btn-primary mx-1"
 												id="btnUpdateGroup">수정</button>
 											<button type="button" class="btn btn-primary"
@@ -126,6 +130,62 @@
 	</div>
 	<!-- ./wrapper -->
 
+	<!-- 모달창 -->
+	<div class="modal fade" id="modalUpperDept" th:fragment="upperDept">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<!-- 모달창 헤더 -->
+				<div class="modal-header">
+					<h4 class="modal-title">상위부서 등록</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<!-- /.모달창 헤더 -->
+
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+						<div class="form-group">
+
+							<div class="row">
+								<div class="col-md-6">
+									<label>부서</label>
+									<select id="CODE_ID" class="form-control">
+										<option value="">선택하세요</option>
+									</select>
+								</div>
+
+								<div class="col-md-6">
+									<label>부서장</label>
+<!--									<input type="text" id="MEMBER_ID" class="form-control">-->
+									<select id="MEMBER_ID" class="form-control">
+										<option value="">선택하세요</option>
+									</select>
+								</div>
+								<div class="col-md-6">
+									<label>사용여부</label><br>
+									<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
+									<input type="radio" name="use_yn" value="N"> 미사용
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary" id="upperDeptSave">저장</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</div>
+		</div>
+	</div>
+	<!-- /.모달창 -->
+
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
@@ -156,11 +216,14 @@
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+
+		const token = $("meta[name='_csrf']").attr("content")
+		const header = $("meta[name='_csrf_header']").attr("content");
+		const name = $("#userName").val();
+
 		var isUpdate = false;
 
-		$(function () {
-			upperDeptDataTable();
-		});
+
 
 		function upperDeptDataTable() {
 			// 기존 테이블 삭제
@@ -186,13 +249,17 @@
 				ajax: {
 					url: "/getUpperDept",
 					type: "POST",
+					//추가해야 하는 부분
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+					},
 					data: {},
 					"dataSrc": function (res) {
 						return res;
 					}
 				},
 				columns: [
-					{data: "PARENT_DEPT_ID", title: "부서", "defaultContent": ""},
+					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
 					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""}
 				],
 				responsive: true,
@@ -202,63 +269,111 @@
 		}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		/*	$(function () {
-				upperDeptDataTable();
-			});
-	
+		$(document).ready(function () {
 			$("#btnAddUpper").on("click", function () {
-				$("#PARENT_DEPT_ID").val('');
-				$("#MEMBER_ID").val('');
-				$("#USE_YN").val('');
-	
-				$('#modalUpperDept').modal();
+				$("#CODE_ID").empty();
+				loadDeptIds();
+				$("#MEMBER_ID").val(''); // 부서장 초기화
+				$('input[name="use_yn"][value="Y"]').prop("checked", true); // 기본값 설정
+				$('#modalUpperDept').modal('show');
 			});
-			
-			$("#upperDeptSave").on('click', function() {
-						let PARENT_DEPT_ID = $("#PARENT_DEPT_ID").val();
-						let MEMBER_ID = $("#GROUP_NAME").val();
-						let DESCRIPTION = $("#DESCRIPTION").val();
-						
-						if (PARENT_DEPT_ID == null || PARENT_DEPT_ID == ''
-							|| MEMBER_ID == null || MEMBER_ID == '') {
-							alert("값을 입력해 주세요.");
-							return;
-						}
-						
-							$.ajax({
-							type : "POST",
-							url : "/addCommonCodeGroup",
-							data : {
-								GROUP_ID : GROUP_ID.toUpperCase(),
-								GROUP_NAME : GROUP_NAME,
-								DESCRIPTION : DESCRIPTION
-							},
-							success : function(res){
-										alert(res.result);
-								  	
-								if (res.resultCode == 1) {
-									location.reload();
-								}
-							},
-							error : function(e){
-								console.log("addCommonCodeGroup() ajax 실패");
-							}
+
+			function loadDeptIds() {
+				$.ajax({
+					type: "GET",
+					url: "/getCommonCodeIds",
+					success: function (data) {
+						let selectBox = $("#CODE_ID");
+						data.forEach(function (item) {
+							console.log("item:", item); // 반환된 데이터 확인
+							selectBox.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
 						});
-					});		*/
+					},
+					error: function () {
+						alert("부서 데이터를 불러오는 데 실패했습니다.");
+					}
+				});
+				loadDeptMng(); //부서장 호출 함수
+			}
+			
+			function loadDeptMng() {
+							$.ajax({
+								type: "GET",
+								url: "/getDepMng",
+								success: function (data) {
+									let selectBox = $("#MEMBER_ID");
+									data.forEach(function (item) {
+										console.log("item:", item); // 반환된 데이터 확인
+										selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+									});
+								},
+								error: function () {
+									alert("멤버 데이터를 불러오는 데 실패했습니다.");
+								}
+							});
+						}
+		});
+
+
+
+
+
+
+
+
+
+
+
+		$(function () {
+			upperDeptDataTable();
+		});
+
+		$("#btnAddUpper").on("click", function () {
+			$("#DEPT_ID").val('');
+			$("#MEMBER_ID").val('');
+			$("#USE_YN").val('');
+
+			$('#modalUpperDept').modal();
+		});
+
+		$("#upperDeptSave").on('click', function () {
+			let DEPT_ID = $("#CODE_ID").val();
+			let MEMBER_ID = $("#MEMBER_ID").val();
+			let CODE_USE_YN = $('input[name="use_yn"]:checked').val();
+
+			console.log("DEPT_ID", DEPT_ID)
+			console.log("부서장 : ", MEMBER_ID)
+
+
+			if (!DEPT_ID || !MEMBER_ID) {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/addUpperDept",
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data: {
+					DEPT_ID: DEPT_ID.toUpperCase(),
+					MEMBER_ID: MEMBER_ID,
+					USE_YN: CODE_USE_YN
+				},
+				success: function (res) {
+					alert(res.result);
+
+					if (res.resultCode == 1) {
+						location.reload();
+					}
+				},
+				error: function () {
+					console.log("addUpperDept() ajax 실패");
+				}
+			});
+		});
 
 
 

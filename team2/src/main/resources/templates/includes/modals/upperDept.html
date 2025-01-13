@@ -1,5 +1,5 @@
 <!-- 모달창 -->
-<div class="modal fade" id="modalUpperCode" th:fragment="upperDept">
+<div class="modal fade" id="modalUpperDept" th:fragment="upperDept">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
@@ -19,22 +19,19 @@
 						<div class="row">
 							<div class="col-md-6">
 								<label>부서</label>
-								<input type="text" id="UPPER_ID" class="form-control">
+								<select id="CODE_ID" class="form-control">
+								        <option value="">선택하세요</option>
+								    </select>
+							</div>
+							
+							<div class="col-md-6">
+								<label>부서장</label>
+								<input type="text" id="MEMBER_ID" class="form-control">
 							</div>
 							<div class="col-md-6">
-								<label>사용여부</label><br>
-								<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
-								<input type="radio" name="use_yn" value="N"> 미사용
-							</div>
-							<div class="col-md-6">
-								<label>부서명</label>
-								<input type="text" id="UPPER_NAME" class="form-control">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<label>부서 설명</label>
-								<textarea id="EXPLAIN" class="form-control" maxlength="200"></textarea>
+							<label>사용여부</label><br>
+							<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
+							<input type="radio" name="use_yn" value="N"> 미사용
 							</div>
 						</div>
 					</div>

@@ -2,6 +2,8 @@ package com.itwillbs.controller;
 
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +31,8 @@ public class CmtController {
     
 	//출근 
 	@PostMapping("/cmt/start")
-	public String cmtPro(HttpSession session,@RequestParam Map<String, Object> map, Model model) {
-		String id = session.getAttribute("id").toString();
+	public String cmtPro(@AuthenticationPrincipal User user,@RequestParam Map<String, Object> map, Model model) {
+		String id = user.getUsername();
 		map.put("memberId", id);		
 		cmtService.getCheckIn(map);
 		
@@ -39,8 +41,8 @@ public class CmtController {
 	
 	//퇴근
 	@PostMapping("/cmt/end")
-	public String endPro(HttpSession session,@RequestParam Map<String, Object> map, Model model) {
-		String id = session.getAttribute("id").toString();
+	public String endPro(@AuthenticationPrincipal User user,@RequestParam Map<String, Object> map, Model model) {
+		String id = user.getUsername();
 		
 	    map.put("memberId", id);
 	    cmtService.updateCheckOut(map);
@@ -50,12 +52,12 @@ public class CmtController {
 	
 	// 출퇴근 기록
 	@GetMapping("/commute/cmt")
-	public String getTodayHistory(HttpSession session, @RequestParam Map<String, Object> map,Model model) {
-		 if (session.getAttribute("id") == null) {
+	public String getTodayHistory(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map,Model model) {
+		 if (user.getUsername() == null) {
 	            return "redirect:/login"; 
 	        }
 	        
-	        String id = session.getAttribute("id").toString();
+		 String id = user.getUsername();
 		
 		map.put("memberId", id);
 		Map<String, Object> todayHistory = cmtService.getTodayHistory(map);		

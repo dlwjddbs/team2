@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AdminLTE 3 | Calendar</title>
 
-<!-- Google Font: Source Sans Pro -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome -->
-<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-<!-- Ion Slider -->
-<link rel="stylesheet" href="../plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
-<!-- fullCalendar -->
-<link rel="stylesheet" href="../plugins/fullcalendar/main.css">
-<!-- Theme style -->
-<link rel="stylesheet" href="../dist/css/adminlte.min.css">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AdminLTE 3 | Calendar</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+	<!-- Ion Slider -->
+	<link rel="stylesheet" href="../plugins/ion-rangeslider/css/ion.rangeSlider.min.css">
+	<!-- fullCalendar -->
+	<link rel="stylesheet" href="../plugins/fullcalendar/main.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../dist/css/adminlte.min.css">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
+
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
-	<!-- Content Wrapper. Contains page content -->
-	
+		<!-- Content Wrapper. Contains page content -->
+
 		<!-- 상단 메뉴 -->
 		<nav th:replace="~{includes/navbar :: navbar}"></nav>
-	
+
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
-	
+
 		<div class="content-wrapper">
 			<!-- 콘텐츠 해더 -->
 			<section class="content-header">
@@ -44,12 +49,12 @@
 				</div>
 			</section>
 			<!-- /.콘텐츠 해더 -->
-			
+
 			<!-- 콘텐츠 메인 -->
 			<section class="content">
 				<div class="container-fluid">
 					<div class="row">
-					
+
 						<!-- 캘린더 -->
 						<div class="col-md-10">
 							<div class="card card-primary">
@@ -61,12 +66,12 @@
 							</div>
 						</div>
 						<!-- /.캘린더 -->
-						
+
 						<!-- 출퇴관리 -->
 						<div class="col-md-2">
 							<div class="sticky-top mb-2">
 								<div class="card">
-									
+
 									<div class="card-header">
 										<h4 class="card-title">출근관리</h4>
 									</div>
@@ -74,73 +79,82 @@
 									<div class="card-body">
 										<div class="mb-4">
 											<span id="currentDateTime">날짜</span>
-<!--											
+											<!--											
 											날짜를 만들어주는 부분
 											<span th:text="${#dates.format(#dates.createNow(), 'yyyy년 MM월 dd일 HH:mm:ss')}">날짜</span>-->
 										</div>
-										
+
 										<div class="d-flex align-items-baseline">
-											<h1>20</h1><p>시간</p><h1>00</h1><p>분</p>
+											<h1>20</h1>
+											<p>시간</p>
+											<h1>00</h1>
+											<p>분</p>
 										</div>
-										
-										
+
+
 										<div class="row margin mb-5">
 											<div class="col-sm-12">
 												<input id="range_6" type="text" name="range_6">
 											</div>
 										</div>
-										
-									
-										
-										
-									
-										<p>출근시간 : <span id = "startTime" class="time_display" th:text="${todayHistory?.CHECK_IN_TIME}"> </span> </p>
-										<p>퇴근시간 : <span id = "endTime" class="time_display" th:text="${todayHistory?.CHECK_OUT_TIME} "> </span> </p>
-										
-									<!-- ========================================================================================= -->
+
+
+
+
+
+										<p>출근시간 : <span id="startTime" class="time_display"
+												th:text="${todayHistory?.CHECK_IN_TIME}"> </span> </p>
+										<p>퇴근시간 : <span id="endTime" class="time_display"
+												th:text="${todayHistory?.CHECK_OUT_TIME} "> </span> </p>
+
+										<!-- ========================================================================================= -->
 										<hr>
-										
+
 										<div class="row">
 											<div class="col-md-6">
 												<form th:action="@{/cmt/start}" method="post" id="startForm">
-												    <button id="startButton" name="check_In_time" type="submit" class="btn btn-block btn-outline-primary" 
-													onclick="return confirmStart()" th:disabled="${todayHistory?.CHECK_IN_TIME != null}">출근하기</button>
+													<button id="startButton" name="check_In_time" type="submit"
+														class="btn btn-block btn-outline-primary"
+														onclick="return confirmStart()"
+														th:disabled="${todayHistory?.CHECK_IN_TIME != null}">출근하기</button>
 												</form>
 											</div>
 											<div class="col-md-6">
 												<form th:action="@{/cmt/end}" method="post" id="endForm">
-												       <button id="endButton" name="check_Out_time" type="submit" 
-													   class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" 
-													   th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>
+													<button id="endButton" name="check_Out_time" type="submit"
+														class="btn btn-block btn-outline-primary"
+														onclick="return confirmEnd()"
+														th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>
 
-													   
-													   <!--	 <button id="endButton" name="check_Out_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>-->
 
-												    </form>
+													<!--	 <button id="endButton" name="check_Out_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>-->
+
+												</form>
 											</div>
 										</div>
-										<button type="button" class="btn btn-block btn-outline-primary mt-3">상태변경</button>
+										<button type="button"
+											class="btn btn-block btn-outline-primary mt-3">상태변경</button>
 									</div>
-									
+
 								</div>
 							</div>
 						</div>
 						<!-- /.출퇴관리 -->
-						
+
 					</div>
 				</div>
 			</section>
 			<!-- /.콘텐츠 메인 -->
-		<!-- /.content -->
+			<!-- /.content -->
 		</div>
 		<!-- /.content-wrapper -->
-	
+
 		<!-- 푸터 -->
 		<aside th:replace="~{includes/footer :: footer}"></aside>
-	
+
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
-		
+
 	</div>
 	<!-- ./wrapper -->
 
@@ -160,212 +174,209 @@
 	<!-- Ion Slider -->
 	<script src="../plugins/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
 	<!-- Ion Slider-->
-	
-	
-	
-	<script>
-	    // 현재 시간을 갱신하는 함수
-	    function updateDateTime() {
-	        const now = new Date();
-	        const formattedTime = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 
-	                               ${String(now.getHours()).padStart(2, '0')} : ${String(now.getMinutes()).padStart(2, '0')} : ${String(now.getSeconds()).padStart(2, '0')}`;
-	        document.getElementById('currentDateTime').textContent = formattedTime;
-	    }
 
-	    // 매초(updateDateTime을 호출)
-	    setInterval(updateDateTime, 1000);
 
-	    // 페이지 로드 시 즉시 시간 표시
-	    updateDateTime();
-	</script>
-		
-		
-		
-		
-	
+
 	<script th:inline="javascript">
-	    function confirmStart() {
-	        // 출근 확인 메시지
-	        if (confirm("출근을 확인하시겠습니까?")) {
-	            // 확인을 누르면 폼을 제출
-	            document.getElementById("startForm").submit();
-	        } else {
-	            // 취소를 누르면 아무 작업도 하지 않음 (폼 제출을 막음)
-	            return false;  // 폼 제출을 막음
-	        }
-	    }
-	</script>
-	
-	<script>
-		    function confirmEnd() {
-		        // 퇴근 확인 메시지
-		        if (confirm("퇴근을 확인하시겠습니까?")) {
-		            // 확인을 누르면 폼을 제출
-		            document.getElementById("endForm").submit();
-		        } else {
-		            // 취소를 누르면 아무 작업도 하지 않음 (폼 제출을 막음)
-		            return false;  // 폼 제출을 막음
-		        }
-		    }
-			 
+		const token = $("meta[name='_csrf']").attr("content")
+				const header = $("meta[name='_csrf_header']").attr("content");
+				const name = $("#userName").val();
+				
+		// 현재 시간을 갱신하는 함수
+		function updateDateTime() {
+			const now = new Date();
+			const formattedTime = `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일 
+	                               ${String(now.getHours()).padStart(2, '0')} : ${String(now.getMinutes()).padStart(2, '0')} : ${String(now.getSeconds()).padStart(2, '0')}`;
+			document.getElementById('currentDateTime').textContent = formattedTime;
+		}
 
-		</script>
-	
-	
-	<script>
+		// 매초(updateDateTime을 호출)
+		setInterval(updateDateTime, 1000);
+
+		// 페이지 로드 시 즉시 시간 표시
+		updateDateTime();
+
+
+
+
+
+		function confirmStart() {
+			// 출근 확인 메시지
+			if (confirm("출근을 확인하시겠습니까?")) {
+				// 확인을 누르면 폼을 제출
+				document.getElementById("startForm").submit();
+			} else {
+				// 취소를 누르면 아무 작업도 하지 않음 (폼 제출을 막음)
+				return false;  // 폼 제출을 막음
+			}
+		}
+
+		function confirmEnd() {
+			// 퇴근 확인 메시지
+			if (confirm("퇴근을 확인하시겠습니까?")) {
+				// 확인을 누르면 폼을 제출
+				document.getElementById("endForm").submit();
+			} else {
+				// 취소를 누르면 아무 작업도 하지 않음 (폼 제출을 막음)
+				return false;  // 폼 제출을 막음
+			}
+		}
+
+
+
+
 		$(function () {
 			/* ION SLIDER */
 			$('#range_6').ionRangeSlider({
-				min     : 0,	//슬라이더 최소값
-				max     : 52,	//슬라이더 최대값
-				from    : 20,	//위치 값
-				type    : 'single',
-				step    : 1,
-				postfix : '시간',
+				min: 0,	//슬라이더 최소값
+				max: 52,	//슬라이더 최대값
+				from: 20,	//위치 값
+				type: 'single',
+				step: 1,
+				postfix: '시간',
 				prettify: false,
-				hasGrid : false,
+				hasGrid: false,
 				readOnly: true,
-	
+
 			})
-			
+
 			$('#range_6').parent().css('pointer-events', 'none');
 		})
-	</script>
-	<!-- Page specific script -->
-	<script>
+		
+	//Page specific script
 		$(function () {
-			
-// 				let date1 = /*[[${todayHistory}]]*/
-				let date2 = /*[[${isCheckedIn}]]*/
+
+			// 				let date1 = /*[[${todayHistory}]]*/
+			let date2 = /*[[${isCheckedIn}]]*/
 				console.log("-----------");
-// 				console.log(date1);
-				console.log(date2);
-			
+			// 				console.log(date1);
+			console.log(date2);
+
 			/* initialize the external events
 			-----------------------------------------------------------------*/
 			function ini_events(ele) {
 				ele.each(function () {
-				
+
 					// create an Event Object (https://fullcalendar.io/docs/event-object)
 					// it doesn't need to have a start or end
 					var eventObject = {
-					title: $.trim($(this).text()) // use the element's text as the event title
+						title: $.trim($(this).text()) // use the element's text as the event title
 					}
-					
+
 					// store the Event Object in the DOM element so we can get to it later
 					$(this).data('eventObject', eventObject)
-					
+
 					// make the event draggable using jQuery UI
 					$(this).draggable({
-						zIndex        : 1070,
-						revert        : true, // will cause the event to go back to its
+						zIndex: 1070,
+						revert: true, // will cause the event to go back to its
 						revertDuration: 0  //  original position after the drag
 					})
-				
+
 				})
 			}
-			
+
 			ini_events($('#external-events div.external-event'))
-			
+
 			/* initialize the calendar
 			-----------------------------------------------------------------*/
 			//Date for the calendar events (dummy data)
 			var date = new Date()
-			var d    = date.getDate(),
-			m    = date.getMonth(),
-			y    = date.getFullYear()
-			
+			var d = date.getDate(),
+				m = date.getMonth(),
+				y = date.getFullYear()
+
 			var Calendar = FullCalendar.Calendar;
 			var Draggable = FullCalendar.Draggable;
-			
+
 			var containerEl = document.getElementById('external-events');
 			var checkbox = document.getElementById('drop-remove');
 			var calendarEl = document.getElementById('calendar');
-			
+
 			// initialize the external events
 			// -----------------------------------------------------------------
-			
+
 			new Draggable(containerEl, {
 				itemSelector: '.external-event',
-				eventData: function(eventEl) {
+				eventData: function (eventEl) {
 					return {
 						title: eventEl.innerText,
-						backgroundColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
-						borderColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
-						textColor: window.getComputedStyle( eventEl ,null).getPropertyValue('color'),
+						backgroundColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
+						borderColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
+						textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color'),
 					};
 				}
 			});
-			
+
 			var calendar = new Calendar(calendarEl, {
 				headerToolbar: {
-					left  : 'prev,next today',
+					left: 'prev,next today',
 					center: 'title',
-					right : 'dayGridMonth,timeGridWeek,timeGridDay'
+					right: 'dayGridMonth,timeGridWeek,timeGridDay'
 				},
 				themeSystem: 'bootstrap',
 				//Random default events
 				events: [
 					{
-						title          : 'All Day Event',
-						start          : new Date(y, m, 1),
+						title: 'All Day Event',
+						start: new Date(y, m, 1),
 						backgroundColor: '#f56954', //red
-						borderColor    : '#f56954', //red
-						allDay         : true
+						borderColor: '#f56954', //red
+						allDay: true
 					},
 					{
-						title          : 'Long Event',
-						start          : new Date(y, m, d - 5),
-						end            : new Date(y, m, d - 2),
+						title: 'Long Event',
+						start: new Date(y, m, d - 5),
+						end: new Date(y, m, d - 2),
 						backgroundColor: '#f39c12', //yellow
-						borderColor    : '#f39c12' //yellow
+						borderColor: '#f39c12' //yellow
 					},
 					{
-						title          : 'Meeting',
-						start          : new Date(y, m, d, 10, 30),
-						allDay         : false,
+						title: 'Meeting',
+						start: new Date(y, m, d, 10, 30),
+						allDay: false,
 						backgroundColor: '#0073b7', //Blue
-						borderColor    : '#0073b7' //Blue
+						borderColor: '#0073b7' //Blue
 					},
 					{
-						title          : 'Lunch',
-						start          : new Date(y, m, d, 12, 0),
-						end            : new Date(y, m, d, 14, 0),
-						allDay         : false,
+						title: 'Lunch',
+						start: new Date(y, m, d, 12, 0),
+						end: new Date(y, m, d, 14, 0),
+						allDay: false,
 						backgroundColor: '#00c0ef', //Info (aqua)
-						borderColor    : '#00c0ef' //Info (aqua)
+						borderColor: '#00c0ef' //Info (aqua)
 					},
 					{
-						title          : 'Birthday Party',
-						start          : new Date(y, m, d + 1, 19, 0),
-						end            : new Date(y, m, d + 1, 22, 30),
-						allDay         : false,
+						title: 'Birthday Party',
+						start: new Date(y, m, d + 1, 19, 0),
+						end: new Date(y, m, d + 1, 22, 30),
+						allDay: false,
 						backgroundColor: '#00a65a', //Success (green)
-						borderColor    : '#00a65a' //Success (green)
+						borderColor: '#00a65a' //Success (green)
 					},
 					{
-						title          : 'Click for Google',
-						start          : new Date(y, m, 28),
-						end            : new Date(y, m, 29),
-						url            : 'https://www.google.com/',
+						title: 'Click for Google',
+						start: new Date(y, m, 28),
+						end: new Date(y, m, 29),
+						url: 'https://www.google.com/',
 						backgroundColor: '#3c8dbc', //Primary (light-blue)
-						borderColor    : '#3c8dbc' //Primary (light-blue)
+						borderColor: '#3c8dbc' //Primary (light-blue)
 					}
 				],
-				editable  : true,
-				droppable : true, // this allows things to be dropped onto the calendar !!!
-				drop      : function(info) {
-				// is the "remove after drop" checkbox checked?
+				editable: true,
+				droppable: true, // this allows things to be dropped onto the calendar !!!
+				drop: function (info) {
+					// is the "remove after drop" checkbox checked?
 					if (checkbox.checked) {
-					// if so, remove the element from the "Draggable Events" list
-					info.draggedEl.parentNode.removeChild(info.draggedEl);
+						// if so, remove the element from the "Draggable Events" list
+						info.draggedEl.parentNode.removeChild(info.draggedEl);
 					}
 				}
 			});
-			
+
 			calendar.render();
 			// $('#calendar').fullCalendar()
-			
+
 			/* ADDING EVENTS */
 			var currColor = '#3c8dbc' //Red by default
 			// Color chooser button
@@ -376,7 +387,7 @@
 				// Add color effect to button
 				$('#add-new-event').css({
 					'background-color': currColor,
-					'border-color'    : currColor
+					'border-color': currColor
 				})
 			})
 			$('#add-new-event').click(function (e) {
@@ -386,24 +397,25 @@
 				if (val.length == 0) {
 					return
 				}
-				
+
 				// Create events
 				var event = $('<div />')
 				event.css({
 					'background-color': currColor,
-					'border-color'    : currColor,
-					'color'           : '#fff'
+					'border-color': currColor,
+					'color': '#fff'
 				}).addClass('external-event')
 				event.text(val)
 				$('#external-events').prepend(event)
-				
+
 				// Add draggable funtionality
 				ini_events(event)
-				
+
 				// Remove event from text input
 				$('#new-event').val('')
 			})
 		})
 	</script>
 </body>
+
 </html>

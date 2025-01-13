@@ -8,10 +8,50 @@
 
 	<select id="getUpperDept" resultType="map">
     SELECT 
-        d.PARENT_DEPT_ID,
+        d.DEPT_ID,
         cc.CODE_NAME AS DEPT_NAME
     FROM DEPT d
     LEFT JOIN COMMON_CODE cc
-        ON d.PARENT_DEPT_ID = cc.CODE_ID
-</select>
+        ON d.DEPT_ID = cc.CODE_ID
+	</select>
+	
+	<select id="isDuplicateUpperDept" resultType="Integer">
+	<!-- isDuplicateUpperDept 상위부서 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM DEPT
+		 WHERE DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	<insert id="insertUpperDept">
+	<!-- insertUpperDept 상위부서 등록 -->
+		INSERT INTO DEPT (
+			  DEPT_ID 
+			, MEMBER_ID
+			, CREATE_DATE
+			, USE_YN 
+		) VALUES (
+			  #{DEPT_ID}
+			, #{MEMBER_ID}
+			, CURRENT_DATE
+			, #{USE_YN}
+		)
+	</insert>
+	
+	<select id="getCcodeList" resultType="map">
+	SELECT 
+    CODE_ID AS codeId,
+    CODE_NAME AS codeName
+FROM 
+    COMMON_CODE
+WHERE GROUP_ID = 'DEP'
+	</select>
+	
+	<select id="getDepMngList" resultType="map">
+	SELECT 
+    MEMBER_ID AS memberId,
+    NAME AS name
+FROM 
+    MEMBER
+WHERE AUTHORITY = 'ADMIN'
+	</select>
 </mapper>
