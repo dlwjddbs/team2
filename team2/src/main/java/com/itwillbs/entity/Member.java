@@ -1,14 +1,11 @@
 package com.itwillbs.entity;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 import com.itwillbs.domain.MemberDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -53,7 +50,7 @@ public class Member {
 	@Column(name = "resign_date")
 	private String resignDate;		
 	
-	@Column(name = "passwd", length = 30)
+	@Column(name = "passwd", length = 100)
 	private String passwd;	
 	
 	@Column(name = "use_yn", length = 1)

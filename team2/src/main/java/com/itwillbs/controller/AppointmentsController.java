@@ -25,51 +25,51 @@ public class AppointmentsController {
 
 	private final AppointmentsService appointmentsService;
 
-	@GetMapping("/personnelAppointments")
+	@GetMapping("/appoint/personnelAppointments")
 	public String getAppointList(@RequestParam Map<String, Object> map, Model model) {
 		List<Map<String, Object>> list = appointmentsService.getAppointList(map);
 		model.addAttribute("appointList", list);
 		return "HRManagement/personnelAppointments";
 	}
 
-	@GetMapping("/getMinMaxDate")
+	@GetMapping("/appoint/getMinMaxDate")
 	@ResponseBody
 	public Map<String, String> getMinMaxDate() {
 		return appointmentsService.getMinMaxDate();
 	}
 
-	@PostMapping("/getAppointList")
+	@PostMapping("/appoint/getAppointList")
 	@ResponseBody
 	public List<Map<String, Object>> getAppointList(@RequestParam Map<String, Object> map) {
 		return appointmentsService.getAppointList(map);
 	}
 
-	@GetMapping("/getAllDepartments")
+	@GetMapping("/appoint/getAllDepartments")
 	public ResponseEntity<List<Map<String, Object>>> getAllDepartments() {
 		List<Map<String, Object>> departments = appointmentsService.getAllDepartments();
 		return ResponseEntity.ok(departments);
 	}
 
-	@GetMapping("/getAllRanks")
+	@GetMapping("/appoint/getAllRanks")
 	public ResponseEntity<List<Map<String, Object>>> getAllRanks() {
 		List<Map<String, Object>> ranks = appointmentsService.getAllRanks();
 		return ResponseEntity.ok(ranks);
 	}
 
-	@GetMapping("/getOrgTree")
+	@GetMapping("/appoint/getOrgTree")
 	@ResponseBody
 	public List<Map<String, Object>> getOrgTree() {
 		return appointmentsService.getOrgTree();
 	}
 
-	@GetMapping("/appointmentsNotice")
+	@GetMapping("/appoint/appointmentsNotice")
 	public String getAppointList2(@RequestParam Map<String, Object> map, Model model) {
 		List<Map<String, Object>> list = appointmentsService.getAppointList(map);
 		model.addAttribute("appointList", list);
 		return "HRManagement/appointmentsNotice";
 	}
 
-	@PostMapping("/updateAppointments")
+	@PostMapping("/appoint/updateAppointments")
 	@ResponseBody
 	public String updateAppointments(@RequestBody List<Map<String, Object>> employeeData) {
 		try {
@@ -81,7 +81,7 @@ public class AppointmentsController {
 		}
 	}
 
-	@PostMapping("/updateChangedColumns")
+	@PostMapping("/appoint/updateChangedColumns")
 	public ResponseEntity<?> updateChangedColumns(@RequestBody List<Map<String, Object>> updatedData) {
 		try {
 			if (updatedData == null || updatedData.isEmpty()) {
@@ -98,7 +98,7 @@ public class AppointmentsController {
 		}
 	}
 
-	@PostMapping("/deleteAppointments")
+	@PostMapping("/appoint/deleteAppointments")
 	public ResponseEntity<?> deleteHistory(@RequestBody List<String> historyIds) {
 	    if (historyIds == null || historyIds.isEmpty()) {
 	        return ResponseEntity.badRequest().body("삭제할 내역이 없습니다.");
@@ -123,4 +123,8 @@ public class AppointmentsController {
 	    }
 	}
 
+	@GetMapping("/appoint/organization")
+	public String getOrganization() {
+		return "HRManagement/organization";
+	}
 }

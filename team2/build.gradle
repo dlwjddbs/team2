@@ -40,6 +40,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	
+	implementation 'org.springframework.boot:spring-boot-starter-security'	
+	// springsecurit test
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
+	testImplementation 'org.springframework.security:spring-security-test'
+	
+	// springsecurit thymeleaf-extras-springsecurity
+	// https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity5
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

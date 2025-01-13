@@ -223,7 +223,7 @@
     // 날짜 범위 선택기 초기화
     function initializeDateRangePicker() {
         $.ajax({
-            url: "/getMinMaxDate",
+            url: "/appoint/getMinMaxDate",
             type: "GET",
             success: function (data) {
                 const minDate = data.minDate || "2025-01-01";
@@ -264,7 +264,7 @@
         // 부서 및 직급 
         $.when(
             $.ajax({
-                url: '/getAllDepartments',
+                url: '/appoint/getAllDepartments',
                 method: 'GET',
                 success: function (data) {
                 	 deptOptions = Array.isArray(data) ? data : [];
@@ -274,7 +274,7 @@
                 }
             }),
             $.ajax({
-                url: '/getAllRanks',
+                url: '/appoint/getAllRanks',
                 method: 'GET',
                 async: false,
                 success: function (data) {
@@ -299,7 +299,7 @@
                     zeroRecords: "검색 결과 없음"
                 },
                 ajax: {
-                    url: "/getAppointList",
+                    url: "/appoint/getAppointList",
                     type: "POST",
                     data: { appointGubun, startDate, endDate },
                     dataSrc: (res) => res

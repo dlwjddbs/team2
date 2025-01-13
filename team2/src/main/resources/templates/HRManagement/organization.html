@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AdminLTE 3 | 인사발령</title>
+<title>AdminLTE 3 | 인사관리</title>
 
 <!-- Google Font: Source Sans Pro -->
 <link rel="stylesheet"
@@ -41,185 +41,14 @@
 			<section class="content-header">
 				<div class="container-fluid">
 
-
-					<!-- 추가버튼 모달 -->
-					<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
-						aria-labelledby="confirmModalLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content" style="min-width: 800px;">
-								<div class="modal-header">
-									<h5 class="modal-title" id="confirmModalLabel">인사발령</h5>
-									<button type="button" class="close" data-dismiss="modal"
-										aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">
-									<!-- 조직도 -->
-									<label class="col-form-label mt-3">발령대상자 선택</label>
-
-									<div class="row">
-										<div class="col-4">
-											<div class="bg-white border rounded"
-												style="height: 300px; overflow-y: scroll;">
-												<ul id="orgTree"
-													class="nav nav-pills nav-sidebar flex-column nav-child-indent"
-													data-widget="treeview" role="menu"></ul>
-											</div>
-										</div>
-										<div class="col-8">
-											<div class="bg-white border rounded p-2"
-												style="height: 300px; overflow-y: scroll;">
-
-												<div id="checkedEmployees">
-													<!-- 체크된 직원 목록 -->
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal">취소</button>
-									<button type="button" class="btn btn-primary" id="confirmOkBtn">확인</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- 발령대상자 선택 버튼 모달 -->
-					<div class="modal fade" id="addModal2" tabindex="-1" role="dialog"
-						aria-labelledby="confirmModalLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content" style="min-width: 700px;">
-								<div class="modal-header">
-									<h5 class="modal-title font-weight-bold" id="confirmModalLabel">인사발령</h5>
-									<button type="button" class="close" data-dismiss="modal"
-										aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body py-0">
-									<div class="row">
-										<div class="col-4 py-3 px-2">
-											<!-- 클릭한 직원명, 부서, 직급 정보 -->
-											<div id="clickedEmployeeInfo">
-												<div class="p-2">
-													<p class="custom-label" style="display: none">
-														<strong class="mr-2">아이디:</strong><span id="memberId"></span>
-													</p>
-													<p class="custom-label">
-														<strong class="mr-2">이름:</strong><span id="memberName"></span>
-													</p>
-													<p class="custom-label">
-														<strong class="mr-2">현재 부서:</strong><span id="oldDept"></span>
-													</p>
-													<p class="custom-label">
-														<strong class="mr-2">현재 직급:</strong><span id="oldGrade"></span>
-													</p>
-												</div>
-											</div>
-										</div>
-										<div class="col-8 pt-3 pl-4 pb-4"
-											style="border-left: 1px solid #e9ecef;">
-											<div class="row">
-												<div class="col-sm">
-													<label class="col-form-label">발령구분 :</label> <select
-														id="appointGubun" class="appointGubun"
-														name="appointGubun1">
-														<option selected="selected" disabled>발령구분</option>
-														<option>입사</option>
-														<option>퇴사</option>
-														<option>승진</option>
-														<option>부서이동</option>
-													</select>
-												</div>
-												<!-- 발령일자 -->
-												<div class="col-sm">
-													<label class="col-form-label">발령일자 :</label>
-													<div class="input-group date" id="reservationdate"
-														data-target-input="nearest">
-														<input type="text"
-															class="form-control datetimepicker-input"
-															data-target="#reservationdate" />
-														<div class="input-group-append"
-															data-target="#reservationdate"
-															data-toggle="datetimepicker">
-															<div class="input-group-text">
-																<i class="fa fa-calendar"></i>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-											<!-- 발령부서, 발령직급 -->
-											<div class="row my-3">
-												<div class="col-sm">
-													<label class="col-form-label mr-3">발령부서 :</label> <select
-														class="appointGubun" id="deptSelectBox" name="deptGubun"
-														style="min-width: 120px">
-														<option selected="selected" disabled>부서를 선택하세요</option>
-													</select>
-												</div>
-												<div class="col-sm">
-													<label class="col-form-label mr-3">발령직급 :</label> <select
-														class="appointGubun" id="rankSelectBox" name="gradeGubun"
-														style="min-width: 120px">
-														<option selected="selected" disabled>직급을 선택하세요</option>
-													</select>
-												</div>
-											</div>
-											<!-- 비고 -->
-											<div>
-												<label class="col-form-label mr-3">비고 :</label> <input
-													type="text" class="form-control" name="etc" placeholder="">
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal">취소</button>
-									<button type="button" class="btn btn-primary" id="confirmBtn">확인</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- 확인 모달 -->
-					<div class="modal fade" id="confirmModal" tabindex="-1"
-						role="dialog" aria-labelledby="confirmModalLabel"
-						aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="confirmModalLabel">인사발령 확인</h5>
-									<button type="button" class="close" data-dismiss="modal"
-										aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">변경된 정보로 등록 하시겠습니까?</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal">취소</button>
-									<button type="button" class="btn btn-primary"
-										id="confirmSaveBtn" data-target="">확인</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>인사발령</h1>
+							<h1>조직현황</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">인사발령</li>
+								<li class="breadcrumb-item active">조직현황</li>
 							</ol>
 						</div>
 					</div>
@@ -228,58 +57,26 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-				<div
-					class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
-					<div class="d-flex">
-						<div class="d-flex">
-							<label class="col-form-label mr-3" style="min-width: 70px">발령구분</label>
-							<select class="appointGubun form-control" name="appointGubun"
-								style="min-width: 120px">
-								<option selected="selected" disabled>발령구분</option>
-								<option>입사</option>
-								<option>퇴사</option>
-								<option>승진</option>
-								<option>부서이동</option>
-							</select>
-						</div>
-
-						<div class="d-flex mx-4">
-							<!-- Date range -->
-							<label for="" class="col-form-label mr-3"
-								style="min-width: 70px;">발령일자</label>
-
-							<div class="input-group">
-								<div class="input-group-prepend">
-									<span class="input-group-text"> <i
-										class="far fa-calendar-alt"></i>
-									</span>
-								</div>
-								<input type="text" class="form-control float-right"
-									id="dateRange">
-							</div>
-						</div>
-					</div>
-					<div class="d-flex">
-						<button type="button" class="btn btn-dark" id="btnSearch">조회</button>
-						<button type="button" class="btn btn-dark ml-1" id="btnAdd">등록</button>
-						<button type="button" class="btn btn-dark ml-1" id="btnSave">저장</button>
-						<button type="button" class="btn btn-dark ml-1" id="btnDelete">삭제</button>
-					</div>
-				</div>
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
 							<div class="card">
 								<div class="card-body">
-									<p class="font-weight-bold">인사발령 관리</p>
-
-
-									<table id="appointments"
-										class="table table-bordered table-striped table-valign-middle">
-										<tbody>
-											<!-- dataTable Ajax -->
-										</tbody>
-									</table>
+									<p class="font-weight-bold">조직도</p>
+									<div class="row">
+										<div class="col-4">
+											<div class="bg-white border rounded"
+												style="height: calc(100vh - 300px); overflow-y: scroll;">
+												<ul id="orgTree"
+													class="nav nav-pills nav-sidebar flex-column nav-child-indent"
+													data-widget="treeview" role="menu"></ul>
+											</div>
+										</div>
+										<div class="col-8">
+											<div class="bg-white border rounded p-2"
+												style="height: 300px; overflow-y: scroll;"></div>
+										</div>
+									</div>
 								</div>
 								<!-- /.card-body -->
 							</div>
@@ -439,18 +236,27 @@
     
         // 부서 및 직급 
         $.when(
-       		$.ajax({
-       		    url: '/appoint/getAllDepartments',
-       		    method: 'GET',
-       		    async: false, 
-       		    success: function (data) {
-       		        deptOptions = Array.isArray(data) ? data : [];
-       		        console.log('Departments:', deptOptions); 
-       		    },
-       		    error: function (error) {
-       		        console.error('Error fetching departments:', error); 
-       		    }
-       		}),
+            $.ajax({
+                url: '/appoint/getAllDepartments',
+                method: 'GET',
+                success: function (data) {
+                	 
+     	            const selectBox = $('#deptSelectBox'); 
+    	            selectBox.empty(); 
+    	            selectBox.append('<option selected disabled>부서를 선택하세요</option>'); 
+    	
+
+    	            data.forEach(function(dept) {
+    	                selectBox.append(`<option value="${dept.CODEID}">${dept.CODENAME}</option>`);
+    	                deptMapping[dept.CODENAME] = dept.CODEID; 
+    	            });
+    	            
+                	 deptOptions = Array.isArray(data) ? data : [];
+                },
+                error: function (error) {
+                    console.error('Error fetching departments:', error);
+                }
+            }),
             $.ajax({
                 url: '/appoint/getAllRanks',
                 method: 'GET',
@@ -568,14 +374,15 @@
                         }                    
                     },
                     {
-                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
+                        data: null,
                         title: "부서",
                         defaultContent: "",
-                        render: function (data, type, row) {
-                            // 이전 부서 (읽기 전용)
-                            const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
+                        render: function(data, type, row) { 
+                        	
+                            const oldDept = deptOptions.find(dept => dept.CODEID === row.OLD_DEPT)?.CODENAME || "없음";
 
-                            // 새로운 부서 (선택 가능)
+                            const newDeptSelected = deptOptions.find(dept => dept.CODEID === row.NEW_DEPT)?.CODENAME || "부서 선택";
+
                             const currentDeptSelect = `
                                 <select class="form-control-custom2 current-dept" disabled>
                                     <option selected>${oldDept}</option>
@@ -585,11 +392,14 @@
                             const newDeptSelect = `
                                 <select class="form-control-custom new-dept">
                                     <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
-                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
+                                    ${deptOptions.map(dept => `
+                                        <option value="${dept.CODEID}" ${dept.CODEID === row.NEW_DEPT ? "selected" : ""}>
+                                            ${dept.CODENAME}
+                                        </option>
+                                    `).join('')}
                                 </select>
                             `;
 
-                            // 렌더링 결과 반환
                             return `
                                 <div class="d-flex">
                                     ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
@@ -633,32 +443,6 @@
         });      
         
     }
-    
-    function groupedDeptOptions(deptOptions, selectedDeptId) {
-        // 부서 데이터를 그룹화
-        const groupedData = deptOptions.reduce((acc, dept) => {
-            const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
-            if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
-            acc[parentDept].push(dept); // 그룹에 데이터 추가
-            return acc;
-        }, {});
-
-        // 그룹화된 데이터를 HTML로 변환
-        return Object.keys(groupedData).map(parent => {
-            return `
-                <optgroup label="${parent}">
-                    ${groupedData[parent]
-                    .filter(dept => dept.PARENTDEPTNAME != null)                    
-                    .map(dept => `<option value="${dept.DEPTID}" ${dept.DEPTID === selectedDeptId ? "selected" : ""}>
-                            ${dept.DEPTNAME}
-                        </option>
-                    	
-                    `).join('')}
-                </optgroup>
-            `;
-        }).join('');
-    }
-
 
     $("#appointments").on("change", "#checkAll", function () {
         $(".row-checkbox").prop("checked", this.checked);
@@ -685,135 +469,57 @@
         });
     }
 
- 	// 조직도 렌더링
+    // 조직도 렌더링
     function renderOrgTree(data) {
         const treeContainer = $("#orgTree");
         treeContainer.empty();
 
-        // 데이터를 부서와 팀으로 그룹화
         const groupedData = data.reduce((acc, item) => {
-            const parentDept = item.PARENTDEPTNAME || item.DEPTNAME; // 상위 부서 이름이 없으면 자체 부서 이름 사용
-
-            if (!acc[parentDept]) {
-                acc[parentDept] = {
-                    deptName: parentDept,
-                    teams: [] // 팀 정보를 저장할 배열
+            if (!acc[item.DEPTID]) {
+                acc[item.DEPTID] = {
+                    deptName: item.DEPTNAME,
+                    members: []
                 };
             }
-
-            if (item.PARENTDEPTNAME) {
-                // 팀 데이터를 추가
-                const existingTeam = acc[parentDept].teams.find(t => t.teamId === item.DEPTID);
-                if (!existingTeam) {
-                    acc[parentDept].teams.push({
-                        teamName: item.DEPTNAME,
-                        teamId: item.DEPTID,
-                        members: []
-                    });
-                }
+            if (item.MEMBERNAME) {
+                acc[item.DEPTID].members.push({
+                    memberName: item.MEMBERNAME,
+                    memberId: item.MEMBERID,
+                    gradeName: item.GRADENAME
+                });
             }
             return acc;
         }, {});
 
-        // 멤버 데이터를 팀에 추가
-        data.forEach(item => {
-            if (item.MEMBERNAME && item.PARENTDEPTNAME) {
-                const parentDept = groupedData[item.PARENTDEPTNAME];
-                const team = parentDept.teams.find(t => t.teamId === item.DEPTID);
-                if (team) {
-                    team.members.push({
-                        memberName: item.MEMBERNAME,
-                        memberId: item.MEMBERID,
-                        gradeName: item.GRADENAME
-                    });
-                }
-            }
-        });
+        Object.keys(groupedData).forEach(deptId => {
+            const dept = groupedData[deptId];
+            const memberCount = dept.members.length;
 
-        // 그룹화된 데이터를 렌더링
-        Object.keys(groupedData).forEach(parentDeptName => {
-            const parentDept = groupedData[parentDeptName];
             const deptHtml = `
                 <li class="nav-item">
-                    <a class="nav-link text-reset rounded-0 orgNav deptNav" href="#" data-dept-id="${parentDeptName}">
-                        <div class="mdi mdi-folder-account"></div>
-                        <p style="font-size: 0.95rem; font-weight: bold;">${parentDept.deptName}</p>
+                    <a class="nav-link text-reset rounded-0 orgNav" href="#" data-dept-id="${deptId}">
+                    	<div class="mdi mdi-folder-account"></div>
+                        <p style="font-size: 0.95rem; font-weight: bold;">${dept.deptName} <span class="text-blue">(${memberCount})</span>
+                      	  <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        ${parentDept.teams.map(team => `
+                    ${dept.members.length > 0 ? `
+                    <ul class="nav nav-treeview" id="members-${deptId}" style="display: none;">
+                        ${dept.members.map(member => `
                             <li class="nav-item">
-                                <a class="nav-link text-reset rounded-0 orgNav teamNav" href="#" data-team-id="${team.teamId}" data-team-name="${team.teamName}">
-                                    <div class="mdi mdi-folder-star"></div>
-                                    <p style="font-size: 0.88rem; font-weight: bold;">${team.teamName}</p>
+                                <a class="nav-link text-reset rounded-0 orgNav" href="#" 
+                                   data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
+                                   data-grade-name="${member.gradeName}" data-dept-name="${dept.deptName}">
+                                   <div class="mdi mdi-account ml-2"></div>
+                                    <p style="font-size: 0.88rem; font-weight: bold;">${member.memberName} <span class="text-gray" style="font-size: 0.8rem;">(${member.gradeName})</span></p>
                                 </a>
-                                ${team.members.length > 0 ? `
-                                <ul class="nav nav-treeview">
-                                    ${team.members.map(member => `
-                                        <li class="nav-item">
-                                            <a class="nav-link text-reset rounded-0 orgNav employeeNav" href="#" 
-                                               data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
-                                               data-grade-name="${member.gradeName}" data-team-name="${team.teamName}">
-                                               <div class="mdi mdi-account ml-2"></div>
-                                                <p style="font-size: 0.8rem; font-weight: bold;">${member.memberName} <span class="text-gray" style="font-size: 0.7rem;">(${member.gradeName})</span></p>
-                                            </a>
-                                        </li>
-                                    `).join('')}
-                                </ul>` : ''}
-                            </li>
-                        `).join('')}
-                    </ul>
+                            </li>`).join('')}
+                    </ul>` : ''}
                 </li>
             `;
             treeContainer.append(deptHtml);
         });
-
-     // 이벤트 위임 방식으로 클릭 이벤트 추가
-        $(document).on("click", ".orgNav", function (e) {
-            e.preventDefault();
-
-            // 직원(3-depth) 클릭 시: 팝업 처리
-            if ($(this).hasClass("employeeNav")) {
-                const memberId = $(this).data("member-id");
-                const memberName = $(this).data("member-name");
-                const gradeName = $(this).data("grade-name");
-                const deptName = $(this).data("team-name");
-
-                if (memberId && memberName && gradeName && deptName) {
-                    // 팝업에 데이터 설정
-                    $("#memberId").text(memberId);
-                    $("#memberName").text(memberName);
-                    $("#oldDept").text(deptName);
-                    $("#oldGrade").text(gradeName);
-
-                    // 모달 열기
-                    $("#addModal2").modal("show");
-                    $("#addModal2").attr("aria-hidden", "false");
-                    $("#addModal2").find("input, select, button").attr("tabindex", "0");
-                }
-                return; // employeeNav 처리 후 종료
-            }
-
-            // 팀 클릭 시: 하위 직원 트리 열기/닫기
-            if ($(this).hasClass("teamNav")) {
-                const subTree = $(this).next("ul.nav-treeview"); // 바로 아래 하위 트리 선택
-                if (subTree.length > 0) {
-                    subTree.slideToggle(); // 열기/닫기 처리
-                }
-                return; // teamNav 처리 후 종료
-            }
-
-            // 부서 클릭 시: 하위 팀 트리 열기/닫기
-            if ($(this).hasClass("deptNav")) {
-                const subTree = $(this).next("ul.nav-treeview"); // 바로 아래 하위 트리 선택
-                if (subTree.length > 0) {
-                    subTree.slideToggle(); // 열기/닫기 처리
-                }
-                return; // deptNav 처리 후 종료
-            }
-        });
-
-
-		 
+        
         $("#confirmBtn").on("click", function () {
             const selectedData = {
                 MEMBER_ID: $("#memberId").text().trim(),
@@ -845,7 +551,7 @@
                     alert("발령일자를 입력해주세요.");
                     return;
                 }
-
+                
                 if (!selectedData.NEW_DEPT) {
                     alert("발령 부서를 선택해주세요.");
                     return;
@@ -855,6 +561,7 @@
                     return;
                 }
             }
+
 
             $("#addModal2").data("selectedData", selectedData);
 

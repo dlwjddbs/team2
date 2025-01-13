@@ -1,6 +1,5 @@
 package com.itwillbs.service;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class MemberService {
     public Optional<Member> findById(String id) {
     	return memberRepository.findById(id);
     }
-    
+ 
     public Member findByIdAndPasswd(MemberDTO memberDTO) {
     	return memberRepository.findByIdAndPasswd(memberDTO.getId(), memberDTO.getPasswd());
     }

@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,6 @@ import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.entity.Member;
 import com.itwillbs.service.MemberService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -39,13 +39,14 @@ public class MemberController {
     private String uploadDir;  // 이미지 저장 경로
 
     @GetMapping("/mypage")
-    public String info(HttpSession session, Model model) {
-    	String id = (String) session.getAttribute("id");
+    public String info(@AuthenticationPrincipal User user, Model model) {
 
-        if (id == null) {
+        if (user == null) {
             return "redirect:/login"; 
         }
 
+        String id = user.getUsername();
+        
         Optional<Member> member = memberService.findById(id);
 
         if (member.isPresent()) {
@@ -72,10 +73,11 @@ public class MemberController {
 
 
     @PostMapping("/mypage")
-    public String updateMemberInfo(HttpSession session,
+    public String updateMemberInfo(@AuthenticationPrincipal User user,
                                    @ModelAttribute MemberDTO memberDTO) {
         try {
-            String id = (String) session.getAttribute("id"); 
+        	 String id = user.getUsername();
+        	 
             memberDTO.setId(id);
 
             // 프로필 이미지 처리
@@ -114,10 +116,11 @@ public class MemberController {
     @PostMapping("/mypage/education")
     public String updateEducation(@RequestParam("certificate_merged") String certificates,
                                                  @RequestParam("education_merged") String education,
-                                                 HttpSession session,
+                                                 @AuthenticationPrincipal User user,
                                                  RedirectAttributes redirectAttributes) {
         try {
-            String id = (String) session.getAttribute("id");
+        	String id = user.getUsername();
+        	
             if (id == null) {
                 redirectAttributes.addFlashAttribute("error", "로그인이 필요합니다.");
                 return "redirect:/login";
