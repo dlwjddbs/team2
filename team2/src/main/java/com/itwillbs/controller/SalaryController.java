@@ -33,7 +33,7 @@ public class SalaryController {
 	// Controller -> Service -> Mapper.java -> Mapper.xml
 	
 	// 사원별 급여조회 - 추가 예정
-	@GetMapping("/salaryListEmployee")
+	@GetMapping("/salary/salaryListEmployee")
 	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
 //	public String salaryListEmployee() {
 		// 관리자 페이지라 관리자 로그인 필수
@@ -58,7 +58,7 @@ public class SalaryController {
 	
 	// 관리자 급여입력 
 	// 페이지 첫 로딩 시 사원 정보 조회
-	@GetMapping("/salaryInput")
+	@GetMapping("/salary/salaryInput")
 //	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
 	public String salaryInput() {
 		
@@ -87,7 +87,7 @@ public class SalaryController {
 	
 	// 관리자 급여입력 (POST)
 	// 페이지 첫 로딩 시 사원 정보 조회
-	@PostMapping("/salaryInput")
+	@PostMapping("/salary/salaryInput")
 	@ResponseBody
 	public List<Map<String, Object>> getSalaryInput(@RequestParam Map<String, Object> param) {
 		List<Map<String, Object>> salaryMember = salaryService.getSalaryMember();
@@ -154,7 +154,7 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력
-	@PostMapping("/writeSalary")
+	@PostMapping("/salary/writeSalary")
 	@ResponseBody
 	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
 		log.info("============= writeSalary =============");
@@ -177,7 +177,7 @@ public class SalaryController {
 	
 	
     // 급여 정보 (Test)
-	@GetMapping("/salaryInfo")
+	@GetMapping("/salary/salaryInfo")
 	public String salaryInfo(Map<String, Object> map, Model model) {
 		log.info("============= salaryInfo =============");
 		
@@ -199,7 +199,7 @@ public class SalaryController {
 	
 	// 관리자 급여 정보 조회 (POST) (Test)
 	// 페이지 첫 로딩 시 입력된 급여 테이블 출력 
-	@PostMapping("/getSalaryInfo")
+	@PostMapping("/salary/getSalaryInfo")
 	@ResponseBody
 	public List<Map<String, Object>> getSalaryInfo(@RequestParam Map<String, Object> map) {
 		log.info("============= getSalaryInfo POST =============");
@@ -211,7 +211,7 @@ public class SalaryController {
 	}
 	
 	// 입력, 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
-    @PostMapping("/getModalContent")
+    @PostMapping("/salary/getModalContent")
     @ResponseBody
     public Map<String, Object> getModalContent(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
     	log.info("============= getModalContent POST start =============");
@@ -238,7 +238,7 @@ public class SalaryController {
     }
     
 	// 사원번호를 클릭시 해당 멤버의 야간수당 정보를 가져옴 (Test)
-    @PostMapping("/getNightBonus")
+    @PostMapping("/salary/getNightBonus")
     @ResponseBody
     public Map<String, Object> getNightBonus(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
     	log.info("============= getNightBonus POST start =============");
@@ -265,7 +265,7 @@ public class SalaryController {
     }
     
     // 수정 버튼을 클릭시 해당 멤버의 급여 정보를 수정
-    @PostMapping("/editSalary")
+    @PostMapping("/salary/editSalary")
     @ResponseBody
     public String updateSalary(@RequestParam Map<String, Object> map) {
     	log.info("============= updateSalary POST start =============");
@@ -283,7 +283,7 @@ public class SalaryController {
     }
     
 	// 관리자 급여 이체 현황 조회
-	@GetMapping("/salaryTransferList")
+	@GetMapping("/salary/salaryTransferList")
 	public String salaryTransferList(Map<String, Object> map, Model model, HttpSession session) {	
 		// 관리자 페이지라 관리자 로그인 필수
 //		if (session.getAttribute("id") == null) {

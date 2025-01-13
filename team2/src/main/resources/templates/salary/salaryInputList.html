@@ -239,7 +239,7 @@
 
 		           	    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 확정하시겠습니까?`)) {
 		           	        $.ajax({
-		           	            url: '/confirmSalary', // 서버 API URL
+		           	            url: '/salary/confirmSalary', // 서버 API URL
 		           	            type: 'POST',
 		           	            data: { memberId, payday },
 		           	            success: function (response) {
@@ -289,7 +289,7 @@
         function loadModalContent(id, payday) {
               // 서버에서 Modal 콘텐츠를 AJAX로 요청
               $.ajax({
-                 url: "/getModalContent",  
+                 url: "/salary/getModalContent",  
                  type: "POST",
                  data: { id: id, payday: payday },
                  success: function(salaryData) {
@@ -431,7 +431,7 @@
 	                
 	                // 야간 수당 계산 조회 후 가져오기
 				  	$.ajax({
-				  		url: "/getNightBonus",  
+				  		url: "/salary/getNightBonus",  
 				  		type: "POST",
 				  		data: { id: salaryData.MEMBER_ID,
 				  			payday: commuteMonth },
@@ -492,7 +492,7 @@
 
              // AJAX로 서버에 데이터 전송
              $.ajax({
-                 url: '/writeSalary', // 컨트롤러 매핑 URL
+                 url: '/salary/writeSalary', // 컨트롤러 매핑 URL
                  type: 'POST',
                  data: $("#writeSa/laryForm").serialize(),
                  success: function (response) {
@@ -516,7 +516,7 @@
             
              // AJAX로 서버에 데이터 전송
              $.ajax({
-                 url : '/editSalary', // 컨트롤러 매핑 URL
+                 url : '/salary/editSalary', // 컨트롤러 매핑 URL
                  type : 'POST',
                  data : $("#editSalaryForm").serialize(),
                  success: function (response) {
