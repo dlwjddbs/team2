@@ -181,21 +181,19 @@
                 {
                     data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
                     render: function (data, type, row) {
-                        // 급여 확정 상태 확인
-                        const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
-                        if (localStorage.getItem(key) === 'true') {
+                           if (row.SALARY_YN === 'Y') {
                             // 확정된 경우: 링크 제거, 일반 텍스트로 표시
                             return `<span style="display: block; text-align: center;">${data}</span>`;
                         }
                         // 확정되지 않은 경우: 링크 제공
                         return `<a href="#" 
-		                           id="${data}" 
-	                               class="edit-link" 
-	                               data-payday="${row.PAYDAY || null}" 
-	                               data-id="${data}" 
-	                               style="text-decoration: underline; font-size: 18px;">
-	                               ${data}
-	                            </a>`;
+						   			id="${data}" 
+						   			class="edit-link" 
+						   			data-payday="${row.PAYDAY || null}" 
+						   			data-id="${data}" 
+						   			style="text-decoration: underline; font-size: 18px;">
+						   			${data}
+								</a>`;
                     }
                 },
                 {data: "NAME", title: "사원명", "defaultContent": ""},
@@ -210,17 +208,18 @@
                 {data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": ""},
                 {data: "TOTAL", title: "실지급액", "defaultContent": ""},
                 {
-                    data: null, title: "",
+                    data: "SALARY_YN", title: "확정유무", "defaultContent": "",
                     render: function (data, type, row) {
-                        const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
-                        if (localStorage.getItem(key) === 'true') {
-                            return `<span style="font-weight: bold; display: block; text-align: center;">확정</span>`;
-                        }
-                        return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-                                          data-id="${row.MEMBER_ID}" 
-                                          data-payday="${row.PAYDAY}">
-                                      급여 확정
-                                    </button>`;
+						if (data === 'N') {
+						     // SALARY_YN이 'N'인 경우에만 버튼 표시
+						     return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
+						                      data-id="${row.MEMBER_ID}" 
+						                      data-payday="${row.PAYDAY}">
+						                   급여 확정
+						             </button>`;
+						}
+						// 다른 경우 아무것도 표시하지 않음
+						return '';
                     }
                 }
             ],
@@ -233,63 +232,47 @@
            .appendTo('#example1_wrapper .col-md-6:eq(0)');   //export 버튼 위치
            
            
-           // 급여 확정 버튼 클릭 이벤트
 		   $(document).on('click', '.confirm-salary-btn', function () {
-			    const memberId = $(this).data('id'); // 사원 번호
-			    const payday = $(this).data('payday'); // 귀속 연월
-			    const button = $(this); // 현재 클릭된 버튼 참조
-			
-			    if (confirm(`[ ${memberId} ] 사원의 [ ${payday} ] 급여를 확정하시겠습니까?`)) {
-			        console.log(`급여 확정: 사원번호 ${memberId}, 귀속연월 ${payday}`);
-			
-			        // 상태 저장 (localStorage)
-			        const key = `confirmed-${memberId}-${payday}`;
-			        localStorage.setItem(key, 'true');
-			
-			        // 버튼 제거 및 상태 변경
-			        button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
-			
-			        // MEMBER_ID 링크를 일반 텍스트로 변경
-			        const memberLink = $(`#example1 a.edit-link[data-id='${memberId}'][data-payday='${payday}']`);
-			        if (memberLink.length > 0) {
-			            memberLink.replaceWith(`<span style="display: block; text-align: center;">${memberId}</span>`);
-			        }
-			    }
-			});
+		           	    const memberId = $(this).data('id');
+		           	    const payday = $(this).data('payday');
+		           	    const button = $(this);
+
+		           	    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 확정하시겠습니까?`)) {
+		           	        $.ajax({
+		           	            url: '/confirmSalary', // 서버 API URL
+		           	            type: 'POST',
+		           	            data: { memberId, payday },
+		           	            success: function (response) {
+		           	                if (response.success) {
+		           	                    alert('급여가 확정되었습니다.');
+
+		           	                    // 버튼을 "확정" 텍스트로 변경
+		           	                    button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
+
+		           	                    // MEMBER_ID 하이퍼링크 제거
+		           	                    const table = $('#example1').DataTable();
+		           	                    const rowIdx = table.rows().indexes().filter(function (idx) {
+		           	                        const row = table.row(idx).data();
+		           	                        return row.MEMBER_ID === memberId && row.PAYDAY === payday;
+		           	                    })[0]; // 해당 row 인덱스 가져오기
+
+		           	                    if (rowIdx !== undefined) {
+		           	                        const rowData = table.row(rowIdx).data();
+		           	                        rowData.SALARY_YN = 'Y'; // 상태 업데이트
+		           	                        table.row(rowIdx).data(rowData).invalidate().draw(false);
+		           	                    }
+		           	                } else {
+		           	                    alert('급여 확정에 실패했습니다. 다시 시도해주세요.');
+		           	                }
+		           	            },
+		           	            error: function () {
+		           	                alert('서버와 통신 중 문제가 발생했습니다.');
+		           	            }
+		           	        });
+		           	    }
+		           	});          
            
-           // 페이지 로드 시, localStorage를 확인하여 급여 확정 버튼 상태 갱신
-           $(document).ready(function () {
-               $('#salaryTable').DataTable({
-                   ajax: '/api/getSalaryData',
-                   columns: [
-                       {data: "MEMBER_ID", title: "사원 번호",
-                           render: function (data, type, row) {
-                               return `<a href="#" 
-			                               id="${data}" 
-			                               class="edit-link" 
-			                               data-payday="${row.PAYDAY || null}" 
-			                               data-id="${data}" 
-			                               style="text-decoration: underline; font-size: 18px;">
-			                               ${data}
-			                            </a>`;
-                           }
-                       },
-                       {data: null, title: "",
-                           render: function (data, type, row) {
-                               const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
-                               if (localStorage.getItem(key) === 'true') {
-                                   return `<span style="font-weight: bold; display: block; text-align: center;">확정</span>`;
-                               }
-                               return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-                                             data-id="${row.MEMBER_ID}" 
-                                             data-payday="${row.PAYDAY}">
-                                         급여 확정
-                                       </button>`;
-                           }
-                       }
-                   ]
-               });
-           });
+          
            
            // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
            $('#example1').on('click', 'a.edit-link', function(event) {
@@ -408,7 +391,8 @@
                   {data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
                   {data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
                   {data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-                  {data: "TOTAL", title: "실지급액", "defaultContent": "" }
+				  {data: "TOTAL", title: "실지급액", "defaultContent": "" },
+				  {data: "SALARY_YN", title: "확정유무", "defaultContent": "" }
                ],
                responsive : true, 
                lengthChange : false, 
@@ -538,7 +522,7 @@
                  success: function (response) {
                      alert('급여 수정 성공!');
                      console.log(response);
-                  window.location.href = '/salaryInput';
+                  window.location.href = '/salaryInputList';
                  },
                  error: function (error) {
                     console.log(error);
