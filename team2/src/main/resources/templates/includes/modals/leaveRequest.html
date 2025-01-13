@@ -18,7 +18,7 @@
 			<!-- /.모달창 헤더 -->
 			
 			<!-- form -->
-			<form th:action="@{/leaveRequest}" method="post" id="addMemberForm">
+			<form th:action="@{/leaveRequest}" method="post" id="leaveRequest">
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
@@ -28,8 +28,7 @@
 									<div class="col-md-6">
 										<div class="form-group">
 											<label>휴가유형</label>
-											<select class="form-control select" id="type" name="TYPE" style="width: 100%">
-												<option selected="selected" disabled></option>
+											<select class="form-control select" id="leaveType" name="LEAVE_TYPE" style="width: 100%">
 											</select>
 										</div>
 									</div>
@@ -43,7 +42,9 @@
 													<i class="far fa-calendar-alt"></i>
 												</span>
 											</div>
-											<input type="text" class="form-control float-right" id="reservation">
+											<input type="text" class="form-control float-right" id="reservation" name="DAYS">
+											<input type="hidden" id="startDate" name="START_DATE">
+											<input type="hidden" id="endDate" name="END_DATE">
 										</div>
 									</div>
 								</div>
@@ -63,8 +64,8 @@
 							</div>
 							<div class='col-md-4 align-self-center pl-4'>
 								<h4>내 연차</h4>
-								<p>총 15일 중 3일 사용</p>
-								<p>남은 잔여 일 수는 12일 입니다.</p>
+								<p>총 <span id="totalVacation"></span>일 중 <span id="usedVacation"></span>일 사용</p>
+								<p>남은 잔여 일 수는 <span id="remainingVacation"></span>일 입니다.</p>
 								<hr>
 								<h4>ㅇㅇ월 공휴일</h4>
 								<p>1월 00일 어쩌고 저쩌고</p>
@@ -90,4 +91,3 @@
 </div>
 <!-- /.모달창 -->
 
-<scprjipt

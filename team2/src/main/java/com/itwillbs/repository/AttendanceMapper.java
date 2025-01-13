@@ -57,4 +57,8 @@ public interface AttendanceMapper {
 	List<Map<String, Object>> getHoliday(Map<String, Object> map);
 
 	Map<String, Object> getHolidayMinMaxDate(Map<String, Object> map);
+
+	Map<String, Object> getMyLeave(Map<String, Object> map);
+
+	List<Map<String, Object>> getLeaveType();
 }

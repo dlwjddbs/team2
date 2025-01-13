@@ -80,13 +80,13 @@
 										<div class="col-sm-6 border-right">
 											<div class="description-block">
 												<h5 class="description-header">총휴가</h5>
-												<span class="description-text" id="totalVacation">12</span>
+												<span class="description-text" id="totalVacation">0</span>
 											</div>
 										</div>
 										<div class="col-sm-6 border-right">
 											<div class="description-block">
 												<h5 class="description-header">잔여휴가</h5>
-												<span class="description-text" id="remainingVacation">7</span>
+												<span class="description-text" id="remainingVacation">0</span>
 											</div>
 										</div>
 									</div>
@@ -185,7 +185,6 @@
 		});
 		
 		function dateRangePicker() {
-			console.log('dateRangePicker');
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 			$('#reservation').daterangepicker({
 				locale: {
@@ -388,6 +387,48 @@
 	            }
 	        });
 		}
+		/*
+		$(document).ready(function () {
+			$.ajax({
+		        type : "POST",
+		        url : "/getMyLeave",
+		        data : {},
+		        success : function(res){
+					$("#totalVacation").text(res.TOTAL_DAYS);
+					$("#usedVacation").text(res.USED_DAYS);
+					$("#remainingVacation").text(res.REMAINING_DAYS);
+		        },
+		        error : function(XMLHttpRequest, textStatus, errorThrown){
+		            console.log("getUserInfo() ajax 실패");
+		        }
+		    });
+		
+			$.ajax({
+				type : "POST",
+				url: "/getLeaveType",
+				data: {},
+				success : function(res){
+					var selectBox = $("#leaveType");
+
+	                selectBox.empty();
+
+	                res.forEach(function (item) {
+	                    var option = $("<option></option>")
+	                        .val(item.LEAVE_TYPE_ID)
+	                        .text(item.CODE_NAME + (item.CODE_NAME ? ` (code: ${item.LEAVE_TYPE_ID})` : ''));
+	                    selectBox.append(option);
+	                });
+				}
+			});
+			
+			$('#submitBtn').on('click', function () {
+				let reservation = $("#reservation").val();
+				let days = reservation.split('~').map(day => day.trim());
+				$('#startDate').val(days[0]);
+				$('#endDate').val(days[1]);
+			});
+		});
+		*/
 	</script>
 </body>
 </html>

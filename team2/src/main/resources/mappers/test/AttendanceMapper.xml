@@ -617,4 +617,33 @@
    		ORDER BY TOTAL_COUNT DESC
    		FETCH FIRST 10 ROWS ONLY
     </select>
+
+    <select id="getMyLeave" resultType="map">
+	<!-- getMyLeave 연차 조회 -->
+		SELECT
+				LEAVE_ID
+			  , YEAR
+			  , TOTAL_DAYS
+			  , USED_DAYS
+			  , REMAINING_DAYS 
+		  FROM  LEAVE
+		 WHERE
+		 		MEMBER_ID = #{id}
+		   AND  YEAR = EXTRACT(YEAR FROM SYSDATE)
+    </select>
+    
+    <select id="getLeaveType" resultType="map">
+    <!-- getLeaveType 연차 타입 조회 -->
+    	SELECT
+    			LT.LEAVE_TYPE_ID
+			  , CC.CODE_NAME
+			  , LT.MAX_DAYS
+			  , LT.IS_PAID
+			  , LT.DOCUMENTATION_REQUIRED
+			  , LT.DESCRIPTION
+		  FROM  LEAVE_TYPES LT
+				JOIN COMMON_CODE CC
+				  ON LT.LEAVE_TYPE_ID = CC.CODE_ID 
+		 WHERE  LT.USE_YN = 'Y'
+    </select>
 </mapper>

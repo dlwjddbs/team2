@@ -218,4 +218,13 @@ public class AttendanceService {
 	public Map<String, Object> getHolidayMinMaxDate(Map<String, Object> map) {
 		return attendanceMapper.getHolidayMinMaxDate(map);
 	}
+
+	public Map<String, Object> getMyLeave(Map<String, Object> map) {
+		return attendanceMapper.getMyLeave(map);
+	}
+
+	public List<Map<String, Object>> getLeaveType() {
+		return attendanceMapper.getLeaveType();
+	}
+
 }

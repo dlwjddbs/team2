@@ -352,7 +352,6 @@
 				method: 'POST',
 				success: function (data) {
 
-					// 데이터 가공 함수
 					function organizeDataByGroup(dataArray) {
 						let groupedData = {};
 						dataArray.forEach(item => {
@@ -364,10 +363,9 @@
 						return groupedData;
 					}
 
-					// Select 박스 데이터 추가 함수
 					function populateSelectBox(selectBoxId, dataArray, placeholder) {
 						let selectBox = $(selectBoxId);
-						selectBox.empty(); // 기존 데이터 제거
+						selectBox.empty();
 						selectBox.append(`<option selected disabled>${placeholder}</option>`);
 						dataArray.forEach(item => {
 							let option = $('<option></option>')
@@ -377,20 +375,16 @@
 						});
 					}
 
-					// 데이터 가공
 					let groupedData = organizeDataByGroup(data);
 
-					// 부서 데이터
 					if (groupedData["DEP"]) {
 						populateSelectBox("#department", groupedData["DEP"], "부서선택");
 					}
 
-					// 직급 데이터
 					if (groupedData["RANK"]) {
 						populateSelectBox("#grade", groupedData["RANK"], "직급선택");
 					}
 
-					// 은행 데이터
 					if (groupedData["BANK"]) {
 						populateSelectBox("#bank_code", groupedData["BANK"], "은행");
 					}
@@ -402,35 +396,30 @@
 			
 			// EMAIL_ID + @ + EMAIL_DOMAIN
 			$('#submitBtn').on('click', function () {
-				// EMAIL_ID와 EMAIL_DOMAIN 값을 가져오기
 				const emailId = $('#emailId').val()?.trim() || '';
 				const emailDomain = $('#emailDomain').val()?.trim() || '';
 
-				// 두 필드가 모두 비어 있으면 아무 작업도 하지 않고 폼 전송
 				if (emailId === "" && emailDomain === "") {
-					return; // 폼 전송을 허용
+					return;
 				}
 
-				// EMAIL_ID 또는 EMAIL_DOMAIN 중 하나라도 비어 있는 경우 처리
 				if (emailId === "") {
-					e.preventDefault(); // 폼 전송 방지
+					e.preventDefault();
 					alert('이메일 ID를 입력하세요.');
 					$('#emailId').focus();
 					return;
 				}
 
 				if (emailDomain === "") {
-					e.preventDefault(); // 폼 전송 방지
+					e.preventDefault();
 					alert('이메일 도메인을 선택하세요.');
 					$('#emailDomain').focus();
 					return;
 				}
 
-				// EMAIL_ID와 EMAIL_DOMAIN 값을 합쳐서 hidden input에 설정
 				const email = `${emailId}@${emailDomain}`;
 				$('#email').val(email);
 
-				// 기존 필드의 name 속성을 제거하여 서버로 전송되지 않도록 설정
 				$('#emailId').removeAttr('name');
 				$('#emailDomain').removeAttr('name');
 			});
@@ -441,23 +430,20 @@
 	<script>
 		function openUpdateModal(member_id) {
 			console.log("memberID", member_id)
-		    // 서버에 AJAX 요청을 보내 멤버 상세 정보 가져오기
 		    $.ajax({
 		        url: '/getMemberDetail',
 		        type: 'POST',
-		        data: { MEMBER_ID: member_id }, // ID 전달
+		        data: { MEMBER_ID: member_id },
 		        success: function (member) {
-					console.log(member.NAME);
-					// 폼 속성 변경
+					
 					$("form").attr('id', 'updateMemberForm');
 					$("form").attr('action', '/updateMember');
 					
 					$("#member_id").val(member_id)
-					$("#name").val(member.NAME || ""); // 이름이 null인 경우 빈칸
-					$("#resident_num").val(member.RESIDENT_REGIST_NUM || ""); // 주민등록번호
-					$("#phone").val(member.PHONE || ""); // 전화번호
+					$("#name").val(member.NAME || "");
+					$("#resident_num").val(member.RESIDENT_REGIST_NUM || "");
+					$("#phone").val(member.PHONE || "");
 
-					// 이메일은 null을 방지하기 위해 추가적인 조건 처리
 					if (member.EMAIL) {
 					    $("#emailId").val(member.EMAIL.split('@')[0] || "");
 					    $("#emailDomain").val(member.EMAIL.split('@')[1] || "");
@@ -466,18 +452,16 @@
 					    $("#emailDomain").val("");
 					}
 
-					$("#postcode").val(member.ADDRESS_NUM || ""); // 우편번호
-					$("#address1").val(member.ADDRESS1 || ""); // 주소1
-					$("#address2").val(member.ADDRESS2 || ""); // 주소2
-					$("#join_date").val(member.JOIN_DATE || ""); // 입사일자
-					$("#department").val(member.DEPT_ID || ""); // 부서
-					$("#grade").val(member.GRADE_ID || ""); // 직급
-					$("#bank_code").val(member.BANK_CODE || ""); // 은행코드
-					$("#account_holder").val(member.ACCOUNT_HOLDER || ""); // 계좌주
-					$("#account").val(member.ACCOUNT || ""); // 계좌번호
-					$("#salary").val(member.SALARY || ""); // 급여
-	                // 모달창 표시
-					
+					$("#postcode").val(member.ADDRESS_NUM || "");
+					$("#address1").val(member.ADDRESS1 || "");
+					$("#address2").val(member.ADDRESS2 || "");
+					$("#join_date").val(member.JOIN_DATE || "");
+					$("#department").val(member.DEPT_ID || "");
+					$("#grade").val(member.GRADE_ID || "");
+					$("#bank_code").val(member.BANK_CODE || "");
+					$("#account_holder").val(member.ACCOUNT_HOLDER || "");
+					$("#account").val(member.ACCOUNT || "");
+					$("#salary").val(member.SALARY || "");
 					
 	                $("#modal-lg").modal("show");
 		        },

@@ -356,6 +356,34 @@ public class AttendanceController {
 		return "/attendance/myCommuteHistoryCal";
 	}
 	
+	/*
+	@PostMapping("/getMyLeave")
+	@ResponseBody
+	public Map<String, Object> getMyLeave(HttpSession session, @RequestParam Map<String, Object> map) {
+		String id = session.getAttribute("id").toString();
+		map.put("id", id);
+		
+		Map<String, Object> myLeave = attendanceService.getMyLeave(map);
+		
+		return myLeave;
+	}
+	
+	@PostMapping("/getLeaveType")
+	@ResponseBody
+	public List<Map<String, Object>> getLeaveType(HttpSession session, @RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> leaveType = attendanceService.getLeaveType();
+		
+		return leaveType;
+	}
+	
+	@PostMapping("/leaveRequest")
+	public String leaveRequest(@RequestParam Map<String, Object> param) {
+		attendanceService.leaveRequest(param);
+		
+		return "redirect:/myCommuteHistoryCal";
+	}
+	*/
+	
 	@PostMapping("/insertCheckTime")
 	@ResponseBody
 	public Map<String, Object> insertCheckTime(HttpSession session, @RequestParam Map<String, Object> map) {
