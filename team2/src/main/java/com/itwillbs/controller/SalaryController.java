@@ -35,11 +35,7 @@ public class SalaryController {
 	// 사원별 급여조회 - 추가 예정
 	@GetMapping("/salary/salaryListEmployee")
 	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
-//	public String salaryListEmployee() {
-		// 관리자 페이지라 관리자 로그인 필수
-//		if (session.getAttribute("id") == null) {
-//            return "redirect:/login"; 
-//        }
+
 		String id = session.getAttribute("id").toString();
 		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
 		
@@ -100,11 +96,6 @@ public class SalaryController {
 	@GetMapping("/salary/salaryInputList")
 	public String salaryInputList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {
 		
-		// 관리자 페이지라 관리자 로그인 필수
-//		if (session.getAttribute("id") == null) {
-//            return "redirect:/login"; 
-//        }
-		
 		log.info("============= salaryInputList =============");
 		
         if (user == null) {
@@ -162,19 +153,23 @@ public class SalaryController {
 		log.info(param.toString());
 		
 		salaryService.writeSalary(param);
-//		System.out.println(insertCount);
-//		
-//		if(insertCount > 0) {
-//			System.out.println("========insert 성공");
-//			System.out.println("insertCount: " + insertCount);
-//		
-//		}
 		
 		return "급여 입력 성공!";
 	}
 	
 	
-	
+	// 확정버튼 클릭시 확정상태 변경
+	@PostMapping("/salary/fixedSalary")
+	@ResponseBody
+	public String fixedSalary(@RequestParam Map<String, Object> param, Model model) {
+				
+		log.info("============= fixedSalary =============");
+		log.info(param.toString());
+
+		Map<String, Object> fixedSalary = salaryService.updatefixedSalary(param);
+		
+		return "fixedSalary";
+	}
 	
     // 급여 정보 (Test)
 	@GetMapping("/salary/salaryInfo")
