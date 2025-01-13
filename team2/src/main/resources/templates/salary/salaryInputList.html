@@ -176,44 +176,46 @@
 		                return abc;
 		            }
 				},
-				columns : [
-					// DB컬럼명 일치하게 작성
-					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
-						render: function(data, type, row) {
-							// MEMBER_ID를 클릭 가능한 링크로 설정
-							return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
-						}
-					},
-					
-					{data: "NAME", title: "사원명", "defaultContent": "" },
-					//{data: "GRADE_ID", title: "직급", "defaultContent": "" },
-					//{data: "DEPT_ID", title: "부서", "defaultContent": "" },
-					{data: "GRADE_NAME", title: "직급", "defaultContent": "" },
-					{data: "DEPT_NAME", title: "부서", "defaultContent": "" },
-					{data: "SALARY", title: "기본급", "defaultContent": "" },
-					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
-					{data: null, title: "",
+				columns: [
+				    {data: "PAYDAY", title: "귀속연월", "defaultContent": ""},
+				    {
+				        data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
+				        render: function (data, type, row) {
+				            // 급여 확정 상태 확인
+				            const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
+				            if (localStorage.getItem(key) === 'true') {
+				                // 확정 상태일 경우: 하이퍼링크 제거, 일반 텍스트로 표시
+				                return `<span style="display: block; text-align: center;">${data}</span>`;
+				            }
+				            // 확정 상태가 아닐 경우: 하이퍼링크로 표시
+				            return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
+				        }
+				    },
+				    {data: "NAME", title: "사원명", "defaultContent": ""},
+				    {data: "GRADE_NAME", title: "직급", "defaultContent": ""},
+				    {data: "DEPT_NAME", title: "부서", "defaultContent": ""},
+				    {data: "SALARY", title: "기본급", "defaultContent": ""},
+				    {data: "POSITION_BONUS", title: "직책수당", "defaultContent": ""},
+				    {data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": ""},
+				    {data: "NIGHT_BONUS", title: "야근수당", "defaultContent": ""},
+				    {data: "YEAREND_BONUS", title: "연말수당", "defaultContent": ""},
+				    {data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": ""},
+				    {data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": ""},
+				    {data: "TOTAL", title: "실지급액", "defaultContent": ""},
+				    {
+				        data: null, title: "",
 				        render: function (data, type, row) {
 				            const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
 				            if (localStorage.getItem(key) === 'true') {
 				                return `<span style="font-weight: bold; display: block; text-align: center;">확정</span>`; // 확정 상태
 				            }
 				            return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-				                          data-id="${row.MEMBER_ID}" 
-				                          data-payday="${row.PAYDAY}">
-				                      급여 확정
-				                    </button>`;
+				                              data-id="${row.MEMBER_ID}" 
+				                              data-payday="${row.PAYDAY}">
+				                          급여 확정
+				                        </button>`;
 				        }
-					},
-					
-					
+				    }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -237,8 +239,22 @@
 			          const key = `confirmed-${memberId}-${payday}`;
 			          localStorage.setItem(key, 'true');
 			          
-			          // 버튼 제거
-			          button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
+					  // 확정 버튼을 "확정"으로 변경
+			         button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
+
+			         // MEMBER_ID 하이퍼링크 제거
+			         const table = $('#salaryTable').DataTable();
+			         const rowIdx = table.rows().indexes().filter(function (idx) {
+			             const row = table.row(idx).data();
+			             return row.MEMBER_ID === memberId && row.PAYDAY === payday;
+			         })[0]; // 해당 row 인덱스 가져오기
+
+			         if (rowIdx !== undefined) {
+			             // 테이블 데이터를 업데이트
+			             const rowData = table.row(rowIdx).data();
+			             rowData.MEMBER_ID = `<span style="display: block; text-align: center;">${memberId}</span>`;
+			             table.row(rowIdx).data(rowData).invalidate().draw(false);
+			         }
 			      }
 			  });
 			  
