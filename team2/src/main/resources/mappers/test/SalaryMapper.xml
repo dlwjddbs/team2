@@ -11,8 +11,12 @@
 		 SELECT
 		 	MEMBER_ID
 		  , NAME
-		  , GRADE_ID
-		  , DEPT_ID
+          , (SELECT CODE_NAME
+            	FROM COMMON_CODE CC
+            	WHERE GRADE_ID = CC.CODE_ID) AS GRADE_NAME
+          , (SELECT CODE_NAME
+        		FROM COMMON_CODE CC
+        		WHERE DEPT_ID = CC.CODE_ID) AS DEPT_NAME
 		  , SALARY
 		 FROM
 		 	MEMBER
@@ -92,8 +96,9 @@
             S.YEAREND_BONUS, 
             S.FULLSERVICE_BONUS,
             S.PERFORMANCE_BONUS,
-            (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS + 
-             S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL
+            S.TOTAL
+<!--             (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS +  -->
+<!--              S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL -->
 		FROM 
 			MEMBER M
 		LEFT JOIN SALARY S
@@ -146,11 +151,18 @@
  	
  	<!-- 급여 수정 - 사원의 기본금 수정 -->
 	<update id="updateMemberSalary" parameterType="map">
-		UPDATE MEMBER 
-	   	   SET 
-	   	   	   SALARY = #{salary}
-		WHERE 
-			 MEMBER_ID = #{memberId}
+	    UPDATE MEMBER
+	       SET 
+	           SALARY = #{salary}
+	     WHERE MEMBER_ID = #{memberId}
+	       AND EXISTS (
+	           SELECT 1
+	             FROM SALARY S
+	            WHERE S.MEMBER_ID = MEMBER.MEMBER_ID
+			            <if test="payday != null and payday != ''">
+			            	AND S.PAYDAY = #{payday}
+			            </if>
+	       )
 	</update>
 	
 	<!-- 급여 수정 - 사원의 상여금(보너스) 수정 -->
@@ -158,15 +170,32 @@
 		UPDATE SALARY 
 	   	   SET 
 	   	   	   PAYDAY = #{payday}
-	   	   	 , POSITION_BONUS = #{positionBonus}
-	       	 , HOLIDAY_BONUS = #{holidayBonus}
-	       	 , NIGHT_BONUS = #{nightBonus}
-	       	 , YEAREND_BONUS = #{yearendBonus}
-	       	 , FULLSERVICE_BONUS = #{fullserviceBonus}
-	       	 , PERFORMANCE_BONUS = #{performanceBonus}
+	   	   	 , POSITION_BONUS = NVL(#{positionBonus}, 0) 
+	       	 , HOLIDAY_BONUS = NVL(#{holidayBonus}, 0) 
+	       	 , NIGHT_BONUS = NVL(#{nightBonus}, 0) 
+	       	 , YEAREND_BONUS = NVL(#{yearendBonus}, 0) 
+	       	 , FULLSERVICE_BONUS = NVL(#{fullserviceBonus}, 0) 
+	       	 , PERFORMANCE_BONUS = NVL(#{performanceBonus}, 0)
+	       	 , TOTAL = (NVL((SELECT SALARY 
+	       	 			 FROM MEMBER 
+	       	 			 WHERE MEMBER_ID = #{memberId}
+	       	 			 		<if test="payday != null and payday != ''">
+	       	 			 	   		AND PAYDAY = #{payday}
+	       	 			 	   	</if> 
+						 ), 0) 
+			       	 + NVL(#{positionBonus}, 0) 
+			       	 + NVL(#{holidayBonus}, 0) 
+			       	 + NVL(#{nightBonus}, 0) 
+		             + NVL(#{yearendBonus}, 0) 
+		             + NVL(#{fullserviceBonus}, 0) 
+		             + NVL(#{performanceBonus}, 0)
+		             )
 	       	 , UPDATE_DATE = SYSDATE
 		WHERE 
 			 MEMBER_ID = #{memberId}
+			 <if test="payday != null and payday != ''">
+	         	AND PAYDAY = #{payday}
+	         </if>
 	</update>
     
     <select id="selectNightBonusById" resultType="map">
@@ -175,22 +204,22 @@
 		WITH DAILY_COMMUTE AS (
 		    SELECT
 		        C.MEMBER_ID,
-		        TO_CHAR(TO_DATE(C.CHECK_IN_DATE, 'YYYY-MM-DD'), 'YYYY-MM') AS COMMUTE_MONTH, -- 출근 월
-		        C.CHECK_IN_DATE, -- 출근 날짜
+		        TO_CHAR(TO_DATE(C.CHECK_IN_DATE, 'YYYY-MM-DD'), 'YYYY-MM') AS COMMUTE_MONTH, <!-- 출근 월 -->
+		        C.CHECK_IN_DATE, <!-- 출근 날짜 -->
 		        CASE
 		            WHEN C.CHECK_OUT_TIME IS NOT NULL THEN
 		                (TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS') - TO_DATE(C.CHECK_IN_TIME, 'HH24:MI:SS')) * 24
 		            ELSE
 		                0
-		        END AS DAILY_WORK_HOURS, -- 일별 근무 시간
-		        -- 연장근무 시간 계산
+		        END AS DAILY_WORK_HOURS, <!-- 일별 근무 시간 -->
+		        <!-- 연장근무 시간 계산 -->
 		        CASE
 		            WHEN TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS') > TO_DATE('18:00:00', 'HH24:MI:SS') THEN
 		                (LEAST(TO_DATE(C.CHECK_OUT_TIME, 'HH24:MI:SS'), TO_DATE('06:00:00', 'HH24:MI:SS') + 1) 
 		                - GREATEST(TO_DATE(C.CHECK_IN_TIME, 'HH24:MI:SS'), TO_DATE('18:00:00', 'HH24:MI:SS'))) * 24
 		            ELSE
 		                0
-		        END AS OVERTIME_HOURS -- 연장근무 시간
+		        END AS OVERTIME_HOURS <!-- 연장근무 시간 -->
 		    FROM
 		        COMMUTE C
 		),
@@ -198,9 +227,9 @@
 		    SELECT
 		        DC.MEMBER_ID,
 		        DC.COMMUTE_MONTH,
-		        COUNT(DISTINCT DC.CHECK_IN_DATE) AS WORK_DAYS, -- 월별 고유 날짜 수
-		        SUM(DC.DAILY_WORK_HOURS) AS TOTAL_WORK_HOURS, -- 월별 총 근무 시간
-		        SUM(DC.OVERTIME_HOURS) AS TOTAL_OVERTIME_HOURS -- 월별 총 연장근무 시간
+		        COUNT(DISTINCT DC.CHECK_IN_DATE) AS WORK_DAYS, <!-- 월별 고유 날짜 수 -->
+		        SUM(DC.DAILY_WORK_HOURS) AS TOTAL_WORK_HOURS, <!-- 월별 총 근무 시간 -->
+		        SUM(DC.OVERTIME_HOURS) AS TOTAL_OVERTIME_HOURS <!-- 월별 총 연장근무 시간 -->
 		    FROM
 		        DAILY_COMMUTE DC
 		    GROUP BY
@@ -213,9 +242,9 @@
 		        MC.COMMUTE_MONTH,
 		        MC.TOTAL_OVERTIME_HOURS,
 		        M.SALARY,
-		        -- 연장근무 수당 계산 (10단위 올림 적용)
+		        <!-- 연장근무 수당 계산 (10단위 올림 적용) -->
 		        CEIL((M.SALARY / 209) * 1.5 * NVL(MC.TOTAL_OVERTIME_HOURS, 0) / 10) * 10 AS OVERTIME_BONUS,
-		        -- 연장근무 수당 원본 값
+		        <!-- 연장근무 수당 원본 값 -->
 		        (M.SALARY / 209) * 1.5 * NVL(MC.TOTAL_OVERTIME_HOURS, 0) AS OVERTIME_BONUS_ORIGIN
 		    FROM
 		        MONTHLY_COMMUTE MC
@@ -229,6 +258,8 @@
 		    CB.OVERTIME_BONUS_ORIGIN
 		FROM
 		    CALCULATED_BONUS CB
+		WHERE
+			CB.MEMBER_ID = #{memberId}
 		ORDER BY
 		    CB.MEMBER_ID,
 		    CB.COMMUTE_MONTH;

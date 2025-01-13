@@ -38,6 +38,11 @@ public class SalaryService {
 		return salaryMapper.selectSalaryListById(salaryMap);
 	}
 	
+	// 급여 조회 - 사원ID의 달별 야간수당을 조회 (귀속연월 추가)
+	public Map<String, Object> findNightBonusById(Map<String, Object> salaryMap) {
+		return salaryMapper.selectNightBonusById(salaryMap);
+	}
+	
 	// 급여 입력 - 입력된 날짜 조회
 	public Map<String, Object> getSalaryListMinMaxDate(String id) {
 		return salaryMapper.getSalaryListMinMaxDate(id);

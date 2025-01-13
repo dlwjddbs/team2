@@ -219,6 +219,33 @@ public class SalaryController {
     	return salaryData;
     }
     
+	// 사원번호를 클릭시 해당 멤버의 야간수당 정보를 가져옴 (Test)
+    @PostMapping("/getNightBonus")
+    @ResponseBody
+    public Map<String, Object> getNightBonus(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
+    	log.info("============= getNightBonus POST start =============");
+    	
+    	log.info(id);
+    	log.info(payday);
+    	
+    	Map<String, Object> salaryMap = new HashMap<>();
+    	salaryMap.put("id", id);
+    	
+    	// payday가 없으면 null로 들어가야하는데 빈 문자열로 인식하는 문제
+    	// 파라미터를 명확히 null로 처리
+    	salaryMap.put("payday", payday == null || payday.trim().isEmpty() ? null : payday);
+
+        // DB에서 ID에 해당하는 데이터를 가져와서 model에 추가
+    	// 야간 수당을 조회 (귀속연월 조건으로 추가하여 조회)
+    	Map<String, Object> nightBonusData = salaryService.findNightBonusById(salaryMap);
+    	
+    	log.info("nightBonus Data : " + nightBonusData);
+    	
+    	log.info("============= getNightBonus POST end =============");
+    	
+    	return nightBonusData;
+    }
+    
     // 수정 버튼을 클릭시 해당 멤버의 급여 정보를 수정
     @PostMapping("/editSalary")
     @ResponseBody

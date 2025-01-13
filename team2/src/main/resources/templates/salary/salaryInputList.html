@@ -301,6 +301,8 @@
                  loadModalContent(id, payday); // 모달 콘텐츠 로드 함수 호출
            });
            
+        let salaryData = null;
+        
         function loadModalContent(id, payday) {
               // 서버에서 Modal 콘텐츠를 AJAX로 요청
               $.ajax({
@@ -312,19 +314,19 @@
                     console.log("서버 데이터:", salaryData);
                     
                     // 받은 데이터를 각 입력 필드에 설정
-                    $('#memberId').val(salaryData.MEMBER_ID);               // 사원 ID
-                  $('#name').val(salaryData.NAME);                     // 이름
-                    $('#gradeId').val(salaryData.GRADE_ID);                  // 직급 ID
-                    $('#deptId').val(salaryData.DEPT_ID);                  // 부서 ID
-                    $('#payday').val(salaryData.PAYDAY);                  // 급여 지급일
-                  $('#salary').val(salaryData.SALARY);                  // 기본급
+                    $('#memberId').val(salaryData.MEMBER_ID);               	// 사원 ID
+                 	$('#name').val(salaryData.NAME);                     		// 이름
+                    $('#gradeId').val(salaryData.GRADE_ID);                  	// 직급 ID
+                    $('#deptId').val(salaryData.DEPT_ID);                  		// 부서 ID
+                    $('#daterange').val(salaryData.PAYDAY);                  	// 급여 지급일
+                  	$('#salary').val(salaryData.SALARY);                  		// 기본급
                     $('#positionBonus').val(salaryData.POSITION_BONUS);         // 직책 수당
-                    $('#holidayBonus').val(salaryData.HOLIDAY_BONUS);         // 연휴 수당
-                    $('#nightBonus').val(salaryData.NIGHT_BONUS);            // 야근 수당
-                    $('#yearendBonus').val(salaryData.YEAREND_BONUS);         // 연말 수당
-                    $('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);   // 만기근속자포상
-                    $('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);   // 실적우수자포상
-                    $('#total').val(salaryData.TOTAL);                     // 총 급여(실지급액)
+                    $('#holidayBonus').val(salaryData.HOLIDAY_BONUS);         	// 연휴 수당
+                    $('#nightBonus').val(salaryData.NIGHT_BONUS);            	// 야간 수당
+                    $('#yearendBonus').val(salaryData.YEAREND_BONUS);         	// 연말 수당
+                    $('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);   // 만기근속자 수당
+                    $('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);   // 성과금
+                    $('#total').val(salaryData.TOTAL);                     		// 총 급여(실지급액)
                     
                     // 모달 표시
                     $('#modal-lg').modal('show');
@@ -418,27 +420,55 @@
          });
          
            
-           $(document).ready(function () {
-               // 현재 날짜 계산
-               const currentDate = new Date();
-               
-               $('#daterange').datepicker({
-                   format: "yyyy-mm",
-                   autoclose: true,
-                   startView: "months", // 월 선택 모드
-                   minViewMode: "months", // 선택할 수 있는 최소 뷰 모드
-                   language: "ko", // 한글 로케일 설정
-                   startDate: "1960-01", // 시작 날짜 설정
-                   endDate: currentDate, // 종료 날짜 설정
-               }).on('changeDate', function (e) {
-                   $('#daterange').val(e.format());
-               });
+         $(document).ready(function () {
+	            // 현재 날짜 계산
+	            const currentDate = new Date();
 
-               // 모달이 열릴 때마다 입력 필드 초기화
-               $('#modal-lg').on('show.bs.modal', function () {
-                   $('#daterange').val(''); // 입력 필드 초기화
-               });
-           });
+	            $('#daterange').datepicker({
+	                format: "yyyy-mm",
+	                autoclose: true,
+	                startView: "months", // 월 선택 모드
+	                minViewMode: "months", // 선택할 수 있는 최소 뷰 모드
+	                language: "ko", // 한글 로케일 설정
+	                startDate: "1960-01", // 시작 날짜 설정
+	                endDate: currentDate, // 종료 날짜 설정
+	            }).on('changeDate', function (e) {
+	                $('#daterange').val(e.format());
+	                const commuteMonth = $(this).val();
+	                
+	                console.log(salaryData);
+	                console.log(salaryData.MEMBER_ID);
+	                console.log(commuteMonth);
+
+	                if (!salaryData) {
+	                    alert("급여 정보를 아직 가져오지 못했습니다.");
+	                    return;
+	                }
+	                
+	                // 야간 수당 계산 조회 후 가져오기
+				  	$.ajax({
+				  		url: "/getNightBonus",  
+				  		type: "POST",
+				  		data: { id: salaryData.MEMBER_ID,
+				  			payday: commuteMonth },
+				  		success: function(nightBonusData) {
+				  			console.log("사원 번호:", salaryData.MEMBER_ID);
+				  			console.log("서버 데이터:", nightBonusData);
+				  			
+				  			// 받은 데이터를 각 입력 필드에 설정
+		  					$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);				// 야간 수당
+				  		},
+				  		error: function() {
+				  			alert("야간근무수당을 불러오는 데 실패했습니다.");
+				  		}
+				  	});
+	            });
+
+	            // 모달이 열릴 때마다 입력 필드 초기화
+	            $('#modal-lg').on('show.bs.modal', function () {
+	                //$('#daterange').val(''); // 입력 필드 초기화  
+	            });
+	        });
 
       });
 
