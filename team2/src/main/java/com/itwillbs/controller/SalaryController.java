@@ -31,6 +31,10 @@ public class SalaryController {
 	// Controller -> Service -> Mapper.java -> Mapper.xml
 	
 	// 사원별 급여조회 - 추가 예정
+	@GetMapping("/salaryListEmployee")
+	public String salaryListEmployee() {
+		return "/salary/salaryListEmployee";
+	}
 	
 	// 관리자 급여입력 
 	// 페이지 첫 로딩 시 사원 정보 조회
