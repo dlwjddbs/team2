@@ -32,7 +32,25 @@ public class SalaryController {
 	
 	// 사원별 급여조회 - 추가 예정
 	@GetMapping("/salaryListEmployee")
-	public String salaryListEmployee() {
+	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
+//	public String salaryListEmployee() {
+		// 관리자 페이지라 관리자 로그인 필수
+//		if (session.getAttribute("id") == null) {
+//            return "redirect:/login"; 
+//        }
+		String id = session.getAttribute("id").toString();
+		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
+		
+		if (salaryInputMinMaxDate == null) {
+			LocalDate now = LocalDate.now();
+			
+			salaryInputMinMaxDate = new HashMap<>();
+			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
+			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
+		}
+		
+		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
+		
 		return "/salary/salaryListEmployee";
 	}
 	
@@ -136,6 +154,9 @@ public class SalaryController {
 		
 		return "급여 입력 성공!";
 	}
+	
+	
+	
 	
     // 급여 정보 (Test)
 	@GetMapping("/salaryInfo")

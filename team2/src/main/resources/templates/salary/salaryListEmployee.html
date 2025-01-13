@@ -73,12 +73,6 @@
 					</div>
 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button>
 				</div>
-<!-- 				<div class="col-2"> -->
-<!-- 					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1"> -->
-<!-- 						급여 정보 입력 -->
-<!-- 					</button> -->
-<!-- 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav> -->
-<!-- 				</div> -->
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
@@ -179,13 +173,7 @@
 				columns : [
 					// DB컬럼명 일치하게 작성
 					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
-						render: function(data, type, row) {
-							// MEMBER_ID를 클릭 가능한 링크로 설정
-							return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
-						}
-					},
-					
+					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": ""},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
 					//{data: "GRADE_ID", title: "직급", "defaultContent": "" },
 					//{data: "DEPT_ID", title: "부서", "defaultContent": "" },
@@ -199,21 +187,6 @@
 					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
 					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
 					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
-					{data: null, title: "",
-				        render: function (data, type, row) {
-				            const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
-				            if (localStorage.getItem(key) === 'true') {
-				                return `<span style="font-weight: bold; display: block; text-align: center;">확정</span>`; // 확정 상태
-				            }
-				            return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-				                          data-id="${row.MEMBER_ID}" 
-				                          data-payday="${row.PAYDAY}">
-				                      급여 확정
-				                    </button>`;
-				        }
-					},
-					
-					
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -223,96 +196,6 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
 			  
-			  
-			  // 급여 확정 버튼 클릭 이벤트
-			  $(document).on('click', '.confirm-salary-btn', function () {
-			      const memberId = $(this).data('id');
-			      const payday = $(this).data('payday');
-			      const button = $(this);
-
-			      if (confirm(`[ ${memberId} ] 사원의 [ ${payday} ] 급여를 확정하시겠습니까?`)) {
-			          console.log(`급여 확정: 사원번호 ${memberId}, 귀속연월 ${payday}`);
-			          
-			          // 상태 저장
-			          const key = `confirmed-${memberId}-${payday}`;
-			          localStorage.setItem(key, 'true');
-			          
-			          // 버튼 제거
-			          button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
-			      }
-			  });
-			  
-			  // 페이지 로드 시, localStorage를 확인하여 급여 확정 버튼 상태 갱신
-			  $(document).ready(function () {
-			      $('#salaryTable').DataTable({
-			          ajax: '/api/getSalaryData',
-			          columns: [
-			              {data: "MEMBER_ID", title: "사원 번호",
-			                  render: function (data, type, row) {
-			                      return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY}" data-id="${data}">${data}</a>`;
-			                  }
-			              },
-			              {data: null, title: "",
-			                  render: function (data, type, row) {
-			                      const key = `confirmed-${row.MEMBER_ID}-${row.PAYDAY}`;
-			                      if (localStorage.getItem(key) === 'true') {
-			                          return `<span style="font-weight: bold; display: block; text-align: center;">확정</span>`;
-			                      }
-			                      return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-			                                    data-id="${row.MEMBER_ID}" 
-			                                    data-payday="${row.PAYDAY}">
-			                                급여 확정
-			                              </button>`;
-			                  }
-			              }
-			          ]
-			      });
-			  });
-			  
-			  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
-			  $('#example1').on('click', 'a.edit-link', function(event) {
-				  	event.preventDefault(); // 기본 링크 동작 방지
-				  	var id = $(this).attr('id'); // 클릭된 ID 값 가져오기
-			        var payday = $(this).data('payday') ?? null; // 귀속연월 가져오기 (값이 없으면 null)
-				  	console.log("클릭된 사원 번호:", id);
-				  	console.log("클릭된 귀속연월:", payday);
-				  	loadModalContent(id, payday); // 모달 콘텐츠 로드 함수 호출
-			  });
-			  
-		  function loadModalContent(id, payday) {
-			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
-			  	$.ajax({
-			  		url: "/getModalContent",  
-			  		type: "POST",
-			  		data: { id: id, payday: payday },
-			  		success: function(salaryData) {
-			  			console.log("사원 번호:", id);
-			  			console.log("서버 데이터:", salaryData);
-			  			
-			  			// 받은 데이터를 각 입력 필드에 설정
-			  			$('#memberId').val(salaryData.MEMBER_ID);					// 사원 ID
-						$('#name').val(salaryData.NAME);							// 이름
-			  			$('#gradeId').val(salaryData.GRADE_ID);						// 직급 ID
-			  			$('#deptId').val(salaryData.DEPT_ID);						// 부서 ID
-			  			$('#payday').val(salaryData.PAYDAY);						// 급여 지급일
-						$('#salary').val(salaryData.SALARY);						// 기본급
-			  			$('#positionBonus').val(salaryData.POSITION_BONUS);			// 직책 수당
-			  			$('#holidayBonus').val(salaryData.HOLIDAY_BONUS);			// 연휴 수당
-	  					$('#nightBonus').val(salaryData.NIGHT_BONUS);				// 야근 수당
-			  			$('#yearendBonus').val(salaryData.YEAREND_BONUS);			// 연말 수당
-			  			$('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);	// 만기근속자포상
-			  			$('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);	// 실적우수자포상
-			  			$('#total').val(salaryData.TOTAL);							// 총 급여(실지급액)
-			  			
-			  			// 모달 표시
-			  			$('#modal-lg').modal('show');
-			  		},
-			  		error: function() {
-			  			alert("Modal 콘텐츠를 불러오는 데 실패했습니다.");
-			  		}
-			  	});
-			  }
-			
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 			let date = /*[[${salaryInputMinMaxDate}]]*/
 			$('#reservation').daterangepicker({
