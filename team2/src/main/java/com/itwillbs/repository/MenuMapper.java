@@ -8,6 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MenuMapper {
 
-	List<Map<String, Object>> selectMenu();
+	List<Map<String, Object>> selectMenu(String auth);
 	
 }

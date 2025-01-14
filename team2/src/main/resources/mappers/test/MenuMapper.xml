@@ -8,5 +8,7 @@
     <select id="selectMenu" resultType="map">
         SELECT *
           FROM menu
+         WHERE ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+         ORDER BY DEPTH, SORT_ORDER ASC 
     </select>
 </mapper>
