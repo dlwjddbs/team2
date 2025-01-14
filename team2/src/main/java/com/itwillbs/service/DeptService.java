@@ -1,5 +1,6 @@
 package com.itwillbs.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +14,50 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeptService {
 	
-	private final DeptMapper DeptMapper;
+	private final DeptMapper deptMapper;
 	
 	public List<Map<String, Object>> getUpperDept(Map<String, Object> map) {
-		return DeptMapper.getUpperDept(map) ;
+		return deptMapper.getUpperDept(map) ;
+	}
+
+	public Map<String, Object> insertUpperDept(Map<String, Object> map) {
+Map<String, Object> message = new HashMap<>();
+		
+		String result = "이미 등록된 코드입니다.";
+		String resultCode = "0";
+		
+		//try {
+			int duplicateCnt = deptMapper.isDuplicateUpperDept(map);
+			System.out.println(duplicateCnt);
+			if (duplicateCnt == 0) {
+				int resultCnt = deptMapper.insertUpperDept(map);
+				if (resultCnt > 0) {
+					result = "등록 되었습니다.";
+					resultCode = "1";
+				} else {
+					result = "등록 실패.";
+				}
+			}
+		//} catch (Exception e) {
+			//e.printStackTrace();
+			//result = "등록 실패.";
+		//}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	
+
+	public List<Map<String, Object>> getCcodeList(Map<String, Object> map) {
+		
+		return deptMapper.getCcodeList(map);
+	}
+
+	public List<Map<String, Object>> getDepMngList(Map<String, Object> map) {
+		return deptMapper.getDepMngList(map);
 	}
 
 }

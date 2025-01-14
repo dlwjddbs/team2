@@ -56,5 +56,11 @@ public class SalaryService {
 		salaryMapper.updateSalaryBonus(map);
 
 	}
+	
+	// 급여 확정 상태 변경
+	public Map<String, Object> updatefixedSalary(Map<String, Object> param) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

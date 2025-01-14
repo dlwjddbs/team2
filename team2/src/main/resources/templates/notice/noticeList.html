@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 	<meta charset="utf-8">
@@ -26,6 +26,9 @@
 	<link rel="stylesheet" href="../../plugins/codemirror/theme/monokai.css">
 	<!-- SimpleMDE -->
 	<link rel="stylesheet" href="../../plugins/simplemde/simplemde.min.css">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -162,6 +165,7 @@
 									<h2 class="card-title">공지사항 수정</h2>
 								</div>
 								<form id="updateNoticeForm" action="/updateNotice" method="POST">
+									<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 									<!-- /.card-header -->
 									<div class="card-body">
 										<div class="mb-3">
@@ -246,7 +250,11 @@
 	<!-- 공지사항 모달창 -->
 	<script src="../../bower_components/ckeditor/ckeditor.js"></script>
 
-	<script>
+	<script th:inline="javascript">
+		const token = $("meta[name='_csrf']").attr("content")
+		const header = $("meta[name='_csrf_header']").attr("content");
+		const name = $("#userName").val();
+
 		$(function () {
 			// Summernote 초기화 시 높이 설정
 			$('#noticeContent').summernote({
@@ -263,21 +271,18 @@
 				focus: true, // 포커스 자동 설정 (선택 사항)
 			});
 		});
-	</script>
 
-	<!-- Page specific script -->
-	<script th:inline="javascript">
+		//Page specific script 
 		const isAdmin = true; // 관리자 여부 (서버에서 가져온 데이터로 설정)
 		const notices = []; // 서버에서 공지사항 데이터를 가져올 배열
 
-	</script>
 
 
-	<script>
 		function addNotice() {
 			$('#addNoticeModal').modal('show');
 		}
 
+		// 공지 등록
 		$('#addNoticeForm').on('submit', function (event) {
 			event.preventDefault(); // 기본 제출 동작 방지
 
@@ -285,60 +290,34 @@
 			const content = $('#noticeContent').val();
 
 			$.ajax({
-				url: '/api/notice/createNotice',
+				url: '/createNotice',
 				method: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					if (header && token) {
+						xhr.setRequestHeader(header, token);
+					}
+				},
 				data: {
 					title: title,
 					content: content
 				},
 				success: function (response) {
-					alert(response); // 서버에서 받은 메시지 표시
-					fetchNotices(); // 공지사항 목록 새로고침
-					$('#addNoticeModal').modal('hide');
-				},
-
-			});
-		});
-
-		document.getElementById("addNoticeForm").addEventListener("submit", function (event) {
-			event.preventDefault(); // 기본 폼 제출 방지
-
-			// 폼 데이터 수집
-			// 			var noticeAuthor = document.getElementById("noticeAuthor").value;
-			var noticeTitle = document.getElementById("noticeTitle").value;
-			var noticeContent = document.getElementById("noticeContent").value;
-
-
-			// 서버로 전송할 데이터 객체 만들기
-			var data = new FormData();
-			// 			data.append("noticeAuthor", noticeAuthor);
-			data.append("noticeTitle", noticeTitle);
-			data.append("noticeContent", noticeContent);
-
-			// AJAX 요청 (POST)
-			fetch('/createNotice', {
-				method: 'POST',
-				body: data
-			})
-				.then(response => response.json()) // 서버에서 JSON 응답을 받음
-				.then(data => {
-					if (data.success) {
+					if (response) {
 						alert('공지사항이 등록되었습니다.');
 						$('#addNoticeModal').modal('hide'); // 모달 숨기기
 						location.reload(); // 페이지 새로 고침 (공지사항 목록 갱신)
 					} else {
 						alert('공지사항 등록에 실패했습니다.');
 					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					alert('공지사항 등록 중 오류가 발생했습니다.');
-				});
+				},
+				error: function () {
+					console.error("공지사항 등록 중 오류가 발생했습니다.");
+				}
+			});
 		});
-	</script>
 
 
-	<script th:inline="javascript">
 		$(function () {
 			handlingButtonRole();
 
@@ -354,11 +333,18 @@
 			$.ajax({
 				url: '/session', // 서버에 관리자 여부를 요청하는 엔드포인트
 				method: 'GET',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					if (header && token) {
+						xhr.setRequestHeader(header, token);
+					}
+				},
 				success: function (data) {
+					console.log(data);
 					const userRole = data.authority; // role 값 ("ADMIN" 또는 "USER" 등)
 
 					// 관리자 권한이면 작성 버튼 표시
-					if (userRole === "ADM") {
+					if (userRole === "ROLE_ADMIN") {
 						$("#btnAddNotice").show();
 					}
 				},
@@ -372,6 +358,10 @@
 			console.info(noticeId);
 			$.ajax({
 				type: "POST",
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
 				url: "/deleteNotice", // 실제 삭제를 수행할 컨트롤러/라우트
 				data: {
 					noticeId: noticeId      // 서버로 전달할 파라미터
@@ -416,10 +406,16 @@
 				ajax: {
 					url: "/getNoticeList",
 					type: "POST",
+					//추가해야 하는 부분
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+					},
 
 					"dataSrc": function (res) {
+						console.log(res);
 						return res;
 					}
+
 
 				},
 				columns: [
@@ -448,7 +444,7 @@
 						render: function (editable, type, row) {
 							if (editable) {
 								return `
-				            <button type="button" class="btn btn-outline-primary updateNoticeBtn" id="btnUpdateNotice"
+				            <button type="button" class="btn btn-outline-primary updateNoticeBtn"
 				                            data-id="${row.NOTICE_ID}"
 				                            onclick="openUpdateModal('${row.NOTICE_ID}')">수정하기</button>`;
 							}
@@ -476,44 +472,21 @@
 					}
 				]
 
-			})
-
-			$(document).on("click", ".subject-link", function (e) {
-				e.preventDefault();
-				const noticeId = $(this).data("id");
-
-				$.ajax({
-					url: "/getNoticeList", // Spring Controller의 매핑 URL
-					type: "POST",
-					contentType: "application/json",
-					data: JSON.stringify({id: noticeId}),
-					success: function (data) {
-						// 모달 내용 설정
-						$("#modalTitle").text(data.subject);
-						$("#modalContent").text(data.content);
-						$("#modalAuthor").text(data.name);
-						$("#modalTime").text(data.createTime);
-
-						// 모달 열기
-						$("#noticeModal").modal("show");
-					},
-					error: function () {
-						alert("데이터를 불러오는데 실패했습니다.");
-					},
-				});
-			});
+			})	
 
 		}
-	</script>
 
-	<!--	수정하기 모달창-->
-	<script>
+		//수정하기 모달창
 		function openUpdateModal(notice_id) {
 			console.log("noticeID", notice_id)
 			// 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
 			$.ajax({
 				url: '/getNoticeDetail',
 				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
 				data: {NOTICE_ID: notice_id}, // ID 전달
 				success: function (notice) {
 					// 폼 속성 변경
@@ -530,21 +503,24 @@
 
 
 				},
+				
 				error: function (xhr, status, error) {
 					console.error("공지 조회 오류:", error);
 				}
 			});
 		}
-	</script>
 
-	<!--	상세보기 모달창-->
-	<script>
+		//상세보기 모달창
 		function openSubjectModal(notice_id) {
 			console.log("noticeID", notice_id)
 			// 서버에 AJAX 요청을 보내 공지 상세 정보 가져오기
 			$.ajax({
 				url: '/getNoticeDetail',
 				type: 'POST',
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
 				data: {NOTICE_ID: notice_id}, // ID 전달
 				success: function (notice) {
 					// 폼 속성 변경

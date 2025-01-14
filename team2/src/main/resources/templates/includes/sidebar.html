@@ -144,7 +144,6 @@
 				
 				<!-- 근태 정보 --> 
 				<li class="nav-item">
-				
 					<a href="#" class="nav-link">
 						<p>
 							근태
@@ -175,53 +174,26 @@
 						</li>
 						<li class="nav-header">ㅡ  관리자 출퇴근 기록</li>
 						<li class="nav-item">
-							<a th:href="@{/commuteHistory}" class="nav-link">
+							<a th:href="@{/admin/commuteHistory}" class="nav-link">
 								<p>출퇴근 기록 관리</p>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/attendanceTime}" class="nav-link">
+							<a th:href="@{/admin/attendanceTime}" class="nav-link">
 								<p>출퇴근 기준 시간 관리</p>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/attendanceHistory}" class="nav-link">
+							<a th:href="@{/admin/attendanceHistory}" class="nav-link">
 								<p>지각/조퇴/결근 내역 확인</p>
 							</a>
 						</li>
-						
-<!-- 						<li class="nav-header">ㅡ  휴가 관리</li> -->
-<!-- 						<li class="nav-item"> -->
-<!-- 							<a href="#" class="nav-link"> -->
-<!-- 								<p>휴가 신청 및 상태 확인</p> -->
-<!-- 							</a> -->
-<!-- 						</li> -->
-<!-- 						<li class="nav-item"> -->
-<!-- 							<a href="../mailbox/mailbox.html" class="nav-link"> -->
-<!-- 								<p>연차/반차/특별휴가 내역 조회</p> -->
-<!-- 							</a> -->
-<!-- 						</li> -->
-<!-- 						<li class="nav-item"> -->
-<!-- 							<a href="../mailbox/compose.html" class="nav-link"> -->
-<!-- 								<p>휴가 잔여일 확인</p> -->
-<!-- 							</a> -->
-<!-- 						</li> -->
-						
 						<li class="nav-header">ㅡ  근무 일정 관리</li>
-<!-- 						<li class="nav-item"> -->
-<!-- 							<a href="../mailbox/read-mail.html" class="nav-link"> -->
-<!-- 								<p>개인 근무 스케줄 조회</p> -->
-<!-- 							</a> -->
-<!-- 						</li> -->
 						<li class="nav-item">
-							<a th:href="@{/setHoliday}" class="nav-link">
+							<a th:href="@{/admin/setHoliday}" class="nav-link">
 								<p>휴무일 관리</p>
 							</a>
 						</li>
-<!-- 						<li class="nav-item"> -->
-<!-- 							<a th:href="@{/setHoliday}" class="nav-link"> -->
-<!-- 								<p>휴일 등록</p> -->
-<!-- 							</a> -->
 						</li>
 					</ul>
 				</li>
@@ -239,7 +211,7 @@
 					<ul class="nav nav-treeview">
 						<li class="nav-header">ㅡ  급여 조회</li>
 						<li class="nav-item">
-							<a th:href="@{/salaryListEmployee}" class="nav-link">
+							<a th:href="@{/salary/salaryListEmployee}" class="nav-link">
 								<p>사원별 급여 조회</p>
 							</a>
 						</li>
@@ -268,28 +240,28 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/salarySendTest}" class="nav-link">
+							<a th:href="@{/salary/salarySendTest}" class="nav-link">
 								<p>급여 명세서 발급</p>
 							</a>
 						</li>
 						<li class="nav-header">ㅡ  관리자 화면(급여)</li>
 						<li class="nav-item">
-							<a th:href="@{/salaryInput}" class="nav-link">
+							<a th:href="@{/salary/salaryInput}" class="nav-link">
 								<p>급여 입력</p>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/salaryInputList}" class="nav-link">
+							<a th:href="@{/salary/salaryInputList}" class="nav-link">
 								<p>급여 등록 현황</p>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/salaryTransferList}" class="nav-link">
+							<a th:href="@{/salary/salaryTransferList}" class="nav-link">
 								<p>급여 이체 현황</p>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a th:href="@{/salaryStatistics}" class="nav-link">
+							<a th:href="@{/salary/salaryStatistics}" class="nav-link">
 								<p>급여 통계(미구현)</p>
 							</a>
 						</li>

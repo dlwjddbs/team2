@@ -193,7 +193,7 @@
 		function selectBox(type) {
 			$.ajax({
                 type : "POST",
-                url : "/selectBox",
+                url : "/attendance/selectBox",
                 data : {
                 	type : type
                 },
@@ -259,7 +259,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getCommuteHistory",
+					url : "/attendance/getCommuteHistory",
 					type:"POST",
 					data : {
 						startDate : date[0],					
@@ -304,7 +304,7 @@
 			
 			$.ajax({
                 type : "POST",
-                url : "/deleteCommuteTime",
+                url : "/attendance/deleteCommuteTime",
                 data : {
                 	id : id
 				},
@@ -344,7 +344,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/addCommuteTime",
+	            url : "/attendance/addCommuteTime",
 	            data : {
 	            	MEMBER_ID : MEMBER_ID,
 	            	CHECK_IN_TIME : CHECK_IN_TIME,
@@ -367,7 +367,7 @@
 		function memberSelectBox() {
 			$.ajax({
                 type : "POST",
-                url : "/memberSelectBox",
+                url : "/attendance/memberSelectBox",
                 data : {},
                 success : function(res){
                 	let str = '<option value="" selected="selected" disabled>전체</option>';
