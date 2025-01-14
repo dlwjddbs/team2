@@ -329,27 +329,27 @@
 
 <script th:fragment="sidebar" th:inline="javascript">
 	let menuData = /*[[${menus}]]*/
-
+	
 	function generateMenu(data) {
 	    const menuMap = new Map();
 
 	    data.forEach(item => {
-	        menuMap.set(item.ID, { ...item, children: [] });
+	        menuMap.set(item.MENU_ID, { ...item, children: [] });
 	    });
-
+		
 	    // 부모-자식 관계 설정
 	    data.forEach(item => {
 	        if (item.PARENT_ID) {
 	            const parent = menuMap.get(item.PARENT_ID);
 	            if (parent) {
-	                parent.children.push(menuMap.get(item.ID));
+	                parent.children.push(menuMap.get(item.MENU_ID));
 	            }
 	        }
 	    });
 
 	    // 최상위 메뉴만 반환
 	    const rootItems = [...menuMap.values()].filter(item => !item.PARENT_ID);
-
+		console.log(rootItems);
 	    function createMenuHTML(items) {
 	        if (!items.length) {
 				return '';

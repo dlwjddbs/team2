@@ -36,10 +36,18 @@ public class MenuController {
 	
 	@PostMapping("/system/getMenuList")
 	@ResponseBody
-	public List<Map<String, Object>> getMenuList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+	public List<Map<String, Object>> getMenuList(@RequestParam Map<String, Object> map) {
 		List<Map<String, Object>> menuList = menuService.getMenuList(map);
 		
 		return menuList;
+	}
+	
+	@PostMapping("/system/addMenu")
+	@ResponseBody
+	public Map<String, Object> addMenu(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.addMenu(map);
+		
+		return message;
 	}
 	
 }

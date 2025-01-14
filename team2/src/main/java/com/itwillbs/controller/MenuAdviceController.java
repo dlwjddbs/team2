@@ -35,6 +35,7 @@ public class MenuAdviceController {
 	            
 	        	if (!auth2.isEmpty()) {
 	                List<Map<String, Object>> menus = menuService.selectMenu(auth2);
+	                
 	                model.addAttribute("menus", menus);
 	        	}
 	        }

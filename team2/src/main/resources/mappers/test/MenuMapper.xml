@@ -36,4 +36,49 @@
 		   </if>
 		 ORDER BY SORT_ORDER ASC
     </select>
+    
+    <insert id="insertMenu">
+    	INSERT INTO MENU (
+			  MENU_ID
+			, NAME
+			, PARENT_ID
+			, URL
+			, ROLE
+			, SORT_ORDER
+			, DEPTH
+			, USE_YN
+		) VALUES (
+			  (SELECT 'ME' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(MENU_ID, 3))), 0) + 1, 10, '0') FROM MENU)
+			, #{NAME}
+			, #{PARENT_ID}
+			, #{URL}
+			, #{ROLE}
+			, #{SORT_ORDER}
+			, #{DEPTH}
+			, #{USE_YN}
+		)
+    </insert>
+    
+    <select id="isDuplicateMenuSortOrder" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   <choose>
+		   	   <when test="PARENT_ID != null and PARENT_ID != ''">
+		   	   		AND PARENT_ID = #{PARENT_ID}
+		   	   </when>
+		   	   <otherwise>
+		   	   		 AND PARENT_ID IS NULL
+		   	   </otherwise>
+		   </choose>
+		   AND SORT_ORDER = #{SORT_ORDER}
+    </select>
+    
+    <select id="isDuplicateMenuURL" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   AND URL IS NOT NULL
+		   AND URL = #{URL}
+    </select>
 </mapper>
