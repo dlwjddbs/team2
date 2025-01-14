@@ -15,7 +15,7 @@ public class MenuService {
 	
 	private final MenuMapper menuMapper;
 
-	public List<Map<String, Object>> selectMenu() {
-		return menuMapper.selectMenu();
+	public List<Map<String, Object>> selectMenu(String auth) {
+		return menuMapper.selectMenu(auth);
 	}
 }

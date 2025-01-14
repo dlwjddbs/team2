@@ -3,6 +3,8 @@ package com.itwillbs.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +28,7 @@ public class HrManagementController {
 	private final HrManagementService hrManagementService;
 	
 	// 신규 사원 추가
-	@PostMapping("/addMember")
+	@PostMapping("/ajax/addMember")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
 		int insertCount = hrManagementService.addMember(param);
@@ -36,7 +38,7 @@ public class HrManagementController {
 //======================================================================================================
 	
 	// 사원 상세 정보 수정
-	@PostMapping("/updateMember")
+	@PostMapping("/ajax/updateMember")
 	public String updateMember(@RequestParam Map<String, Object> param) {
 		
 		int updateCount = hrManagementService.updateMember(param);
@@ -47,14 +49,18 @@ public class HrManagementController {
 	}
 	
 	// 사원 정보
-	@GetMapping("/memberList")
-	public String memberList() {
+	@GetMapping("/admin/memberList")
+	public String memberList(@AuthenticationPrincipal User user) {
+		if (user == null) {
+            return "redirect:/login"; 
+        }
+		
 		return "/HRManagement/member_list";
 	}
 	
 	
 	// 사원 정보
-	@PostMapping("/getMemberList")
+	@PostMapping("/ajax/getMemberList")
 	@ResponseBody
 	public List<Map<String, Object>> getMemberList(@RequestParam Map<String, Object> param) {
 		List<Map<String, Object>> memberList = hrManagementService.getMemberList();
@@ -62,7 +68,7 @@ public class HrManagementController {
 	}	
 	
 	// 사원 상세 정보
-	@PostMapping("/getMemberDetail")
+	@PostMapping("/ajax/getMemberDetail")
 	@ResponseBody
 	public Map<String, Object> getMemberDetail(@RequestParam Map<String, Object> param) throws JsonProcessingException {
 		Map<String, Object> member = hrManagementService.getMemberDetail(param);
@@ -72,7 +78,7 @@ public class HrManagementController {
 	
 	
 	// 은행코드, 부서, 직급
-	@PostMapping("/getOrganizationData")
+	@PostMapping("/ajax/getOrganizationData")
 	@ResponseBody
 	public List<Map<String, Object>> getOrganizationData() throws JsonProcessingException {
 		List<Map<String, Object>> data = hrManagementService.getOrganizationData();

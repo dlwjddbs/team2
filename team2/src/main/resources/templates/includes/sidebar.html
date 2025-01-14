@@ -68,6 +68,11 @@
 								<p>공통코드</p>
 							</a>
 						</li>
+						<li class="nav-item">
+							<a th:href="@{/admin/menu}" class="nav-link">
+								<p>메뉴</p>
+							</a>
+						</li>
 					</ul>
 				</li>
 				<!-- /.시스템관리 -->
@@ -316,3 +321,70 @@
 	</div>
 	<!-- /.sidebar -->
 </aside>
+
+<script th:fragment="sidebar" th:inline="javascript">
+	let menuData = /*[[${menus}]]*/
+
+	function generateMenu(data) {
+	    const menuMap = new Map();
+
+	    data.forEach(item => {
+	        menuMap.set(item.ID, { ...item, children: [] });
+	    });
+
+	    // 부모-자식 관계 설정
+	    data.forEach(item => {
+	        if (item.PARENT_ID) {
+	            const parent = menuMap.get(item.PARENT_ID);
+	            if (parent) {
+	                parent.children.push(menuMap.get(item.ID));
+	            }
+	        }
+	    });
+
+	    // 최상위 메뉴만 반환
+	    const rootItems = [...menuMap.values()].filter(item => !item.PARENT_ID);
+
+	    function createMenuHTML(items) {
+	        if (!items.length) {
+				return '';
+			}
+			
+	        let html = '<ul class="nav nav-treeview">';
+	        items.forEach(item => {
+	            html += `
+	                <li class="nav-item">
+	                    <a href="${item.URL || '#'}" class="nav-link">
+	                        <p>${item.NAME}${item.URL ? '' : '<i class="fas fa-angle-left right"></i>'}</p>
+	                    </a>
+	                    ${createMenuHTML(item.children)}
+	                </li>
+	            `;
+	        });
+	        html += '</ul>';
+			
+	        return html;
+	    }
+
+	    let html = '<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">';
+	    rootItems.forEach(item => {
+	        html += `
+	            <li class="nav-item">
+	                <a href="${item.URL || '#'}" class="nav-link">
+	                    <p>${item.NAME}${item.URL ? '' : '<i class="fas fa-angle-left right"></i>'}</p>
+	                </a>
+	                ${createMenuHTML(item.children)}
+	            </li>
+	        `;
+	    });
+	    html += '</ul>';
+	    return html;
+	}
+
+	document.addEventListener("DOMContentLoaded", () => {
+	    const sidebar = document.querySelector(".mt-2");
+	    if (sidebar) {
+//	        sidebar.innerHTML = generateMenu(menuData);
+	    }
+	});
+</script>
