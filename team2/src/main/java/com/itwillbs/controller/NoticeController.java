@@ -115,7 +115,6 @@ public class NoticeController {
     @PostMapping("/createNotice")
     @ResponseBody
     public Map<String, Object> createNotice(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map, Model model) {
-    	System.out.println(map.toString() + " oooooooooooo");
     	String id = user.getUsername();
         map.put("memberId", id);
         noticeService.createNotice(map);
@@ -127,6 +126,7 @@ public class NoticeController {
 //    공지사항 수정 (관리자 전용)
     @PostMapping("/updateNotice")
     public String updateNotice(@AuthenticationPrincipal User user,@RequestParam Map<String, Object> map, Model model) {
+    	System.out.println(map.toString() + " iiiiiiiiiiiiii");
     	String id = user.getUsername();
 		map.put("memberId", id);
 	    noticeService.updateNotice(map);
