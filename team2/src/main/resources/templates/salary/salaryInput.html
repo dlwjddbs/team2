@@ -54,31 +54,6 @@
 			<section class="content">
 			
 				<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
-				
-<!-- 				검색 필터 -->
-<!-- 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2"> -->
-<!-- 					<div class="d-flex"> -->
-<!-- 						<div class="d-flex ml-4"> -->
-<!-- 							Date range -->
-<!-- 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label> -->
-<!-- 							<div class="input-group"> -->
-<!-- 								<div class="input-group-prepend"> -->
-<!-- 									<span class="input-group-text"> -->
-<!-- 										<i class="far fa-calendar-alt"></i> -->
-<!-- 									</span> -->
-<!-- 								</div> -->
-<!-- 								<input type="text" class="form-control float-right" id="reservation"> -->
-<!-- 							</div> -->
-<!-- 						</div> -->
-<!-- 					</div> -->
-<!-- 					<button type="button" class="btn btn-primary" id="btnSearch">조회</button> -->
-<!-- 				</div> -->
-<!-- 				<div class="col-2" > -->
-<!-- 					<button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1"> -->
-<!-- 						급여 정보 입력 -->
-<!-- 					</button> -->
-<!-- 					<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav> -->
-<!-- 				</div> -->
 				<br>
 				<div class="container-fluid">
 					<div class="row">
@@ -204,7 +179,7 @@
 		  function loadModalContent(id) {
 			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
 			  	$.ajax({
-			  		url: "/salary/getModalContent",  
+			  		url: "/salary/salaryWriteModal",  
 			  		type: "POST",
 			  		data: { id: id },
 			  		success: function(salaryData) {

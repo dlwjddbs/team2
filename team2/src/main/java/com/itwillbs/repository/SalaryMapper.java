@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SalaryMapper {
@@ -18,6 +19,9 @@ public interface SalaryMapper {
 	
 	// 급여 조회 - 사원ID에 해당하는 급여정보를 조회
 //	Map<String, Object> selectSalaryListById(String id);
+
+	// 급여 조회 - 급여 입력시 한 사원의 한 데이터만 조회되도록
+	Map<String, Object> selectSalaryWriteById(Map<String, Object> salaryMap);
 	
 	// 급여 조회 - 사원ID에 해당하는 급여정보를 조회 (귀속연월 추가)
 	Map<String, Object> selectSalaryListById(Map<String, Object> salaryMap);
@@ -36,5 +40,9 @@ public interface SalaryMapper {
 	
 	// 급여 수정 - 사원의 상여금(보너스) 수정
 	void updateSalaryBonus(Map<String, Object> map);
+	
+	// 급여 확정 - 버튼 비활성화
+	void updatefixedSalary(Map<String, Object> param);
+
 
 }

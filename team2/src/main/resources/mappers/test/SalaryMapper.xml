@@ -81,6 +81,21 @@
 		  </if>
     </select>
     
+    <select id="selectSalaryWriteById" resultType="map">
+	    	SELECT
+	            MEMBER_ID,
+	            NAME,
+	            GRADE_ID,
+	            DEPT_ID,
+	            SALARY
+			FROM 
+				MEMBER
+			WHERE
+				1 = 1
+				AND
+					MEMBER_ID = #{id}
+	</select>
+    
     <select id="selectSalaryListById" resultType="map">
     <!-- 사원ID와 귀속연월에 해당하는 급여정보를 조회 -->
     <!-- 만약 귀속연월이 없으면 사원ID에 해당하는 급여정보를 조회 -->
@@ -98,8 +113,6 @@
             S.FULLSERVICE_BONUS,
             S.PERFORMANCE_BONUS,
             S.TOTAL
-<!--             (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS +  -->
-<!--              S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL -->
 		FROM 
 			MEMBER M
 		LEFT JOIN SALARY S
@@ -274,5 +287,15 @@
 		    CB.MEMBER_ID,
 		    CB.COMMUTE_MONTH;
 	</select>
+	
+	<!-- 급여 확정 버튼 비활성화 -->
+	<update id="updatefixedSalary" parameterType="map">
+		UPDATE SALARY
+		SET SALARY_YN = 'Y'
+		, UPDATE_DATE = SYSDATE
+        WHERE MEMBER_ID = #{memberId}
+        	AND PAYDAY = #{payday}
+        	AND SALARY_YN = 'N'
+	</update>
 
 </mapper>

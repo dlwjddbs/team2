@@ -33,6 +33,11 @@ public class SalaryService {
 //		return salaryMapper.selectSalaryListById(id);
 //	}
 	
+	// 급여 조회 - 급여 입력시 한 사원의 한 데이터만 조회되도록
+	public Map<String, Object> findSalaryWriteById(Map<String, Object> salaryMap) {
+		return salaryMapper.selectSalaryWriteById(salaryMap);
+	}
+
 	// 급여 조회 - 사원 ID의 급여 정보를 조회 (귀속연월 추가)
 	public Map<String, Object> findSalaryById(Map<String, Object> salaryMap) {
 		return salaryMapper.selectSalaryListById(salaryMap);
@@ -58,9 +63,9 @@ public class SalaryService {
 	}
 	
 	// 급여 확정 상태 변경
-	public Map<String, Object> updatefixedSalary(Map<String, Object> param) {
-		// TODO Auto-generated method stub
-		return null;
+	public void updatefixedSalary(Map<String, Object> param) {
+		salaryMapper.updatefixedSalary(param);
 	}
+	
 
 }

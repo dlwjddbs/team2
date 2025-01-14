@@ -3,10 +3,14 @@ package com.itwillbs.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -136,11 +140,20 @@ public class SalaryController {
         
 		//String id = "admin";
         String id = user.getUsername();
+        Collection<GrantedAuthority> auth = user.getAuthorities();
         log.info(id);
+        log.info(auth.toString());
         
-		map.put("id", user.getUsername());
-		List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
-		
+        // if문 써서 전체 출력 or 해당 사원 조회되게 만들기
+        if(auth.toString() == "[ROLE_ADMIN]") {
+    		map.put("id", "admin");
+    		
+        } else {
+    		map.put("id", user.getUsername());
+        }
+        
+        List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
+        
 		return salaryInputData;
 	}
 	
@@ -160,15 +173,14 @@ public class SalaryController {
 	
 	// 확정버튼 클릭시 확정상태 변경
 	@PostMapping("/salary/fixedSalary")
-	@ResponseBody
 	public String fixedSalary(@RequestParam Map<String, Object> param, Model model) {
 				
 		log.info("============= fixedSalary =============");
 		log.info(param.toString());
 
-		Map<String, Object> fixedSalary = salaryService.updatefixedSalary(param);
+		salaryService.updatefixedSalary(param);
 		
-		return "fixedSalary";
+		return "redirect:/salary/salaryInputList";
 	}
 	
     // 급여 정보 (Test)
@@ -204,8 +216,33 @@ public class SalaryController {
 		
 		return salaryInfoData;
 	}
+	// 입력 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
+	@PostMapping("/salary/salaryWriteModal")
+    @ResponseBody
+    public Map<String, Object> salaryWriteModal(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
+    	log.info("============= salaryWriteModal POST start =============");
+    	
+    	log.info(id);
+    	log.info(payday);
+    	
+    	Map<String, Object> salaryMap = new HashMap<>();
+    	salaryMap.put("id", id);
+    	
+    	// payday가 없으면 null로 들어가야하는데 빈 문자열로 인식하는 문제
+    	// 파라미터를 명확히 null로 처리
+    	salaryMap.put("payday", payday == null || payday.trim().isEmpty() ? null : payday);
+
+        // DB에서 ID에 해당하는 데이터를 가져와서 model에 추가
+    	Map<String, Object> salaryWriteData = salaryService.findSalaryWriteById(salaryMap);
+    	
+    	log.info("Salary Write Data : " + salaryWriteData);
+    	
+    	log.info("============= getModalContent POST end =============");
+    	
+    	return salaryWriteData;
+    }
 	
-	// 입력, 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
+	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
     @PostMapping("/salary/getModalContent")
     @ResponseBody
     public Map<String, Object> getModalContent(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {

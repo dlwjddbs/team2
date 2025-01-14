@@ -239,11 +239,11 @@
 
 		           	    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 확정하시겠습니까?`)) {
 		           	        $.ajax({
-		           	            url: '/salary/confirmSalary', // 서버 API URL
+		           	            url: '/salary/fixedSalary', // 서버 API URL
 		           	            type: 'POST',
 		           	            data: { memberId, payday },
 		           	            success: function (response) {
-		           	                if (response.success) {
+		           	                if (response) {
 		           	                    alert('급여가 확정되었습니다.');
 
 		           	                    // 버튼을 "확정" 텍스트로 변경
