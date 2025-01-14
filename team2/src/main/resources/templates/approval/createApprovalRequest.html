@@ -152,7 +152,7 @@
 		$("#cancelTest").on("click", function() {
 			$.ajax({
 	            type : "POST",
-	            url : "/cancelApprovalRequest",
+	            url : "/approval/cancelApprovalRequest",
 	            data : {
 					REQUEST_ID : 'AR0000000007'
 				},
@@ -172,7 +172,7 @@
 		$("#btnTest").on("click", function() {
 			$.ajax({
 	            type : "POST",
-	            url : "/createApprovalRequest",
+	            url : "/approval/createApprovalRequest",
 	            data : {
 				},
 	            success : function(res){

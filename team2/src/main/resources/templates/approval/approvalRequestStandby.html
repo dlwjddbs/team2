@@ -147,7 +147,7 @@
 		function approvalRequestDetail(id) {
 			$.ajax({
 	            type : "POST",
-	            url : "/approvalRequestDetail",
+	            url : "/approval/approvalRequestDetail",
 	            data : {
 	            	REQUEST_ID : id,
 				},
@@ -211,7 +211,7 @@
 		$("#return").on("click", function() {
 			$.ajax({
 	            type : "POST",
-	            url : "/returnApprovalRequest",
+	            url : "/approval/returnApprovalRequest",
 	            data : {
 	            	REQUEST_ID : $("#REQUEST_ID").text(),
 					STATUS : 'REJECTED'
@@ -232,7 +232,7 @@
 		$("#approve").on("click", function() {
 			$.ajax({
 	            type : "POST",
-	            url : "/approveApprovalRequest",
+	            url : "/approval/approveApprovalRequest",
 	            data : {
 	            	REQUEST_ID : $("#REQUEST_ID").text(),
 					STATUS : 'APPROVED'
@@ -300,7 +300,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/selectApprovalPendingList",
+					url : "/approval/selectApprovalPendingList",
 					type:"POST",
 					data : {
  						startDate : date[0],					

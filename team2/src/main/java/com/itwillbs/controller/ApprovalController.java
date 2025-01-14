@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,13 +28,13 @@ public class ApprovalController {
 	
 	private final ApprovalService approvalService;
 	
-	@GetMapping("/createApprovalRequest")
+	@GetMapping("/approval/createApprovalRequest")
 	public String createApprovalRequest(HttpSession session) {
 		
 		return "/approval/createApprovalRequest";
 	}
 	
-	@PostMapping("createApprovalRequest")
+	@PostMapping("/approval/createApprovalRequest")
 	@ResponseBody
 	public Map<String, Object> createApprovalRequest(@RequestParam Map<String, Object> map) {
 		map.put("APPROVAL_TYPE", "AN");
@@ -48,19 +50,13 @@ public class ApprovalController {
 		return message;
 	}
 	
-	@GetMapping("/approvalRequestStandby")
-	public String approvalRequestStandby(HttpServletRequest request, HttpSession session, Model model, Map<String, Object> map) {
-		if (session.getAttribute("id") == null) {
+	@GetMapping("/admin/approvalRequestStandby")
+	public String approvalRequestStandby(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+		if (user == null) {
             return "redirect:/login"; 
         }
 		
-		if (!session.getAttribute("authority").toString().equals("ADM") 
-        			&& request.getHeader("Referer") != null) {
-//        	return "redirect:" + request.getHeader("Referer");
-        	return "redirect:/login";
-        }
-		
-		String id = session.getAttribute("id").toString();
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		Map<String, Object> approvalRequestMinMaxDate = approvalService.getApprovalRequestStandbyMinMaxDate(map);
@@ -78,7 +74,7 @@ public class ApprovalController {
 		return "/approval/approvalRequestStandby";
 	}
 	
-	@PostMapping("approvalRequestDetail")
+	@PostMapping("/approval/approvalRequestDetail")
 	@ResponseBody
 	public List<Map<String, Object>> approvalRequestDetail(@RequestParam Map<String, Object> map) {
 		
@@ -87,10 +83,10 @@ public class ApprovalController {
 		return approvalDetail;
 	}
 	
-	@PostMapping("/approveApprovalRequest")
+	@PostMapping("/approval/approveApprovalRequest")
 	@ResponseBody
-	public Map<String, Object> approveApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public Map<String, Object> approveApprovalRequest(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("APPROVER_ID", id);
 		
 		Map<String, Object> message = approvalService.approveApprovalRequest(map);
@@ -98,10 +94,10 @@ public class ApprovalController {
 		return message;
 	}
 	
-	@PostMapping("/returnApprovalRequest")
+	@PostMapping("/approval/returnApprovalRequest")
 	@ResponseBody
-	public Map<String, Object> returnApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public Map<String, Object> returnApprovalRequest(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("APPROVER_ID", id);
 		
 		Map<String, Object> message = approvalService.returnApprovalRequest(map);
@@ -109,18 +105,18 @@ public class ApprovalController {
 		return message;
 	}
 	
-	@PostMapping("/cancelApprovalRequest")
+	@PostMapping("/approval/cancelApprovalRequest")
 	@ResponseBody
-	public Map<String, Object> cancelApprovalRequest(HttpSession session, @RequestParam Map<String, Object> map) {
+	public Map<String, Object> cancelApprovalRequest(@RequestParam Map<String, Object> map) {
 		Map<String, Object> message = approvalService.cancelApprovalRequest(map);
 		
 		return message;
 	}
 	
-	@PostMapping("selectApprovalPendingList")
+	@PostMapping("/approval/selectApprovalPendingList")
 	@ResponseBody
-	public List<Map<String, Object>> selectApprovalPending(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public List<Map<String, Object>> selectApprovalPending(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		List<Map<String, Object>> approvalList = approvalService.selectApprovalPendingList(map);
@@ -128,19 +124,13 @@ public class ApprovalController {
 		return approvalList;
 	}
 	
-	@GetMapping("/approvalRequestCompletion")
-	public String approvalRequestCompletion(HttpServletRequest request, HttpSession session, Model model, Map<String, Object> map) {
-		if (session.getAttribute("id") == null) {
+	@GetMapping("/admin/approvalRequestCompletion")
+	public String approvalRequestCompletion(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+		if (user == null) {
             return "redirect:/login"; 
         }
 		
-		if (!session.getAttribute("authority").toString().equals("ADM") 
-        			&& request.getHeader("Referer") != null) {
-//        	return "redirect:" + request.getHeader("Referer");
-        	return "redirect:/login";
-        }
-		
-		String id = session.getAttribute("id").toString();
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		Map<String, Object> approvalRequestMinMaxDate = approvalService.getApprovalRequestCompletionMinMaxDate(map);
@@ -158,10 +148,10 @@ public class ApprovalController {
 		return "/approval/approvalRequestCompletion";
 	}
 	
-	@PostMapping("selectApprovalCompletionList")
+	@PostMapping("/approval/selectApprovalCompletionList")
 	@ResponseBody
-	public List<Map<String, Object>> selectApprovalCompletionList(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public List<Map<String, Object>> selectApprovalCompletionList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		List<Map<String, Object>> approvalList = approvalService.selectApprovalCompletionList(map);
@@ -169,13 +159,13 @@ public class ApprovalController {
 		return approvalList;
 	}
 	
-	@GetMapping("/myApprovalRequestCompletion")
-	public String myApprovalRequestCompletion(HttpSession session, Model model, Map<String, Object> map) {
-		if (session.getAttribute("id") == null) {
+	@GetMapping("/approval/myApprovalRequestCompletion")
+	public String myApprovalRequestCompletion(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+		if (user == null) {
             return "redirect:/login"; 
         }
 		
-		String id = session.getAttribute("id").toString();
+		String id = user.getUsername();
 		map.put("id", id);
 		map.put("status", "completion");
 		
@@ -194,10 +184,10 @@ public class ApprovalController {
 		return "/approval/myApprovalRequestCompletion";
 	}
 	
-	@PostMapping("selectMyApprovalList")
+	@PostMapping("/approval/selectMyApprovalList")
 	@ResponseBody
-	public List<Map<String, Object>> selectMyApprovalList(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public List<Map<String, Object>> selectMyApprovalList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		List<Map<String, Object>> approvalList = approvalService.selectMyApprovalList(map);
@@ -205,13 +195,13 @@ public class ApprovalController {
 		return approvalList;
 	}
 	
-	@GetMapping("/myApprovalRequestStandby")
-	public String myApprovalRequestStandby(HttpSession session, Model model, Map<String, Object> map) {
-		if (session.getAttribute("id") == null) {
+	@GetMapping("/approval/myApprovalRequestStandby")
+	public String myApprovalRequestStandby(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+		if (user == null) {
             return "redirect:/login"; 
         }
 		
-		String id = session.getAttribute("id").toString();
+		String id = user.getUsername();
 		map.put("id", id);
 		map.put("status", "pending");
 		

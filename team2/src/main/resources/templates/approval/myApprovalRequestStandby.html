@@ -147,7 +147,7 @@
 		function approvalRequestDetail(id) {
 			$.ajax({
 	            type : "POST",
-	            url : "/approvalRequestDetail",
+	            url : "/approval/approvalRequestDetail",
 	            data : {
 	            	REQUEST_ID : id,
 				},
@@ -258,7 +258,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/selectMyApprovalList",
+					url : "/approval/selectMyApprovalList",
 					type:"POST",
 					data : {
 							startDate : date[0],					
@@ -296,7 +296,7 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/cancelApprovalRequest",
+	            url : "/approval/cancelApprovalRequest",
 	            data : {
 					REQUEST_ID : $("#REQUEST_ID").text()
 				},
