@@ -9,5 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface MenuMapper {
 
 	List<Map<String, Object>> selectMenu(String auth);
+
+	List<Map<String, Object>> getMenuList(Map<String, Object> map);
 	
 }
