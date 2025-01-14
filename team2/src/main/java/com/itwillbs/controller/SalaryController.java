@@ -36,7 +36,7 @@ public class SalaryController {
 	// MyBatis흐름
 	// Controller -> Service -> Mapper.java -> Mapper.xml
 	
-	// 사원별 급여조회 - 추가 예정
+	// 사원별 급여조회
 	@GetMapping("/salary/salaryListEmployee")
 	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
 
@@ -57,7 +57,6 @@ public class SalaryController {
 	}
 	
 	// 관리자 급여입력 
-	// 페이지 첫 로딩 시 사원 정보 조회
 	@GetMapping("/salary/salaryInput")
 //	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
 	public String salaryInput() {
@@ -94,25 +93,34 @@ public class SalaryController {
 		return salaryMember;
 	}	
 	
-	
 	// 관리자 급여입력 내역 조회
 	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
 	@GetMapping("/salary/salaryInputList")
-	public String salaryInputList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {
-		
+	public String salaryInputList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {	
 		log.info("============= salaryInputList =============");
 		
         if (user == null) {
             return "redirect:/login"; 
         }
+
+        // 로그인한 유저의 권한 가져오기
+        Collection<GrantedAuthority> authorities = user.getAuthorities();
         
 		//String id = "admin";
-        String id = user.getUsername();
-        log.info("test1");
-
-		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
-		
+ 		String id = null;
+         
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("ADMIN 권한입니다.");
+            id = "admin";
+        } else {
+         	log.info("USER 권한입니다.");
+            id = user.getUsername();
+        }
+        
 		log.info(id);
+		
+		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
+
 		if (salaryInputMinMaxDate == null) {
 			LocalDate now = LocalDate.now();
 			
@@ -122,7 +130,7 @@ public class SalaryController {
 		}
 		
 		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
-		log.info("test2");
+
 		return "/salary/salaryInputList";
 	}
 	
@@ -131,25 +139,18 @@ public class SalaryController {
 	@PostMapping("/salary/salaryInputList")
 	@ResponseBody
 	public List<Map<String, Object>> getSalaryInputList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
-		
 		log.info("============= salaryInputList POST =============");
 		
-        if (user == null) {
-            //return "redirect:/login"; 
-        }
+        // 로그인한 유저의 권한 가져오기
+        Collection<GrantedAuthority> authorities = user.getAuthorities();
         
-		//String id = "admin";
-        String id = user.getUsername();
-        Collection<GrantedAuthority> auth = user.getAuthorities();
-        log.info(id);
-        log.info(auth.toString());
-        
-        // if문 써서 전체 출력 or 해당 사원 조회되게 만들기
-        if(auth.toString() == "[ROLE_ADMIN]") {
-    		map.put("id", "admin");
-    		
+        //user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("ADMIN 권한입니다.");
+     		map.put("id", "admin");
         } else {
-    		map.put("id", user.getUsername());
+            log.info("USER 권한입니다.");
+     		map.put("id", user.getUsername());
         }
         
         List<Map<String, Object>> salaryInputData = salaryService.getSalaryList(map);
@@ -157,7 +158,7 @@ public class SalaryController {
 		return salaryInputData;
 	}
 	
-	// 관리자 급여입력
+	// 관리자 급여입력 (POST)
 	@PostMapping("/salary/writeSalary")
 	@ResponseBody
 	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
@@ -169,8 +170,7 @@ public class SalaryController {
 		
 		return "급여 입력 성공!";
 	}
-	
-	
+
 	// 확정버튼 클릭시 확정상태 변경
 	@PostMapping("/salary/fixedSalary")
 	public String fixedSalary(@RequestParam Map<String, Object> param, Model model) {
@@ -183,7 +183,7 @@ public class SalaryController {
 		return "redirect:/salary/salaryInputList";
 	}
 	
-    // 급여 정보 (Test)
+    // 관리자 급여 정보 (Test)
 	@GetMapping("/salary/salaryInfo")
 	public String salaryInfo(Map<String, Object> map, Model model) {
 		log.info("============= salaryInfo =============");
@@ -216,7 +216,8 @@ public class SalaryController {
 		
 		return salaryInfoData;
 	}
-	// 입력 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
+	
+	// 입력 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴 (기본급만 조회)
 	@PostMapping("/salary/salaryWriteModal")
     @ResponseBody
     public Map<String, Object> salaryWriteModal(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
@@ -242,7 +243,7 @@ public class SalaryController {
     	return salaryWriteData;
     }
 	
-	// 수정 버튼을 클릭시 해당 멤버의 급여 정보를 가져옴
+	// 사원번호를 클릭시 해당 멤버의 급여 정보를 가져옴 (상여금 포함 조회)
     @PostMapping("/salary/getModalContent")
     @ResponseBody
     public Map<String, Object> getModalContent(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
@@ -269,7 +270,7 @@ public class SalaryController {
     	return salaryData;
     }
     
-	// 사원번호를 클릭시 해당 멤버의 야간수당 정보를 가져옴 (Test)
+	// 사원번호를 클릭시 해당 멤버의 야간수당 정보를 가져옴
     @PostMapping("/salary/getNightBonus")
     @ResponseBody
     public Map<String, Object> getNightBonus(@RequestParam("id") String id, @RequestParam(value = "payday", required = false) String payday) {
@@ -302,8 +303,6 @@ public class SalaryController {
     public String updateSalary(@RequestParam Map<String, Object> map) {
     	log.info("============= updateSalary POST start =============");
     	
-        //log.info("id" +  id);
-        
     	log.info(map.toString());
     	
     	salaryService.updateSalary(map);
@@ -314,31 +313,67 @@ public class SalaryController {
     	return "급여 수정 성공!";
     }
     
-	// 관리자 급여 이체 현황 조회
-	@GetMapping("/salary/salaryTransferList")
-	public String salaryTransferList(Map<String, Object> map, Model model, HttpSession session) {	
-		// 관리자 페이지라 관리자 로그인 필수
-//		if (session.getAttribute("id") == null) {
-//            return "redirect:/login"; 
-//        }
-		
-		log.info("============= salaryTransferList =============");
-		
-		String id = "admin";
-		Map<String, Object> salaryTransferMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
-		
-		if (salaryTransferMinMaxDate == null) {
-			LocalDate now = LocalDate.now();
-			
-			salaryTransferMinMaxDate = new HashMap<>();
-			salaryTransferMinMaxDate.put("SALARY_MIN_DATE", now);
-			salaryTransferMinMaxDate.put("SALARY_MAX_DATE", now);
-		}
-		
-		model.addAttribute("salaryTransferMinMaxDate", salaryTransferMinMaxDate);
-		
-		return "/salary/salaryTransferList";
-	}
-	
-	
+    // 관리자 급여 이체 현황 조회
+ 	@GetMapping("/salary/salaryTransferList")
+ 	public String salaryTransferList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model, HttpSession session) {
+ 		log.info("============= salaryTransferList =============");
+ 		
+        if (user == null) {
+            return "redirect:/login"; 
+        }  
+         
+        // 로그인한 유저의 권한 가져오기
+        Collection<GrantedAuthority> authorities = user.getAuthorities();
+        
+		//String id = "admin";
+ 		String id = null;
+         
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("ADMIN 권한입니다.");
+            id = "admin";
+        } else {
+         	log.info("USER 권한입니다.");
+            id = user.getUsername();
+        }
+        
+        log.info(id);
+        
+ 		Map<String, Object> salaryTransferMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
+ 		
+ 		if (salaryTransferMinMaxDate == null) {
+ 			LocalDate now = LocalDate.now();
+ 			
+ 			salaryTransferMinMaxDate = new HashMap<>();
+ 			salaryTransferMinMaxDate.put("SALARY_MIN_DATE", now);
+ 			salaryTransferMinMaxDate.put("SALARY_MAX_DATE", now);
+ 		}
+ 		
+ 		model.addAttribute("salaryTransferMinMaxDate", salaryTransferMinMaxDate);
+ 		
+ 		return "/salary/salaryTransferList";
+ 	}
+ 	
+ 	// 관리자 급여 이체 현황 조회 (POST)
+ 	@PostMapping("/salary/salaryTransferList")
+ 	@ResponseBody
+ 	public List<Map<String, Object>> salaryTransferList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+ 		log.info("============= salaryTransferList POST =============");
+ 		
+        // 로그인한 유저의 권한 가져오기
+        Collection<GrantedAuthority> authorities = user.getAuthorities();
+        
+        //user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("ADMIN 권한입니다.");
+     		map.put("id", "admin");
+        } else {
+            log.info("USER 권한입니다.");
+     		map.put("id", user.getUsername());
+        }
+         
+ 		List<Map<String, Object>> salaryTransferData = salaryService.getSalaryTransferList(map);
+ 		
+ 		return salaryTransferData;
+ 	}
+ 	
 }

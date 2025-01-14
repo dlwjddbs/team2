@@ -23,7 +23,8 @@ public class SalaryService {
 	public List<Map<String, Object>> getSalaryList(Map<String, Object> map) {
 		return salaryMapper.selectSalaryList(map);
 	}
-
+	
+	// 급여 입력
 	public void writeSalary(Map<String, Object> param) {
 		salaryMapper.insertSalary(param);
 	}
@@ -46,6 +47,11 @@ public class SalaryService {
 	// 급여 조회 - 사원ID의 달별 야간수당을 조회 (귀속연월 추가)
 	public Map<String, Object> findNightBonusById(Map<String, Object> salaryMap) {
 		return salaryMapper.selectNightBonusById(salaryMap);
+	}
+	
+	// 급여 조회 - 전체 사원의 급여 이체 정보 조회
+	public List<Map<String, Object>> getSalaryTransferList(Map<String, Object> map) {
+		return salaryMapper.selectSalaryTransferList(map);
 	}
 	
 	// 급여 입력 - 입력된 날짜 조회
