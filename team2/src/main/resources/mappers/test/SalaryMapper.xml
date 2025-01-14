@@ -207,7 +207,7 @@
 <!--         ) -->	    
 	</insert>
  	
- 	<!-- 급여 수정 - 사원의 기본금 수정 -->
+ 	<!-- 급여 수정 - 사원의 기본급 수정 -->
 	<update id="updateMemberSalary" parameterType="map">
 	    UPDATE MEMBER
 	       SET 
@@ -255,6 +255,13 @@
 	         	AND PAYDAY = #{payday}
 	         </if>
 	</update>
+	
+	<!-- 급여 삭제 -->
+	<delete id="deleteSalary">
+		DELETE FROM salary
+        WHERE MEMBER_ID = #{memberId}
+          AND PAYDAY = #{payday}
+	</delete>    
     
     <select id="selectNightBonusById" resultType="map">
     <!-- 야간 근무 시간 계산 -->

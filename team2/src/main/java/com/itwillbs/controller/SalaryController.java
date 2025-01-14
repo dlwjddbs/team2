@@ -313,6 +313,21 @@ public class SalaryController {
     	return "급여 수정 성공!";
     }
     
+    // 급여 입력 삭제
+    @PostMapping("/salary/deleteSalary")
+    @ResponseBody
+    public String deleteSalary(@RequestParam Map<String, Object> map) {
+    	log.info("============= deleteSalary POST start =============");
+    	
+    	log.info(map.toString());
+    	
+    	salaryService.deleteteSalary(map);
+    	
+    	log.info("============= deleteSalary POST end =============");
+    	
+    	return "급여 삭제 성공!";
+    }
+    
     // 관리자 급여 이체 현황 조회
  	@GetMapping("/salary/salaryTransferList")
  	public String salaryTransferList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model, HttpSession session) {

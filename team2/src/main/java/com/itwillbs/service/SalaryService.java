@@ -68,6 +68,12 @@ public class SalaryService {
 
 	}
 	
+	// 급여 삭제
+	public void deleteteSalary(Map<String, Object> map) {
+		salaryMapper.deleteSalary(map);
+		
+	}
+	
 	// 급여 확정 상태 변경
 	public void updatefixedSalary(Map<String, Object> param) {
 		salaryMapper.updatefixedSalary(param);

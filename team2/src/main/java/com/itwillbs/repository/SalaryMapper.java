@@ -38,14 +38,18 @@ public interface SalaryMapper {
 	// 급여 입력
 	void insertSalary(Map<String, Object> param);
 	
-	// 급여 수정 - 사원의 기본금 수정
+	// 급여 수정 - 사원의 기본급 수정
 	void updateMemberSalary(Map<String, Object> map);
 	
 	// 급여 수정 - 사원의 상여금(보너스) 수정
 	void updateSalaryBonus(Map<String, Object> map);
 	
+	// 급여 삭제 - 사원의 급여 삭제
+	void deleteSalary(Map<String, Object> map);
+
 	// 급여 확정 - 버튼 비활성화
 	void updatefixedSalary(Map<String, Object> param);
+
 
 
 }
