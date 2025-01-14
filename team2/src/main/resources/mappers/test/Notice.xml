@@ -34,7 +34,7 @@
 
 	<insert id="createNotice" parameterType="map">
         INSERT INTO NOTICE (NAME, SUBJECT, MEMBER_ID, CONTENT)
-        VALUES ((SELECT NAME FROM MEMBER WHERE MEMBER_ID = #{memberId}), #{noticeTitle}, #{memberId}, #{noticeContent})
+        VALUES ((SELECT NAME FROM MEMBER WHERE MEMBER_ID = #{memberId}), #{title}, #{memberId}, #{content})
     </insert>
 
 	<update id="updateNotice" parameterType="map">
