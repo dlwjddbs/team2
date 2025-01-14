@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +27,7 @@ public class DeptController {
 	private final DeptService deptService;
 	
 	@GetMapping("/department")
-	public String dept(HttpSession session) {
+	public String dept(@AuthenticationPrincipal User user) {
 //		if (session.getAttribute("id") == null) {
 //            return "redirect:/login"; 
 //        }
@@ -33,6 +35,7 @@ public class DeptController {
 		return "/dept/department";
 	}
 	
+	// 상위부서 리스트
 	@PostMapping("getUpperDept")
 	@ResponseBody
 	public List<Map<String, Object>> getUpperDept(@RequestParam Map<String, Object> map) {
@@ -41,6 +44,7 @@ public class DeptController {
 		return upperList;
 	}
 	
+	// 상위부서 등록
 	@PostMapping("addUpperDept")
 	@ResponseBody
 	public Map<String, Object> addUpperDept(@RequestParam Map<String, Object> map) {
@@ -50,6 +54,7 @@ public class DeptController {
 		return message;
 	}
 	
+	// 공통코드 조회
 	 @GetMapping("/getCommonCodeIds")
 	 @ResponseBody
 	    public List<Map<String, Object>> getCommonCodeIds(@RequestParam Map<String, Object> map, Model model) {
@@ -57,6 +62,7 @@ public class DeptController {
 		 return deptService.getCcodeList(map);
 	    }
 	 
+	 // 부서장 조회
 	 @GetMapping("/getDepMng")
 	 @ResponseBody
 	    public List<Map<String, Object>> getDepMng(@RequestParam Map<String, Object> map, Model model) {
@@ -64,4 +70,20 @@ public class DeptController {
 		 return deptService.getDepMngList(map);
 	    }
 	
+	 // 상위부서 삭제
+	 @PostMapping("/deleteUpperDept")
+	@ResponseBody
+	public Map<String, Object> deleteUpperDept(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = deptService.deleteUpperDept(map);
+			
+		return message;
+		}
+	 
+	 @PostMapping("/updateUpperDept")
+	 @ResponseBody
+	public Map<String, Object> updateUpperDept(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = deptService.updateUpperDept(map);
+			
+			return message;
+		}
 }

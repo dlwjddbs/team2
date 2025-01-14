@@ -13,6 +13,11 @@
     FROM DEPT d
     LEFT JOIN COMMON_CODE cc
         ON d.DEPT_ID = cc.CODE_ID
+        <where>
+        <if test="DEPT_ID != null and DEPT_ID != ''">
+    AND d.DEPT_ID = #{DEPT_ID}
+</if>
+        </where>
 	</select>
 	
 	<select id="isDuplicateUpperDept" resultType="Integer">
@@ -52,6 +57,29 @@ WHERE GROUP_ID = 'DEP'
     NAME AS name
 FROM 
     MEMBER
-WHERE AUTHORITY = 'ADMIN'
+<!-- WHERE AUTHORITY = 'ADMIN' -->
 	</select>
+	
+	<select id="isExistUpperDeptChild" resultType="Integer">
+	<!-- isExistUpperDeptChild 상위부서 삭제전 하위 부서 존재 확인 -->
+		SELECT COUNT(*) 
+		  FROM DEPT
+		 WHERE PARENT_DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	<delete id="deleteUpperDept">
+	<!-- "deleteUpperDept" 상위부서 삭제 -->
+		DELETE FROM DEPT
+ 		 WHERE DEPT_ID = #{DEPT_ID}
+	</delete>
+	
+	<update id="updateUpperDept">
+	<!-- updateCommonCodeGroup 공통코드 대분류 수정 -->
+		UPDATE DEPT 
+		   SET 
+			   MEMBER_ID = #{MEMBER_ID}
+			 , UPDATE_DATE = CURRENT_DATE
+		 WHERE DEPT_ID = #{DEPT_ID}
+	</update>
+	
 </mapper>

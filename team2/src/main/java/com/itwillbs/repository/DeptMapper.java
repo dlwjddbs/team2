@@ -18,4 +18,10 @@ public interface DeptMapper {
 
 	List<Map<String, Object>> getDepMngList(Map<String, Object> map);
 
+	int isExistUpperDeptChild(Map<String, Object> map);
+
+	int deleteUpperDept(Map<String, Object> map);
+
+	int updateUpperDept(Map<String, Object> map);
+
 }

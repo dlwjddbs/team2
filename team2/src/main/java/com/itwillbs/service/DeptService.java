@@ -26,7 +26,7 @@ Map<String, Object> message = new HashMap<>();
 		String result = "이미 등록된 코드입니다.";
 		String resultCode = "0";
 		
-		//try {
+		try {
 			int duplicateCnt = deptMapper.isDuplicateUpperDept(map);
 			System.out.println(duplicateCnt);
 			if (duplicateCnt == 0) {
@@ -38,10 +38,10 @@ Map<String, Object> message = new HashMap<>();
 					result = "등록 실패.";
 				}
 			}
-		//} catch (Exception e) {
-			//e.printStackTrace();
-			//result = "등록 실패.";
-		//}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = "등록 실패.";
+		}
 		
 		message.put("result", result);
 		message.put("resultCode", resultCode);
@@ -58,6 +58,55 @@ Map<String, Object> message = new HashMap<>();
 
 	public List<Map<String, Object>> getDepMngList(Map<String, Object> map) {
 		return deptMapper.getDepMngList(map);
+	}
+
+	public Map<String, Object> deleteUpperDept(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "하위코드가 존재합니다.";
+		String resultCode = "0";
+		
+//		try {
+			int existCnt = deptMapper.isExistUpperDeptChild(map);
+			if (existCnt == 0) {
+				int resultCnt = deptMapper.deleteUpperDept(map);
+				if (resultCnt > 0) {
+					result = "삭제 되었습니다.";
+					resultCode = "1";
+				}
+			}
+//		} catch (Exception e) {
+//			result = "삭제 실패.";
+//			resultCode = "0";
+//		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> updateUpperDept(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "";
+		String resultCode = "";
+		
+//		try {
+			int resultCnt = deptMapper.updateUpperDept(map);
+			if (resultCnt > 0) {
+				result = "수정 되었습니다.";
+				resultCode = "1";
+			}
+//		} catch (Exception e) {
+//			result = "수정 실패.";
+//			resultCode = "0";
+//		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
 	}
 
 }

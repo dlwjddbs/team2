@@ -73,9 +73,9 @@
 											<button type="button" class="btn btn-primary" id="btnAddUpper"
 												data-bs-target="#modalUpperDept" data-bs-toggle="modal">등록</button>
 											<button type="button" class="btn btn-primary mx-1"
-												id="btnUpdateGroup">수정</button>
+												id="btnUpdateUpper">수정</button>
 											<button type="button" class="btn btn-primary"
-												id="btnDeleteGroup">삭제</button>
+												id="btnDeleteUpper">삭제</button>
 										</div>
 									</div>
 								</div>
@@ -186,6 +186,63 @@
 	</div>
 	<!-- /.모달창 -->
 
+
+	<!-- 모달창 -->
+<div class="modal fade" id="modalUpperDeptEdit" th:fragment="UpperDeptEdit">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">상위부서 수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+					
+						<div class="row">
+							<div class="col-md-6">
+								<label>부서</label>
+								<input type="text" id="DEPT_ID_UPDATE" class="form-control" readonly>
+							</div>
+							<div class="col-md-6">
+								<label>부서장</label>
+								<select id="MEMBER_ID_UPDATE" class="form-control">
+										<option value="">선택하세요</option>
+									</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+									<label>사용여부</label><br>
+									<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
+									<input type="radio" name="use_yn" value="N"> 미사용
+								</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="groupCodeUpdate">수정</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+	
+
+
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
@@ -222,9 +279,23 @@
 		const name = $("#userName").val();
 
 		var isUpdate = false;
+	
+		function getSelectedRowUpper() {
+			let table = $('#upperDept').DataTable();
+			if (!$.fn.dataTable.isDataTable("#upperDept") 
+				|| table.row('.selected').length == 0) {
+				alert("상위부서를 선택하세요.");
+				
+				return;
+			}
+			let code = table.rows('.selected').data()[0].DEPT_ID;
+			
+			return code;
+		}
+		
+		
 
-
-
+		//리스트
 		function upperDeptDataTable() {
 			// 기존 테이블 삭제
 			if ($.fn.dataTable.isDataTable("#upperDept")) {
@@ -268,7 +339,7 @@
 			});
 		}
 
-
+		//부서조회
 		$(document).ready(function () {
 			$("#btnAddUpper").on("click", function () {
 				$("#CODE_ID").empty();
@@ -296,6 +367,7 @@
 				loadDeptMng(); //부서장 호출 함수
 			}
 			
+			//부서장 조회
 			function loadDeptMng() {
 							$.ajax({
 								type: "GET",
@@ -314,16 +386,7 @@
 						}
 		});
 
-
-
-
-
-
-
-
-
-
-
+		//등록
 		$(function () {
 			upperDeptDataTable();
 		});
@@ -374,7 +437,80 @@
 				}
 			});
 		});
-
-
+		
+		//상위부서 삭제
+		$("#btnDeleteUpper").on('click', function() {
+			let code = getSelectedRowUpper();
+			console.log("Selected DEPT_ID:", code);
+			if (code == null) {
+// 				alert("삭제할 상위부서를 선택하세요.");
+				return;
+			}
+			
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/deleteUpperDept",
+	          //추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+	            data : {
+	            	DEPT_ID : code,
+				},
+	            success : function(res){
+	            	 console.log("Response:", res);
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("deleteUpperDept() ajax 실패");
+	            }
+	        });
+		});
+		
+		$("#btnUpdateUpper").on('click', function(e) {
+			let code = getSelectedRowUpper();
+			if (code == null) {
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/getUpperDept",
+	          //추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+	            data : {
+	            	DEPT_ID : code,
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+					
+					$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
+					$("#USE_YN_" + res[0].USE_YN).prop("checked", true);
+					// 부서장 목록 로드 및 선택
+		            loadDeptMng(res[0].MEMBER_ID_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+	            },
+	            error : function(e){
+	                console.log("getUpperDept() ajax 실패");
+	            }
+	        });
+			
+			$('#modalUpperDeptEdit').modal();
+		});
+		
+		
 
 	</script>
