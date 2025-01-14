@@ -11,4 +11,29 @@
          WHERE ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
          ORDER BY DEPTH, SORT_ORDER ASC 
     </select>
+    
+    <select id="getMenuList" resultType="map">
+	    SELECT
+			   MENU_ID 
+			 , NAME 
+			 , URL 
+			 , ROLE 
+			 , SORT_ORDER
+			 , DEPTH
+			 , USE_YN 
+			 , CASE 
+			 		WHEN URL IS NULL THEN '폴더'
+			 		ELSE '페이지'
+			 	END	AS TYPE
+		  FROM MENU
+		 WHERE 
+		 	   1 = 1
+		   <if test="depth != null and depth != ''">
+		   	   AND DEPTH = #{depth}
+		   </if>
+		   <if test="menu_id != null and menu_id != ''">
+		   	   AND PARENT_ID = #{menu_id}
+		   </if>
+		 ORDER BY SORT_ORDER ASC
+    </select>
 </mapper>

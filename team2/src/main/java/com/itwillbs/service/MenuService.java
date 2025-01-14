@@ -18,4 +18,8 @@ public class MenuService {
 	public List<Map<String, Object>> selectMenu(String auth) {
 		return menuMapper.selectMenu(auth);
 	}
+
+	public List<Map<String, Object>> getMenuList(Map<String, Object> map) {
+		return menuMapper.getMenuList(map);
+	}
 }
