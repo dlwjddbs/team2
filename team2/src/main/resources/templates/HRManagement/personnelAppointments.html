@@ -439,18 +439,23 @@
     
         // 부서 및 직급 
         $.when(
-       		$.ajax({
-       		    url: '/appoint/getAllDepartments',
-       		    method: 'GET',
-       		    async: false, 
-       		    success: function (data) {
-       		        deptOptions = Array.isArray(data) ? data : [];
-       		        console.log('Departments:', deptOptions); 
-       		    },
-       		    error: function (error) {
-       		        console.error('Error fetching departments:', error); 
-       		    }
-       		}),
+			$.ajax({
+			    url: '/appoint/getAllDepartments',
+			    method: 'GET',
+			    success: function (data) {
+			        const selectBox = $('#deptSelectBox');
+			        selectBox.empty();
+			        selectBox.append('<option selected disabled>부서를 선택하세요</option>');
+
+			        const groupedOptions = groupedDeptOptions(data);
+			        selectBox.append(groupedOptions);
+			        console.log("부서 옵션:", selectBox.html());
+					deptOptions = Array.isArray(data) ? data : [];
+			    },
+			    error: function (error) {
+			        console.error('Error fetching departments:', error);
+			    }
+			}),
             $.ajax({
                 url: '/appoint/getAllRanks',
                 method: 'GET',
@@ -567,37 +572,37 @@
                             `;
                         }                    
                     },
-                    {
-                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
-                        title: "부서",
-                        defaultContent: "",
-                        render: function (data, type, row) {
-                            // 이전 부서 (읽기 전용)
-                            const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
+					{
+					                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
+					                        title: "부서",
+					                        defaultContent: "",
+					                        render: function (data, type, row) {
+					                            // 이전 부서 (읽기 전용)
+					                            const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
 
-                            // 새로운 부서 (선택 가능)
-                            const currentDeptSelect = `
-                                <select class="form-control-custom2 current-dept" disabled>
-                                    <option selected>${oldDept}</option>
-                                </select>
-                            `;
+					                            // 새로운 부서 (선택 가능)
+					                            const currentDeptSelect = `
+					                                <select class="form-control-custom2 current-dept" disabled>
+					                                    <option selected>${oldDept}</option>
+					                                </select>
+					                            `;
 
-                            const newDeptSelect = `
-                                <select class="form-control-custom new-dept">
-                                    <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
-                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
-                                </select>
-                            `;
+					                            const newDeptSelect = `
+					                                <select class="form-control-custom new-dept">
+					                                    <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
+					                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
+					                                </select>
+					                            `;
 
-                            // 렌더링 결과 반환
-                            return `
-                                <div class="d-flex">
-                                    ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
-                                    ${newDeptSelect}
-                                </div>
-                            `;
-                        }
-                    },
+					                            // 렌더링 결과 반환
+					                            return `
+					                                <div class="d-flex">
+					                                    ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
+					                                    ${newDeptSelect}
+					                                </div>
+					                            `;
+					                        }
+					                    },
                     {
                         data: "ETC",
                         title: "비고",
@@ -633,15 +638,22 @@
         });      
         
     }
-    
+
     function groupedDeptOptions(deptOptions, selectedDeptId) {
+		
+		if (!Array.isArray(deptOptions) || deptOptions.length === 0) {
+		       console.warn("Invalid or empty deptOptions:", deptOptions);
+		       return ""; // 빈 옵션 반환
+		   }
+				
         // 부서 데이터를 그룹화
         const groupedData = deptOptions.reduce((acc, dept) => {
             const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
             if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
             acc[parentDept].push(dept); // 그룹에 데이터 추가
-            return acc;
+            return acc;				
         }, {});
+			console.log("Grouped Data:", groupedData);
 
         // 그룹화된 데이터를 HTML로 변환
         return Object.keys(groupedData).map(parent => {
@@ -728,7 +740,6 @@
             }
         });
 
-        // 그룹화된 데이터를 렌더링
         Object.keys(groupedData).forEach(parentDeptName => {
             const parentDept = groupedData[parentDeptName];
             const deptHtml = `
@@ -890,30 +901,6 @@
         $("#checkedEmployees").on("click", "#memberDelete", function () {
             $(this).closest(".newPosition").remove(); // 해당 직원 정보 삭제
         });
-
-
-        $(".orgNav").on("click", function (e) {
-            e.preventDefault();
-            $(".orgNav").removeClass("activeToggle");
-            $(this).addClass("activeToggle");
-        });
-
-
-         $("#addModal .nav-treeview .nav-link").on("click", function (e) {
-            e.preventDefault();
-            const memberId = $(this).data("member-id");
-            const memberName = $(this).data("member-name");
-            const gradeName = $(this).data("grade-name");
-            const deptName = $(this).data("dept-name");
-
-            $("#memberId").text(memberId);
-            $("#memberName").text(memberName);
-            $("#oldDept").text(deptName);
-            $("#oldGrade").text(gradeName);
-            $("#addModal2").modal("show");
-            $("#addModal2").attr("aria-hidden", "false"); // aria-hidden 제거
-            $("#addModal2").find("input, select, button").attr("tabindex", "0");
-        }); 
     }
     
     // 재확인 팝업

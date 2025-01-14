@@ -41,6 +41,7 @@ public class SecurityConfig {
 			            		, "/system/**"
 			            		, "/approval/**"
 			            		, "/ajax/**"
+			            		, "/mypage/**"
 			            ) // 특정 경로 CSRF 비활성화
 			        )				
 				.formLogin(formLoginCustomizer
