@@ -1,7 +1,9 @@
 package com.itwillbs.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -19,4 +21,19 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**")
         		.addResourceLocations("file:./uploads/", "classpath:/static/images/");
     }
+    
+    
+    // 테스트 로그 확인용
+    
+//    private final ControllerLoggingInterceptor loggingInterceptor;
+//
+//    @Autowired
+//    public WebConfig(ControllerLoggingInterceptor loggingInterceptor) {
+//        this.loggingInterceptor = loggingInterceptor;
+//    }
+//
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(loggingInterceptor);
+//    }
 }
