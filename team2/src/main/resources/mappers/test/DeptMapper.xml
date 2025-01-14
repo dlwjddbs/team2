@@ -17,6 +17,7 @@
         <if test="DEPT_ID != null and DEPT_ID != ''">
     AND d.DEPT_ID = #{DEPT_ID}
 </if>
+    AND d.PARENT_DEPT_ID IS NULL
         </where>
 	</select>
 	
@@ -74,10 +75,69 @@ FROM
 	</delete>
 	
 	<update id="updateUpperDept">
-	<!-- updateCommonCodeGroup 공통코드 대분류 수정 -->
+	<!-- updateUpperDept 상위부서 수정 -->
+		UPDATE DEPT 
+		   SET 
+			   MEMBER_ID = #{MEMBER_ID},
+			   USE_YN = #{USE_YN},
+			   UPDATE_DATE = CURRENT_DATE
+		 WHERE DEPT_ID = #{DEPT_ID}
+	</update>
+	
+	<select id="getLowerDept" resultType="map">
+	<!-- getLowerDept 하위부서 조회 -->
+		SELECT 
+			   d.DEPT_ID 
+			 , d.PARENT_DEPT_ID 
+			 , cc.CODE_NAME AS DEPT_NAME
+			 , d.USE_YN 
+		  FROM DEPT d
+		  LEFT JOIN COMMON_CODE CC
+		  	ON d.DEPT_ID = cc.CODE_ID
+		 WHERE 
+		 	   1 = 1
+			<if test='DEPT_ID != null and DEPT_ID != ""'>
+		   		AND d.PARENT_DEPT_ID = #{DEPT_ID}
+		   	</if>
+	</select>
+	
+	<select id="isDuplicateLowerDept" resultType="Integer">
+	<!-- isDuplicateLowerDept 하위부서 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM DEPT
+		 WHERE DEPT_ID = #{DEPT_ID}
+	</select>
+	
+	<insert id="insertLowerDept">
+	<!-- insertLowerDept 하위부서 등록 -->
+		INSERT INTO DEPT (
+			  DEPT_ID
+			, PARENT_DEPT_ID
+			, MEMBER_ID
+			, CREATE_DATE
+			, USE_YN 
+		) VALUES (
+			  #{DEPT_ID}
+			, #{PARENT_DEPT_ID}
+			, #{MEMBER_ID}
+			, CURRENT_DATE
+			, #{USE_YN}
+		)
+	</insert>
+	
+	<delete id="deleteLowerDept">
+	<!-- deleteLowerDept 하위부서 삭제 -->
+		DELETE FROM DEPT
+    WHERE DEPT_ID = #{DEPT_ID}
+    AND PARENT_DEPT_ID IS NOT NULL
+	</delete>
+	
+	<update id="updateLowerDept">
+	<!-- "updateLowerDept" 공통코드 소분류 수정 -->
 		UPDATE DEPT 
 		   SET 
 			   MEMBER_ID = #{MEMBER_ID}
+			 , USE_YN = #{USE_YN}
 			 , UPDATE_DATE = CURRENT_DATE
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</update>

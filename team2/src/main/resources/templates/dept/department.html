@@ -94,15 +94,15 @@
 									<h3 class="card-title">하위부서</h3>
 									<div class="card-tools">
 										<div class="d-flex">
-											<button type="button" class="btn btn-primary" id="btnAddCode">등록</button>
+											<button type="button" class="btn btn-primary" id="btnAddLower">등록</button>
 											<button type="button" class="btn btn-primary mx-1"
-												id="btnUpdateCode">수정</button>
-											<button type="button" class="btn btn-primary" id="btnDeleteCode">삭제</button>
+												id="btnUpdateLower">수정</button>
+											<button type="button" class="btn btn-primary" id="btnDeleteLower">삭제</button>
 										</div>
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="commonCode" class="table table-bordered table-striped">
+									<table id="lowerDept" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -158,7 +158,7 @@
 
 								<div class="col-md-6">
 									<label>부서장</label>
-<!--									<input type="text" id="MEMBER_ID" class="form-control">-->
+									<!--									<input type="text" id="MEMBER_ID" class="form-control">-->
 									<select id="MEMBER_ID" class="form-control">
 										<option value="">선택하세요</option>
 									</select>
@@ -188,59 +188,179 @@
 
 
 	<!-- 모달창 -->
-<div class="modal fade" id="modalUpperDeptEdit" th:fragment="UpperDeptEdit">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<!-- 모달창 헤더 -->
-			<div class="modal-header">
-				<h4 class="modal-title">상위부서 수정</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<!-- /.모달창 헤더 -->
-			
-			<!-- 모달창 바디 -->
-			<div class="modal-body">
-				<div class="card-body">
-					<div class="form-group">
-					
-						<div class="row">
-							<div class="col-md-6">
-								<label>부서</label>
-								<input type="text" id="DEPT_ID_UPDATE" class="form-control" readonly>
-							</div>
-							<div class="col-md-6">
-								<label>부서장</label>
-								<select id="MEMBER_ID_UPDATE" class="form-control">
+	<div class="modal fade" id="modalUpperDeptEdit" th:fragment="UpperDeptEdit">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<!-- 모달창 헤더 -->
+				<div class="modal-header">
+					<h4 class="modal-title">상위부서 수정</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<!-- /.모달창 헤더 -->
+
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+						<div class="form-group">
+
+							<div class="row">
+								<div class="col-md-6">
+									<label>부서</label>
+									<input type="text" id="DEPT_ID_UPDATE" class="form-control" readonly>
+								</div>
+								<div class="col-md-6">
+									<label>부서장</label>
+									<select id="MEMBER_ID_UPDATE" class="form-control">
 										<option value="">선택하세요</option>
 									</select>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<label>사용여부</label><br>
+									<input type="radio" name="use_yn" value="Y" id="use_yn" checked> 사용 &nbsp;
+									<input type="radio" name="use_yn" value="N" id="use_yn"> 미사용
+								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-6">
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary" id="upperDeptUpdate">수정</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</div>
+		</div>
+	</div>
+	<!-- /.모달창 -->
+
+
+	<!-- 모달창 -->
+	<div class="modal fade" id="modalLowerDept" th:fragment="modalLowerDept">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<!-- 모달창 헤더 -->
+				<div class="modal-header">
+					<h4 class="modal-title">하위부서 등록</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<!-- /.모달창 헤더 -->
+
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-6">
+									<label>상위부서 코드</label>
+									<input type="text" id="LOWER_PARENT_ID" class="form-control" readonly>
+								</div>
+								<div class="col-md-6">
 									<label>사용여부</label><br>
 									<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
 									<input type="radio" name="use_yn" value="N"> 미사용
 								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<label>부서</label>
+									<select id="DEPT_ID" class="form-control">
+										<option value="">선택하세요</option>
+									</select>
+								</div>
+
+								<div class="col-md-6">
+									<label>부서장</label>
+									<select id="MEMBER_ID_LOWER" class="form-control">
+										<option value="">선택하세요</option>
+									</select>
+								</div>
+							</div>
+							<div class="row">
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<!-- /.모달창 바디 -->
-			<!-- 모달창 푸터-->
-			<div>
-				<div class="modal-footer justify-content-between">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-primary" id="groupCodeUpdate">수정</button>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary" id="lowerDeptSave">저장</button>
+					</div>
 				</div>
+				<!-- /.모달창 푸터-->
 			</div>
-			<!-- /.모달창 푸터-->
 		</div>
 	</div>
-</div>
-<!-- /.모달창 -->
-	
+	<!-- /.모달창 -->
+
+	<!-- 모달창 -->
+	<div class="modal fade" id="modalLowerDeptEdit" th:fragment="modalLowerDeptEdit">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<!-- 모달창 헤더 -->
+				<div class="modal-header">
+					<h4 class="modal-title">하위부서 수정</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<!-- /.모달창 헤더 -->
+				
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+				    <div class="card-body">
+				        <div class="form-group">
+				            <div class="row">
+				                <div class="col-md-6">
+				                    <label>상위부서 코드</label>
+				                    <input type="text" id="PARENT_ID_UPDATE" class="form-control" readonly>
+				                </div>
+				                <div class="col-md-6">
+				                    <label>사용여부</label><br>
+				                    <input id="USE_YN_Y" type="radio" name="use_yn_update" value="Y"> 사용 &nbsp;
+				                    <input id="USE_YN_N" type="radio" name="use_yn_update" value="N"> 미사용
+				                </div>
+				            </div>
+				            <div class="row">
+				            	<div class="col-md-6">
+				                    <label>부서</label>
+				                    <input type="text" id="LOWER_DEPT_UPDATE" class="form-control" readonly>
+				                </div>
+				                <div class="col-md-6">
+				                    <label>부서장</label>
+									<select id="LOWER_MEMBER_UPDATE" class="form-control">
+									<option value="">선택하세요</option>
+									</select>
+				                </div>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary" id="lowerDeptUpdate">수정</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</div>
+		</div>
+	</div>
+	<!-- /.모달창 -->
+
 
 
 	<!-- jQuery -->
@@ -279,21 +399,37 @@
 		const name = $("#userName").val();
 
 		var isUpdate = false;
-	
+
 		function getSelectedRowUpper() {
 			let table = $('#upperDept').DataTable();
-			if (!$.fn.dataTable.isDataTable("#upperDept") 
+			if (!$.fn.dataTable.isDataTable("#upperDept")
 				|| table.row('.selected').length == 0) {
 				alert("상위부서를 선택하세요.");
-				
+
 				return;
 			}
 			let code = table.rows('.selected').data()[0].DEPT_ID;
-			
+
 			return code;
 		}
-		
-		
+
+		function getSelectedRowLower() {
+			if (!$.fn.dataTable.isDataTable("#lowerDept")) {
+				alert("상위부서를 선택하세요.");
+
+				return;
+			}
+
+			let table = $('#upperDept').DataTable();
+			if (table.row('.selected').length == 0) {
+				alert("하위부서를 선택하세요.");
+
+				return;
+			}
+			let code = table.rows('.selected').data()[0].DEPT_ID;
+
+			return code;
+		}
 
 		//리스트
 		function upperDeptDataTable() {
@@ -366,24 +502,24 @@
 				});
 				loadDeptMng(); //부서장 호출 함수
 			}
-			
+
 			//부서장 조회
 			function loadDeptMng() {
-							$.ajax({
-								type: "GET",
-								url: "/getDepMng",
-								success: function (data) {
-									let selectBox = $("#MEMBER_ID");
-									data.forEach(function (item) {
-										console.log("item:", item); // 반환된 데이터 확인
-										selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
-									});
-								},
-								error: function () {
-									alert("멤버 데이터를 불러오는 데 실패했습니다.");
-								}
-							});
-						}
+				$.ajax({
+					type: "GET",
+					url: "/getDepMng",
+					success: function (data) {
+						let selectBox = $("#MEMBER_ID");
+						data.forEach(function (item) {
+							console.log("item:", item); // 반환된 데이터 확인
+							selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+						});
+					},
+					error: function () {
+						alert("멤버 데이터를 불러오는 데 실패했습니다.");
+					}
+				});
+			}
 		});
 
 		//등록
@@ -437,80 +573,511 @@
 				}
 			});
 		});
-		
+
 		//상위부서 삭제
-		$("#btnDeleteUpper").on('click', function() {
+		$("#btnDeleteUpper").on('click', function () {
 			let code = getSelectedRowUpper();
 			console.log("Selected DEPT_ID:", code);
 			if (code == null) {
-// 				alert("삭제할 상위부서를 선택하세요.");
+				// 				alert("삭제할 상위부서를 선택하세요.");
 				return;
 			}
-			
+
 			if (!confirm("삭제 하시겠습니까?")) {
 				return;
 			}
-			
-	 		$.ajax({
-	            type : "POST",
-	            url : "/deleteUpperDept",
-	          //추가해야 하는 부분
+
+			$.ajax({
+				type: "POST",
+				url: "/deleteUpperDept",
+				//추가해야 하는 부분
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader(header, token);
 				},
-	            data : {
-	            	DEPT_ID : code,
+				data: {
+					DEPT_ID: code,
 				},
-	            success : function(res){
-	            	 console.log("Response:", res);
-	           		alert(res.result);
-	           		
-	            	if (res.resultCode == 1) {
+				success: function (res) {
+					console.log("Response:", res);
+					alert(res.result);
+
+					if (res.resultCode == 1) {
 						location.reload();
-	            	}
-	            },
-	            error : function(e){
-	                console.log("deleteUpperDept() ajax 실패");
-	            }
-	        });
+					}
+				},
+				error: function (e) {
+					console.log("deleteUpperDept() ajax 실패");
+				}
+			});
 		});
-		
-		$("#btnUpdateUpper").on('click', function(e) {
+
+		//상위부서 수정 값 조회
+		$("#btnUpdateUpper").on('click', function (e) {
 			let code = getSelectedRowUpper();
 			if (code == null) {
 				return;
 			}
-			
+
 			$.ajax({
-	            type : "POST",
-	            url : "/getUpperDept",
-	          //추가해야 하는 부분
+				type: "POST",
+				url: "/getUpperDept",
+				//추가해야 하는 부분
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader(header, token);
 				},
-	            data : {
-	            	DEPT_ID : code,
+				data: {
+					DEPT_ID: code,
 				},
-	            success : function(res){
+				success: function (res) {
 					if (res.length == 0) {
 						alert("조회 실패");
+
+						return;
+					}
+
+					$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
+					$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
+					// 부서장 목록 로드 및 선택
+					loadDeptMng(res[0].MEMBER_ID_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+				},
+				error: function (e) {
+					console.log("getUpperDept() ajax 실패");
+				}
+			});
+
+			$('#modalUpperDeptEdit').modal();
+		});
+
+		// 상위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
+		function loadDeptMng(selectedMemberId) {
+			$.ajax({
+				type: "GET",
+				url: "/getDepMng",
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success: function (data) {
+					let selectBox = $("#MEMBER_ID_UPDATE");
+					selectBox.empty(); // 기존 옵션 제거
+					selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
+
+					data.forEach(function (item) {
+						console.log("item:", item); // 반환된 데이터 확인
+						let selected = item.MEMBERID === selectedMemberId ? "selected" : "";
+						selectBox.append(
+							`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`
+						);
+					});
+				},
+				error: function () {
+					alert("부서장 데이터를 불러오는 데 실패했습니다.");
+				},
+			});
+		}
+
+		//상위부서 수정
+		$("#upperDeptUpdate").on('click', function () {
+			let DEPT_ID = $("#DEPT_ID_UPDATE").val();
+			let MEMBER_ID = $("#MEMBER_ID_UPDATE").val();
+			let USE_YN = $('input[name="use_yn"]:checked').val();
+
+			if (MEMBER_ID == null || MEMBER_ID == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/updateUpperDept",
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data: {
+					DEPT_ID: DEPT_ID,
+					MEMBER_ID: MEMBER_ID,
+					USE_YN: USE_YN,
+				},
+				success: function (res) {
+					alert(res.result);
+
+					if (res.resultCode == 1) {
+						alert("수정이 완료되었습니다.");
+						$('#modalUpperDeptEdit').modal('hide');
+						location.reload();
+					}
+				},
+				error: function (e) {
+					console.log("updateUpperDept() ajax 실패");
+					alert("수정 요청에 실패했습니다.");
+				}
+			});
+		});
+
+
+		$('#upperDept').on('click', 'tbody tr', function () {
+			// dataTables select적용 시간보다 늦어야함.
+			setTimeout(function () {
+				let table = $('#upperDept').DataTable();
+
+				// 대분류 선택 해제할 시 소분류 테이블 삭제
+				if (table.row('.selected').length == 0) {
+					$("#lowerDept").DataTable().destroy();
+					$("#lowerDept").empty();
+					isUpdate = false;
+
+					return;
+				}
+
+				let code = table.rows('.selected').data()[0].DEPT_ID;
+				lowerDeptDataTable(code);
+				if (!isUpdate) {
+					isUpdate = true;
+				}
+			}, 10);
+		});
+
+
+
+		function lowerDeptDataTable(code) {
+			// 기존 테이블 삭제
+			if ($.fn.dataTable.isDataTable("#lowerDept")) {
+				$("#lowerDept").DataTable().destroy();
+			}
+
+			let table = $("#lowerDept").DataTable({
+				aaSorting: [], // 초기 정렬 비활성화
+				select: {
+					style: 'single'
+				},
+
+				language: {
+					search: "검색",
+					paginate: {
+						"first": "처음",
+						"last": "마지막",
+						"next": "다음",
+						"previous": "이전"
+					},
+					zeroRecords: "검색 결과 없음"
+				},
+				ajax: {
+
+					url: "/getLowerDept",
+					type: "POST",
+					//추가해야 하는 부분
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					data: {
+						DEPT_ID: code
+					},
+					"dataSrc": function (res) {
+						console.log("Response:", res); // 응답 데이터 확인
+						return res;
+					},
+					error: function (xhr, status, error) {
+						console.error("Ajax Error:", error);
+					}
+
+				},
+				columns: [
+					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
+					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""},
+					{data: "USE_YN", title: "사용여부", "defaultContent": ""}
+				],
+
+				responsive: true,
+				lengthChange: false,
+				autoWidth: false,
+			});
+		}
+
+
+
+
+		//부서조회
+		$(document).ready(function () {
+			$("#btnAddLower").on("click", function () {
+				let code = getSelectedRowLower();
+				if (code == null) {
+					return;
+				}
+
+				$("#LOWER_PARENT_ID").val(code);
+				$("#CODE_ID").empty();
+				loadDeptIds();
+				$("#MEMBER_ID").val(''); // 부서장 초기화
+				$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
+				$('#modalLowerDept').modal('show');
+			});
+
+			function loadDeptIds() {
+				$.ajax({
+					type: "GET",
+					url: "/getCommonCodeIds",
+					//추가해야 하는 부분
+									beforeSend: function (xhr) {
+										xhr.setRequestHeader(header, token);
+									},
+					success: function (data) {
+						let selectBox = $("#DEPT_ID");
+						data.forEach(function (item) {
+							console.log("item:", item); // 반환된 데이터 확인
+							selectBox.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
+						});
+					},
+					error: function () {
+						alert("부서 데이터를 불러오는 데 실패했습니다.");
+					}
+				});
+				loadDeptMng(); //부서장 호출 함수
+			}
+
+			//부서장 조회
+			function loadDeptMng() {
+				$.ajax({
+					type: "GET",
+					url: "/getDepMng",
+					//추가해야 하는 부분
+					beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+					},
+					success: function (data) {
+						let selectBox = $("#MEMBER_ID_LOWER");
+						selectBox.empty(); // 기존 옵션 제거
+						selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
 						
+						data.forEach(function (item) {
+							console.log("item:", item); // 반환된 데이터 확인
+							selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+						});
+					},
+					error: function () {
+						alert("멤버 데이터를 불러오는 데 실패했습니다.");
+					}
+				});
+			}
+		});
+
+		// 하위부서 등록
+		$("#btnAddLower").on("click", function () {
+			let code = getSelectedRowLower();
+			if (code == null) {
+				return;
+			}
+
+			$("#LOWER_PARENT_ID").val(code);
+			$("#DEPT_ID").val('');
+			$("#MEMBER_ID_LOWER").val('');
+			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
+
+			$('#modalLowerDept').modal();
+		});
+
+		$("#lowerDeptSave").on('click', function () {
+			let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
+			let DEPT_ID = $("#DEPT_ID").val();
+			let MEMBER_ID = $("#MEMBER_ID_LOWER").val();
+			let USE_YN = $('input[name="use_yn"]:checked').val();
+
+			if (DEPT_ID == null || DEPT_ID == ''
+				|| MEMBER_ID == null || MEMBER_ID == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+			console.log({
+			        DEPT_ID: DEPT_ID.toUpperCase(),
+			        PARENT_DEPT_ID: PARENT_DEPT_ID.toUpperCase(),
+			        MEMBER_ID: MEMBER_ID,
+			        USE_YN: USE_YN
+			    });
+			
+			$.ajax({
+				type: "POST",
+				url: "/addLowerDept",
+				//추가해야 하는 부분
+				beforeSend: function (xhr) {
+				xhr.setRequestHeader(header, token);
+				},
+				data: {
+					DEPT_ID: DEPT_ID.toUpperCase(),
+					PARENT_DEPT_ID: PARENT_DEPT_ID.toUpperCase(),
+					MEMBER_ID: MEMBER_ID,
+					USE_YN: USE_YN
+				},
+				success: function (res) {
+					console.log("Response:", res); // 응답 데이터 확인
+					alert(res.result);
+
+					if (res.resultCode == 1) {
+						location.reload();
+					} else {
+						console.error("등록 실패:", res.result);
+						alert("등록 실패: " + res.result);
+					}
+				},
+				error: function (e) {
+					console.log("addLowerDept() ajax 실패");
+				}
+			});
+		});
+	
+		$("#btnDeleteLower").on('click', function() {
+					let code = getSelectedRowLower();
+					let table = $("#lowerDept").DataTable();
+					let selectedRowData = table.row({selected: true}).data(); // 선택된 행 데이터 가져오기
+
+					if (code == null) {
 						return;
 					}
 					
-					$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
-					$("#USE_YN_" + res[0].USE_YN).prop("checked", true);
-					// 부서장 목록 로드 및 선택
-		            loadDeptMng(res[0].MEMBER_ID_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
-	            },
-	            error : function(e){
-	                console.log("getUpperDept() ajax 실패");
-	            }
-	        });
-			
-			$('#modalUpperDeptEdit').modal();
-		});
+					if (!confirm("삭제 하시겠습니까?")) {
+						return;
+					}
+					console.info("selectedRowData" , selectedRowData.DEPT_ID);
+			 		$.ajax({
+			            type : "POST",
+			            url : "/deleteLowerDept",
+						//추가해야 하는 부분
+						beforeSend: function (xhr) {
+						xhr.setRequestHeader(header, token);
+						},
+			            data : {
+			            	DEPT_ID : selectedRowData.DEPT_ID,
+						},
+			            success : function(res){
+			           		alert(res.result);
+			           		
+			            	if (res.resultCode == 1) {
+								location.reload();
+			            	}
+			            },
+			            error : function(e){
+			                console.log("deleteLowerDept() ajax 실패");
+			            }
+			        });
+				});
 		
-		
+				
+				
+				
+				
+				
+				
+				
+				//하위부서 수정 값 조회
+						$("#btnUpdateLower").on('click', function (e) {
+							let code = getSelectedRowLower();
+							if (code == null) {
+								return;
+							}
+
+							$.ajax({
+								type: "POST",
+								url: "/getLowerDept",
+								//추가해야 하는 부분
+								beforeSend: function (xhr) {
+									xhr.setRequestHeader(header, token);
+								},
+								data: {
+									DEPT_ID: code,
+								},
+								success: function (res) {
+									if (res.length == 0) {
+										alert("조회 실패");
+
+										return;
+									}
+									$("#PARENT_ID_UPDATE").val(res[0].PARENT_DEPT_ID);
+									$("#LOWER_DEPT_UPDATE").val(res[0].DEPT_ID);
+									$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
+									// 부서장 목록 로드 및 선택
+									loadLowerDeptMng(res[0].LOWER_MEMBER_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+								},
+								error: function (e) {
+									console.log("getUpperDept() ajax 실패");
+								}
+							});
+
+							$('#modalLowerDeptEdit').modal();
+						});
+
+						// 하위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
+						function loadLowerDeptMng(selectedMemberId) {
+							$.ajax({
+								type: "GET",
+								url: "/getDepMng",
+								//추가해야 하는 부분
+								beforeSend: function (xhr) {
+									xhr.setRequestHeader(header, token);
+								},
+								success: function (data) {
+									let selectBox = $("#LOWER_MEMBER_UPDATE");
+									selectBox.empty(); // 기존 옵션 제거
+									selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
+
+									data.forEach(function (item) {
+										console.log("item:", item); // 반환된 데이터 확인
+										let selected = item.MEMBERID === selectedMemberId ? "selected" : "";
+										selectBox.append(
+											`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`
+										);
+									});
+								},
+								error: function () {
+									alert("부서장 데이터를 불러오는 데 실패했습니다.");
+								},
+							});
+						}
+
+						//하위부서 수정
+						$("#lowerDeptUpdate").on('click', function () {
+							let PARENT_DEPT_ID = $("#PARENT_ID_UPDATE").val();
+							let DEPT_ID = $("#LOWER_DEPT_UPDATE").val();
+							let MEMBER_ID = $("#LOWER_MEMBER_UPDATE").val();
+							let USE_YN = $('input[name="use_yn"]:checked').val();
+
+							if (MEMBER_ID == null || MEMBER_ID == '') {
+								alert("값을 입력해 주세요.");
+								return;
+							}
+
+							$.ajax({
+								type: "POST",
+								url: "/updateLowerDept",
+								//추가해야 하는 부분
+								beforeSend: function (xhr) {
+									xhr.setRequestHeader(header, token);
+								},
+								data: {
+									PARENT_DEPT_ID: PARENT_DEPT_ID,
+									DEPT_ID: DEPT_ID,
+									MEMBER_ID: MEMBER_ID,
+									USE_YN: USE_YN,
+								},
+								success: function (res) {
+									alert(res.result);
+
+									if (res.resultCode == 1) {
+										$('#modalLowerDeptEdit').modal('hide');
+										location.reload();
+									}
+								},
+								error: function (e) {
+									console.log("updateLowerDept() ajax 실패");
+									alert("수정 요청에 실패했습니다.");
+								}
+							});
+						});
+				
+				
+				
+
+
+
+
 
 	</script>

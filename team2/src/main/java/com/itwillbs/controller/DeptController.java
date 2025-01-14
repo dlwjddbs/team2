@@ -79,6 +79,7 @@ public class DeptController {
 		return message;
 		}
 	 
+	 // 상위부서 수정
 	 @PostMapping("/updateUpperDept")
 	 @ResponseBody
 	public Map<String, Object> updateUpperDept(@RequestParam Map<String, Object> map) {
@@ -86,4 +87,41 @@ public class DeptController {
 			
 			return message;
 		}
+	 
+	// 하위부서 리스트
+	@PostMapping("getLowerDept")
+	@ResponseBody
+	public List<Map<String, Object>> getLowerDept(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> lowerList = deptService.getLowerDept(map);
+			
+		return lowerList;
+		}
+	 
+	//하위부서 등록
+	@PostMapping("/addLowerDept")
+	@ResponseBody
+	public Map<String, Object> addLowerDept(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = deptService.insertLowerDept(map);
+		
+		return message;
+	}
+	
+	// 하위부서 삭제
+	@PostMapping("/deleteLowerDept")
+	@ResponseBody
+	public Map<String, Object> deleteLowerDept(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = deptService.deleteLowerDept(map);
+		
+		return message;
+	} 
+	
+	// 하위부서 수정
+	@PostMapping("/updateLowerDept")
+	@ResponseBody
+	public Map<String, Object> updateLowerDept(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = deptService.updateLowerDept(map);
+				
+	return message;
+	}
+	 
 }

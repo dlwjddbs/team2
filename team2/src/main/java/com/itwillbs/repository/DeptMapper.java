@@ -24,4 +24,14 @@ public interface DeptMapper {
 
 	int updateUpperDept(Map<String, Object> map);
 
+	List<Map<String, Object>> getLowerDept(Map<String, Object> map);
+
+	int isDuplicateLowerDept(Map<String, Object> map);
+
+	int insertLowerDept(Map<String, Object> map);
+
+	int deleteLowerDept(Map<String, Object> map);
+
+	int updateLowerDept(Map<String, Object> map);
+
 }
