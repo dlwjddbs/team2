@@ -176,7 +176,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/deleteCommonCodeGroup",
+	            url : "/system/deleteCommonCodeGroup",
 	            data : {
 	            	GROUP_ID : code,
 				},
@@ -206,7 +206,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/addCommonCodeGroup",
+	            url : "/system/addCommonCodeGroup",
 	            data : {
 	            	GROUP_ID : GROUP_ID.toUpperCase(),
 	            	GROUP_NAME : GROUP_NAME,
@@ -233,7 +233,7 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/getGroupCommonCode",
+	            url : "/system/getGroupCommonCode",
 	            data : {
 	            	GROUP_ID : code,
 				},
@@ -268,7 +268,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/updateCommonCodeGroup",
+	            url : "/system/updateCommonCodeGroup",
 	            data : {
 					GROUP_ID : GROUP_ID,
 	            	GROUP_NAME : GROUP_NAME,
@@ -340,7 +340,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getGroupCommonCode",
+					url : "/system/getGroupCommonCode",
 					type:"POST",
 					data : {},
 					"dataSrc": function (res) {
@@ -402,7 +402,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/getCommonCode",
+					url : "/system/getCommonCode",
 					type:"POST",
 					data : {
 						GROUP_ID : code
@@ -452,7 +452,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/addCommonCode",
+	            url : "/system/addCommonCode",
 	            data : {
 	            	CODE_ID : CODE_ID.toUpperCase(),
 	            	GROUP_ID : CODE_GROUP_ID.toUpperCase(),
@@ -485,7 +485,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/deleteCommonCode",
+	            url : "/system/deleteCommonCode",
 	            data : {
 	            	CODE_ID : code,
 				},
@@ -502,37 +502,6 @@
 	        });
 		});
 		
-		$("#groupCodeUpdate").on('click', function() {
-			let GROUP_ID = $("#GROUP_ID_UPDATE").val();
-			let GROUP_NAME = $("#GROUP_NAME_UPDATE").val();
-			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
-
-			if (GROUP_NAME == null || GROUP_NAME == '') {
-				alert("값을 입력해 주세요.");
-				return;
-			}
-			
-	 		$.ajax({
-	            type : "POST",
-	            url : "/updateCommonCodeGroup",
-	            data : {
-					GROUP_ID : GROUP_ID,
-	            	GROUP_NAME : GROUP_NAME,
-	            	DESCRIPTION : DESCRIPTION
-				},
-	            success : function(res){
-	           		alert(res.result);
-	           		
-	            	if (res.resultCode == 1) {
-						location.reload();
-	            	}
-	            },
-	            error : function(e){
-	                console.log("updateCommonCodeGroup() ajax 실패");
-	            }
-	        });
-		});
-
 		$("#btnUpdateCode").on('click', function(e) {
 			let code = getSelectedRowCode();
 			if (code == null) {
@@ -541,7 +510,7 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/getCommonCode",
+	            url : "/system/getCommonCode",
 	            data : {
 	            	CODE_ID : code
 				},
@@ -580,7 +549,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/updateCommonCode",
+	            url : "/system/updateCommonCode",
 	            data : {
 	            	GROUP_ID : CODE_GROUP_ID,
 					CODE_ID : CODE_ID,
