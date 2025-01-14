@@ -29,12 +29,12 @@ public class SecurityConfig {
 						-> authorizeHttpRequestsCutomizer
 						.requestMatchers("/", "/login/**", "/dist/**", "/build/**", "/docs/**", "/examples/**", "/forms/**", "/images/**", "/layout/**", "/plugins/**").permitAll()
 						.requestMatchers("/mypage/**",  "/appoint/**").authenticated()
-						.requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
+						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.anyRequest()
 						.authenticated()
 						)
 			    .csrf(csrf -> csrf
-			            .ignoringRequestMatchers("/appoint/**", "/salary/**", "/attendance/**") // 특정 경로 CSRF 비활성화
+			            .ignoringRequestMatchers("/appoint/**", "/salary/**", "/attendance/**", "/system/**") // 특정 경로 CSRF 비활성화
 			        )				
 				.formLogin(formLoginCustomizer
 						-> formLoginCustomizer
@@ -78,9 +78,9 @@ public class SecurityConfig {
 	        return new BCryptPasswordEncoder(); // 비밀번호 암호화를 위한 인코더
 	    }
 	    
-	    @Bean
-	    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
-	        return new GrantedAuthorityDefaults(""); // 접두사 제거
-	    }
+//	    @Bean
+//	    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+//	        return new GrantedAuthorityDefaults(""); // 접두사 제거
+//	    }
 
 }
