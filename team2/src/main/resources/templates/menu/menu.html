@@ -31,6 +31,7 @@
 		<!-- /.좌측 메뉴 -->
 		
 		<nav th:replace="~{includes/modals/menuAdd :: menuAdd}"></nav>
+		<nav th:replace="~{includes/modals/menuEdit :: menuEdit}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -269,16 +270,6 @@
 				return;
 			}
 			
-			/*
-			console.log(DEPTH);
-			console.log(PARENT_ID);
-			console.log(NAME);
-			console.log(URL);
-			console.log(SORT_ORDER);
-			console.log(CODE_USE_YN);
-			console.log(ROLE);
-			*/
-			
 			$.ajax({
 	            type : "POST",
 	            url : "/system/addMenu",
@@ -302,7 +293,6 @@
 	                console.log("addMenu() ajax 실패");
 	            }
 	        });
-			
 		});
 		
 		function selectRow(id, type) {
@@ -313,8 +303,128 @@
 				return;
 			}
 			
-		    let depth = selectedData[0].MENU_ID;
-		    console.log("선택된 행의 메뉴아이디: " + depth);
+			let menu_id = selectedData[0].MENU_ID;
+			
+			switch (type) {
+				case 'update' : updateMenu(menu_id); break; 
+				case 'delete' : deleteMenu(menu_id); break;	
+			}
+		}
+		
+		function updateMenu(menu_id) {
+			$.ajax({
+	            type : "POST",
+	            url : "/system/getMenuList",
+	            data : {
+	            	menu_id : menu_id,
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+
+					$("#MENU_ID_EDIT").val(menu_id);
+					$("#PARENT_ID_EDIT").val(res[0].PARENT_ID);
+					$("#NAME_EDIT").val(res[0].NAME);
+					$("#URL_EDIT").val(res[0].URL);
+					$("#SORT_ORDER_EDIT").val(res[0].SORT_ORDER);
+					$("#USE_YN_" + res[0].USE_YN).prop("checked", true);
+					
+					let role = res[0].ROLE;
+					if (role.includes('USER')) {
+						$("#ROLE_USER").prop("checked", true);
+					} else {
+						// ROLE_USER default가 checked라 해제해줘야됨.
+						$("#ROLE_USER").prop("checked", false);
+					}
+					
+					if (role.includes('ADMIN')) {
+						$("#ROLE_ADMIN").prop("checked", true);
+					}
+	            },
+	            error : function(e){
+	                console.log("updateMenu() ajax 실패");
+	            }
+	        });
+			
+			$('#menuEdit').modal();
+		}
+		
+		$("#menuUpdate").on("click", function() {
+			let MENU_ID = $("#MENU_ID_EDIT").val();
+			let PARENT_ID = $("#PARENT_ID_EDIT").val();
+			let NAME = $("#NAME_EDIT").val();
+			let URL = $("#URL_EDIT").val();
+			let SORT_ORDER = $("#SORT_ORDER_EDIT").val();
+			
+			let ROLE = '';
+			$('input:checkbox[name=role_edit]').each(function (index) {
+				if($(this).is(":checked")){
+					ROLE += $(this).val() + ',';
+			    }
+			});
+			
+			let USE_YN = $('input[name="use_yn_edit"]:checked').val();
+			
+			if (NAME == null || NAME == ''
+				|| SORT_ORDER == null || SORT_ORDER == ''
+				|| USE_YN == null || USE_YN == ''
+				|| ROLE == null || ROLE == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/system/updateMenu",
+	            data : {
+	            	MENU_ID : MENU_ID,
+	            	PARENT_ID : PARENT_ID,
+	            	NAME : NAME,
+	            	URL : URL,
+	            	SORT_ORDER : SORT_ORDER,
+	            	ROLE : ROLE,
+	            	USE_YN : USE_YN
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("getMenuList() ajax 실패");
+	            }
+	        });
+		});
+		
+		// todo
+		function deleteMenu(menu_id) {
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			console.log('delete   ' + menu_id);
+			
+// 	 		$.ajax({
+// 	            type : "POST",
+// 	            url : "/system/deleteCommonCodeGroup",
+// 	            data : {
+// 	            	GROUP_ID : code,
+// 				},
+// 	            success : function(res){
+// 	           		alert(res.result);
+	           		
+// 	            	if (res.resultCode == 1) {
+// 						location.reload();
+// 	            	}
+// 	            },
+// 	            error : function(e){
+// 	                console.log("deleteCommonCodeGroup() ajax 실패");
+// 	            }
+// 	        });
 		}
 		
 		function destroyChild(row) {
@@ -354,7 +464,7 @@
 					url : "/system/getMenuList",
 					type:"POST",
 					data : {
-						menu_id : menu_id
+						parent_id : menu_id
 					},
 					"dataSrc": function (res) {
 		                return res;

@@ -349,7 +349,7 @@
 
 	    // 최상위 메뉴만 반환
 	    const rootItems = [...menuMap.values()].filter(item => !item.PARENT_ID);
-		console.log(rootItems);
+	    
 	    function createMenuHTML(items) {
 	        if (!items.length) {
 				return '';

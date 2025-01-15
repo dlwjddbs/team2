@@ -7,7 +7,7 @@
 <mapper namespace="com.itwillbs.repository.MenuMapper">
     <select id="selectMenu" resultType="map">
         SELECT *
-          FROM menu
+          FROM MENU
          WHERE ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
          ORDER BY DEPTH, SORT_ORDER ASC 
     </select>
@@ -15,6 +15,7 @@
     <select id="getMenuList" resultType="map">
 	    SELECT
 			   MENU_ID 
+			 , PARENT_ID
 			 , NAME 
 			 , URL 
 			 , ROLE 
@@ -31,8 +32,11 @@
 		   <if test="depth != null and depth != ''">
 		   	   AND DEPTH = #{depth}
 		   </if>
+		   <if test="parent_id != null and parent_id != ''">
+		   	   AND PARENT_ID = #{parent_id}
+		   </if>
 		   <if test="menu_id != null and menu_id != ''">
-		   	   AND PARENT_ID = #{menu_id}
+		   	   AND MENU_ID = #{menu_id}
 		   </if>
 		 ORDER BY SORT_ORDER ASC
     </select>
@@ -71,6 +75,9 @@
 		   	   		 AND PARENT_ID IS NULL
 		   	   </otherwise>
 		   </choose>
+		   <if test="MENU_ID != null and MENU_ID != ''">
+		   		AND MENU_ID != #{MENU_ID}
+		   </if>
 		   AND SORT_ORDER = #{SORT_ORDER}
     </select>
     
@@ -80,5 +87,26 @@
 		 WHERE 1 = 1
 		   AND URL IS NOT NULL
 		   AND URL = #{URL}
+   		   <if test="MENU_ID != null and MENU_ID != ''">
+		   		AND MENU_ID != #{MENU_ID}
+		   </if>
     </select>
+    
+    <select id="isExistChildMenu" resultType="Integer">
+	    SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   AND PARENT_ID = #{MENU_ID}
+    </select>
+    
+    <update id="updateMenu">
+    	UPDATE MENU
+		   SET 
+			     NAME = #{NAME}
+			   , URL = #{URL, jdbcType=VARCHAR}
+			   , SORT_ORDER = #{SORT_ORDER}
+			   , ROLE = #{ROLE}
+			   , USE_YN = #{USE_YN}
+		 WHERE MENU_ID = #{MENU_ID}
+    </update>
 </mapper>
