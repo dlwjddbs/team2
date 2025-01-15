@@ -73,12 +73,6 @@
                </div>
                <button type="button" class="btn btn-primary" id="btnSearch">조회</button>
             </div>
-<!--             <div class="col-2"> -->
-<!--                <button type="button" class="btn btn-primary" id="newSalary" data-toggle="modal" data-target="#modal-lg1"> -->
-<!--                   급여 정보 입력 -->
-<!--                </button> -->
-<!--                <nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav> -->
-<!--             </div> -->
             <div class="container-fluid">
                <div class="row">
                   <div class="col-12">
@@ -150,127 +144,181 @@
           });
       });
       $(function () {
-         // 페이지 첫 로딩 시 테이블 출력
-         $("#example1").DataTable({
-            aaSorting: [], // 초기 정렬 비활성화
-            // 버튼 위치 조절
-            dom:   "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-                 + "<'row'<'col-sm-12'tr>>"
-                 + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-            language : {
-               search : "검색",
-               paginate: {
-                      "first" : "처음",
-                      "last" : "마지막",
-                      "next" : "다음",
-                      "previous" : "이전"
-                  }
-            },
-            ajax : {
-               url : "/salary/salaryInputList",
-               type :"POST",
-               data : {},
-               "dataSrc" : function (abc) {
-                  console.log(abc);
-                  console.log("abc : " + abc);
-                      return abc;
-                  }
-            },
-            columns: [
-                {data: "PAYDAY", title: "귀속연월", "defaultContent": ""},
-                {
-                    data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
-                    render: function (data, type, row) {
-                           if (row.SALARY_YN === 'Y') {
-                            // 확정된 경우: 링크 제거, 일반 텍스트로 표시
-                            return `<span style="display: block; text-align: center;">${data}</span>`;
-                        }
-                        // 확정되지 않은 경우: 링크 제공
-                        return `<a href="#" 
-						   			id="${data}" 
-						   			class="edit-link" 
-						   			data-payday="${row.PAYDAY || null}" 
-						   			data-id="${data}" 
-						   			style="text-decoration: underline; font-size: 18px;">
-						   			${data}
-								</a>`;
-                    }
-                },
-                {data: "NAME", title: "사원명", "defaultContent": ""},
-                {data: "GRADE_NAME", title: "직급", "defaultContent": ""},
-                {data: "DEPT_NAME", title: "부서", "defaultContent": ""},
-                {data: "SALARY", title: "기본급", "defaultContent": ""},
-                {data: "POSITION_BONUS", title: "직책수당", "defaultContent": ""},
-                {data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": ""},
-                {data: "NIGHT_BONUS", title: "야근수당", "defaultContent": ""},
-                {data: "YEAREND_BONUS", title: "연말수당", "defaultContent": ""},
-                {data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": ""},
-                {data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": ""},
-                {data: "TOTAL", title: "실지급액", "defaultContent": ""},
-                {
-                    data: "SALARY_YN", title: "확정유무", "defaultContent": "",
-                    render: function (data, type, row) {
-						if (data === 'N') {
-						     // SALARY_YN이 'N'인 경우에만 버튼 표시
-						     return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
-						                      data-id="${row.MEMBER_ID}" 
-						                      data-payday="${row.PAYDAY}">
-						                   급여 확정
-						             </button>`;
-						}
-						// 다른 경우 아무것도 표시하지 않음
-						return '';
-                    }
-                }
-            ],
-            responsive : true, 
-            lengthChange : false, 
-            autoWidth : false,
-            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-         }).buttons()
+    	    // 페이지 첫 로딩 시 테이블 출력
+    	    $("#example1").DataTable({
+    	        aaSorting: [], // 초기 정렬 비활성화
+    	        // 버튼 위치 조절
+    	        dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
+    	           + "<'row'<'col-sm-12'tr>>"
+    	           + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+    	        language: {
+    	            search: "검색",
+    	            paginate: {
+    	                "first": "처음",
+    	                "last": "마지막",
+    	                "next": "다음",
+    	                "previous": "이전"
+    	            }
+    	        },
+    	        ajax: {
+    	            url: "/salary/salaryInputList",
+    	            type: "POST",
+    	            data: {},
+    	            "dataSrc": function (response) {
+    	                console.log(response);
+    	                // SALARY_YN이 Y 또는 N인 데이터만 반환
+    	                return response.filter(row => row.SALARY_YN === 'Y' || row.SALARY_YN === 'N');
+    	            }
+    	        },
+    	        columns: [
+    	            { data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
+    	            {
+    	                data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
+    	                render: function (data, type, row) {
+    	                    if (row.SALARY_YN === 'Y') {
+    	                        // 확정된 경우: 링크 제거, 일반 텍스트로 표시
+    	                        return `<span style="display: block; text-align: center;">${data}</span>`;
+    	                    }
+    	                    // 확정되지 않은 경우: 링크 제공
+    	                    return `<a href="#" 
+    	                                id="${data}" 
+    	                                class="edit-link" 
+    	                                data-payday="${row.PAYDAY || null}" 
+    	                                data-id="${data}" 
+    	                                style="text-decoration: underline; font-size: 18px;">
+    	                                ${data}
+    	                            </a>`;
+    	                }
+    	            },
+    	            { data: "NAME", title: "사원명", "defaultContent": "" },
+    	            { data: "GRADE_NAME", title: "직급", "defaultContent": "" },
+    	            { data: "DEPT_NAME", title: "부서", "defaultContent": "" },
+    	            { data: "SALARY", title: "기본급", "defaultContent": "" },
+    	            { data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
+    	            { data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
+    	            { data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
+    	            { data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
+    	            { data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
+    	            { data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
+    	            { data: "TOTAL", title: "실지급액", "defaultContent": "" },
+    	            {
+    	                data: "SALARY_YN", title: "확정유무", "defaultContent": "",
+    	                render: function (data, type, row) {
+    	                    if (data === 'N') {
+    	                        // SALARY_YN이 'N'인 경우에만 버튼 표시
+    	                        return `<button type="button" class="btn btn-outline-primary confirm-salary-btn" 
+    	                                    data-id="${row.MEMBER_ID}" 
+    	                                    data-payday="${row.PAYDAY}"
+   	                                    	style="display: block; margin: 0 auto;">
+    	                                 확정
+    	                                </button>`;
+    	                    }
+    	                    // 'Y'인 경우 일반 텍스트 표시
+    	                    return `<span style="font-weight: bold; display: block; text-align: center;">확정됨</span>`;
+    	                }
+    	            },
+    	            {
+    	                data: null, title: "", "defaultContent": "",
+    	                render: function (data, type, row) {
+    	                    if (row.SALARY_YN === 'N') {
+    	                        // SALARY_YN이 'N'인 경우에만 삭제 버튼 표시
+    	                        return `<button type="button" class="btn btn-outline-danger delete-salary-btn" 
+    	                                    data-id="${row.MEMBER_ID}" 
+    	                                    data-payday="${row.PAYDAY}">
+    	                                 삭제
+    	                                </button>`;
+    	                    }
+    	                    // 'Y'인 경우 삭제 버튼 숨기기
+    	                    return ''; // 빈 문자열을 반환하여 삭제 버튼 숨기기
+    	                }
+    	            }
+    	          ],
+    	        responsive: true,
+    	        lengthChange: false,
+    	        autoWidth: false,
+    	        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    	    }).buttons()
            .container()
            .appendTo('#example1_wrapper .col-md-6:eq(0)');   //export 버튼 위치
            
            
 		   $(document).on('click', '.confirm-salary-btn', function () {
-		           	    const memberId = $(this).data('id');
-		           	    const payday = $(this).data('payday');
-		           	    const button = $(this);
+           	    const memberId = $(this).data('id');
+           	    const payday = $(this).data('payday');
+           	    const button = $(this);
 
-		           	    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 확정하시겠습니까?`)) {
-		           	        $.ajax({
-		           	            url: '/salary/fixedSalary', // 서버 API URL
-		           	            type: 'POST',
-		           	            data: { memberId, payday },
-		           	            success: function (response) {
-		           	                if (response) {
-		           	                    alert('급여가 확정되었습니다.');
+           	    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 확정하시겠습니까?`)) {
+           	        $.ajax({
+           	            url: '/salary/fixedSalary', // 서버 API URL
+           	            type: 'POST',
+           	            data: { memberId, payday },
+           	            success: function (response) {
+           	                if (response) {
+           	                    alert('급여가 확정되었습니다.');
 
-		           	                    // 버튼을 "확정" 텍스트로 변경
-		           	                    button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
+           	                    // 버튼을 "확정" 텍스트로 변경
+           	                    button.replaceWith(`<span style="font-weight: bold; display: block; text-align: center;">확정</span>`);
 
-		           	                    // MEMBER_ID 하이퍼링크 제거
-		           	                    const table = $('#example1').DataTable();
-		           	                    const rowIdx = table.rows().indexes().filter(function (idx) {
-		           	                        const row = table.row(idx).data();
-		           	                        return row.MEMBER_ID === memberId && row.PAYDAY === payday;
-		           	                    })[0]; // 해당 row 인덱스 가져오기
+           	                    // MEMBER_ID 하이퍼링크 제거
+           	                    const table = $('#example1').DataTable();
+           	                    const rowIdx = table.rows().indexes().filter(function (idx) {
+           	                        const row = table.row(idx).data();
+           	                        return row.MEMBER_ID === memberId && row.PAYDAY === payday;
+           	                    })[0]; // 해당 row 인덱스 가져오기
 
-		           	                    if (rowIdx !== undefined) {
-		           	                        const rowData = table.row(rowIdx).data();
-		           	                        rowData.SALARY_YN = 'Y'; // 상태 업데이트
-		           	                        table.row(rowIdx).data(rowData).invalidate().draw(false);
-		           	                    }
-		           	                } else {
-		           	                    alert('급여 확정에 실패했습니다. 다시 시도해주세요.');
-		           	                }
-		           	            },
-		           	            error: function () {
-		           	                alert('서버와 통신 중 문제가 발생했습니다.');
-		           	            }
-		           	        });
-		           	    }
-		           	});          
+           	                    if (rowIdx !== undefined) {
+           	                        const rowData = table.row(rowIdx).data();
+           	                        rowData.SALARY_YN = 'Y'; // 상태 업데이트
+           	                        table.row(rowIdx).data(rowData).invalidate().draw(false);
+           	                    }
+           	                } else {
+           	                    alert('급여 확정에 실패했습니다. 다시 시도해주세요.');
+           	                }
+           	            },
+           	            error: function () {
+           	                alert('서버와 통신 중 문제가 발생했습니다.');
+           	            }
+           	        });
+           	    }
+           	}); 
+           
+		   $(document).on('click', '.delete-salary-btn', function () {
+			    const memberId = $(this).data('id');
+			    const payday = $(this).data('payday');
+
+			    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 삭제하시겠습니까?`)) {
+			        $.ajax({
+			            url: '/salary/deleteSalary', // 삭제 처리 API URL
+			            type: 'POST',
+			            data: { memberId, payday },
+			            success: function (response) {
+			                if (response) { // 서버 응답의 성공 여부 판단
+			                    alert('급여가 삭제되었습니다.');
+
+			                    const table = $('#example1').DataTable();
+
+			                    // 테이블에서 삭제할 행의 인덱스를 찾아 제거
+			                    const rowIdx = table.rows().indexes().filter(function (idx) {
+			                        const row = table.row(idx).data();
+			                        return row.MEMBER_ID === memberId && row.PAYDAY === payday;
+			                    })[0];
+
+			                    if (rowIdx !== undefined) {
+			                        table.row(rowIdx).remove().draw(false); // 행 삭제 및 화면 갱신
+			                    }
+			                } else {
+			                    // 실패 메시지 처리
+			                    alert(response.message || '급여 삭제에 실패했습니다. 다시 시도해주세요.');
+			                }
+			            },
+			            error: function (xhr, status, error) {
+			                // 통신 오류 처리
+			                console.error(`Error: ${error}`);
+			                alert('서버와 통신 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+			            }
+			        });
+			    }
+			});
            
           
            
@@ -457,30 +505,30 @@
       });
 
          function isNumberKey(evt) {
-                     // 숫자만 입력되도록 제한
-                     var charCode = (evt.which) ? evt.which : evt.keyCode;
-                     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                         return false; // 숫자가 아닌 경우 false 반환
-                     }
-                     return true; // 숫자인 경우 true 반환
+               // 숫자만 입력되도록 제한
+               var charCode = (evt.which) ? evt.which : evt.keyCode;
+               if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                   return false; // 숫자가 아닌 경우 false 반환
+               }
+               return true; // 숫자인 경우 true 반환
+           }
+      
+         $(document).ready(function() {
+             // 금액 입력 필드에만 이벤트를 설정
+             $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
+                 let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
+                 
+                 // 숫자 형식으로 변환
+                 if (value && !isNaN(value)) {
+                     value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+                 } else if (value) {
+                     alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
+                     $(this).val(''); // 입력 필드 초기화
+                     return; // 추가 처리 방지
                  }
-            
-               $(document).ready(function() {
-                   // 금액 입력 필드에만 이벤트를 설정
-                   $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
-                       let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
-                       
-                       // 숫자 형식으로 변환
-                       if (value && !isNaN(value)) {
-                           value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
-                       } else if (value) {
-                           alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
-                           $(this).val(''); // 입력 필드 초기화
-                           return; // 추가 처리 방지
-                       }
-                       $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
-                   });
-               });
+                 $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
+             });
+         });
                
          // 급여 등록 버튼을 클릭시 이벤트 발생
          $('#submitBtn2').click(function () {
@@ -494,7 +542,7 @@
              $.ajax({
                  url: '/salary/writeSalary', // 컨트롤러 매핑 URL
                  type: 'POST',
-                 data: $("#writeSa/laryForm").serialize(),
+                 data: $("#writeSalaryForm").serialize(),
                  success: function (response) {
                      alert('급여 입력 성공!');
                      window.location.href = '/salaryInput';
@@ -529,8 +577,8 @@
                      alert('급여 수정 실패');
                  }
              });
-         });         
-      
+         });    
+         
    </script>
 </body>
 </html>
