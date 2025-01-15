@@ -29,14 +29,14 @@ public class MenuAdviceController {
 							, HttpServletRequest request
 							, Model model
 							, @AuthenticationPrincipal UserDetails userDetails) {
-        if (user != null) {
-        	String id = user.getUsername();
-            Map<String, Object> userInfo = menuService.selectUser(id);
-            model.addAttribute("userInfo", userInfo);
-        }
-		
 	    // 페이지 로딩 시만 조회 -> ajax는 제외.
 	    if ("GET".equalsIgnoreCase(request.getMethod())) {
+	    	if (user != null) {
+	        	String id = user.getUsername();
+	            Map<String, Object> userInfo = menuService.selectUser(id);
+	            model.addAttribute("userInfo", userInfo);
+	        }
+	    	
 	    	// UserDetails가 null일 때가 있음 예외 처리.
 	    	// Cannot invoke "org.springframework.security.core.userdetails.UserDetails.getAuthorities()" because "userDetails" is null
 	        if (userDetails != null) {
