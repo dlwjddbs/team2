@@ -127,4 +127,9 @@ public class AppointmentsController {
 	public String getOrganization() {
 		return "HRManagement/organization";
 	}
+	
+	@GetMapping("/appoint/organizationManagement")
+	public String getOrganizationManagement() {
+		return "HRManagement/organizationManagement";
+	}
 }

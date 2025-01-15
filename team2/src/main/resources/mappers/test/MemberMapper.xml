@@ -22,7 +22,6 @@
 		m.USE_YN,
 		m.CREATE_DATE,
 		m.UPDATE_DATE,
-		<!-- m.BANK_CODE, -->
 		m.SALARY,
 		bank.BANK_NAME AS BANK_NAME,
 		m.ACCOUNT,
@@ -78,10 +77,6 @@
 		</set>
 		WHERE MEMBER_ID = #{id}
 	</update>
-
-
-
-
 
 	<!-- 자격증 및 교육 정보 업데이트 -->
 	<update id="updateEducation">
