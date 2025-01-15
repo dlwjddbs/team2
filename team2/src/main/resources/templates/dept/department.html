@@ -420,13 +420,13 @@
 				return;
 			}
 
-			let table = $('#upperDept').DataTable();
+			let table = $('#lowerDept').DataTable();
 			if (table.row('.selected').length == 0) {
 				alert("하위부서를 선택하세요.");
 
 				return;
 			}
-			let code = table.rows('.selected').data()[0].DEPT_ID;
+			let code = table.rows('.selected').data()[0].PARENT_DEPT_ID;
 
 			return code;
 		}
@@ -480,7 +480,7 @@
 			$("#btnAddUpper").on("click", function () {
 				$("#CODE_ID").empty();
 				loadDeptIds();
-				$("#MEMBER_ID").val(''); // 부서장 초기화
+				$("#MEMBER_ID").empty(); // 부서장 초기화
 				$('input[name="use_yn"][value="Y"]').prop("checked", true); // 기본값 설정
 				$('#modalUpperDept').modal('show');
 			});
@@ -636,9 +636,11 @@
 					}
 
 					$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
+					$("#MEMBER_ID_UPDATE").val(res[0].MEMBER_ID);
+					console.info("MEMBER_ID", res[0].MEMBER_ID);
 					$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
 					// 부서장 목록 로드 및 선택
-					loadDeptMng(res[0].MEMBER_ID_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+					loadDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
 				},
 				error: function (e) {
 					console.log("getUpperDept() ajax 실패");
@@ -797,20 +799,20 @@
 
 
 
-		//부서조회
+		//하위부서 조회
 		$(document).ready(function () {
 			$("#btnAddLower").on("click", function () {
-				let code = getSelectedRowLower();
+				let code = getSelectedRowUpper();
 				if (code == null) {
 					return;
 				}
 
 				$("#LOWER_PARENT_ID").val(code);
-				$("#CODE_ID").empty();
+				$("#DEPT_ID").val('');
 				loadDeptIds();
 				$("#MEMBER_ID").val(''); // 부서장 초기화
 				$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
-				$('#modalLowerDept').modal('show');
+				$('#modalLowerDept').modal();
 			});
 
 			function loadDeptIds() {
@@ -861,20 +863,22 @@
 			}
 		});
 
-		// 하위부서 등록
-		$("#btnAddLower").on("click", function () {
-			let code = getSelectedRowLower();
-			if (code == null) {
-				return;
-			}
+// 		// 하위부서 등록
+// 		$("#btnAddLower").on("click", function () {
+// 			let code = getSelectedRowLower();
+// 			if (code == null) {
+// 				alert("상위부서를 선택하세요");
+// 				return;
+// 			}
 
-			$("#LOWER_PARENT_ID").val(code);
-			$("#DEPT_ID").val('');
-			$("#MEMBER_ID_LOWER").val('');
-			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
+// 			$("#LOWER_PARENT_ID").val(code);
+// 			$("#DEPT_ID").val('');
+			
+// 			$("#MEMBER_ID_LOWER").val('');
+// 			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
 
-			$('#modalLowerDept').modal();
-		});
+// 			$('#modalLowerDept').modal();
+// 		});
 
 		$("#lowerDeptSave").on('click', function () {
 			let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
@@ -971,10 +975,14 @@
 				//하위부서 수정 값 조회
 						$("#btnUpdateLower").on('click', function (e) {
 							let code = getSelectedRowLower();
+							let table = $("#lowerDept").DataTable();
+							let selectedRowData = table.row({selected: true}).data();
 							if (code == null) {
 								return;
 							}
-
+							
+							 console.log("Selected DEPT_ID:", code); // 전달되는 DEPT_ID 확인
+							
 							$.ajax({
 								type: "POST",
 								url: "/getLowerDept",
@@ -984,13 +992,15 @@
 								},
 								data: {
 									DEPT_ID: code,
+									UPPER_ID: selectedRowData.DEPT_ID
+									
 								},
 								success: function (res) {
 									if (res.length == 0) {
-										alert("조회 실패");
-
+										alert("조회실패");
 										return;
 									}
+									console.log("res", res)
 									$("#PARENT_ID_UPDATE").val(res[0].PARENT_DEPT_ID);
 									$("#LOWER_DEPT_UPDATE").val(res[0].DEPT_ID);
 									$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
@@ -998,15 +1008,16 @@
 									loadLowerDeptMng(res[0].LOWER_MEMBER_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
 								},
 								error: function (e) {
-									console.log("getUpperDept() ajax 실패");
+									console.log("getLowerDept() ajax 실패");
 								}
 							});
+									$('#modalLowerDeptEdit').modal('show');
 
-							$('#modalLowerDeptEdit').modal();
 						});
 
 						// 하위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
 						function loadLowerDeptMng(selectedMemberId) {
+							console.log("selectedMemberId:", selectedMemberId); // 전달되는 DEPT_ID 확인
 							$.ajax({
 								type: "GET",
 								url: "/getDepMng",
@@ -1015,6 +1026,8 @@
 									xhr.setRequestHeader(header, token);
 								},
 								success: function (data) {
+									console.log("Response from /getDepMng:", data); // 응답 데이터 확인
+									
 									let selectBox = $("#LOWER_MEMBER_UPDATE");
 									selectBox.empty(); // 기존 옵션 제거
 									selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가

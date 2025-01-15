@@ -34,4 +34,8 @@ public interface DeptMapper {
 
 	int updateLowerDept(Map<String, Object> map);
 
+	void updateAdmin(Map<String, Object> map);
+
+	void updateLowerAdmin(Map<String, Object> map);
+
 }

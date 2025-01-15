@@ -31,6 +31,7 @@ public class DeptService {
 			System.out.println(duplicateCnt);
 			if (duplicateCnt == 0) {
 				int resultCnt = deptMapper.insertUpperDept(map);
+				deptMapper.updateAdmin(map);
 				if (resultCnt > 0) {
 					result = "등록 되었습니다.";
 					resultCode = "1";
@@ -124,6 +125,7 @@ public class DeptService {
 		int duplicateCnt = deptMapper.isDuplicateLowerDept(map);
 		if (duplicateCnt == 0) {
 			int resultCnt = deptMapper.insertLowerDept(map);
+			deptMapper.updateLowerAdmin(map);
 			if (resultCnt > 0) {
 				result = "등록 되었습니다.";
 				resultCode = "1";
@@ -170,17 +172,17 @@ public class DeptService {
 		String result = "";
 		String resultCode = "";
 		
-		try {
+//		try {
 			int resultCnt = deptMapper.updateLowerDept(map);
 			if (resultCnt > 0) {
 				result = "수정이 완료되었습니다.";
 				resultCode = "1";
 			}
-		} catch (Exception e) {
-			System.out.println(e);
-			result = "수정 실패.";
-			resultCode = "0";
-		}
+//		} catch (Exception e) {
+//			System.out.println(e);
+//			result = "수정 실패.";
+//			resultCode = "0";
+//		}
 		
 		message.put("result", result);
 		message.put("resultCode", resultCode);

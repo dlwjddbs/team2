@@ -9,6 +9,7 @@
 	<select id="getUpperDept" resultType="map">
     SELECT 
         d.DEPT_ID,
+        d.MEMBER_ID,
         cc.CODE_NAME AS DEPT_NAME
     FROM DEPT d
     LEFT JOIN COMMON_CODE cc
@@ -42,6 +43,12 @@
 			, #{USE_YN}
 		)
 	</insert>
+	
+	<update id="updateAdmin">
+	UPDATE MEMBER
+	SET AUTHORITY = 'ADMIN'
+	WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
 	
 	<select id="getCcodeList" resultType="map">
 	SELECT 
@@ -99,6 +106,9 @@ FROM
 			<if test='DEPT_ID != null and DEPT_ID != ""'>
 		   		AND d.PARENT_DEPT_ID = #{DEPT_ID}
 		   	</if>
+		   	<if test='UPPER_ID != null and UPPER_ID != ""'>
+		   		AND d.DEPT_ID = #{UPPER_ID}
+		   	</if>
 	</select>
 	
 	<select id="isDuplicateLowerDept" resultType="Integer">
@@ -124,6 +134,12 @@ FROM
 			, #{USE_YN}
 		)
 	</insert>
+	
+	<update id="updateLowerAdmin">
+	UPDATE MEMBER
+	SET AUTHORITY = 'ADMIN'
+	WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
 	
 	<delete id="deleteLowerDept">
 	<!-- deleteLowerDept 하위부서 삭제 -->
