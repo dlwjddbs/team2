@@ -324,10 +324,13 @@
 		FROM
 		    CALCULATED_BONUS CB
 		WHERE
-			CB.MEMBER_ID = #{memberId}
+			CB.MEMBER_ID = #{id}
+			<if test="payday != null and payday != ''">
+	         	AND CB.COMMUTE_MONTH = #{payday}
+	        </if>
 		ORDER BY
 		    CB.MEMBER_ID,
-		    CB.COMMUTE_MONTH;
+		    CB.COMMUTE_MONTH
 	</select>
 	
 	<!-- 급여 확정 버튼 비활성화 -->

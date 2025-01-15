@@ -340,9 +340,11 @@
                  url: "/salary/getModalContent",  
                  type: "POST",
                  data: { id: id, payday: payday },
-                 success: function(salaryData) {
+                 success: function(data) {
                     console.log("사원 번호:", id);
-                    console.log("서버 데이터:", salaryData);
+                    console.log("서버 데이터:", data);
+                    
+                    salaryData = data;
                     
                     // 받은 데이터를 각 입력 필드에 설정
                     $('#memberId').val(salaryData.MEMBER_ID);               	// 사원 ID

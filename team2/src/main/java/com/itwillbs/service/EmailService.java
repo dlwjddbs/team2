@@ -3,6 +3,7 @@ package com.itwillbs.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
@@ -21,9 +22,9 @@ public class EmailService {
 	// 메일 전송하기 동작
 	// javax.mail -> jakarta.mail로 수정
 	// @Async : 비동기 방식으로 처리
-	//@Async
-	public void sendSimpleMessage(String to, String subject, String text){
-		log.info("============= sendSimpleMessage 시작 =============");
+	@Async
+	public void sendMail(String to, String subject, String text){
+		log.info("============= sendMail 시작 =============");
 		
 		MimeMessage message = emailSender.createMimeMessage();
 		
@@ -37,7 +38,7 @@ public class EmailService {
 			
 			emailSender.send(message);
 			
-			log.info("============= sendSimpleMessage 완료 =============");
+			log.info("============= sendMail 완료 =============");
 		
 		} catch (MessagingException e) {
 			e.printStackTrace();
