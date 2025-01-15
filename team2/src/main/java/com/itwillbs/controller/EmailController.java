@@ -2,6 +2,7 @@ package com.itwillbs.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,7 @@ public class EmailController {
 	
 	// 급여명세서 전송 test용 페이지
 	// 전송 기능 구현 완료시 삭제 예정
-	@GetMapping("/salarySendTest")
+	@GetMapping("/salary/salarySendTest")
 	public String salaryEmailTest(Map<String, Object> map, Model model) {
 		log.info("============= salaryEmailTest =============");
 		
@@ -50,10 +51,12 @@ public class EmailController {
 	
 	@PostMapping("/sendEmail")
 	@ResponseBody
-	public String sendEmail(@RequestParam("to") String to, 
-							@RequestParam("subject") String subject) throws Exception{
-		// 매개변수 @RequestParam String text는 고민중
+	public String sendEmail(List<Map<String, Object>> selectedRows) throws Exception{
 		log.info("============= sendEmail =============");
+		
+		log.info(selectedRows.toString());
+		
+		
 		
 		StringBuffer sb = new StringBuffer();
 		
@@ -62,8 +65,9 @@ public class EmailController {
 		sb.append("<h1> ").append("Test").append("님 의").append(" 급여명세서 입니다. </h1> ");
 		sb.append("</body></html>");
 		
-		emailService.sendSimpleMessage(to, subject, sb.toString());
-		
+//		for (RowData row : rows) {
+//			emailService.sendMail(to, subject, sb.toString());
+//		}
 		return "이메일 전송 성공!";
 	}
 

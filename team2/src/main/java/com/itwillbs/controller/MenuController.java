@@ -50,6 +50,22 @@ public class MenuController {
 		return message;
 	}
 	
+	@PostMapping("/system/updateMenu")
+	@ResponseBody
+	public Map<String, Object> updateMenu(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.updateMenu(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/deleteMenu")
+	@ResponseBody
+	public Map<String, Object> deleteMenu(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.deleteMenu(map);
+		
+		return message;
+	}
+	
 }
 
 

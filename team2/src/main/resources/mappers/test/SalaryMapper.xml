@@ -189,12 +189,12 @@
 	            #{FULLSERVICE_BONUS},
 	            #{PERFORMANCE_BONUS},
 	            (
-		            NVL(#{positionBonus}, 0)
-		          + NVL(#{holidayBonus}, 0)
-		          + NVL(#{nightBonus}, 0)
-		          + NVL(#{yearendBonus}, 0)
-		          + NVL(#{fullserviceBonus}, 0)
-		          + NVL(#{performanceBonus}, 0)
+		            NVL(#{POSITION_BONUS}, 0)
+		          + NVL(#{HOLIDAY_BONUS}, 0)
+		          + NVL(#{NIGHT_BONUS}, 0)
+		          + NVL(#{YEAREND_BONUS}, 0)
+		          + NVL(#{FULLSERVICE_BONUS}, 0)
+		          + NVL(#{PERFORMANCE_BONUS}, 0)
 		        ) AS TOTAL
 	        FROM 
 	        	member m
@@ -324,10 +324,13 @@
 		FROM
 		    CALCULATED_BONUS CB
 		WHERE
-			CB.MEMBER_ID = #{memberId}
+			CB.MEMBER_ID = #{id}
+			<if test="payday != null and payday != ''">
+	         	AND CB.COMMUTE_MONTH = #{payday}
+	        </if>
 		ORDER BY
 		    CB.MEMBER_ID,
-		    CB.COMMUTE_MONTH;
+		    CB.COMMUTE_MONTH
 	</select>
 	
 	<!-- 급여 확정 버튼 비활성화 -->

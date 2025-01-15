@@ -17,5 +17,13 @@ public interface MenuMapper {
 	int isDuplicateMenuSortOrder(Map<String, Object> map);
 
 	int isDuplicateMenuURL(Map<String, Object> map);
+
+	int isExistChildMenu(Map<String, Object> map);
+
+	int updateMenu(Map<String, Object> map);
+
+	int deleteMenu(Map<String, Object> map);
+
+	Map<String, Object> selectUser(String id);
 	
 }

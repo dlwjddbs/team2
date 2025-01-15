@@ -6,12 +6,15 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.itwillbs.controller.MenuController;
 import com.itwillbs.repository.MenuMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 @Service
 @RequiredArgsConstructor
+@Log
 public class MenuService {
 	
 	private final MenuMapper menuMapper;
@@ -55,5 +58,67 @@ public class MenuService {
 		message.put("resultCode", resultCode);
 		
 		return message;
+	}
+
+	public Map<String, Object> updateMenu(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "수정 실패";
+		String resultCode = "0";
+		
+		try {
+			// 경로 중복 (자기 자신은 제외)
+			if (menuMapper.isDuplicateMenuURL(map) > 0) {
+				result = "중복된 경로입니다.";
+			// 정렬순서 중복 (자기 자신은 제외)
+			} else if (menuMapper.isDuplicateMenuSortOrder(map) > 0) {
+				result = "중복된 순서입니다.";
+			// 하위메뉴 존재 시 폴더는 페이지로 전환 불가
+			} else if (!map.get("URL").toString().equals("") && menuMapper.isExistChildMenu(map) > 0) {
+				result = "하위 메뉴가 존재하여 페이지로 변환할 수 없습니다.";
+			} else {
+				if (menuMapper.updateMenu(map) > 0) {
+					result = "수정 되었습니다.";
+					resultCode = "1";
+				}
+			}
+		} catch (Exception e) {
+			log.info(e.toString());
+			result = "수정 실패.";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> deleteMenu(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "삭제 실패.";
+		String resultCode = "0";
+		
+		try {
+			if (menuMapper.isExistChildMenu(map) > 0) {
+				result = "하위 메뉴가 존재합니다.";
+			} else {
+				if (menuMapper.deleteMenu(map) > 0) {
+					result = "삭제 되었습니다.";
+					resultCode = "1";
+				}
+			}
+		} catch (Exception e) {
+			log.info(e.toString());
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> selectUser(String id) {
+		return menuMapper.selectUser(id);
 	}
 }
