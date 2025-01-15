@@ -52,7 +52,6 @@
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
-			
 				<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
 				<br>
 				<div class="container-fluid">
@@ -180,10 +179,7 @@
 			}).buttons()
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');	//export 버튼 위치
-			  
-			  
-			  
-			  
+			  		  
 			  // DataTable에서 MEMBER_ID 클릭 시 Modal에 콘텐츠 로딩
 			  $('#example1').on('click', 'a.edit-link', function(event) {
 			  	event.preventDefault(); // 기본 링크 동작 방지
@@ -191,17 +187,21 @@
 			  	console.log("클릭된 사원 번호:", id);
 			  	loadModalContent(id); // 모달 콘텐츠 로드 함수 호출
 			  });
-			  
+		
+		  let salaryData = null;
+		    
 		  function loadModalContent(id) {
 			  	// 서버에서 Modal 콘텐츠를 AJAX로 요청
 			  	$.ajax({
 			  		url: "/salary/salaryWriteModal",  
 			  		type: "POST",
 			  		data: { id: id },
-			  		success: function(salaryData) {
+			  		success: function(data) {
 			  			console.log("사원 번호:", id);
-			  			console.log("서버 데이터:", salaryData);
+			  			console.log("서버 데이터:", data);
 			  			
+						salaryData = data;
+						
 			  			// 받은 데이터를 각 입력 필드에 설정
 			  			$('#member').val(salaryData.MEMBER_ID);						// 사원 ID
 						$('#name').val(salaryData.NAME);							// 이름
@@ -217,8 +217,7 @@
 			  		}
 			  	});
 			  }
-			
-	        
+			        
 	        $(document).ready(function () {
 	            // 현재 날짜 계산
 	            const currentDate = new Date();
@@ -232,8 +231,36 @@
 	                startDate: "1960-01", // 시작 날짜 설정
 	                endDate: currentDate, // 종료 날짜 설정
 	            }).on('changeDate', function (e) {
-	                $('#daterange').val(e.format());
-	            });
+				    $('#daterange').val(e.format());
+				    const commuteMonth = $(this).val();
+				    
+				    console.log(salaryData);
+				    console.log(salaryData.MEMBER_ID);
+				    console.log(commuteMonth);
+				
+				    if (!salaryData) {
+				        alert("급여 정보를 아직 가져오지 못했습니다.");
+				        return;
+				    }
+				    
+				    // 야간 수당 계산 조회 후 가져오기
+				  	$.ajax({
+				  		url: "/salary/getNightBonus",  
+				  		type: "POST",
+				  		data: { id: salaryData.MEMBER_ID,
+				  			payday: commuteMonth },
+				  		success: function(nightBonusData) {
+				  			console.log("사원 번호:", salaryData.MEMBER_ID);
+				  			console.log("서버 데이터:", nightBonusData);
+				  			
+				  			// 받은 데이터를 각 입력 필드에 설정
+							$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);				// 야간 수당
+				  		},
+				  		error: function() {
+				  			alert("야간근무수당을 불러오는 데 실패했습니다.");
+				  		}
+				  	});
+				});
 
 	            // 모달이 열릴 때마다 입력 필드 초기화
 	            $('#modal-lg').on('show.bs.modal', function () {
@@ -242,7 +269,6 @@
 	        });
 
 		});
-		
 
 		function isNumberKey(evt) {
 	            // 숫자만 입력되도록 제한
@@ -252,7 +278,6 @@
 	            }
 	            return true; // 숫자인 경우 true 반환
 	        }
-			
 					
 			$(document).ready(function() {
 			    // 금액 입력 필드에만 이벤트를 설정
@@ -272,60 +297,59 @@
 			});
 					
 			// 급여 등록 버튼을 클릭시 이벤트 발생
-			$('#submitBtn2').click(function () {
-				
-			    // 입력 필드 값 가져오기
-/* 			    var daterange = $('#daterange').val();
-			    var member = $('#member').val(); // 사원 번호
-			    var name = $('#name').val(); // 사원명
-			    var department = $('#department').val(); // 부서
-			    var grade = $('#grade').val(); // 직급
-			    var salary = $('#salary').val(); // 기본급
-			    var position = $('#position').val(); // 직책 수당
-			    var holiday = $('#holiday').val(); // 연휴 수당
-			    var night = $('#night').val(); // 야근 수당
-			    var yearend = $('#yearend').val(); // 연말 격려 수당
-			    var fullservice = $('#fullservice').val(); // 만기 근속자 포상
-			    var performance = $('#performance').val(); // 실적 우수자 포상
-			    
-			    console.log({
-			        daterange, member, name, department, grade, salary, position, holiday, night, yearend, fullservice, performance,
-			    }); */
-			    
+			$('#submitBtn2').click(function () {    
 				var writeSalaryForm = $("#writeSalaryForm").serialize();
 				console.log(writeSalaryForm);
 				console.log(decodeURIComponent(writeSalaryForm));
+				
+				// 입력 값 확인
+				var isFormEmpty = false;
 
-			    // AJAX로 서버에 데이터 전송
-			    $.ajax({
-			        url: '/salary/writeSalary', // 컨트롤러 매핑 URL
-			        type: 'POST',
-			        data: $("#writeSalaryForm").serialize(),
-/* 			        {
-			        	PAYDAY: daterange,
-			        	MEMBER_ID: member,
-			        	NAME: name,
-			        	DEPARTMENT: department,
-			        	GRADE_ID: grade,
-			        	SALARY: salary,
-			        	POSITION_BONUS: position,
-			        	HOLIDAY_BONUS: holiday,
-			        	NIGHT_BONUS: night,
-			        	YEAREND_BONUS: yearend,
-			        	FULLSERVICE_BONUS: fullservice,
-			        	PERFORMANCE_BONUS: performance,
-			        }, */
-			        success: function (response) {
-			            alert('급여 입력 성공!');
-			            window.location.href = '/salary/salaryInput';
-			        },
-			        error: function (error) {
-			            alert('급여 입력 실패');
-// 			            window.location.href = '/salaryInput';
-			        }
-			    });
+				// 폼 데이터 확인 (key=value & key=value 형태를 쿼리 스트링으로 처리)
+				var formDataArray = $("#writeSalaryForm").serializeArray();
+				formDataArray.forEach(function(item) {
+				    if (!item.value.trim()) { // 공백이나 빈 값 확인
+				        isFormEmpty = true;
+				    }
+				});
+
+				// 입력 값이 없으면 경고 메시지 출력
+				if (isFormEmpty) {
+				    alert('급여를 입력해주세요.');
+				    return; // 실행 중지
+				}
+				
+				// 서버에 동일한 귀속연월과 급여정보가 있는지 조회
+				$.ajax({
+				    url: '/salary/checkDuplicate', // 중복 확인을 위한 서버 URL
+				    type: 'POST',
+				    data: $("#writeSalaryForm").serialize(),
+				    success: function (response) {
+				        if (response.isDuplicate) { // 서버에서 중복 여부 반환
+				            alert('해당 귀속연월에 등록된 급여정보가 있습니다.');
+				            return; // 실행 중지
+				        }
+
+				        // 중복이 없으면 급여 등록 요청
+						// AJAX로 서버에 데이터 전송
+						$.ajax({
+						    url: '/salary/writeSalary', // 컨트롤러 매핑 URL
+						    type: 'POST',
+						    data: $("#writeSalaryForm").serialize(),
+						    success: function (response) {
+						        alert('급여 입력 성공!');
+						        window.location.href = '/salary/salaryInput';
+						    },
+						    error: function (error) {
+						        alert('급여 입력 실패');
+						    }
+						});
+				    },
+				    error: function (error) {
+				        alert('중복 확인 중 오류가 발생했습니다.');
+				    }
+				});
 			});
-			
 		
 	</script>
 </body>

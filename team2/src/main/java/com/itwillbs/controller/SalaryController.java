@@ -75,28 +75,7 @@ public class SalaryController {
 	
 	// 관리자 급여입력 
 	@GetMapping("/salary/salaryInput")
-//	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
 	public String salaryInput() {
-		
-		// 관리자 페이지라 관리자 로그인 필수
-//		if (session.getAttribute("id") == null) {
-//            return "redirect:/login"; 
-//        }
-//		
-//		log.info("============= salaryInput =============");
-//		
-//		String id = "admin";
-//		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
-//		
-//		if (salaryInputMinMaxDate == null) {
-//			LocalDate now = LocalDate.now();
-//			
-//			salaryInputMinMaxDate = new HashMap<>();
-//			salaryInputMinMaxDate.put("SALARY_MIN_DATE", now);
-//			salaryInputMinMaxDate.put("SALARY_MAX_DATE", now);
-//		}
-//		
-//		model.addAttribute("salaryInputMinMaxDate", salaryInputMinMaxDate);
 		
 		return "/salary/salaryInput";
 	}
@@ -111,7 +90,7 @@ public class SalaryController {
 	}	
 	
 	// 관리자 급여입력 내역 조회
-	// 페이지 첫 로딩 시 입력된 급여 테이블 출력
+	// 페이지 첫 로딩 시 최소 최대일을 조회한 뒤 입력된 급여 테이블을 조회, 출력
 	@GetMapping("/salary/salaryInputList")
 	public String salaryInputList(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {	
 		log.info("============= salaryInputList =============");
@@ -178,16 +157,40 @@ public class SalaryController {
 	// 관리자 급여입력 (POST)
 	@PostMapping("/salary/writeSalary")
 	@ResponseBody
-	public String writeSalary(@RequestParam Map<String, Object> param, Model model) {
+	public String writeSalary(@RequestParam Map<String, Object> param) {
 		log.info("============= writeSalary =============");
 		
-		log.info(param.toString());
+		log.info("writeSalary : " + param.toString());
 		
 		salaryService.writeSalary(param);
 		
 		return "급여 입력 성공!";
 	}
+	
+	// 급여입력 실행 전 급여 테이블에 동일한 귀속연월과 사원 ID가 있는지 체크 (POST)
+	@PostMapping("/salary/checkDuplicate")
+	@ResponseBody
+	public Map<String, Object> checkSalary(@RequestParam Map<String, Object> param) {
+		log.info("============= checkSalary =============");
+		
+		log.info("checkDuplicate : "  + param.toString());
+		
+	    Map<String, Object> checkSalary = salaryService.checkSalary(param);
 
+	    Map<String, Object> result = new HashMap<>();
+	    
+	    if (checkSalary != null && !checkSalary.isEmpty()) {
+	        // 동일한 귀속연월과 사원 ID가 있는 경우
+	        result.put("isDuplicate", true);
+	    } else {
+	        // 동일한 귀속연월과 사원 ID가 없는 경우
+	        result.put("isDuplicate", false);
+	    }
+
+	    log.info("Duplicate check result: " + result.toString());
+	    return result;
+	}
+	
 	// 확정버튼 클릭시 확정상태 변경
 	@PostMapping("/salary/fixedSalary")
 	@ResponseBody

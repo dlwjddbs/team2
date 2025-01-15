@@ -165,6 +165,23 @@
 			S.PAYDAY DESC
     </select>
     
+    <select id="checkSalaryById" resultType="map">
+    <!-- 급여 입력 전 급여 테이블에 동일한 귀속연월과 사원 ID가 있는지 체크 -->
+		SELECT
+            MEMBER_ID,
+            PAYDAY
+		FROM 
+			SALARY
+		WHERE
+			1 = 1
+			AND
+				MEMBER_ID = #{MEMBER_ID}
+			<if test='PAYDAY != null'>
+				AND 
+					PAYDAY = #{PAYDAY}
+			</if>
+    </select>
+    
     <!-- 사원별 급여 입력(관리자) -->
 	<insert id="insertSalary" parameterType="map">	    
 		INSERT INTO SALARY (

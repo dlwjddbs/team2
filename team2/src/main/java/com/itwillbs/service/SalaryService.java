@@ -29,6 +29,11 @@ public class SalaryService {
 		salaryMapper.insertSalary(param);
 	}
 	
+	// 급여 입력 - 급여 입력 전 급여 테이블에 동일한 귀속연월과 사원 ID가 있는지 체크 (조회)
+	public Map<String, Object> checkSalary(Map<String, Object> map) {
+		return salaryMapper.checkSalaryById(map);
+	}
+	
 	// 급여 조회 - 사원 ID의 급여 정보를 조회
 //	public Map<String, Object> findSalaryById(String id) {
 //		return salaryMapper.selectSalaryListById(id);

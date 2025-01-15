@@ -38,6 +38,9 @@ public interface SalaryMapper {
 	// 급여 입력
 	void insertSalary(Map<String, Object> param);
 	
+	// 급여 입력 - 급여 입력 전 급여 테이블에 동일한 귀속연월과 사원 ID가 있는지 체크 (조회)
+	Map<String, Object> checkSalaryById(Map<String, Object> map);
+	
 	// 급여 수정 - 사원의 기본급 수정
 	void updateMemberSalary(Map<String, Object> map);
 	
