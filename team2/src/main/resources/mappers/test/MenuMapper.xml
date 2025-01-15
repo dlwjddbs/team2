@@ -8,8 +8,20 @@
     <select id="selectMenu" resultType="map">
         SELECT *
           FROM MENU
-         WHERE ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+         WHERE 
+         	   1 = 1
+           AND ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+           AND USE_YN = 'Y'
          ORDER BY DEPTH, SORT_ORDER ASC 
+    </select>
+    
+    <select id="selectUser" parameterType="String" resultType="map">
+    	SELECT
+			   MEMBER_ID 
+			 , NAME 
+			 , CONCAT('/images/', NVL(PROFILE_PIC, 'default.jpg')) AS PROFILE_PIC 
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{id}
     </select>
     
     <select id="getMenuList" resultType="map">

@@ -117,4 +117,8 @@ public class MenuService {
 		
 		return message;
 	}
+
+	public Map<String, Object> selectUser(String id) {
+		return menuMapper.selectUser(id);
+	}
 }

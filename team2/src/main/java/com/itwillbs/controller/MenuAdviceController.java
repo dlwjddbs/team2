@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,7 +25,16 @@ public class MenuAdviceController {
 	private final MenuService menuService;
 	
 	@ModelAttribute
-	public void sideMenuList(HttpServletRequest request, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+	public void sideMenuList(@AuthenticationPrincipal User user
+							, HttpServletRequest request
+							, Model model
+							, @AuthenticationPrincipal UserDetails userDetails) {
+        if (user != null) {
+        	String id = user.getUsername();
+            Map<String, Object> userInfo = menuService.selectUser(id);
+            model.addAttribute("userInfo", userInfo);
+        }
+		
 	    // 페이지 로딩 시만 조회 -> ajax는 제외.
 	    if ("GET".equalsIgnoreCase(request.getMethod())) {
 	    	// UserDetails가 null일 때가 있음 예외 처리.
@@ -35,7 +45,6 @@ public class MenuAdviceController {
 	            
 	        	if (!auth2.isEmpty()) {
 	                List<Map<String, Object>> menus = menuService.selectMenu(auth2);
-	                
 	                model.addAttribute("menus", menus);
 	        	}
 	        }
