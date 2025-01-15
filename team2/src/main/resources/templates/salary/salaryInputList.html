@@ -498,7 +498,7 @@
 
 	            // 모달이 열릴 때마다 입력 필드 초기화
 	            $('#modal-lg').on('show.bs.modal', function () {
-	                //$('#daterange').val(''); // 입력 필드 초기화  
+// 	                $('#daterange').val(''); // 입력 필드 초기화  
 	            });
 	        });
 
@@ -570,7 +570,7 @@
                  success: function (response) {
                      alert('급여 수정 성공!');
                      console.log(response);
-                  window.location.href = '/salaryInputList';
+                  window.location.href = '/salary/salaryInputList';
                  },
                  error: function (error) {
                     console.log(error);
