@@ -149,9 +149,12 @@
 	        });
 	    });
 	    
+	    let salaryList;
+	    let table;
+	    
 	    $(function () {
-	       // 페이지 첫 로딩 시 테이블 출력
-	        const table = $("#example1").DataTable({
+	        // 페이지 첫 로딩 시 테이블 출력
+	        table = $("#example1").DataTable({
 	          aaSorting: [], // 초기 정렬 비활성화
 	          // 버튼 위치 조절
 	          dom:   "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
@@ -171,6 +174,7 @@
 	             type : "POST",
 	             data : {},
 	             "dataSrc" : function (data) {
+	            	 			salaryList = data;
 								console.log(data);
 							 	return data;
 							 }
@@ -203,8 +207,6 @@
 	       }).buttons()
 	         .container()
 	         .appendTo('#example1_wrapper .col-md-6:eq(0)');   //export 버튼 위치
-	         
-	       let salaryData = null;
 	       
 	       // date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
 	       let date = /*[[${salaryTransferMinMaxDate}]]*/
@@ -231,7 +233,7 @@
 	          
 	          let date = $("#reservation").val().split(' ~ ');
 	          
-	          const table = $("#example1").DataTable({
+	          table = $("#example1").DataTable({
 	             aaSorting: [], // 초기 정렬 비활성화
 	             // 버튼 위치 조절
 	             dom :  "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
@@ -254,6 +256,7 @@
 	                   endDate : date[1]
 	                },
 	                "dataSrc" : function (res) {
+        	 						salaryList = res;
 	                				console.log(res);
 				                	return res;
 				                }
@@ -299,35 +302,44 @@
 		$("#mailSend").on("click", (function() {
             $("#mailSend").prop("disabled", true);
             
-            const selectedRows = [];
-            table.rows().every(function () {
-              const row = this.data();
-              const checkbox = $(this.node()).find(".selectRow");
-              if (checkbox.prop("checked")) {
-                selectedRows.push(row);
-              }
-            });
-
-            if (selectedRows.length === 0) {
-              alert("메일을 전송할 사원을 선택해주세요.");
-              return;
-            }
-  
-         	// 메일 테스트용 임시 데이터
-            //var to = "pbg736837@gmail.com"
-            //var subject = "안녕하세요 itwill 입니다.(급여명세서 이메일 테스트)"
+			const selectedRows = [];
+			$("#example1 tbody tr").each(function () {
+			    const checkbox = $(this).find(".selectRow");
+			    if (checkbox.prop("checked")) {
+			    	
+			    	const payday = $(this).find("td:nth-child(2)").text(); // 귀속연월 열의 값
+			    	const memberId = $(this).find("td:nth-child(3)").text(); // 사원 번호 열의 값
+			    	selectedRows.push({ PAYDAY: payday, MEMBER_ID: memberId }); // 귀속연월과 사원 번호 저장
+			    }
+			});
+			
+			// 만약 선택된 사원이 없으면
+			if (selectedRows.length === 0) {
+			    alert("메일을 전송할 사원을 선택해주세요.");
+			    $("#mailSend").prop("disabled", false);
+			    return;
+			}
+			
+			// salaryList에서 선택된 PAYDAY와 MEMBER_ID 조건에 맞는 데이터 필터링
+			const selectedData = salaryList.filter((row) =>
+			    selectedRows.some((selected) => 
+			    selected.PAYDAY === row.PAYDAY && selected.MEMBER_ID === row.MEMBER_ID)
+			);
+		
+		  	console.log("선택된 데이터:", selectedData);
             
-    		//var token = $("meta[name='_csrf']").attr("content");
-    		//var header = $("meta[name='_csrf_header']").attr("content");
-    		
-			//var salaryList = ${salaryList};
+            if (selectedRows.length === 0) {
+                alert("메일을 전송할 사원을 선택해주세요.");
+                $("#mailSend").prop("disabled", false);
+                return;
+            }
 			
 			$.ajax({
-				url : "/sendEmail",
+				url : "/salary/sendEmail",
 				type : "POST",
 				//dataType : "TEXT",
 			    contentType: "application/json; charset=utf-8",
-			    data: JSON.stringify(selectedRows),
+			    data: JSON.stringify(selectedData),
 				success : function(response) {
 					alert("메일이 성공적으로 전송되었습니다.");
 	                $("#mailSend").prop("disabled", false);
