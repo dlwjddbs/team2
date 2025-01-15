@@ -38,9 +38,26 @@ public class SalaryController {
 	
 	// 사원별 급여조회
 	@GetMapping("/salary/salaryListEmployee")
-	public String salaryInput(Map<String, Object> map, Model model, HttpSession session) {
+	public String salaryInput(@AuthenticationPrincipal User user, Map<String, Object> map, Model model) {
 
-		String id = session.getAttribute("id").toString();
+        if (user == null) {
+            return "redirect:/login"; 
+        }  
+         
+        // 로그인한 유저의 권한 가져오기
+        Collection<GrantedAuthority> authorities = user.getAuthorities();
+        
+		//String id = "admin";
+ 		String id = null;
+         
+        if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("ADMIN 권한입니다.");
+            id = "admin";
+        } else {
+         	log.info("USER 권한입니다.");
+            id = user.getUsername();
+        }
+        
 		Map<String, Object> salaryInputMinMaxDate = salaryService.getSalaryListMinMaxDate(id);
 		
 		if (salaryInputMinMaxDate == null) {
@@ -173,14 +190,14 @@ public class SalaryController {
 
 	// 확정버튼 클릭시 확정상태 변경
 	@PostMapping("/salary/fixedSalary")
+	@ResponseBody
 	public String fixedSalary(@RequestParam Map<String, Object> param, Model model) {
 				
 		log.info("============= fixedSalary =============");
 		log.info(param.toString());
-
 		salaryService.updatefixedSalary(param);
 		
-		return "redirect:/salary/salaryInputList";
+		return "/salary/salaryInputList";
 	}
 	
     // 관리자 급여 정보 (Test)

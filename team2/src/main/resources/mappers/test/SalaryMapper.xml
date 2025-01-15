@@ -44,8 +44,7 @@
             S.YEAREND_BONUS,
             S.FULLSERVICE_BONUS,
             S.PERFORMANCE_BONUS,
-            (M.SALARY + S.POSITION_BONUS + S.HOLIDAY_BONUS + S.NIGHT_BONUS + 
-            S.YEAREND_BONUS + S.FULLSERVICE_BONUS + S.PERFORMANCE_BONUS) AS TOTAL,
+			S.TOTAL,
             S.SALARY_YN            
         FROM MEMBER M
         LEFT JOIN SALARY S
@@ -73,6 +72,7 @@
             S.PAYDAY,
             M.MEMBER_ID,
             M.NAME,
+            M.EMAIL,
             M.BANK_CODE,
             BS.BANK_NAME,
             M.ACCOUNT,
@@ -182,12 +182,12 @@
 	            m.member_id,
 	            m.grade_id,
 	            #{PAYDAY},  
-	            #{POSITION_BONUS}, 
-	            #{HOLIDAY_BONUS},    
-		    	#{NIGHT_BONUS},
-	            #{YEAREND_BONUS},
-	            #{FULLSERVICE_BONUS},
-	            #{PERFORMANCE_BONUS},
+	            NVL(#{POSITION_BONUS}, 0), 
+	            NVL(#{HOLIDAY_BONUS}, 0),    
+		    	NVL(#{NIGHT_BONUS}, 0),
+	            NVL(#{YEAREND_BONUS}, 0),
+	            NVL(#{FULLSERVICE_BONUS}, 0),
+	            NVL(#{PERFORMANCE_BONUS}, 0),
 	            (
 		            NVL(#{POSITION_BONUS}, 0)
 		          + NVL(#{HOLIDAY_BONUS}, 0)
