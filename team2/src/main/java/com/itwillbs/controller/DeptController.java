@@ -26,7 +26,7 @@ public class DeptController {
 	
 	private final DeptService deptService;
 	
-	@GetMapping("/department")
+	@GetMapping("/admin/department")
 	public String dept(@AuthenticationPrincipal User user) {
 //		if (session.getAttribute("id") == null) {
 //            return "redirect:/login"; 

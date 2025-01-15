@@ -31,7 +31,7 @@ public class DeptService {
 			System.out.println(duplicateCnt);
 			if (duplicateCnt == 0) {
 				int resultCnt = deptMapper.insertUpperDept(map);
-				deptMapper.updateAdmin(map);
+				deptMapper.updateInUpperAdmin(map);
 				if (resultCnt > 0) {
 					result = "등록 되었습니다.";
 					resultCode = "1";
@@ -86,7 +86,8 @@ public class DeptService {
 
 		return message;
 	}
-
+	
+	// 상위부서 수정
 	public Map<String, Object> updateUpperDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 
@@ -94,9 +95,12 @@ public class DeptService {
 		String resultCode = "";
 
 		try {
+			deptMapper.updateUpperUser(map);
 			int resultCnt = deptMapper.updateUpperDept(map);
+			deptMapper.updateUpperAdmin(map);
+			
 			if (resultCnt > 0) {
-				result = "수정 되었습니다.";
+				result = "수정이 완료되었습니다.";
 				resultCode = "1";
 			}
 		} catch (Exception e) {
@@ -125,7 +129,7 @@ public class DeptService {
 		int duplicateCnt = deptMapper.isDuplicateLowerDept(map);
 		if (duplicateCnt == 0) {
 			int resultCnt = deptMapper.insertLowerDept(map);
-			deptMapper.updateLowerAdmin(map);
+			deptMapper.updateInLowerAdmin(map);
 			if (resultCnt > 0) {
 				result = "등록 되었습니다.";
 				resultCode = "1";
@@ -173,7 +177,9 @@ public class DeptService {
 		String resultCode = "";
 		
 //		try {
+			deptMapper.updateLowerUser(map);
 			int resultCnt = deptMapper.updateLowerDept(map);
+			deptMapper.updateLowerAdmin(map);
 			if (resultCnt > 0) {
 				result = "수정이 완료되었습니다.";
 				resultCode = "1";

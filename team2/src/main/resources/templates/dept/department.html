@@ -36,11 +36,6 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 
-		<!--		<nav th:replace="~{includes/modals/upperDept :: upperDept}"></nav>-->
-		<!--		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>-->
-		<!--		<nav th:replace="~{includes/modals/modalCommonCode :: modalCommonCode}"></nav>-->
-		<!--		<nav th:replace="~{includes/modals/modalCommonCodeEdit :: modalCommonCodeEdit}"></nav>-->
-
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
@@ -705,7 +700,7 @@
 					alert(res.result);
 
 					if (res.resultCode == 1) {
-						alert("수정이 완료되었습니다.");
+						//alert("수정이 완료되었습니다.");
 						$('#modalUpperDeptEdit').modal('hide');
 						location.reload();
 					}
@@ -808,7 +803,7 @@
 				}
 
 				$("#LOWER_PARENT_ID").val(code);
-				$("#DEPT_ID").val('');
+				$("#DEPT_ID").empty();
 				loadDeptIds();
 				$("#MEMBER_ID").val(''); // 부서장 초기화
 				$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
@@ -928,12 +923,11 @@
 				}
 			});
 		});
-	
-		$("#btnDeleteLower").on('click', function() {
+			$("#btnDeleteLower").on('click', function() {
 					let code = getSelectedRowLower();
 					let table = $("#lowerDept").DataTable();
 					let selectedRowData = table.row({selected: true}).data(); // 선택된 행 데이터 가져오기
-
+					
 					if (code == null) {
 						return;
 					}
@@ -1003,9 +997,11 @@
 									console.log("res", res)
 									$("#PARENT_ID_UPDATE").val(res[0].PARENT_DEPT_ID);
 									$("#LOWER_DEPT_UPDATE").val(res[0].DEPT_ID);
+									$("#LOWER_MEMBER_UPDATE").val(res[0].MEMBER_ID);
+									console.info("MEMBER_ID", res[0].MEMBER_ID);
 									$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
 									// 부서장 목록 로드 및 선택
-									loadLowerDeptMng(res[0].LOWER_MEMBER_UPDATE); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+									loadLowerDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
 								},
 								error: function (e) {
 									console.log("getLowerDept() ajax 실패");

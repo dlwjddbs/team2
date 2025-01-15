@@ -43,29 +43,21 @@
 			, #{USE_YN}
 		)
 	</insert>
-	
-	<update id="updateAdmin">
-	UPDATE MEMBER
-	SET AUTHORITY = 'ADMIN'
-	WHERE MEMBER_ID = #{MEMBER_ID}
-	</update>
-	
+
 	<select id="getCcodeList" resultType="map">
-	SELECT 
-    CODE_ID AS codeId,
-    CODE_NAME AS codeName
-FROM 
-    COMMON_CODE
-WHERE GROUP_ID = 'DEP'
+	SELECT CC.CODE_ID AS codeId, CC.CODE_NAME AS codeName
+FROM COMMON_CODE CC
+LEFT JOIN DEPT D ON CC.CODE_ID = D.DEPT_ID
+WHERE CC.GROUP_ID LIKE 'DEP%' 
+  AND D.DEPT_ID IS NULL
 	</select>
 	
 	<select id="getDepMngList" resultType="map">
-	SELECT 
-    MEMBER_ID AS memberId,
-    NAME AS name
-FROM 
-    MEMBER
-<!-- WHERE AUTHORITY = 'ADMIN' -->
+	SELECT M.MEMBER_ID AS memberId, M.NAME AS name 
+		FROM MEMBER M
+		LEFT JOIN 
+	DEPT D ON M.MEMBER_ID = D.MEMBER_ID
+		WHERE D.MEMBER_ID IS NULL
 	</select>
 	
 	<select id="isExistUpperDeptChild" resultType="Integer">
@@ -90,11 +82,34 @@ FROM
 			   UPDATE_DATE = CURRENT_DATE
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</update>
+			
+	<update id="updateInUpperAdmin">
+	UPDATE MEMBER
+	SET AUTHORITY = 'ADMIN'
+	WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
+	
+	<update id="updateUpperUser">
+    UPDATE MEMBER
+    SET AUTHORITY = 'USER'
+    WHERE MEMBER_ID IN (
+        SELECT MEMBER_ID
+        FROM DEPT
+        WHERE DEPT_ID = #{DEPT_ID}
+    )
+	</update>
+	
+	<update id="updateUpperAdmin">
+    UPDATE MEMBER
+    SET AUTHORITY = 'ADMIN'
+    WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
 	
 	<select id="getLowerDept" resultType="map">
 	<!-- getLowerDept 하위부서 조회 -->
 		SELECT 
 			   d.DEPT_ID 
+			 , d.MEMBER_ID
 			 , d.PARENT_DEPT_ID 
 			 , cc.CODE_NAME AS DEPT_NAME
 			 , d.USE_YN 
@@ -135,12 +150,28 @@ FROM
 		)
 	</insert>
 	
-	<update id="updateLowerAdmin">
+	<update id="updateInLowerAdmin">
 	UPDATE MEMBER
 	SET AUTHORITY = 'ADMIN'
 	WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 	
+	<update id="updateLowerUser">
+    UPDATE MEMBER
+    SET AUTHORITY = 'USER'
+    WHERE MEMBER_ID IN (
+        SELECT MEMBER_ID
+        FROM DEPT
+        WHERE DEPT_ID = #{DEPT_ID}
+    )
+	</update>
+	
+	<update id="updateLowerAdmin">
+    UPDATE MEMBER
+    SET AUTHORITY = 'ADMIN'
+    WHERE MEMBER_ID = #{MEMBER_ID}
+	</update>
+		
 	<delete id="deleteLowerDept">
 	<!-- deleteLowerDept 하위부서 삭제 -->
 		DELETE FROM DEPT
@@ -149,7 +180,7 @@ FROM
 	</delete>
 	
 	<update id="updateLowerDept">
-	<!-- "updateLowerDept" 공통코드 소분류 수정 -->
+	<!-- "updateLowerDept" 하위부서 수정 -->
 		UPDATE DEPT 
 		   SET 
 			   MEMBER_ID = #{MEMBER_ID}

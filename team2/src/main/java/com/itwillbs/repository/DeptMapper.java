@@ -34,7 +34,15 @@ public interface DeptMapper {
 
 	int updateLowerDept(Map<String, Object> map);
 
-	void updateAdmin(Map<String, Object> map);
+	void updateInUpperAdmin(Map<String, Object> map);
+
+	void updateInLowerAdmin(Map<String, Object> map);
+
+	void updateUpperUser(Map<String, Object> map);
+
+	void updateUpperAdmin(Map<String, Object> map);
+
+	void updateLowerUser(Map<String, Object> map);
 
 	void updateLowerAdmin(Map<String, Object> map);
 
