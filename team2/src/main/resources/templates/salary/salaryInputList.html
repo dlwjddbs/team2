@@ -242,7 +242,7 @@
            .container()
            .appendTo('#example1_wrapper .col-md-6:eq(0)');   //export 버튼 위치
            
-           
+           // 확정 버튼
 		   $(document).on('click', '.confirm-salary-btn', function () {
            
 			   	const idx = $(this).data('index');
@@ -277,38 +277,30 @@
            	    
            	}); 
            
+           // 삭제 버튼
 		   $(document).on('click', '.delete-salary-btn', function () {
 			    const memberId = $(this).data('id');
 			    const payday = $(this).data('payday');
+			    const button = $(this);
 
 			    if (confirm(`[${memberId}] 사원의 [${payday}] 급여를 삭제하시겠습니까?`)) {
 			        $.ajax({
-			            url: '/salary/deleteSalary', // 삭제 처리 API URL
+			        	url: '/salary/deleteSalary', // 서버 API URL
 			            type: 'POST',
 			            data: { memberId, payday },
 			            success: function (response) {
-			                if (response) { // 서버 응답의 성공 여부 판단
 			                    alert('급여가 삭제되었습니다.');
+
+			                    // 테이블 행 삭제
 			                    const table = $('#example1').DataTable();
 
-			                    // 테이블에서 삭제할 행의 인덱스를 찾아 제거
-			                    const rowIdx = table.rows().indexes().filter(function (idx) {
-			                        const row = table.row(idx).data();
-			                        return row.MEMBER_ID === memberId && row.PAYDAY === payday;
-			                    })[0];
-
-			                    if (rowIdx !== undefined) {
-			                        table.row(rowIdx).remove().draw(false); // 행 삭제 및 화면 갱신
-			                    }
-			                } else {
-			                    // 실패 메시지 처리
-			                    alert(response.message || '급여 삭제에 실패했습니다. 다시 시도해주세요.');
-			                }
-			            },
-			            error: function (xhr, status, error) {
-			                // 통신 오류 처리
-			                console.error(`Error: ${error}`);
-			                alert('서버와 통신 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+			                    // 현재 버튼이 위치한 행의 인덱스를 찾음
+			                    const row = button.closest('tr');
+			                    table.row(row).remove().draw(false); // 행 삭제 및 테이블 갱신
+			                    
+			            	},
+			            error: function () {
+			                alert('서버와 통신 중 문제가 발생했습니다.');
 			            }
 			        });
 			    }

@@ -167,7 +167,7 @@
 					"dataSrc" : function (abc) {
 						console.log(abc);
 						console.log("abc : " + abc);
-		                return abc;
+						return abc.filter(row => row.SALARY_YN === 'Y');
 		            }
 				},
 				columns : [
@@ -175,8 +175,6 @@
 					{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 					{data: "MEMBER_ID", title: "사원 번호", "defaultContent": ""},
 					{data: "NAME", title: "사원명", "defaultContent": "" },
-					//{data: "GRADE_ID", title: "직급", "defaultContent": "" },
-					//{data: "DEPT_ID", title: "부서", "defaultContent": "" },
 					{data: "GRADE_NAME", title: "직급", "defaultContent": "" },
 					{data: "DEPT_NAME", title: "부서", "defaultContent": "" },
 					{data: "SALARY", title: "기본급", "defaultContent": "" },
