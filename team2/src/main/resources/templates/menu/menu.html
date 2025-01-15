@@ -396,35 +396,33 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("getMenuList() ajax 실패");
+	                console.log("updateMenu() ajax 실패");
 	            }
 	        });
 		});
 		
-		// todo
 		function deleteMenu(menu_id) {
 			if (!confirm("삭제 하시겠습니까?")) {
 				return;
 			}
-			console.log('delete   ' + menu_id);
 			
-// 	 		$.ajax({
-// 	            type : "POST",
-// 	            url : "/system/deleteCommonCodeGroup",
-// 	            data : {
-// 	            	GROUP_ID : code,
-// 				},
-// 	            success : function(res){
-// 	           		alert(res.result);
+	 		$.ajax({
+	            type : "POST",
+	            url : "/system/deleteMenu",
+	            data : {
+	            	MENU_ID : menu_id,
+				},
+	            success : function(res){
+	           		alert(res.result);
 	           		
-// 	            	if (res.resultCode == 1) {
-// 						location.reload();
-// 	            	}
-// 	            },
-// 	            error : function(e){
-// 	                console.log("deleteCommonCodeGroup() ajax 실패");
-// 	            }
-// 	        });
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("deleteMenu() ajax 실패");
+	            }
+	        });
 		}
 		
 		function destroyChild(row) {

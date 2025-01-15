@@ -109,4 +109,9 @@
 			   , USE_YN = #{USE_YN}
 		 WHERE MENU_ID = #{MENU_ID}
     </update>
+    
+    <delete id="deleteMenu">
+    	DELETE FROM MENU
+    	 WHERE MENU_ID = #{MENU_ID}
+    </delete>
 </mapper>
