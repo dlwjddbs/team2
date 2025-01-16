@@ -264,7 +264,7 @@
     	                                    data-id="${row.MEMBER_ID}" 
     	                                    data-payday="${row.PAYDAY}"
     	                                   	data-index="${info.row}"
-   	                                    	style="display: block; margin: 0 auto;">
+   	                                    	style="display: block; margin: 0 auto; width: 60px; height: 40px;">
     	                                 확정
     	                                </button>`;
     	                    }
@@ -279,7 +279,8 @@
     	                        // SALARY_YN이 'N'인 경우에만 삭제 버튼 표시
     	                        return `<button type="button" class="btn btn-outline-danger delete-salary-btn" 
     	                                    data-id="${row.MEMBER_ID}" 
-    	                                    data-payday="${row.PAYDAY}">
+    	                                    data-payday="${row.PAYDAY}"
+   	                                    	style="display: block; margin: 0 auto; width: 60px; height: 40px;">
     	                                 삭제
     	                                </button>`;
     	                    }

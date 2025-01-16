@@ -10,10 +10,13 @@
     SELECT 
         d.DEPT_ID,
         d.MEMBER_ID,
-        cc.CODE_NAME AS DEPT_NAME
-    FROM DEPT d
+        cc.CODE_NAME AS DEPT_NAME,
+        m.NAME AS MEMBER_NAME
+    FROM  DEPARTMENT d
     LEFT JOIN COMMON_CODE cc
         ON d.DEPT_ID = cc.CODE_ID
+    LEFT JOIN MEMBER m
+        ON d.MEMBER_ID = m.MEMBER_ID
         <where>
         <if test="DEPT_ID != null and DEPT_ID != ''">
     AND d.DEPT_ID = #{DEPT_ID}
@@ -25,13 +28,13 @@
 	<select id="isDuplicateUpperDept" resultType="Integer">
 	<!-- isDuplicateUpperDept 상위부서 insert전 중복 확인 -->
 		SELECT COUNT(*)	AS COUNT
-		  FROM DEPT
+		  FROM DEPARTMENT
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</select>
 	
 	<insert id="insertUpperDept">
 	<!-- insertUpperDept 상위부서 등록 -->
-		INSERT INTO DEPT (
+		INSERT INTO DEPARTMENT (
 			  DEPT_ID 
 			, MEMBER_ID
 			, CREATE_DATE
@@ -47,7 +50,7 @@
 	<select id="getCcodeList" resultType="map">
 	SELECT CC.CODE_ID AS codeId, CC.CODE_NAME AS codeName
 FROM COMMON_CODE CC
-LEFT JOIN DEPT D ON CC.CODE_ID = D.DEPT_ID
+LEFT JOIN DEPARTMENT D ON CC.CODE_ID = D.DEPT_ID
 WHERE CC.GROUP_ID LIKE 'DEP%' 
   AND D.DEPT_ID IS NULL
 	</select>
@@ -56,26 +59,26 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 	SELECT M.MEMBER_ID AS memberId, M.NAME AS name 
 		FROM MEMBER M
 		LEFT JOIN 
-	DEPT D ON M.MEMBER_ID = D.MEMBER_ID
+	DEPARTMENT D ON M.MEMBER_ID = D.MEMBER_ID
 		WHERE D.MEMBER_ID IS NULL
 	</select>
 	
 	<select id="isExistUpperDeptChild" resultType="Integer">
 	<!-- isExistUpperDeptChild 상위부서 삭제전 하위 부서 존재 확인 -->
 		SELECT COUNT(*) 
-		  FROM DEPT
+		  FROM DEPARTMENT
 		 WHERE PARENT_DEPT_ID = #{DEPT_ID}
 	</select>
 	
 	<delete id="deleteUpperDept">
 	<!-- "deleteUpperDept" 상위부서 삭제 -->
-		DELETE FROM DEPT
+		DELETE FROM DEPARTMENT
  		 WHERE DEPT_ID = #{DEPT_ID}
 	</delete>
 	
 	<update id="updateUpperDept">
 	<!-- updateUpperDept 상위부서 수정 -->
-		UPDATE DEPT 
+		UPDATE DEPARTMENT 
 		   SET 
 			   MEMBER_ID = #{MEMBER_ID},
 			   USE_YN = #{USE_YN},
@@ -94,7 +97,7 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
     SET AUTHORITY = 'USER'
     WHERE MEMBER_ID IN (
         SELECT MEMBER_ID
-        FROM DEPT
+        FROM DEPARTMENT
         WHERE DEPT_ID = #{DEPT_ID}
     )
 	</update>
@@ -112,10 +115,13 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 			 , d.MEMBER_ID
 			 , d.PARENT_DEPT_ID 
 			 , cc.CODE_NAME AS DEPT_NAME
-			 , d.USE_YN 
-		  FROM DEPT d
+			 , d.USE_YN
+			 , m.NAME AS MEMBER_NAME 
+		  FROM DEPARTMENT d
 		  LEFT JOIN COMMON_CODE CC
 		  	ON d.DEPT_ID = cc.CODE_ID
+		  	LEFT JOIN MEMBER m
+       		 ON d.MEMBER_ID = m.MEMBER_ID
 		 WHERE 
 		 	   1 = 1
 			<if test='DEPT_ID != null and DEPT_ID != ""'>
@@ -129,13 +135,13 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 	<select id="isDuplicateLowerDept" resultType="Integer">
 	<!-- isDuplicateLowerDept 하위부서 insert전 중복 확인 -->
 		SELECT COUNT(*)	AS COUNT
-		  FROM DEPT
+		  FROM DEPARTMENT
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</select>
 	
 	<insert id="insertLowerDept">
 	<!-- insertLowerDept 하위부서 등록 -->
-		INSERT INTO DEPT (
+		INSERT INTO DEPARTMENT (
 			  DEPT_ID
 			, PARENT_DEPT_ID
 			, MEMBER_ID
@@ -161,7 +167,7 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
     SET AUTHORITY = 'USER'
     WHERE MEMBER_ID IN (
         SELECT MEMBER_ID
-        FROM DEPT
+        FROM DEPARTMENT
         WHERE DEPT_ID = #{DEPT_ID}
     )
 	</update>
@@ -174,14 +180,14 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 		
 	<delete id="deleteLowerDept">
 	<!-- deleteLowerDept 하위부서 삭제 -->
-		DELETE FROM DEPT
+		DELETE FROM DEPARTMENT
     WHERE DEPT_ID = #{DEPT_ID}
     AND PARENT_DEPT_ID IS NOT NULL
 	</delete>
 	
 	<update id="updateLowerDept">
 	<!-- "updateLowerDept" 하위부서 수정 -->
-		UPDATE DEPT 
+		UPDATE DEPARTMENT 
 		   SET 
 			   MEMBER_ID = #{MEMBER_ID}
 			 , USE_YN = #{USE_YN}
@@ -196,7 +202,7 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
         d.MEMBER_ID,
         d.USE_YN, 
         m.name AS dept_name      
-    FROM DEPT d 
+    FROM DEPARTMENT d 
 LEFT JOIN MEMBER m
 ON d.MEMBER_ID = m.MEMBER_ID
 	</select>
