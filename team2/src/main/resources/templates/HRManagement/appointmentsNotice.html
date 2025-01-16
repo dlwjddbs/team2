@@ -266,8 +266,9 @@
             $.ajax({
                 url: '/appoint/getAllDepartments',
                 method: 'GET',
-                success: function (data) {
+                success: function (data) {                	
                 	 deptOptions = Array.isArray(data) ? data : [];
+                	console.log("deptOptions:", deptOptions)
                 },
                 error: function (error) {
                     console.error('Error fetching departments:', error);
@@ -350,10 +351,11 @@
                         defaultContent: "",
                         render: function(data, type, row) { 
                         	
-                            const oldDept = deptOptions.find(dept => dept.CODEID === row.OLD_DEPT)?.CODENAME || "없음";
+                            const oldDept = deptOptions.find(dept => dept.DEPTID  === row.OLD_DEPT)?.DEPTNAME || "없음";
 
-                            const newDept = deptOptions.find(dept => dept.CODEID === row.NEW_DEPT)?.CODENAME || "부서 선택";
+                            const newDept = deptOptions.find(dept => dept.DEPTID  === row.NEW_DEPT)?.DEPTNAME || "부서 선택";
 
+          
                             return `
                                 <div class="d-flex">
                                     ${oldDept} <span class="mx-2 align-items-center"> → </span>

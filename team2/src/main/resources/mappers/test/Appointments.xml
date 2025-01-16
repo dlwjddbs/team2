@@ -102,34 +102,37 @@
 	<!-- 조직도 조회 -->
 	<select id="getOrgTree" resultType="map">
 		SELECT
-		d1.DEPT_ID AS deptId, -- 부서/팀 ID
-		c1.CODE_NAME AS deptName, -- 부서/팀 이름 (COMMON_CODE에서 가져옴)
-		c2.CODE_NAME AS parentDeptName, -- 상위 부서 이름
-		e.MEMBER_ID AS memberId, -- 직원 ID
-		e.NAME AS memberName, -- 직원 이름
-		g.CODE_NAME AS gradeName -- 직원 직급
+		d1.DEPT_ID AS deptId, 
+		c1.CODE_NAME AS deptName,
+		c2.CODE_NAME AS parentDeptName, 
+		e.MEMBER_ID AS memberId, 
+		e.NAME AS memberName,
+		g.CODE_NAME AS gradeName,
+		d1.PARENT_DEPT_ID AS parentDeptId, 
+		d1.DEPT_ID AS deptId 
 		FROM
-		DEPARTMENT d1
-		LEFT JOIN
-		COMMON_CODE c1 ON d1.DEPT_ID = c1.CODE_ID AND c1.GROUP_ID = 'DEP' -- 부서/팀 이름 매핑
-		LEFT JOIN
-		DEPARTMENT d2 ON d1.PARENT_DEPT_ID = d2.DEPT_ID -- 상위 부서와 조인
-		LEFT JOIN
-		COMMON_CODE c2 ON d2.DEPT_ID = c2.CODE_ID AND c2.GROUP_ID = 'DEP' -- 상위 부서 이름 매핑
-		LEFT JOIN
-		MEMBER e ON d1.DEPT_ID = e.DEPT_ID -- 직원 정보 조인
-		LEFT JOIN
-		COMMON_CODE g ON e.GRADE_ID = g.CODE_ID AND g.GROUP_ID = 'RANK' -- 직원 직급 매핑
+		MEMBER e
+		LEFT JOIN DEPARTMENT d1
+		ON e.DEPT_ID = d1.DEPT_ID
+		LEFT JOIN COMMON_CODE c1
+		ON d1.DEPT_ID = c1.CODE_ID
+		AND c1.GROUP_ID = 'DEP' 
+		LEFT JOIN DEPARTMENT d2
+		ON d1.PARENT_DEPT_ID = d2.DEPT_ID 
+		LEFT JOIN COMMON_CODE c2
+		ON d2.DEPT_ID = c2.CODE_ID
+		AND c2.GROUP_ID = 'DEP'
+		LEFT JOIN COMMON_CODE g
+		ON e.GRADE_ID = g.CODE_ID
+		AND g.GROUP_ID = 'RANK' 
 		WHERE
-		d1.USE_YN = 'Y' -- 사용 중인 부서만
-		AND (e.USE_YN = 'Y' OR e.USE_YN IS NULL) -- 사용 중인 직원만
+		e.USE_YN = 'Y' 
 		ORDER BY
-		c2.CODE_NAME, -- 상위 부서 이름 정렬
-		c1.CODE_NAME, -- 부서/팀 이름 정렬
-		g.CODE_NAME, -- 직급 정렬
-		e.NAME -- 직원 이름 정렬
+		c2.CODE_NAME,
+		c1.CODE_NAME,
+		g.CODE_NAME,
+		e.NAME
 	</select>
-
 
 
 	<!-- MEMBER_HISTORY에 변경 이력 삽입 -->

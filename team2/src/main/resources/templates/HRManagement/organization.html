@@ -24,7 +24,8 @@
 <!-- Theme style -->
 <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 <!-- jsTree CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -69,12 +70,14 @@
 										<div class="col-4">
 											<div id="orgTree" class="bg-white border rounded"
 												style="height: calc(100vh - 300px); overflow-y: scroll;">
-												
+
 											</div>
 										</div>
 										<div class="col-8">
 											<div id="employeeTree" class="bg-white border rounded p-2"
-												style="height: 300px; overflow-y: scroll;"><!-- 해당 부서 소속 직원  --></div>
+												style="height: 300px; overflow-y: scroll;">
+												<!-- 해당 부서 소속 직원  -->
+											</div>
 										</div>
 									</div>
 								</div>
@@ -105,8 +108,9 @@
 
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
-	 <!-- jsTree JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+	<!-- jsTree JS -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
 	<!-- Bootstrap 4 -->
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- Select2 -->
@@ -135,139 +139,229 @@
 		src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
 	<script
 		src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script>
+$(document).ready(function () {
+    loadOrgTree(); // 페이지 로드 시 조직도 데이터 로드
+});
 
+// 전역 변수 선언
+let groupedData = {}; 
+let ceo = null;  // 사장 정보
 
-    <script>
-        $(document).ready(function () {
-            loadOrgTree(); // 페이지 로드 시 조직도 데이터 로드
-        });
+// 조직도 데이터 로드
+function loadOrgTree() {
+    $.ajax({
+        url: "/appoint/getOrgTree", // 조직도 데이터 API 호출
+        method: "GET",
+        success: function (data) {
+            renderOrgTree(data); // 데이터 로딩 후 조직도 렌더링
+        },
+        error: function (error) {
+            console.error("Error fetching org tree:", error); // 데이터 로딩 실패 시 에러 출력
+        }
+    });
+}
 
-        // 전역 변수 선언
-        let groupedData = {}; 
+// 조직도 렌더링 함수
+function renderOrgTree(data) {
+    const treeContainer = $("#orgTree");
+    treeContainer.empty(); // 기존 내용 삭제
 
-        // 조직도 데이터 로드
-        function loadOrgTree() {
-            $.ajax({
-                url: "/appoint/getOrgTree", // 조직도 데이터 API 호출
-                method: "GET",
-                success: function (data) {
-                    renderOrgTree(data); // 데이터 로딩 후 조직도 렌더링
-                },
-                error: function (error) {
-                    console.error("Error fetching org tree:", error); // 데이터 로딩 실패 시 에러 출력
-                }
-            });
+    groupedData = {};  // groupedData 초기화
+    ceo = null;  
+
+    data.forEach(item => {
+        const department = item.PARENTDEPTNAME || item.DEPTNAME || "기타"; // 부서 정보 처리
+
+        if (item.GRADENAME === "사장") {
+            ceo = {
+                "text": `${item.MEMBERNAME} (${item.GRADENAME})`,
+                "state": { "opened": true },
+                "data-member-id": item.MEMBERID,
+                "data-member-name": item.MEMBERNAME,
+                "children": [] 
+            };
         }
 
-        // 조직도 렌더링 함수
-        function renderOrgTree(data) {
-            const treeContainer = $("#orgTree");
-            treeContainer.empty(); // 기존 내용 삭제
-
-            // 데이터가 비어 있을 경우 처리
-            if (!data || data.length === 0) {
-                treeContainer.append("<p>조직 데이터를 찾을 수 없습니다.</p>");
-                return;
+        if (department !== "기타") {
+            if (!groupedData[department]) {
+                groupedData[department] = { deptName: department, teams: {} };  
             }
 
-            // 데이터를 부서와 팀으로 그룹화
-            groupedData = data.reduce((acc, item) => {
-                const parentDept = item.PARENTDEPTNAME || item.DEPTNAME;
-
-                if (!acc[parentDept]) {
-                    acc[parentDept] = { deptName: parentDept, teams: [] };
-                }
-
-                if (item.PARENTDEPTNAME) {
-                    const existingTeam = acc[parentDept].teams.find(t => t.teamId === item.DEPTID);
-                    if (!existingTeam) {
-                        acc[parentDept].teams.push({
-                            teamName: item.DEPTNAME,
-                            teamId: item.DEPTID,
-                            members: []
-                        });
-                    }
-                }
-                return acc;
-            }, {});
-
-            data.forEach(item => {
-                if (item.MEMBERNAME && item.PARENTDEPTNAME) {
-                    const parentDept = groupedData[item.PARENTDEPTNAME];
-                    const team = parentDept.teams.find(t => t.teamId === item.DEPTID);
-                    if (team) {
-                        team.members.push({
-                            memberName: item.MEMBERNAME,
-                            memberId: item.MEMBERID,
-                            gradeName: item.GRADENAME
-                        });
-                    }
-                }
-            });
-            
-            // jsTree에서 사용될 트리 데이터 포맷으로 변환
-            const treeData = Object.keys(groupedData).map(department => {
-                const departmentNode = {
-                    "text": department,
-                    "children": groupedData[department].teams.map(team => ({
-                        "text": team.teamName,
-                        "data-team-id": team.teamId,
-                        "data-team-name": team.teamName
-                    }))
+            if (item.PARENTDEPTNAME) {
+                const team = item.DEPTNAME || "기타"; 
+                const member = {
+                    "text": `${item.MEMBERNAME} (${item.GRADENAME || '직원'})`,
+                    "state": { "opened": true },
+                    "data-member-id": item.MEMBERID,
+                    "data-member-name": item.MEMBERNAME,
                 };
-                return departmentNode;
-            });
 
-            // jsTree 초기화
-            $('#orgTree').jstree({
-                'core': {
-                    'data': treeData
+                if (!groupedData[department].teams[team]) {
+                    groupedData[department].teams[team] = []; 
                 }
-            });
 
-            // 팀 클릭 이벤트 처리
-            $('#orgTree').on("select_node.jstree", function (e, data) {
-                const teamId = data.node.original['data-team-id'];
-                const teamName = data.node.original['data-team-name'];
-                showEmployeesInTeam(teamId, teamName);
-            });
-        }
-
-        // 팀 소속 직원 목록을 #employeeTree로 표시
-        function showEmployeesInTeam(teamId, teamName) {
-            const employeeTreeContainer = $("#employeeTree");
-            employeeTreeContainer.empty();  // 기존 내용 삭제
-
-            // 조직도에서 해당 팀의 직원 목록 찾기
-            const teamData = findTeamDataById(teamId);
-
-            if (teamData && teamData.members.length > 0) {
-                const employeeListHtml = teamData.members.map(member => `
-                    <div class="employee-item">
-                        <p><strong>${member.memberName}</strong> (${member.gradeName})</p>
-                    </div>
-                `).join('');
-                employeeTreeContainer.html(`${employeeListHtml}`);
-            } else {
-                employeeTreeContainer.html(`<p>이 팀에 소속된 직원이 없습니다.</p>`);
+                groupedData[department].teams[team].push(member); 
             }
         }
+    });
 
-        // 팀 ID로 팀 데이터 찾기
-        function findTeamDataById(teamId) {
-            let foundTeam = null;
+    const treeData = [];
 
-            Object.keys(groupedData).forEach(department => {
-                groupedData[department].teams.forEach(team => {
-                    if (String(team.teamId) === String(teamId)) {
-                        foundTeam = team;
-                    }
+    const companyNode = {
+        "text": "회사", 
+        "state": { "opened": true },
+        "children": [] 
+    };
+    treeData.push(companyNode);
+
+    if (ceo) {
+        const ceoNode = {
+            "text": ceo.text,
+            "state": { "opened": true },
+            "children": [] 
+        };
+        companyNode.children.push(ceoNode);
+
+        Object.keys(groupedData).forEach(department => {
+            if (department !== "기타") {
+                const departmentNode = {
+                    "text": `${department} (${getTotalMembersInDepartment(department)})`,
+                    "state": { "opened": true },
+                    "data-department": department,  // 부서 데이터 추가
+                    "children": []
+                };
+
+                Object.keys(groupedData[department].teams).forEach(team => {
+                    const teamNode = {
+                        "text": `${team} (${groupedData[department].teams[team].length})`,
+                        "state": { "opened": true },
+                        "data-team-id": team, 
+                        "data-team-name": team,
+                        "children": [] 
+                    };
+
+                    departmentNode.children.push(teamNode);  
                 });
-            });
 
-            return foundTeam;
+                ceoNode.children.push(departmentNode);  
+            }
+        });
+    }
+
+    // "기타" 부서가 있을 경우 처리
+    if (groupedData["기타"]) {
+        companyNode.children.push({
+            "text": "기타",
+            "state": { "opened": true },
+            "children": groupedData["기타"].teams["기타"].map(member => ({
+                "text": member.text,
+                "data-member-id": member["data-member-id"],
+                "data-member-name": member["data-member-name"],
+            }))
+        });
+    }
+
+    // jsTree 초기화
+    $('#orgTree').jstree({
+        'core': {
+            'data': treeData
         }
-    </script>
+    });
+
+    // 부서 클릭 이벤트 처리 (부서 클릭 시 해당 부서의 모든 팀원 표시)
+    $('#orgTree').on("select_node.jstree", function (e, data) {
+        const departmentName = data.node.original['data-department'];
+        if (departmentName) {
+            console.log("Department Clicked: ", departmentName);  // 부서 클릭 시 부서명이 제대로 전달되는지 확인
+            showEmployeesInDepartment(departmentName); // 부서를 클릭했을 때 해당 부서의 직원 목록 표시
+        } else if (data.node.original['data-team-id']) {
+            const teamId = data.node.original['data-team-id'];
+            const teamName = data.node.original['data-team-name'];
+            showEmployeesInTeam(teamId, teamName); // 팀 클릭 시 해당 팀원 목록 표시
+        }
+    });
+}
+
+// 부서 소속 직원 목록을 #employeeTree로 표시
+function showEmployeesInDepartment(departmentName) {
+    const employeeTreeContainer = $("#employeeTree");
+    employeeTreeContainer.empty();  // 기존 내용 삭제
+
+    const departmentData = groupedData[departmentName];  // groupedData에서 부서 데이터 찾기
+
+    console.log("Department Data: ", departmentData);  // 부서 데이터가 잘 들어왔는지 확인
+
+    if (departmentData && departmentData.teams) {
+        let employeeListHtml = "";
+        // 부서의 모든 팀을 순회하여 팀원 추가
+        Object.keys(departmentData.teams).forEach(team => {
+            const teamMembers = departmentData.teams[team];
+            if (teamMembers.length > 0) {
+                employeeListHtml += teamMembers.map(member => 
+                    `<div class="employee-item">
+                        <p><strong>${member['data-member-name']}</strong> (${getGrade(member)})</p>
+                    </div>`).join('');
+            } else {
+                employeeListHtml += `<h5>${team} 팀 직원 목록</h5><p>이 팀에 소속된 직원이 없습니다.</p>`;
+            }
+        });
+        employeeTreeContainer.html(employeeListHtml);
+    } else {
+        employeeTreeContainer.html("<p>이 부서에 소속된 직원이 없습니다.</p>");
+    }
+}
+
+// 부서 내 총 인원 수 구하기
+function getTotalMembersInDepartment(departmentName) {
+    const departmentData = groupedData[departmentName];
+    let totalMembers = 0;
+
+    if (departmentData && departmentData.teams) {
+        Object.keys(departmentData.teams).forEach(team => {
+            totalMembers += departmentData.teams[team].length;
+        });
+    }
+
+    return totalMembers;
+}
+
+// 팀 소속 직원 목록을 #employeeTree로 표시
+function showEmployeesInTeam(teamId, teamName) {
+    const employeeTreeContainer = $("#employeeTree");
+    employeeTreeContainer.empty();  // 기존 내용 삭제
+
+    let found = false;
+    // 팀 데이터 찾기
+    Object.keys(groupedData).forEach(departmentName => {
+        const teamData = groupedData[departmentName].teams[teamName];
+        
+        if (teamData) {
+            found = true;
+            const employeeListHtml = teamData.map(member => 
+                `<div class="employee-item">
+                    <p><strong>${member['data-member-name']}</strong> (${getGrade(member)})</p>
+                </div>`).join('');
+            employeeTreeContainer.html(`${employeeListHtml}`);
+        }
+    });
+
+    if (!found) {
+        employeeTreeContainer.html("<p>선택한 팀에 데이터가 없습니다.</p>");
+    }
+}
+
+// 직원의 직급을 반환하는 함수
+function getGrade(member) {
+    if (member && member.state && member.state.text) {
+        // 직급을 괄호에서 추출
+        return member.state.text.split('(')[1].replace(')', '');
+    }
+    return "직원";  // 직급 정보가 없으면 "직원"으로 처리
+}
+</script>
+
+
 	<style>
 .form-control-custom {
 	display: block;
@@ -360,15 +454,16 @@
 	justify-content: end;
 }
 
-.nav-sidebar .menu-open>.nav-treeview{
+.nav-sidebar .menu-open>.nav-treeview {
 	display: block;
 	height: 100% !important;
 }
- #orgTree {
-            width: 100%;
-            height: 400px; /* 높이를 명시적으로 지정 */
-            border: 1px solid #ccc;
-        }
+
+#orgTree {
+	width: 100%;
+	height: 400px; /* 높이를 명시적으로 지정 */
+	border: 1px solid #ccc;
+}
 </style>
 </body>
 </html>
