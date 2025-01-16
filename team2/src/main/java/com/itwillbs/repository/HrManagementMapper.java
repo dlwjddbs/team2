@@ -7,8 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.itwillbs.entity.Member;
-
 @Mapper
 public interface HrManagementMapper {
 	// xml의 id값과 동일한 메서드명 사용 필수

@@ -16,8 +16,12 @@ public class LeaveService {
 	
 	private final LeaveMapper leaveMapper;
 
-	public List<Map<String, Object>> getleaveList() {
-		return leaveMapper.selectLeave();
+	public List<Map<String, Object>> getleaveList(Map<String, Object> map) {
+		return leaveMapper.getLeaveList(map);
+	}
+
+	public List<Map<String, Object>> getleaveHisList(Map<String, Object> map) {
+		return leaveMapper.getLeaveHisList(map);
 	}
 
 
