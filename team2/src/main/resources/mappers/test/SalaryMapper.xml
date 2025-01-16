@@ -209,20 +209,20 @@
 	            m.member_id,
 	            m.grade_id,
 	            #{PAYDAY},  
-	            NVL(#{POSITION_BONUS}, 0), 
-	            NVL(#{HOLIDAY_BONUS}, 0),    
-		    	NVL(#{NIGHT_BONUS}, 0),
-	            NVL(#{YEAREND_BONUS}, 0),
-	            NVL(#{FULLSERVICE_BONUS}, 0),
-	            NVL(#{PERFORMANCE_BONUS}, 0),
-	            (
-		            NVL(#{POSITION_BONUS}, 0)
-		          + NVL(#{HOLIDAY_BONUS}, 0)
-		          + NVL(#{NIGHT_BONUS}, 0)
-		          + NVL(#{YEAREND_BONUS}, 0)
-		          + NVL(#{FULLSERVICE_BONUS}, 0)
-		          + NVL(#{PERFORMANCE_BONUS}, 0)
-		        ) AS TOTAL
+			    NVL(TO_NUMBER(REPLACE(#{POSITION_BONUS}, ',', '')), 0), 
+			    NVL(TO_NUMBER(REPLACE(#{HOLIDAY_BONUS}, ',', '')), 0),    
+			    NVL(TO_NUMBER(REPLACE(#{NIGHT_BONUS}, ',', '')), 0),
+			    NVL(TO_NUMBER(REPLACE(#{YEAREND_BONUS}, ',', '')), 0),
+			    NVL(TO_NUMBER(REPLACE(#{FULLSERVICE_BONUS}, ',', '')), 0),
+			    NVL(TO_NUMBER(REPLACE(#{PERFORMANCE_BONUS}, ',', '')), 0),
+			    (
+			        NVL(TO_NUMBER(REPLACE(#{POSITION_BONUS}, ',', '')), 0)
+			      + NVL(TO_NUMBER(REPLACE(#{HOLIDAY_BONUS}, ',', '')), 0)
+			      + NVL(TO_NUMBER(REPLACE(#{NIGHT_BONUS}, ',', '')), 0)
+			      + NVL(TO_NUMBER(REPLACE(#{YEAREND_BONUS}, ',', '')), 0)
+			      + NVL(TO_NUMBER(REPLACE(#{FULLSERVICE_BONUS}, ',', '')), 0)
+			      + NVL(TO_NUMBER(REPLACE(#{PERFORMANCE_BONUS}, ',', '')), 0)
+			    ) AS TOTAL
 	        FROM 
 	        	member m
 	        WHERE 
