@@ -128,7 +128,7 @@
 												<button type="button" id="checkOutBtn" class="btn btn-block btn-outline-primary">퇴근하기</button>
 											</div>
 										</div>
-										<button type="button" class="btn btn-block btn-outline-primary mt-3">상태변경</button>
+<!-- 										<button type="button" class="btn btn-block btn-outline-primary mt-3">로그아웃</button> -->
 									</div>
 								</div>
 							</div>
@@ -143,7 +143,7 @@
 		<!-- /.content-wrapper -->
 	
 		<!-- 푸터 -->
-		<aside th:replace="~{includes/footer :: footer}"></aside>
+<!-- 		<aside th:replace="~{includes/footer :: footer}"></aside> -->
 	
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
@@ -215,7 +215,7 @@
 		function checkInOutBtnInit() {
 			$.ajax({
 	            type : "POST",
-	            url : "/getMyCommuteHistory",
+	            url : "/attendance/getMyCommuteHistory",
 	            data : {
 					isToday : 'Y'
 				},
@@ -237,7 +237,7 @@
 					}
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
-	                console.log("calendar() ajax 실패");
+	                console.log("checkInOutBtnInit() ajax 실패");
 	            }
 	        });
 		}
@@ -262,7 +262,7 @@
 						
 			$.ajax({
 	            type : "POST",
-	            url : "/insertCheckTime",
+	            url : "/attendance/insertCheckTime",
 	            data : {
 					type : type
 				},
@@ -286,7 +286,7 @@
 		function slider() {
 			$.ajax({
 	            type : "POST",
-	            url : "/getWeekendTotalWorkHour",
+	            url : "/attendance/getWeekendTotalWorkHour",
 	            data : {},
 	            success : function(res){
 					/* ION SLIDER */
@@ -321,7 +321,7 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/getMyCommuteHistory",
+	            url : "/attendance/getMyCommuteHistory",
 	            data : {},
 	            success : function(res){
 					let events = [];
@@ -366,7 +366,7 @@
 		function getUserInfo() {
 			$.ajax({
 	            type : "POST",
-	            url : "/getUserInfo",
+	            url : "/attendance/getUserInfo",
 	            data : {},
 	            success : function(res){
 	            	if (res.length != 0) {
@@ -383,7 +383,7 @@
 	            	}
 	            },
 	            error : function(XMLHttpRequest, textStatus, errorThrown){
-	                console.log("calendar() ajax 실패");
+	                console.log("getUserInfo() ajax 실패");
 	            }
 	        });
 		}

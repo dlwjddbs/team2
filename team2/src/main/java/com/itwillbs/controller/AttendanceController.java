@@ -339,9 +339,9 @@ public class AttendanceController {
 	 * ===================================================================
 	 * */
 	
-	@GetMapping("/myCommuteHistoryCal")
-	public String getMyCommuteHistoryCal(HttpSession session, Model model, Map<String, Object> map) {
-		if (session.getAttribute("id") == null) {
+	@GetMapping("/")
+	public String getMyCommuteHistoryCal(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+		if (user == null) {
             return "redirect:/login"; 
         }
 		
@@ -376,10 +376,10 @@ public class AttendanceController {
 	}
 	*/
 	
-	@PostMapping("/insertCheckTime")
+	@PostMapping("/attendance/insertCheckTime")
 	@ResponseBody
-	public Map<String, Object> insertCheckTime(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public Map<String, Object> insertCheckTime(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		Map<String, Object> message = attendanceService.insertCheckTime(map);
@@ -387,10 +387,10 @@ public class AttendanceController {
 		return message;
 	}
 	
-	@PostMapping("/getWeekendTotalWorkHour")
+	@PostMapping("/attendance/getWeekendTotalWorkHour")
 	@ResponseBody
-	public double getWeekendTotalWorkHour(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public double getWeekendTotalWorkHour(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		double count = attendanceService.getWeekendTotalWorkHour(map);
@@ -398,16 +398,22 @@ public class AttendanceController {
 		return count;
 	}
 	
-	@PostMapping("/getUserInfo")
+	@PostMapping("/attendance/getUserInfo")
 	@ResponseBody
-	public List<Map<String, Object>> getUserInfo(HttpSession session, @RequestParam Map<String, Object> map) {
-		String id = session.getAttribute("id").toString();
+	public List<Map<String, Object>> getUserInfo(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		String id = user.getUsername();
 		map.put("id", id);
 		
 		List<Map<String, Object>> userInfo = attendanceService.getUserInfo(map);
 		
 		return userInfo;
 	}
+
+//	@GetMapping("/attendance/logout")
+//	public String logout(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+//		session.invalidate();
+//		return "redirect:/login";
+//	}
 	
 	/*====================================================================
 	 * 8. 공휴일 달력
@@ -472,11 +478,6 @@ public class AttendanceController {
 		return memberSelectBoxList;
 	}
 	
-	@GetMapping("/logout")
-	public String logout(HttpSession session, Model model, Map<String, Object> map) {
-		session.invalidate();
-		return "redirect:/login";
-	}
 }
 
 

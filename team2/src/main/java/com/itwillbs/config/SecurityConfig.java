@@ -70,7 +70,7 @@ public class SecurityConfig {
 	            System.out.println("로그인 성공!");
 	            System.out.println("사용자 이름: " + authentication.getName());
 	            System.out.println("권한: " + authentication.getAuthorities());
-	            response.sendRedirect("/mypage"); // 로그인 성공 후 이동할 경로
+	            response.sendRedirect("/"); // 로그인 성공 후 이동할 경로
 	        };
 	    }
 
