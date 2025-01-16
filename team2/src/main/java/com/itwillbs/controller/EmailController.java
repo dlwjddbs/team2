@@ -88,15 +88,16 @@ public class EmailController {
 	      .append("님 의 ")
 	      .append(rowData.get("PAYDAY"))
 	      .append("월 급여명세서입니다.</h1>");
-	    sb.append("<p>귀속연월: ").append(rowData.get("PAYDAY")).append("</p>");
-	    sb.append("<p>직책수당: ").append(rowData.get("POSITION_BONUS")).append("</p>");
-	    sb.append("<p>연휴수당: ").append(rowData.get("HOLIDAY_BONUS")).append("</p>");
-	    sb.append("<p>야근수당: ").append(rowData.get("NIGHT_BONUS")).append("</p>");
-	    sb.append("<p>연말수당: ").append(rowData.get("YEAREND_BONUS")).append("</p>");
-	    sb.append("<p>만기근속 포상금: ").append(rowData.get("FULLSERVICE_BONUS")).append("</p>");
-	    sb.append("<p>성과금: ").append(rowData.get("PERFORMANCE_BONUS")).append("</p>");
-	    sb.append("<p>실지급액: ").append(rowData.get("TOTAL")).append("원</p>");
-	    sb.append("<p>예금주명: ").append(rowData.get("ACCOUNT_HOLDER")).append("</p>");
+	    sb.append("<p>귀속연월 : ").append(rowData.get("PAYDAY")).append("월</p>");
+	    sb.append("<p>기본금 : ").append(rowData.get("SALARY")).append("원</p>");
+	    sb.append("<p>직책수당 : ").append(rowData.get("POSITION_BONUS")).append("원</p>");
+	    sb.append("<p>연휴수당 : ").append(rowData.get("HOLIDAY_BONUS")).append("원</p>");
+	    sb.append("<p>야근수당 : ").append(rowData.get("NIGHT_BONUS")).append("원</p>");
+	    sb.append("<p>연말수당 : ").append(rowData.get("YEAREND_BONUS")).append("원</p>");
+	    sb.append("<p>만기근속포상금 : ").append(rowData.get("FULLSERVICE_BONUS")).append("원</p>");
+	    sb.append("<p>성과금 : ").append(rowData.get("PERFORMANCE_BONUS")).append("원</p>");
+	    sb.append("<p>실지급액 : ").append(rowData.get("TOTAL")).append("원</p>");
+	    sb.append("<p>예금주명 : ").append(rowData.get("ACCOUNT_HOLDER")).append("</p>");
 	    sb.append("</body></html>");
 
 	    return sb.toString();

@@ -77,6 +77,7 @@
             BS.BANK_NAME,
             M.ACCOUNT,
             M.ACCOUNT_HOLDER,
+            M.SALARY,
             S.POSITION_BONUS,
             S.HOLIDAY_BONUS,
             S.NIGHT_BONUS,
@@ -102,6 +103,8 @@
 					PAYDAY BETWEEN #{startDate} 
 					AND #{endDate} 
 			</if>
+				AND
+					SALARY_YN = 'Y'
 		ORDER BY
 			S.PAYDAY DESC
     </select>

@@ -140,6 +140,10 @@
               $('#example1 thead th').css('font-size', '15px'); // 원하는 글자 크기 설정
           });
       });
+      
+	  let salaryList;
+	  let table;
+	    
       $(function () {
          // 페이지 첫 로딩 시 테이블 출력
          $("#example1").DataTable({
@@ -159,15 +163,24 @@
             },
             ajax : {
                url : "/salary/salaryTransferList",
-               type :"POST",
+               type : "POST",
                data : {},
-               "dataSrc" : function (abc) {
-                  console.log(abc);
-                  console.log("abc : " + abc);
-                      return abc;
+               "dataSrc" : function (data) {
+            	   		salaryList = data;
+            	   		console.log(data);
+				   		return data;
                   }
             },
             columns: [
+	            {
+	                data: null,
+	                render: function (data, type, row) {
+	                  return '<input type="checkbox" class="selectRow">';
+	                },
+	                orderable: false, // 정렬 비활성화
+	                searchable: false, // 검색 비활성화
+	                title: '<input type="checkbox" id="selectAll">'
+	            },
                 {data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
                 {data: "MEMBER_ID", title: "사원 번호", "defaultContent": ""},
                 {data: "NAME", title: "사원명", "defaultContent": "" },
@@ -182,13 +195,20 @@
     	            render: function (data) {
     	                return `${data.toLocaleString()}원`;
     	            }
-    	        },
-				{data: "SALARY_YN", title: "확정유무", "defaultContent": "" }
+    	        }
             ],
             responsive : true, 
             lengthChange : false, 
             autoWidth : false,
-            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis",
+	            {
+	                text: "메일 전송", // 버튼 텍스트
+	                className: "btn btn-info", // 스타일 클래스 추가
+	                action: function (e, dt, node, config) {
+	                    sendMail(); // 메일 전송 함수 호출
+	                }
+	       		}
+	        ]
          }).buttons()
            .container()
            .appendTo('#example1_wrapper .col-md-6:eq(0)');   //export 버튼 위치
@@ -236,19 +256,30 @@
                      }
                },
                ajax : {
-                  url : "/salary/salaryInputList",
+                  url : "/salary/salaryTransferList",
                   type:"POST",
                   data : {
                      startDate : date[0],               
                      endDate : date[1]
                   },
                   "dataSrc": function (res) {
+                	  	 salaryList = res;
+                	  	 console.log(res);
                          return res;
                      }
                   
                },
                columns : [
                     // DB컬럼명 일치하게 작성
+                    {
+		                data: null,
+		                render: function (data, type, row) {
+		                  return '<input type="checkbox" class="selectRow">';
+		                },
+		                orderable: false, // 정렬 비활성화
+		                searchable: false, // 검색 비활성화
+		                title: '<input type="checkbox" id="selectAll">'
+	            	},
 	                {data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
 	                {data: "MEMBER_ID", title: "사원 번호", "defaultContent": ""},
 	                {data: "NAME", title: "사원명", "defaultContent": "" },
@@ -264,17 +295,82 @@
 	    	                return `${data.toLocaleString()}원`;
 	    	            }
 	    	        },
-					{data: "SALARY_YN", title: "확정유무", "defaultContent": "" }
                ],
                responsive : true, 
                lengthChange : false, 
                autoWidth : false,
-               buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]        
+               buttons : ["copy", "csv", "excel", "pdf", "print", "colvis",
+                   {
+ 	                  text: "메일 전송", // 버튼 텍스트
+ 	                  className: "btn btn-info", // 스타일 클래스 추가
+ 	                  action: function (e, dt, node, config) {
+ 	                      sendMail(); // 메일 전송 함수 호출
+ 	                  }
+              	  }
+               ]     
             }).buttons()
               .container()
               .appendTo('#example1_wrapper .col-md-6:eq(0)');
          });
-      });
+      })
+	    
+	 	// 전체 선택 체크박스 이벤트
+	    $(document).on("change", "#selectAll", function () {
+	      $(".selectRow").prop("checked", this.checked);
+	    });
+      
+	    function sendMail() {
+	        $("#mailSend").prop("disabled", true);
+	        
+	        const selectedRows = [];
+	        $("#example1 tbody tr").each(function () {
+	            const checkbox = $(this).find(".selectRow");
+	            if (checkbox.prop("checked")) {
+	                const payday = $(this).find("td:nth-child(2)").text(); // 귀속연월 열의 값
+	                const memberId = $(this).find("td:nth-child(3)").text(); // 사원 번호 열의 값
+	                selectedRows.push({ PAYDAY: payday, MEMBER_ID: memberId }); // 귀속연월과 사원 번호 저장
+	            }
+	        });
+	        
+	        // 만약 선택된 사원이 없으면
+	        if (selectedRows.length === 0) {
+	            alert("메일을 전송할 사원을 선택해주세요.");
+	            $("#mailSend").prop("disabled", false);
+	            return;
+	        }
+	        
+	        // salaryList에서 선택된 PAYDAY와 MEMBER_ID 조건에 맞는 데이터 필터링
+	        const selectedData = salaryList.filter((row) =>
+	            selectedRows.some((selected) => 
+	            selected.PAYDAY === row.PAYDAY && selected.MEMBER_ID === row.MEMBER_ID)
+	        );
+
+	        console.log("선택된 데이터:", selectedData);
+	        
+	        // 선택된 데이터가 없으면 알림 표시
+	        if (selectedData.length === 0) {
+	            alert("선택한 조건에 해당하는 데이터가 없습니다.");
+	            $("#mailSend").prop("disabled", false);
+	            return;
+	        }   
+	        
+	        $.ajax({
+	            url: "/salary/sendEmail",
+	            type: "POST",
+	            contentType: "application/json; charset=utf-8",
+	            data: JSON.stringify(selectedData),
+	            success: function(response) {
+	                alert("메일이 성공적으로 전송되었습니다.");
+	                $("#mailSend").prop("disabled", false);
+	            },
+	            error: function(xhr, status, error) {
+	                alert("메일 전송에 실패했습니다.");
+	                console.log(error);
+	                console.error(xhr.responseText);
+	                $("#mailSend").prop("disabled", false);
+	            }
+	        });
+	    }
    </script>
 </body>
 </html>
