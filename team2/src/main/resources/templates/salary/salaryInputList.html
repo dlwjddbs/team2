@@ -144,63 +144,116 @@
           });
       });
       $(function () {
-    	    // 페이지 첫 로딩 시 테이블 출력
-    	    $("#example1").DataTable({
-    	        aaSorting: [], // 초기 정렬 비활성화
-    	        // 버튼 위치 조절
-    	        dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-    	           + "<'row'<'col-sm-12'tr>>"
-    	           + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-    	        language: {
-    	            search: "검색",
-    	            paginate: {
-    	                "first": "처음",
-    	                "last": "마지막",
-    	                "next": "다음",
-    	                "previous": "이전"
-    	            }
-    	        },
-    	        ajax: {
-    	            url: "/salary/salaryInputList",
-    	            type: "POST",
-    	            data: {},
-    	            "dataSrc": function (response) {
-    	                console.log(response);
-    	                // SALARY_YN이 Y 또는 N인 데이터만 반환
-    	                return response.filter(row => row.SALARY_YN === 'Y' || row.SALARY_YN === 'N');
-    	            }
-    	        },
-    	        columns: [
-    	            { data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-    	            {
-    	                data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
-    	                render: function (data, type, row) {
-    	                    if (row.SALARY_YN === 'Y') {
-    	                        // 확정된 경우: 링크 제거, 일반 텍스트로 표시
-    	                        return `<span style="display: block; text-align: center;">${data}</span>`;
-    	                    }
-    	                    // 확정되지 않은 경우: 링크 제공
-    	                    return `<a href="#" 
-    	                                id="${data}" 
-    	                                class="edit-link" 
-    	                                data-payday="${row.PAYDAY || null}" 
-    	                                data-id="${data}" 
-    	                                style="text-decoration: underline; font-size: 18px;">
-    	                                ${data}
-    	                            </a>`;
-    	                }
-    	            },
-    	            { data: "NAME", title: "사원명", "defaultContent": "" },
-    	            { data: "GRADE_NAME", title: "직급", "defaultContent": "" },
-    	            { data: "DEPT_NAME", title: "부서", "defaultContent": "" },
-    	            { data: "SALARY", title: "기본급", "defaultContent": "" },
-    	            { data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-    	            { data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-    	            { data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-    	            { data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-    	            { data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-    	            { data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-    	            { data: "TOTAL", title: "실지급액", "defaultContent": "" },
+    	  // 페이지 첫 로딩시 테이블 출력
+	      $("#example1").DataTable({
+	    	    aaSorting: [], // 초기 정렬 비활성화
+	    	    dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
+	    	        + "<'row'<'col-sm-12'tr>>"
+	    	        + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+	    	    language: {
+	    	        search: "검색",
+	    	        paginate: {
+	    	            "first": "처음",
+	    	            "last": "마지막",
+	    	            "next": "다음",
+	    	            "previous": "이전"
+	    	        }
+	    	    },
+	    	    ajax: {
+	    	        url: "/salary/salaryInputList",
+	    	        type: "POST",
+	    	        data: {},
+	    	        "dataSrc": function (response) {
+	    	            return response.filter(row => row.SALARY_YN === 'Y' || row.SALARY_YN === 'N');
+	    	        }
+	    	    },
+	    	    columns: [
+	    	        { data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
+	    	        {
+	    	            data: "MEMBER_ID",
+	    	            title: "사원 번호",
+	    	            "defaultContent": "",
+	    	            render: function (data, type, row) {
+	    	                if (row.SALARY_YN === 'Y') {
+	    	                    return `<span style="display: block; text-align: center;">${data}</span>`;
+	    	                }
+	    	                return `<a href="#" 
+	    	                            id="${data}" 
+	    	                            class="edit-link" 
+	    	                            data-payday="${row.PAYDAY || null}" 
+	    	                            data-id="${data}" 
+	    	                            style="text-decoration: underline; font-size: 18px;">
+	    	                            ${data}
+	    	                        </a>`;
+	    	            }
+	    	        },
+	    	        { data: "NAME", title: "사원명", "defaultContent": "" },
+	    	        { data: "GRADE_NAME", title: "직급", "defaultContent": "" },
+	    	        { data: "DEPT_NAME", title: "부서", "defaultContent": "" },
+	    	        {
+	    	            data: "SALARY",
+	    	            title: "기본급",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "POSITION_BONUS",
+	    	            title: "직책수당",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "HOLIDAY_BONUS",
+	    	            title: "연휴수당",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "NIGHT_BONUS",
+	    	            title: "야근수당",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "YEAREND_BONUS",
+	    	            title: "연말수당",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "FULLSERVICE_BONUS",
+	    	            title: "만기근속자포상",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "PERFORMANCE_BONUS",
+	    	            title: "실적우수자포상",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
+	    	        {
+	    	            data: "TOTAL",
+	    	            title: "실지급액",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
     	            {
     	                data: "SALARY_YN", title: "확정유무", "defaultContent": "",
     	                render: function (data, type, row, info) {

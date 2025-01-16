@@ -161,14 +161,22 @@
 	                    data: "SALARY", 
 	                    title: "기본급", 
 	                    "defaultContent": "",
+// 	                    render: function(data, type, row) {
+// 	                        if (!data) {
+	                            // 데이터가 없으면 빈 문자열 출력
+// 	                            return '';
+// 	                        }
+	                        // 숫자에 콤마 추가하고 '원'을 붙이기
+// 	                        const formattedSalary = new Intl.NumberFormat('ko-KR').format(data);
+// 	                        return `${formattedSalary}원`;
+// 	                    }
 	                    render: function(data, type, row) {
 	                        if (!data) {
 	                            // 데이터가 없으면 빈 문자열 출력
 	                            return '';
 	                        }
 	                        // 숫자에 콤마 추가하고 '원'을 붙이기
-	                        const formattedSalary = new Intl.NumberFormat('ko-KR').format(data);
-	                        return `${formattedSalary}원`;
+	                        return `${data.toLocaleString('ko-KR')}원`;
 	                    }
 	                }
 				],

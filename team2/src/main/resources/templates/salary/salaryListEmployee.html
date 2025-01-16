@@ -38,12 +38,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>급여 등록 현황</h1>
+							<h1>나의 급여 조회</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">급여 등록 현황</li>
+								<li class="breadcrumb-item active">나의 급여 조회</li>
 							</ol>
 						</div>
 					</div>
@@ -177,14 +177,70 @@
 					{data: "NAME", title: "사원명", "defaultContent": "" },
 					{data: "GRADE_NAME", title: "직급", "defaultContent": "" },
 					{data: "DEPT_NAME", title: "부서", "defaultContent": "" },
-					{data: "SALARY", title: "기본급", "defaultContent": "" },
-					{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-					{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-					{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-					{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-					{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-					{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
+			        {
+			            data: "SALARY",
+			            title: "기본급",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "POSITION_BONUS",
+			            title: "직책수당",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "HOLIDAY_BONUS",
+			            title: "연휴수당",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "NIGHT_BONUS",
+			            title: "야근수당",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "YEAREND_BONUS",
+			            title: "연말수당",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "FULLSERVICE_BONUS",
+			            title: "만기근속자포상",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "PERFORMANCE_BONUS",
+			            title: "실적우수자포상",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
+			        {
+			            data: "TOTAL",
+			            title: "실지급액",
+			            "defaultContent": "",
+			            render: function (data) {
+			                return `${data.toLocaleString()}원`;
+			            }
+			        },
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -241,31 +297,84 @@
 							startDate : date[0],					
 							endDate : date[1]
 						},
-						"dataSrc": function (res) {
-			                return res;
+						"dataSrc": function (abc) {
+							console.log(abc)
+							console.log("abc : " + abc);
+			                return abc.filter(row => row.SALARY_YN === 'Y');
 			            }
 						
 					},
 					columns : [
 						// DB컬럼명 일치하게 작성
 						{data: "PAYDAY", title: "귀속연월", "defaultContent": "" },
-						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": "",
-							render: function(data, type, row) {
-								// MEMBER_ID를 클릭 가능한 링크로 설정
-								return `<a href="#" id="${data}" class="edit-link" data-payday="${row.PAYDAY || null}" data-id="${data}">${data}</a>`;
-							}
-						},
+						{data: "MEMBER_ID", title: "사원 번호", "defaultContent": ""},
 						{data: "NAME", title: "사원명", "defaultContent": "" },
 						{data: "GRADE_ID", title: "직급", "defaultContent": "" },
 						{data: "DEPT_ID", title: "부서", "defaultContent": "" },
-						{data: "SALARY", title: "기본급", "defaultContent": "" },
-						{data: "POSITION_BONUS", title: "직책수당", "defaultContent": "" },
-						{data: "HOLIDAY_BONUS", title: "연휴수당", "defaultContent": "" },
-						{data: "NIGHT_BONUS", title: "야근수당", "defaultContent": "" },
-						{data: "YEAREND_BONUS", title: "연말수당", "defaultContent": "" },
-						{data: "FULLSERVICE_BONUS", title: "만기근속자포상", "defaultContent": "" },
-						{data: "PERFORMANCE_BONUS", title: "실적우수자포상", "defaultContent": "" },
-						{data: "TOTAL", title: "실지급액", "defaultContent": "" }
+						{
+				            data: "SALARY",
+				            title: "기본급",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "POSITION_BONUS",
+				            title: "직책수당",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "HOLIDAY_BONUS",
+				            title: "연휴수당",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "NIGHT_BONUS",
+				            title: "야근수당",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "YEAREND_BONUS",
+				            title: "연말수당",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "FULLSERVICE_BONUS",
+				            title: "만기근속자포상",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "PERFORMANCE_BONUS",
+				            title: "실적우수자포상",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        },
+				        {
+				            data: "TOTAL",
+				            title: "실지급액",
+				            "defaultContent": "",
+				            render: function (data) {
+				                return `${data.toLocaleString()}원`;
+				            }
+				        }
 					],
 					responsive : true, 
 					lengthChange : false, 
