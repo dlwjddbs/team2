@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.AttendanceService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -340,7 +341,7 @@ public class AttendanceController {
 	 * */
 	
 	@GetMapping("/")
-	public String getMyCommuteHistoryCal(@AuthenticationPrincipal User user, Model model, Map<String, Object> map) {
+	public String getMyCommuteHistoryCal(@AuthenticationPrincipal User user, HttpServletRequest request, Model model, Map<String, Object> map) {
 		if (user == null) {
             return "redirect:/login"; 
         }

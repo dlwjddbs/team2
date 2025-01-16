@@ -1,12 +1,17 @@
 package com.itwillbs.controller;
 
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.itwillbs.service.MemberService;
 import com.itwillbs.service.TestService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -37,7 +42,20 @@ public class TestController {
 	}
 	
 	@GetMapping("/login")
-	public String login() {
+	public String login(HttpServletRequest request, Model model) {
+        String rememberedUsername = null;
+        
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("rememberedUsername".equals(cookie.getName())) {
+                    rememberedUsername = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        
+        model.addAttribute("rememberedUsername", rememberedUsername);
+		
 		return "login";
 	}
 
@@ -69,10 +87,10 @@ public class TestController {
 		return "modals";
 	}
 
-	@GetMapping("/index")
-	public String index() {
-		return "index";
-	}
+//	@GetMapping("/index")
+//	public String index() {
+//		return "index";
+//	}
 	
 	@GetMapping("/calendar")
 	public String calendar() {

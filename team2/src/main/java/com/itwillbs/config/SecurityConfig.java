@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor //자동으로 객체 생성 하겠다
@@ -57,7 +58,7 @@ public class SecurityConfig {
 				.logout(logoutCustomizer
 						-> logoutCustomizer
 						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-						.logoutSuccessUrl("/")
+						.logoutSuccessUrl("/login")
 						)
 				.userDetailsService(myUserDetailsService)
 				.build();
@@ -67,8 +68,25 @@ public class SecurityConfig {
 	  @Bean
 	    public AuthenticationSuccessHandler authenticationSuccessHandler() {
 	        return (request, response, authentication) -> {
+	        	String username = authentication.getName();
+	        	String remember = request.getParameter("remember");
+	        	
+	            if ("on".equals(remember)) {
+	                Cookie cookie = new Cookie("rememberedUsername", username);
+	                cookie.setPath("/");
+	                cookie.setMaxAge(60 * 60 * 24 * 30);
+	                cookie.setHttpOnly(true);
+	                cookie.setSecure(true);
+	                response.addCookie(cookie);
+	            } else {
+	                Cookie cookie = new Cookie("rememberedUsername", null);
+	                cookie.setPath("/");
+	                cookie.setMaxAge(0);
+	                response.addCookie(cookie);
+	            }
+	        	
 	            System.out.println("로그인 성공!");
-	            System.out.println("사용자 이름: " + authentication.getName());
+	            System.out.println("사용자 이름: " + username);
 	            System.out.println("권한: " + authentication.getAuthorities());
 	            response.sendRedirect("/"); // 로그인 성공 후 이동할 경로
 	        };
