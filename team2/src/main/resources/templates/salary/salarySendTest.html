@@ -38,7 +38,7 @@
             <div class="container-fluid">
                <div class="row mb-2">
                   <div class="col-sm-6">
-                     <h1>급여 이체 현황</h1>
+                     <h1>급여 이체 현황 (Test)</h1>
                   </div>
                   <div class="col-sm-6">
                      <ol class="breadcrumb float-sm-right">
@@ -74,9 +74,9 @@
 				<button type="button" class="btn btn-primary" id="mailSend">
 					메일 전송(Test)
 				</button>
-				<button type="button" class="btn btn-primary" id="smsSend">
-					SMS 전송(미구현)
-				</button>
+<!-- 				<button type="button" class="btn btn-primary" id="smsSend"> -->
+<!-- 					SMS 전송(미구현) -->
+<!-- 				</button> -->
 			</div>
             <div class="container-fluid">
                <div class="row">
@@ -306,7 +306,6 @@
 			$("#example1 tbody tr").each(function () {
 			    const checkbox = $(this).find(".selectRow");
 			    if (checkbox.prop("checked")) {
-			    	
 			    	const payday = $(this).find("td:nth-child(2)").text(); // 귀속연월 열의 값
 			    	const memberId = $(this).find("td:nth-child(3)").text(); // 사원 번호 열의 값
 			    	selectedRows.push({ PAYDAY: payday, MEMBER_ID: memberId }); // 귀속연월과 사원 번호 저장
@@ -328,11 +327,12 @@
 		
 		  	console.log("선택된 데이터:", selectedData);
             
-            if (selectedRows.length === 0) {
-                alert("메일을 전송할 사원을 선택해주세요.");
-                $("#mailSend").prop("disabled", false);
-                return;
-            }
+		    // 선택된 데이터가 없으면 알림 표시
+		    if (selectedData.length === 0) {
+		        alert("선택한 조건에 해당하는 데이터가 없습니다.");
+		        $("#mailSend").prop("disabled", false);
+		        return;
+		    }   
 			
 			$.ajax({
 				url : "/salary/sendEmail",

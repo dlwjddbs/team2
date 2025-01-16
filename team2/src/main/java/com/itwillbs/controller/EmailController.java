@@ -59,18 +59,14 @@ public class EmailController {
 
 		// 메일 내용 생성 및 전송
 	    for (Map<String, Object> rowData : selectedData) {
-	        // 각 데이터의 값 추출
-	        String memberName = (String) rowData.get("NAME"); // 사원명
-	        String email = (String) rowData.get("EMAIL"); // 이메일 주소
-	        String payday = (String) rowData.get("PAYDAY"); // 귀속연월
-	        String totalSalary = String.valueOf(rowData.get("TOTAL")); // 실지급액
-	        String accountHolder = (String) rowData.get("ACCOUNT_HOLDER"); // 예금주명
-
-	        // 이메일 제목과 내용 생성
-	        String subject = String.format("%s월 급여명세서", payday);
-	        String message = generateEmailContent(memberName, payday, totalSalary, accountHolder);
-	        
 	        try {
+		        String email = (String) rowData.get("EMAIL"); // 이메일 주소
+		        String payday = (String) rowData.get("PAYDAY"); // 귀속연월
+	
+		        // 이메일 제목과 내용 생성
+		        String subject = String.format("%s월 급여명세서", payday);
+		        String message = generateEmailContent(rowData);
+		        
 	            // 이메일 전송 서비스 호출
 	            emailService.sendMail(email, subject, message);
 	            
@@ -83,21 +79,26 @@ public class EmailController {
 	}
 	
 	// 메일 내용 생성
-	private String generateEmailContent(String name, String payday, String totalSalary, String accountHolder) {
+	private String generateEmailContent(Map<String, Object> rowData) {
 	    StringBuilder sb = new StringBuilder();
-	    
+
 	    sb.append("<html><head></head><body>");
-	    sb.append("<h1>").append(name).append("님 의 ").append(payday).append("월 급여명세서입니다.</h1>");
-	    sb.append("<p>귀속연월: ").append(payday).append("</p>");
-	    sb.append("<p>직책수당: ").append(payday).append("</p>");
-	    sb.append("<p>연휴수당: ").append(payday).append("</p>");
-	    sb.append("<p>야근수당: ").append(payday).append("</p>");
-	    sb.append("<p>연말수당: ").append(payday).append("</p>");
-	    sb.append("<p>만기근속 포상금: ").append(payday).append("</p>");
-	    sb.append("<p>성과금: ").append(payday).append("</p>");
-	    sb.append("<p>실지급액: ").append(totalSalary).append("원</p>");
-	    sb.append("<p>예금주명: ").append(accountHolder).append("</p>");
+	    sb.append("<h1>")
+	      .append(rowData.get("NAME"))
+	      .append("님 의 ")
+	      .append(rowData.get("PAYDAY"))
+	      .append("월 급여명세서입니다.</h1>");
+	    sb.append("<p>귀속연월: ").append(rowData.get("PAYDAY")).append("</p>");
+	    sb.append("<p>직책수당: ").append(rowData.get("POSITION_BONUS")).append("</p>");
+	    sb.append("<p>연휴수당: ").append(rowData.get("HOLIDAY_BONUS")).append("</p>");
+	    sb.append("<p>야근수당: ").append(rowData.get("NIGHT_BONUS")).append("</p>");
+	    sb.append("<p>연말수당: ").append(rowData.get("YEAREND_BONUS")).append("</p>");
+	    sb.append("<p>만기근속 포상금: ").append(rowData.get("FULLSERVICE_BONUS")).append("</p>");
+	    sb.append("<p>성과금: ").append(rowData.get("PERFORMANCE_BONUS")).append("</p>");
+	    sb.append("<p>실지급액: ").append(rowData.get("TOTAL")).append("원</p>");
+	    sb.append("<p>예금주명: ").append(rowData.get("ACCOUNT_HOLDER")).append("</p>");
 	    sb.append("</body></html>");
+
 	    return sb.toString();
 	}
 

@@ -253,10 +253,15 @@
 				  			console.log("서버 데이터:", nightBonusData);
 				  			
 				  			// 받은 데이터를 각 입력 필드에 설정
-							$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);				// 야간 수당
+				  			// 만약 야간 수당이 나오지 않으면 0으로 설정
+				  			if(nightBonusData.OVERTIME_BONUS != null) {
+			  					$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);
+				  			} else {
+				  				$('#nightBonus').val(0);				
+				  			}
 				  		},
 				  		error: function() {
-				  			alert("야간근무수당을 불러오는 데 실패했습니다.");
+				  			alert("야근수당을 불러오는 데 실패했습니다.");
 				  		}
 				  	});
 				});

@@ -77,6 +77,12 @@
             BS.BANK_NAME,
             M.ACCOUNT,
             M.ACCOUNT_HOLDER,
+            S.POSITION_BONUS,
+            S.HOLIDAY_BONUS,
+            S.NIGHT_BONUS,
+            S.YEAREND_BONUS, 
+            S.FULLSERVICE_BONUS,
+            S.PERFORMANCE_BONUS,
             S.TOTAL,
             S.SALARY_YN            
         FROM MEMBER M

@@ -143,6 +143,7 @@
               $('#example1 thead th').css('font-size', '15px'); // 원하는 글자 크기 설정
           });
       });
+      
       $(function () {
     	  // 페이지 첫 로딩시 테이블 출력
 	      $("#example1").DataTable({
@@ -370,6 +371,7 @@
            });
            
         let salaryData = null;
+        let originalData = null;
         
         function loadModalContent(id, payday) {
               // 서버에서 Modal 콘텐츠를 AJAX로 요청
@@ -397,6 +399,8 @@
                     $('#fullserviceBonus').val(salaryData.FULLSERVICE_BONUS);   // 만기근속자 수당
                     $('#performanceBonus').val(salaryData.PERFORMANCE_BONUS);   // 성과금
                     $('#total').val(salaryData.TOTAL);                     		// 총 급여(실지급액)
+                    
+                    originalData = $("#editSalaryForm").serialize();
                     
                     // 모달 표시
                     $('#modal-lg').modal('show');
@@ -574,7 +578,7 @@
 	                $('#daterange').val(e.format());
 	                const commuteMonth = $(this).val();
 	                
-	                console.log(salaryData);
+	                console.log("salaryData : " + salaryData);
 	                console.log(salaryData.MEMBER_ID);
 	                console.log(commuteMonth);
 
@@ -594,7 +598,13 @@
 				  			console.log("서버 데이터:", nightBonusData);
 				  			
 				  			// 받은 데이터를 각 입력 필드에 설정
-		  					$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);				// 야간 수당
+				  			// 만약 야간 수당이 나오지 않으면 0으로 설정
+				  			if(nightBonusData.OVERTIME_BONUS != null) {
+			  					$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);
+				  			} else {
+				  				$('#nightBonus').val(0);				
+				  			}
+
 				  		},
 				  		error: function() {
 				  			alert("야간근무수당을 불러오는 데 실패했습니다.");
@@ -607,43 +617,38 @@
 // 	                $('#daterange').val(''); // 입력 필드 초기화  
 	            });
 	        });
-
-      });
-
+         
          function isNumberKey(evt) {
-               // 숫자만 입력되도록 제한
-               var charCode = (evt.which) ? evt.which : evt.keyCode;
-               if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                   return false; // 숫자가 아닌 경우 false 반환
-               }
-               return true; // 숫자인 경우 true 반환
-           }
-      
-         $(document).ready(function() {
-             // 금액 입력 필드에만 이벤트를 설정
-             $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
-                 let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
-                 
-                 // 숫자 형식으로 변환
-                 if (value && !isNaN(value)) {
-                     value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
-                 } else if (value) {
-                     alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
-                     $(this).val(''); // 입력 필드 초기화
-                     return; // 추가 처리 방지
-                 }
-                 $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
-             });
-         });
-               
+             // 숫자만 입력되도록 제한
+             var charCode = (evt.which) ? evt.which : evt.keyCode;
+             if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                 return false; // 숫자가 아닌 경우 false 반환
+             }
+             return true; // 숫자인 경우 true 반환
+         }  
+         
          // 급여 수정 버튼을 클릭시 이벤트 발생
          $('#submitBtn').click(function () {
-            //debugger;
+             //debugger;
             
-            //return;
-            
-            var editSalaryForm = $("#editSalaryForm").serialize();
-            console.log(editSalaryForm); 
+             //return;
+             
+         	 if (!originalData) {
+			        alert("초기 데이터가 없습니다. 다시 시도해주세요.");
+			        return;
+			 }
+         	 
+         	 // 급여 수정 모달 폼을 가져와서 직렬화
+             let editSalaryForm = $("#editSalaryForm").serialize();
+             
+             console.log("originalData : " + originalData);
+             console.log("editSalaryForm : " + editSalaryForm);
+  
+             // 수정 여부 확인
+             if (originalData === editSalaryForm) {
+                 alert('수정된 내용이 없습니다.');
+                 return; // 변경 사항이 없으면 요청 중단
+             }
             
              // AJAX로 서버에 데이터 전송
              $.ajax({
@@ -660,8 +665,25 @@
                      alert('급여 수정 실패');
                  }
              });
-         });    
-         
+         }); 
+      });
+      
+      $(document).ready(function() {
+          // 금액 입력 필드에만 이벤트를 설정
+          $('#salary, #position, #holiday, #night, #yearend, #fullservice, #performance').on('input', function() {
+              let value = $(this).val().replace(/,/g, ''); // 기존의 쉼표 제거
+              
+              // 숫자 형식으로 변환
+              if (value && !isNaN(value)) {
+                  value = parseInt(value).toLocaleString(); // 숫자로 변환 후 쉼표 추가
+              } else if (value) {
+                  alert("숫자를 입력해주세요."); // 숫자가 아닌 경우 경고 메시지
+                  $(this).val(''); // 입력 필드 초기화
+                  return; // 추가 처리 방지
+              }
+              $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
+          });
+      });
    </script>
 </body>
 </html>
