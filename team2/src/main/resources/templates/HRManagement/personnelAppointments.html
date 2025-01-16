@@ -313,6 +313,7 @@
 	<script src="../../plugins/select2/js/select2.full.min.js"></script>
 	<!-- InputMask -->
 	<script src="../../plugins/moment/moment.min.js"></script>
+	
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
@@ -344,15 +345,17 @@
     $(document).ready(function () {
         // Select2 초기화
         $('.appointGubun').select2();
+        $('#reservationdate').datetimepicker();
         
-        let defaultDate = moment(); // 오늘 날짜로 moment 객체 생성
+        let defaultDate = moment(); 
+        
         console.log("Initial Default Date (as moment):", defaultDate);
 
         $('#reservationdate').datetimepicker({
             format: 'YYYY-MM-DD',
             locale: 'ko',
-            defaultDate: defaultDate, // moment 객체 전달
-            minDate: moment() // 최소 날짜 설정
+            defaultDate: defaultDate, 
+            minDate: moment() 
         });
 
         // 날짜 범위 선택기 설정 및 테이블 초기 로드
