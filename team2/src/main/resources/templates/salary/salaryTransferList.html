@@ -175,7 +175,14 @@
                 {data: "BANK_NAME", title: "은행명", "defaultContent": "" },
                 {data: "ACCOUNT", title: "계좌번호", "defaultContent": "" },
                 {data: "ACCOUNT_HOLDER", title: "예금주명", "defaultContent": "" },
-				{data: "TOTAL", title: "실지급액", "defaultContent": "" },
+                {
+    	            data: "TOTAL",
+    	            title: "실지급액",
+    	            "defaultContent": "",
+    	            render: function (data) {
+    	                return `${data.toLocaleString()}원`;
+    	            }
+    	        },
 				{data: "SALARY_YN", title: "확정유무", "defaultContent": "" }
             ],
             responsive : true, 
@@ -249,7 +256,14 @@
 	                {data: "BANK_NAME", title: "은행명", "defaultContent": "" },
 	                {data: "ACCOUNT", title: "계좌번호", "defaultContent": "" },
 	                {data: "ACCOUNT_HOLDER", title: "예금주명", "defaultContent": "" },
-					{data: "TOTAL", title: "실지급액", "defaultContent": "" },
+	                {
+	    	            data: "TOTAL",
+	    	            title: "실지급액",
+	    	            "defaultContent": "",
+	    	            render: function (data) {
+	    	                return `${data.toLocaleString()}원`;
+	    	            }
+	    	        },
 					{data: "SALARY_YN", title: "확정유무", "defaultContent": "" }
                ],
                responsive : true, 
