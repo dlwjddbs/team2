@@ -206,7 +206,7 @@
 						$('#name').val(salaryData.NAME);							// 이름
 			  			$('#department').val(salaryData.DEPT_ID);					// 부서 ID
 			  			$('#grade').val(salaryData.GRADE_ID);						// 직급 ID
-						$('#salary').val(salaryData.SALARY);						// 기본급
+			  			$('#salary').val(formatNumberWithComma(salaryData.SALARY)); // 기본급
 						
 						// 모달 표시
 			  			$('#modal-lg').modal('show');
@@ -300,11 +300,13 @@
 			    });
 			});
 			
-		    // 숫자에 콤마를 추가하는 함수
-		    function formatNumber(input) {
-		        let value = input.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
-		        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 3자리마다 콤마 추가
-		    }
+			// 불러온 기본급에 콤마를 추가하는 함수
+			function formatNumberWithComma(value) {
+			    // 숫자형태로 변환 후 콤마 추가
+			    value = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+			    return value;
+			}
+
 
 		    // 숫자만 입력하도록 하는 함수 (필수)
 		    function isNumberKey(event) {
