@@ -38,12 +38,12 @@
 						<div class="col-sm-6">
 							<h1>Calendar</h1>
 						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">Calendar</li>
-							</ol>
-						</div>
+<!-- 						<div class="col-sm-6"> -->
+<!-- 							<ol class="breadcrumb float-sm-right"> -->
+<!-- 								<li class="breadcrumb-item"><a href="#">Home</a></li> -->
+<!-- 								<li class="breadcrumb-item active">Calendar</li> -->
+<!-- 							</ol> -->
+<!-- 						</div> -->
 					</div>
 				</div>
 			</section>
@@ -176,7 +176,8 @@
 		$(function () {
 			calendar();
 			slider();
-// 		    setInterval(updateDateTime, 1000);
+			updateDateTime();
+ 		    setInterval(updateDateTime, 1000 * 60);
 			checkInOutBtnInit();
 			event();
 			getUserInfo();
@@ -280,7 +281,14 @@
 		}
 		
 		function updateDateTime() {
-			$("#currentDateTime").text(new Date().toLocaleString());
+			$("#currentDateTime").text(new Date().toLocaleString('ko-KR', {
+				  year: 'numeric',
+				  month: '2-digit',
+				  day: '2-digit',
+				  hour: '2-digit',
+				  minute: '2-digit',
+				  hour12: false,
+			}));
 	    }
 		
 		function slider() {

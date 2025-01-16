@@ -71,19 +71,16 @@ public class SecurityConfig {
 	        	String username = authentication.getName();
 	        	String remember = request.getParameter("remember");
 	        	
+	        	Cookie cookie = new Cookie("rememberedUsername", username);
+	        	cookie.setPath("/");
 	            if ("on".equals(remember)) {
-	                Cookie cookie = new Cookie("rememberedUsername", username);
-	                cookie.setPath("/");
 	                cookie.setMaxAge(60 * 60 * 24 * 30);
 	                cookie.setHttpOnly(true);
 	                cookie.setSecure(true);
-	                response.addCookie(cookie);
 	            } else {
-	                Cookie cookie = new Cookie("rememberedUsername", null);
-	                cookie.setPath("/");
 	                cookie.setMaxAge(0);
-	                response.addCookie(cookie);
 	            }
+	            response.addCookie(cookie);
 	        	
 	            System.out.println("로그인 성공!");
 	            System.out.println("사용자 이름: " + username);
