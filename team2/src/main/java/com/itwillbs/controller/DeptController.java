@@ -123,5 +123,25 @@ public class DeptController {
 				
 	return message;
 	}
-	 
+	
+	@GetMapping("/departmentList")
+	public String deptList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> deptList = deptService.getDepartmentList(map);
+		// noticeList가 null이면 확인
+	    if (deptList == null) {
+	        System.out.println("deptList is null");
+	    } else {
+	    }
+		return "/dept/departmentList";
+	} 
+	
+	
+	// 상위부서 리스트
+		@PostMapping("getDepartmentList")
+		@ResponseBody
+		public List<Map<String, Object>> getDepartmentList(@RequestParam Map<String, Object> map) {
+			List<Map<String, Object>> departmentList = deptService.getDepartmentList(map);
+			
+			return departmentList;
+		}
 }

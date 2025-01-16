@@ -189,4 +189,15 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</update>
 	
+	<select id="getDepartmentList" resultType="map">
+    SELECT 
+        d.DEPT_ID, 
+        NVL(d.PARENT_DEPT_ID, ' ') AS PARENT_DEPT_ID, 
+        d.MEMBER_ID,
+        d.USE_YN, 
+        m.name AS dept_name      
+    FROM DEPT d 
+LEFT JOIN MEMBER m
+ON d.MEMBER_ID = m.MEMBER_ID
+	</select>
 </mapper>

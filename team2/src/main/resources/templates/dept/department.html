@@ -411,11 +411,13 @@
 		function getSelectedRowLower() {
 			if (!$.fn.dataTable.isDataTable("#lowerDept")) {
 				alert("상위부서를 선택하세요.");
+				$("#lowerDept").DataTable(); // 선택 상태 초기화
 
 				return;
 			}
 
 			let table = $('#lowerDept').DataTable();
+			let selectedData = table.rows('.selected').data();
 			if (table.row('.selected').length == 0) {
 				alert("하위부서를 선택하세요.");
 
@@ -736,11 +738,11 @@
 		});
 
 
-
 		function lowerDeptDataTable(code) {
 			// 기존 테이블 삭제
 			if ($.fn.dataTable.isDataTable("#lowerDept")) {
 				$("#lowerDept").DataTable().destroy();
+				$("#lowerDept").empty(); // 기존 내용을 비웁니다.
 			}
 
 			let table = $("#lowerDept").DataTable({
@@ -792,8 +794,6 @@
 		}
 
 
-
-
 		//하위부서 조회
 		$(document).ready(function () {
 			$("#btnAddLower").on("click", function () {
@@ -815,9 +815,9 @@
 					type: "GET",
 					url: "/getCommonCodeIds",
 					//추가해야 하는 부분
-									beforeSend: function (xhr) {
-										xhr.setRequestHeader(header, token);
-									},
+					beforeSend: function (xhr) {
+					xhr.setRequestHeader(header, token);
+					},
 					success: function (data) {
 						let selectBox = $("#DEPT_ID");
 						data.forEach(function (item) {
@@ -857,23 +857,6 @@
 				});
 			}
 		});
-
-// 		// 하위부서 등록
-// 		$("#btnAddLower").on("click", function () {
-// 			let code = getSelectedRowLower();
-// 			if (code == null) {
-// 				alert("상위부서를 선택하세요");
-// 				return;
-// 			}
-
-// 			$("#LOWER_PARENT_ID").val(code);
-// 			$("#DEPT_ID").val('');
-			
-// 			$("#MEMBER_ID_LOWER").val('');
-// 			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
-
-// 			$('#modalLowerDept').modal();
-// 		});
 
 		$("#lowerDeptSave").on('click', function () {
 			let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
@@ -959,12 +942,6 @@
 			        });
 				});
 		
-				
-				
-				
-				
-				
-				
 				
 				//하위부서 수정 값 조회
 						$("#btnUpdateLower").on('click', function (e) {
@@ -1081,12 +1058,5 @@
 								}
 							});
 						});
-				
-				
-				
-
-
-
-
 
 	</script>

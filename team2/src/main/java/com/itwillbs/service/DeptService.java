@@ -195,4 +195,8 @@ public class DeptService {
 		
 		return message;
 	}
+
+	public List<Map<String, Object>> getDepartmentList(Map<String, Object> map) {
+		return deptMapper.getDepartmentList(map);
+	}
 }

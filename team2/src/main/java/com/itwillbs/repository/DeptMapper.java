@@ -46,4 +46,6 @@ public interface DeptMapper {
 
 	void updateLowerAdmin(Map<String, Object> map);
 
+	List<Map<String, Object>> getDepartmentList(Map<String, Object> map);
+
 }
