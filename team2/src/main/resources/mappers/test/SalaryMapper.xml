@@ -216,7 +216,8 @@
 			    NVL(TO_NUMBER(REPLACE(#{FULLSERVICE_BONUS}, ',', '')), 0),
 			    NVL(TO_NUMBER(REPLACE(#{PERFORMANCE_BONUS}, ',', '')), 0),
 			    (
-			        NVL(TO_NUMBER(REPLACE(#{POSITION_BONUS}, ',', '')), 0)
+					m.salary
+			      + NVL(TO_NUMBER(REPLACE(#{POSITION_BONUS}, ',', '')), 0)
 			      + NVL(TO_NUMBER(REPLACE(#{HOLIDAY_BONUS}, ',', '')), 0)
 			      + NVL(TO_NUMBER(REPLACE(#{NIGHT_BONUS}, ',', '')), 0)
 			      + NVL(TO_NUMBER(REPLACE(#{YEAREND_BONUS}, ',', '')), 0)
