@@ -161,15 +161,6 @@
 	                    data: "SALARY", 
 	                    title: "기본급", 
 	                    "defaultContent": "",
-// 	                    render: function(data, type, row) {
-// 	                        if (!data) {
-	                            // 데이터가 없으면 빈 문자열 출력
-// 	                            return '';
-// 	                        }
-	                        // 숫자에 콤마 추가하고 '원'을 붙이기
-// 	                        const formattedSalary = new Intl.NumberFormat('ko-KR').format(data);
-// 	                        return `${formattedSalary}원`;
-// 	                    }
 	                    render: function(data, type, row) {
 	                        if (!data) {
 	                            // 데이터가 없으면 빈 문자열 출력
@@ -303,6 +294,18 @@
 			        $(this).val(value); // 변환된 값을 다시 입력 필드에 설정
 			    });
 			});
+			
+		    // 숫자에 콤마를 추가하는 함수
+		    function formatNumber(input) {
+		        let value = input.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
+		        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 3자리마다 콤마 추가
+		    }
+
+		    // 숫자만 입력하도록 하는 함수 (필수)
+		    function isNumberKey(event) {
+		        const charCode = event.charCode;
+		        return (charCode >= 48 && charCode <= 57) || charCode === 8 || charCode === 9;
+		    }
 					
 			// 급여 등록 버튼을 클릭시 이벤트 발생
 			$('#submitBtn2').click(function () {    
