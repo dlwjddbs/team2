@@ -107,6 +107,9 @@
 		c2.CODE_NAME AS parentDeptName, 
 		e.MEMBER_ID AS memberId, 
 		e.NAME AS memberName,
+		e.EMAIL AS email,
+		e.PHONE AS phone,
+		e.PROFILE_PIC AS profile,
 		g.CODE_NAME AS gradeName,
 		d1.PARENT_DEPT_ID AS parentDeptId, 
 		d1.DEPT_ID AS deptId 

@@ -156,7 +156,8 @@
 											<!-- 발령부서, 발령직급 -->
 											<div class="row my-3">
 												<div class="col-sm">
-													<label class="col-form-label mr-3">발령부서 :</label> <select
+													<label class="col-form-label mr-3">발령부서 :</label> 
+													<select
 														class="appointGubun" id="deptSelectBox" name="deptGubun"
 														style="min-width: 120px">
 														<option selected="selected" disabled>부서를 선택하세요</option>
@@ -349,7 +350,6 @@
         
         let defaultDate = moment(); 
         
-        console.log("Initial Default Date (as moment):", defaultDate);
 
         $('#reservationdate').datetimepicker({
             format: 'YYYY-MM-DD',
@@ -452,7 +452,15 @@
 
 			        const groupedOptions = groupedDeptOptions(data);
 			        selectBox.append(groupedOptions);
-			        console.log("부서 옵션:", selectBox.html());
+			       
+					 //console.log("부서 옵션:", selectBox.html());
+					 
+					 // 부서 목록을 deptMapping 객체로 변환
+			        data.forEach(department => {
+			            deptMapping[department.DEPTNAME.trim()] = department.DEPTID; // DEPTNAME을 키로, DEPTID를 값으로 매핑
+			        });
+
+			        console.log("deptMapping:", deptMapping);  // deptMapping 객체 확인
 					deptOptions = Array.isArray(data) ? data : [];
 			    },
 			    error: function (error) {
@@ -576,36 +584,36 @@
                         }                    
                     },
 					{
-					                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
-					                        title: "부서",
-					                        defaultContent: "",
-					                        render: function (data, type, row) {
-					                            // 이전 부서 (읽기 전용)
-					                            const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
+                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
+                        title: "부서",
+                        defaultContent: "",
+                        render: function (data, type, row) {
+                            // 이전 부서 (읽기 전용)
+                            const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
 
-					                            // 새로운 부서 (선택 가능)
-					                            const currentDeptSelect = `
-					                                <select class="form-control-custom2 current-dept" disabled>
-					                                    <option selected>${oldDept}</option>
-					                                </select>
-					                            `;
+                            // 새로운 부서 (선택 가능)
+                            const currentDeptSelect = `
+                                <select class="form-control-custom2 current-dept" disabled>
+                                    <option selected>${oldDept}</option>
+                                </select>
+                            `;
 
-					                            const newDeptSelect = `
-					                                <select class="form-control-custom new-dept">
-					                                    <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
-					                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
-					                                </select>
-					                            `;
+                            const newDeptSelect = `
+                                <select class="form-control-custom new-dept">
+                                    <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
+                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
+                                </select>
+                            `;
 
-					                            // 렌더링 결과 반환
-					                            return `
-					                                <div class="d-flex">
-					                                    ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
-					                                    ${newDeptSelect}
-					                                </div>
-					                            `;
-					                        }
-					                    },
+                            // 렌더링 결과 반환
+                            return `
+                                <div class="d-flex">
+                                    ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
+                                    ${newDeptSelect}
+                                </div>
+                            `;
+                        }
+                    },
                     {
                         data: "ETC",
                         title: "비고",
@@ -642,37 +650,47 @@
         
     }
 
-    function groupedDeptOptions(deptOptions, selectedDeptId) {
-		
-		if (!Array.isArray(deptOptions) || deptOptions.length === 0) {
-		       console.warn("Invalid or empty deptOptions:", deptOptions);
-		       return ""; // 빈 옵션 반환
-		   }
-				
-        // 부서 데이터를 그룹화
-        const groupedData = deptOptions.reduce((acc, dept) => {
-            const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
-            if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
-            acc[parentDept].push(dept); // 그룹에 데이터 추가
-            return acc;				
-        }, {});
-			console.log("Grouped Data:", groupedData);
+	function groupedDeptOptions(deptOptions, selectedDeptId) {
+	    if (!Array.isArray(deptOptions) || deptOptions.length === 0) {
+	        console.warn("Invalid or empty deptOptions:", deptOptions);
+	        return ""; // 빈 옵션 반환
+	    }
 
-        // 그룹화된 데이터를 HTML로 변환
-        return Object.keys(groupedData).map(parent => {
-            return `
-                <optgroup label="${parent}">
-                    ${groupedData[parent]
-                    .filter(dept => dept.PARENTDEPTNAME != null)                    
-                    .map(dept => `<option value="${dept.DEPTID}" ${dept.DEPTID === selectedDeptId ? "selected" : ""}>
-                            ${dept.DEPTNAME}
-                        </option>
-                    	
-                    `).join('')}
-                </optgroup>
-            `;
-        }).join('');
-    }
+	    // 부서 데이터를 그룹화
+	    const groupedData = deptOptions.reduce((acc, dept) => {
+	        const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
+	        if (!parentDept) return acc; // null, undefined는 그룹화에서 제외
+
+	        if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
+	        acc[parentDept].push(dept); // 그룹에 데이터 추가
+	        return acc;
+	    }, {});
+
+	    //console.log("Grouped Data:", groupedData); // groupedData 출력
+
+	    const parentKeys = Object.keys(groupedData).slice(0, 3); // 최대 3개의 상위 부서만 가져옴
+
+	    const html = parentKeys
+	        .map(parent => {
+	            const childDepts = groupedData[parent].filter(dept => dept.PARENTDEPTNAME); // 하위 부서만 필터링
+
+	            return `
+	                <optgroup label="${parent}" class="parent-dept" data-parent="${parent}">
+	                    ${childDepts
+	                        .map(dept => {
+	                            const isSelected = dept.DEPTID === selectedDeptId ? "selected" : ""; // 선택된 부서 검사
+	                            return `<option value="${dept.DEPTID}" ${isSelected} data-dept-info='${JSON.stringify(dept)}'>
+	                                ${dept.DEPTNAME}
+	                            </option>`;
+	                        }).join('')}
+	                </optgroup>
+	            `;
+	        }).join('');
+
+	    //console.log("Generated HTML:", html);
+
+	    return html;
+	}
 
 
     $("#appointments").on("change", "#checkAll", function () {
@@ -701,83 +719,87 @@
     }
 
     // 조직도 렌더링
-    function renderOrgTree(data) {
-        const treeContainer = $("#orgTree");
-        treeContainer.empty();
+	function renderOrgTree(data) {
+	    const treeContainer = $("#orgTree");
+	    treeContainer.empty(); // 기존 트리 초기화
 
-        // 데이터를 부서와 팀으로 그룹화
-        const groupedData = data.reduce((acc, item) => {
-            const parentDept = item.PARENTDEPTNAME || item.DEPTNAME;
+	    // 데이터를 부서와 팀으로 그룹화
+	    const groupedData = data.reduce((acc, item) => {
+	        const parentDept = item.PARENTDEPTNAME || item.DEPTNAME;
 
-            if (!acc[parentDept]) {
-                acc[parentDept] = {
-                    deptName: parentDept,
-                    teams: []
-                };
-            }
+	        // parentDept가 null 또는 undefined인 경우를 필터링
+	        if (!parentDept) return acc;
 
-            if (item.PARENTDEPTNAME) {
-                const existingTeam = acc[parentDept].teams.find(t => t.teamId === item.DEPTID);
-                if (!existingTeam) {
-                    acc[parentDept].teams.push({
-                        teamName: item.DEPTNAME,
-                        teamId: item.DEPTID,
-                        members: []
-                    });
-                }
-            }
-            return acc;
-        }, {});
+	        if (!acc[parentDept]) {
+	            acc[parentDept] = {
+	                deptName: parentDept,
+	                teams: []
+	            };
+	        }
 
-        data.forEach(item => {
-            if (item.MEMBERNAME && item.PARENTDEPTNAME) {
-                const parentDept = groupedData[item.PARENTDEPTNAME];
-                const team = parentDept.teams.find(t => t.teamId === item.DEPTID);
-                if (team) {
-                    team.members.push({
-                        memberName: item.MEMBERNAME,
-                        memberId: item.MEMBERID,
-                        gradeName: item.GRADENAME
-                    });
-                }
-            }
-        });
+	        if (item.PARENTDEPTNAME) {
+	            const existingTeam = acc[parentDept].teams.find(t => t.teamId === item.DEPTID);
+	            if (!existingTeam) {
+	                acc[parentDept].teams.push({
+	                    teamName: item.DEPTNAME,
+	                    teamId: item.DEPTID,
+	                    members: []
+	                });
+	            }
+	        }
+	        return acc;
+	    }, {});
 
-        Object.keys(groupedData).forEach(parentDeptName => {
-            const parentDept = groupedData[parentDeptName];
-            const deptHtml = `
-                <li class="nav-item">
-                    <a class="nav-link text-reset rounded-0" href="#" data-dept-id="${parentDeptName}">
-                        <div class="mdi mdi-folder-account"></div>
-                        <p style="font-size: 0.95rem; font-weight: bold;">${parentDept.deptName}</p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        ${parentDept.teams.map(team => `
-                            <li class="nav-item">
-                                <a class="nav-link text-reset rounded-0" href="#" data-team-id="${team.teamId}" data-team-name="${team.teamName}">
-                                    <div class="mdi mdi-folder-star"></div>
-                                    <p style="font-size: 0.88rem; font-weight: bold;">${team.teamName}</p>
-                                </a>
-                                ${team.members.length > 0 ? `
-                                <ul class="nav nav-treeview">
-                                    ${team.members.map(member => `
-                                        <li class="nav-item">
-                                            <a class="nav-link text-reset rounded-0 employeeNav" href="#" 
-                                               data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
-                                               data-grade-name="${member.gradeName}" data-team-name="${team.teamName}">
-                                               <div class="mdi mdi-account ml-2"></div>
-                                                <p style="font-size: 0.8rem; font-weight: bold;">${member.memberName} <span class="text-gray" style="font-size: 0.7rem;">(${member.gradeName})</span></p>
-                                            </a>
-                                        </li>
-                                    `).join('')}
-                                </ul>` : ''}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </li>
-            `;
-            treeContainer.append(deptHtml);
-        });
+	    data.forEach(item => {
+	        if (item.MEMBERNAME && item.PARENTDEPTNAME) {
+	            const parentDept = groupedData[item.PARENTDEPTNAME];
+	            const team = parentDept.teams.find(t => t.teamId === item.DEPTID);
+	            if (team) {
+	                team.members.push({
+	                    memberName: item.MEMBERNAME,
+	                    memberId: item.MEMBERID,
+	                    gradeName: item.GRADENAME
+	                });
+	            }
+	        }
+	    });
+
+	    // 그룹화된 데이터를 UI로 렌더링
+	    Object.keys(groupedData).forEach(parentDeptName => {
+	        const parentDept = groupedData[parentDeptName];
+	        const deptHtml = `
+	            <li class="nav-item">
+	                <a class="nav-link text-reset rounded-0" href="#" data-dept-id="${parentDeptName}">
+	                    <div class="mdi mdi-folder-account"></div>
+	                    <p style="font-size: 0.95rem; font-weight: bold;">${parentDept.deptName}</p>
+	                </a>
+	                <ul class="nav nav-treeview">
+	                    ${parentDept.teams.map(team => `
+	                        <li class="nav-item">
+	                            <a class="nav-link text-reset rounded-0" href="#" data-team-id="${team.teamId}" data-team-name="${team.teamName}">
+	                                <div class="mdi mdi-folder-star"></div>
+	                                <p style="font-size: 0.88rem; font-weight: bold;">${team.teamName}</p>
+	                            </a>
+	                            ${team.members.length > 0 ? `
+	                            <ul class="nav nav-treeview">
+	                                ${team.members.map(member => `
+	                                    <li class="nav-item">
+	                                        <a class="nav-link text-reset rounded-0 employeeNav" href="#" 
+	                                           data-member-id="${member.memberId}" data-member-name="${member.memberName}" 
+	                                           data-grade-name="${member.gradeName}" data-team-name="${team.teamName}">
+	                                           <div class="mdi mdi-account ml-2"></div>
+	                                            <p style="font-size: 0.8rem; font-weight: bold;">${member.memberName} <span class="text-gray" style="font-size: 0.7rem;">(${member.gradeName})</span></p>
+	                                        </a>
+	                                    </li>
+	                                `).join('')}
+	                            </ul>` : ''}
+	                        </li>
+	                    `).join('')}
+	                </ul>
+	            </li>
+	        `;
+	        treeContainer.append(deptHtml);
+	    });
 
        $(document).on("click", ".employeeNav", function (e) {
     	   e.preventDefault();
@@ -802,21 +824,30 @@
 
 		 
         $("#confirmBtn").on("click", function () {
+			const changeDate = $("#reservationdate input").val(); // 예: "01/08/2025 12:49 AM"
+			console.log("changeDate", changeDate)
+			const formattedDate = moment(changeDate, "MM/DD/YYYY hh:mm A").format("YYYY-MM-DD");
+			
             const selectedData = {
-                MEMBER_ID: $("#memberId").text().trim(),
-                MEMBER_NAME: $("#memberName").text().trim(),
-                OLD_DEPT: deptMapping[$("#oldDept").text().trim()],
-                OLD_DEPT_NAME: $("#oldDept").text().trim(),
-                OLD_GRADE: gradeMapping[$("#oldGrade").text().trim()],
-                OLD_GRADE_NAME: $("#oldGrade").text().trim(),
-                ASSIGNMENT_TYPE: $("#appointGubun").val(),
-                CHANGE_DATE: $("#reservationdate input").val(),
-                NEW_DEPT_NAME: $("#deptSelectBox option:selected").text(),
-                NEW_DEPT: deptMapping[$("#deptSelectBox option:selected").text()],
-                NEW_GRADE_NAME: $("#rankSelectBox option:selected").text(),
-                NEW_GRADE: gradeMapping[$("#rankSelectBox option:selected").text()],
-                ETC: $("input[name='etc']").val()
+				MEMBER_ID: $("#memberId").text().trim(),
+				MEMBER_NAME: $("#memberName").text().trim(),
+				OLD_DEPT_NAME: $("#oldDept").text().trim(),
+				OLD_DEPT: deptMapping[$("#oldDept").text().trim()],
+				OLD_GRADE: gradeMapping[$("#oldGrade").text().trim()],
+				OLD_GRADE_NAME: $("#oldGrade").text().trim(),
+				ASSIGNMENT_TYPE: $("#appointGubun").val(),
+				CHANGE_DATE: formattedDate,
+				NEW_DEPT_NAME: $("#deptSelectBox option:selected").text().trim(),
+				NEW_DEPT: deptMapping[ $("#deptSelectBox option:selected").text().trim()],
+				NEW_GRADE_NAME: $("#rankSelectBox option:selected").text(),
+				NEW_GRADE: gradeMapping[$("#rankSelectBox option:selected").text()],
+				ETC: $("input[name='etc']").val()
             };
+			
+			console.log("Selected Data:", selectedData);
+			console.log("Selected Department Code:", selectedData.OLD_DEPT);
+			console.log("Selected Department Code:", selectedData.NEW_DEPT);
+		
 
             if (selectedData.ASSIGNMENT_TYPE === '퇴사') {
                 if (!selectedData.CHANGE_DATE) {
