@@ -411,8 +411,7 @@
 		function getSelectedRowLower() {
 			if (!$.fn.dataTable.isDataTable("#lowerDept")) {
 				alert("상위부서를 선택하세요.");
-				$("#lowerDept").DataTable(); // 선택 상태 초기화
-
+// 				$("#lowerDept").DataTable(); // 선택 상태 초기화
 				return;
 			}
 
@@ -464,7 +463,8 @@
 				},
 				columns: [
 					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
-					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""}
+					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""},
+					{data: "MEMBER_NAME", title: "부서장", "defaultContent": ""},
 				],
 				responsive: true,
 				lengthChange: false,
@@ -737,7 +737,8 @@
 			}, 10);
 		});
 
-
+	
+		//하위부서 리스트
 		function lowerDeptDataTable(code) {
 			// 기존 테이블 삭제
 			if ($.fn.dataTable.isDataTable("#lowerDept")) {
@@ -784,6 +785,7 @@
 				columns: [
 					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
 					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""},
+					{data: "MEMBER_NAME", title: "부서장", "defaultContent": ""},
 					{data: "USE_YN", title: "사용여부", "defaultContent": ""}
 				],
 
@@ -857,7 +859,8 @@
 				});
 			}
 		});
-
+		
+		//하위부서 등록
 		$("#lowerDeptSave").on('click', function () {
 			let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
 			let DEPT_ID = $("#DEPT_ID").val();
@@ -906,14 +909,16 @@
 				}
 			});
 		});
+		
+			//하위부서 삭제
 			$("#btnDeleteLower").on('click', function() {
 					let code = getSelectedRowLower();
-					let table = $("#lowerDept").DataTable();
-					let selectedRowData = table.row({selected: true}).data(); // 선택된 행 데이터 가져오기
-					
 					if (code == null) {
 						return;
 					}
+					let table = $("#lowerDept").DataTable();
+					let selectedRowData = table.row({selected: true}).data(); // 선택된 행 데이터 가져오기
+					
 					
 					if (!confirm("삭제 하시겠습니까?")) {
 						return;
@@ -944,13 +949,16 @@
 		
 				
 				//하위부서 수정 값 조회
-						$("#btnUpdateLower").on('click', function (e) {
+						$("#btnUpdateLower").on('click', function () {
 							let code = getSelectedRowLower();
-							let table = $("#lowerDept").DataTable();
-							let selectedRowData = table.row({selected: true}).data();
+							
 							if (code == null) {
 								return;
 							}
+							
+							let table = $("#lowerDept").DataTable();
+							let selectedRowData = table.row({selected: true}).data();
+							
 							
 							 console.log("Selected DEPT_ID:", code); // 전달되는 DEPT_ID 확인
 							
