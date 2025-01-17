@@ -42,11 +42,6 @@ public class NoticeService {
 	public void deleteNotice(Map<String, Object> map) {
 		noticeMapper.deleteNotice(map);
 	}
-
-	
-
-	
-	 
 }
 	
 

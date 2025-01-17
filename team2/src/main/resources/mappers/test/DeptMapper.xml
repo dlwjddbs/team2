@@ -5,7 +5,8 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.DeptMapper">
-
+	
+<!-- 	상위부서 리스트 -->
 	<select id="getUpperDept" resultType="map">
     SELECT 
         d.DEPT_ID,
@@ -46,7 +47,8 @@
 			, #{USE_YN}
 		)
 	</insert>
-
+	
+<!-- 	셀렉트박스 부서 목록 -->
 	<select id="getCcodeList" resultType="map">
 	SELECT CC.CODE_ID AS codeId, CC.CODE_NAME AS codeName
 FROM COMMON_CODE CC
@@ -55,6 +57,7 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
   AND D.DEPT_ID IS NULL
 	</select>
 	
+<!-- 	셀렉트박스 유저 목록 -->
 	<select id="getDepMngList" resultType="map">
 	SELECT M.MEMBER_ID AS memberId, M.NAME AS name 
 		FROM MEMBER M
@@ -85,13 +88,15 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 			   UPDATE_DATE = CURRENT_DATE
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</update>
-			
+	
+<!-- 	부서장 등록시 AUTHORITY가 'ADMIN으로 변경 		 -->
 	<update id="updateInUpperAdmin">
 	UPDATE MEMBER
 	SET AUTHORITY = 'ADMIN'
 	WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 	
+<!-- 	부서장 수정시 기존 부서장 AUTHORITY를 'USER'로 변경 -->
 	<update id="updateUpperUser">
     UPDATE MEMBER
     SET AUTHORITY = 'USER'
@@ -102,12 +107,14 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
     )
 	</update>
 	
+	<!-- 	부서장 수정시 기존 부서장 AUTHORITY를 'ADMIN'으로 변경 -->
 	<update id="updateUpperAdmin">
     UPDATE MEMBER
     SET AUTHORITY = 'ADMIN'
     WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 	
+	<!-- 	하위부서 부서장 수정시 기존 부서장 AUTHORITY를 'USER'로 변경 -->
 	<select id="getLowerDept" resultType="map">
 	<!-- getLowerDept 하위부서 조회 -->
 		SELECT 
@@ -156,12 +163,14 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 		)
 	</insert>
 	
+<!-- 	하위부서 등록시 부서장 AUTHORITY를 'ADMIN으로 변경 -->
 	<update id="updateInLowerAdmin">
 	UPDATE MEMBER
 	SET AUTHORITY = 'ADMIN'
 	WHERE MEMBER_ID = #{MEMBER_ID}
 	</update>
 	
+<!-- 	하위부서 부서장 수정시 기존 부서장 AUTHORITY를 'USER'로 변경 -->
 	<update id="updateLowerUser">
     UPDATE MEMBER
     SET AUTHORITY = 'USER'
@@ -172,6 +181,7 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
     )
 	</update>
 	
+<!-- 	부서장 수정시 기존 부서장 AUTHORITY를 'ADMIN'으로 변경 -->
 	<update id="updateLowerAdmin">
     UPDATE MEMBER
     SET AUTHORITY = 'ADMIN'
@@ -194,7 +204,8 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
 			 , UPDATE_DATE = CURRENT_DATE
 		 WHERE DEPT_ID = #{DEPT_ID}
 	</update>
-	
+
+<!-- 부서 목록	 -->
 	<select id="getDepartmentList" resultType="map">
     SELECT 
         d.DEPT_ID, 

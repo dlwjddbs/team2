@@ -6,6 +6,7 @@
 
 <mapper namespace="com.itwillbs.repository.NoticeMapper">
 
+<!-- 공지사항 목록 -->
 	<select id="getNoticeList" resultType="map">
         SELECT 
             NOTICE_ID,
@@ -18,7 +19,8 @@
        	 ORDER BY 
           	  NOTICE_ID DESC
     </select>
-	
+
+<!-- 공지사항 상세보기	 -->
 	<select id="detailNotice" resultType="map">
         SELECT
             NOTICE_ID, 
@@ -32,18 +34,21 @@
         	NOTICE_ID = #{NOTICE_ID}
     </select>
 
+<!-- 공지사항 등록 -->
 	<insert id="createNotice" parameterType="map">
         INSERT INTO NOTICE (NAME, SUBJECT, MEMBER_ID, CONTENT)
         VALUES ((SELECT NAME FROM MEMBER WHERE MEMBER_ID = #{memberId}), #{title}, #{memberId}, #{content})
     </insert>
 
+<!-- 공지사항 수정 -->
 	<update id="updateNotice" parameterType="map">
 	UPDATE NOTICE
 	SET SUBJECT = #{subject},
 		CONTENT = #{content, jdbcType=VARCHAR}
 	WHERE NOTICE_ID = #{noticeId, jdbcType=INTEGER}
 	</update>
-	
+
+<!-- 공지사항 삭제	 -->
 	<delete id="deleteNotice" parameterType="map">
 		DELETE FROM NOTICE
 		WHERE NOTICE_ID = #{noticeId, jdbcType=INTEGER}

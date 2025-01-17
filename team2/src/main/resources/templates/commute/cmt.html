@@ -98,15 +98,10 @@
 											</div>
 										</div>
 
-
-
-
-
 										<p>출근시간 : <span id="startTime" class="time_display"
 												th:text="${todayHistory?.CHECK_IN_TIME}"> </span> </p>
 										<p>퇴근시간 : <span id="endTime" class="time_display"
 												th:text="${todayHistory?.CHECK_OUT_TIME} "> </span> </p>
-
 										<!-- ========================================================================================= -->
 										<hr>
 
@@ -125,10 +120,6 @@
 														class="btn btn-block btn-outline-primary"
 														onclick="return confirmEnd()"
 														th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>
-
-
-													<!--	 <button id="endButton" name="check_Out_time" type="submit" class="btn btn-block btn-outline-primary" onclick="return confirmEnd()" th:disabled="${todayHistory?.CHECK_IN_TIME == NULL or todayHistory?.CHECK_OUT_TIME != ' '}">퇴근하기</button>-->
-
 												</form>
 											</div>
 										</div>
@@ -176,7 +167,6 @@
 	<!-- Ion Slider-->
 
 
-
 	<script th:inline="javascript">
 		const token = $("meta[name='_csrf']").attr("content")
 				const header = $("meta[name='_csrf_header']").attr("content");
@@ -195,10 +185,6 @@
 
 		// 페이지 로드 시 즉시 시간 표시
 		updateDateTime();
-
-
-
-
 
 		function confirmStart() {
 			// 출근 확인 메시지
@@ -221,9 +207,6 @@
 				return false;  // 폼 제출을 막음
 			}
 		}
-
-
-
 
 		$(function () {
 			/* ION SLIDER */

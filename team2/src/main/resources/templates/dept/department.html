@@ -2,27 +2,33 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>AdminLTE 3 | DataTables</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdminLTE 3 | DataTables</title>
 
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet"
-		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-select/css/select.bootstrap4.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	href="../../plugins/fontawesome-free/css/all.min.css">
+<!-- DataTables -->
+<link rel="stylesheet"
+	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-select/css/select.bootstrap4.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="../../plugins/daterangepicker/daterangepicker.css">
 
-	<meta name="_csrf" th:content="${_csrf.token}" />
-	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -65,8 +71,9 @@
 									<h3 class="card-title">상위부서</h3>
 									<div class="card-tools">
 										<div class="d-flex">
-											<button type="button" class="btn btn-primary" id="btnAddUpper"
-												data-bs-target="#modalUpperDept" data-bs-toggle="modal">등록</button>
+											<button type="button" class="btn btn-primary"
+												id="btnAddUpper" data-bs-target="#modalUpperDept"
+												data-bs-toggle="modal">등록</button>
 											<button type="button" class="btn btn-primary mx-1"
 												id="btnUpdateUpper">수정</button>
 											<button type="button" class="btn btn-primary"
@@ -75,7 +82,8 @@
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="upperDept" class="table table-bordered table-striped">
+									<table id="upperDept"
+										class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -89,15 +97,18 @@
 									<h3 class="card-title">하위부서</h3>
 									<div class="card-tools">
 										<div class="d-flex">
-											<button type="button" class="btn btn-primary" id="btnAddLower">등록</button>
+											<button type="button" class="btn btn-primary"
+												id="btnAddLower">등록</button>
 											<button type="button" class="btn btn-primary mx-1"
 												id="btnUpdateLower">수정</button>
-											<button type="button" class="btn btn-primary" id="btnDeleteLower">삭제</button>
+											<button type="button" class="btn btn-primary"
+												id="btnDeleteLower">삭제</button>
 										</div>
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="lowerDept" class="table table-bordered table-striped">
+									<table id="lowerDept"
+										class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -132,7 +143,8 @@
 				<!-- 모달창 헤더 -->
 				<div class="modal-header">
 					<h4 class="modal-title">상위부서 등록</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -145,8 +157,7 @@
 
 							<div class="row">
 								<div class="col-md-6">
-									<label>부서</label>
-									<select id="CODE_ID" class="form-control">
+									<label>부서</label> <select id="CODE_ID" class="form-control">
 										<option value="">선택하세요</option>
 									</select>
 								</div>
@@ -159,9 +170,9 @@
 									</select>
 								</div>
 								<div class="col-md-6">
-									<label>사용여부</label><br>
-									<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
-									<input type="radio" name="use_yn" value="N"> 미사용
+									<label>사용여부</label><br> <input type="radio" name="use_yn"
+										value="Y" checked> 사용 &nbsp; <input type="radio"
+										name="use_yn" value="N"> 미사용
 								</div>
 							</div>
 						</div>
@@ -183,13 +194,15 @@
 
 
 	<!-- 모달창 -->
-	<div class="modal fade" id="modalUpperDeptEdit" th:fragment="UpperDeptEdit">
+	<div class="modal fade" id="modalUpperDeptEdit"
+		th:fragment="UpperDeptEdit">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<!-- 모달창 헤더 -->
 				<div class="modal-header">
 					<h4 class="modal-title">상위부서 수정</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -202,21 +215,21 @@
 
 							<div class="row">
 								<div class="col-md-6">
-									<label>부서</label>
-									<input type="text" id="DEPT_ID_UPDATE" class="form-control" readonly>
+									<label>부서</label> <input type="text" id="DEPT_ID_UPDATE"
+										class="form-control" readonly>
 								</div>
 								<div class="col-md-6">
-									<label>부서장</label>
-									<select id="MEMBER_ID_UPDATE" class="form-control">
+									<label>부서장</label> <select id="MEMBER_ID_UPDATE"
+										class="form-control">
 										<option value="">선택하세요</option>
 									</select>
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-6">
-									<label>사용여부</label><br>
-									<input type="radio" name="use_yn" value="Y" id="use_yn" checked> 사용 &nbsp;
-									<input type="radio" name="use_yn" value="N" id="use_yn"> 미사용
+									<label>사용여부</label><br> <input type="radio" name="use_yn"
+										value="Y" id="use_yn" checked> 사용 &nbsp; <input
+										type="radio" name="use_yn" value="N" id="use_yn"> 미사용
 								</div>
 							</div>
 						</div>
@@ -238,13 +251,15 @@
 
 
 	<!-- 모달창 -->
-	<div class="modal fade" id="modalLowerDept" th:fragment="modalLowerDept">
+	<div class="modal fade" id="modalLowerDept"
+		th:fragment="modalLowerDept">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<!-- 모달창 헤더 -->
 				<div class="modal-header">
 					<h4 class="modal-title">하위부서 등록</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -256,32 +271,30 @@
 						<div class="form-group">
 							<div class="row">
 								<div class="col-md-6">
-									<label>상위부서 코드</label>
-									<input type="text" id="LOWER_PARENT_ID" class="form-control" readonly>
+									<label>상위부서 코드</label> <input type="text" id="LOWER_PARENT_ID"
+										class="form-control" readonly>
 								</div>
 								<div class="col-md-6">
-									<label>사용여부</label><br>
-									<input type="radio" name="use_yn" value="Y" checked> 사용 &nbsp;
-									<input type="radio" name="use_yn" value="N"> 미사용
+									<label>사용여부</label><br> <input type="radio" name="use_yn"
+										value="Y" checked> 사용 &nbsp; <input type="radio"
+										name="use_yn" value="N"> 미사용
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-6">
-									<label>부서</label>
-									<select id="DEPT_ID" class="form-control">
+									<label>부서</label> <select id="DEPT_ID" class="form-control">
 										<option value="">선택하세요</option>
 									</select>
 								</div>
 
 								<div class="col-md-6">
-									<label>부서장</label>
-									<select id="MEMBER_ID_LOWER" class="form-control">
+									<label>부서장</label> <select id="MEMBER_ID_LOWER"
+										class="form-control">
 										<option value="">선택하세요</option>
 									</select>
 								</div>
 							</div>
-							<div class="row">
-							</div>
+							<div class="row"></div>
 						</div>
 					</div>
 				</div>
@@ -300,47 +313,50 @@
 	<!-- /.모달창 -->
 
 	<!-- 모달창 -->
-	<div class="modal fade" id="modalLowerDeptEdit" th:fragment="modalLowerDeptEdit">
+	<div class="modal fade" id="modalLowerDeptEdit"
+		th:fragment="modalLowerDeptEdit">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<!-- 모달창 헤더 -->
 				<div class="modal-header">
 					<h4 class="modal-title">하위부서 수정</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				<!-- /.모달창 헤더 -->
-				
+
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
-				    <div class="card-body">
-				        <div class="form-group">
-				            <div class="row">
-				                <div class="col-md-6">
-				                    <label>상위부서 코드</label>
-				                    <input type="text" id="PARENT_ID_UPDATE" class="form-control" readonly>
-				                </div>
-				                <div class="col-md-6">
-				                    <label>사용여부</label><br>
-				                    <input id="USE_YN_Y" type="radio" name="use_yn_update" value="Y"> 사용 &nbsp;
-				                    <input id="USE_YN_N" type="radio" name="use_yn_update" value="N"> 미사용
-				                </div>
-				            </div>
-				            <div class="row">
-				            	<div class="col-md-6">
-				                    <label>부서</label>
-				                    <input type="text" id="LOWER_DEPT_UPDATE" class="form-control" readonly>
-				                </div>
-				                <div class="col-md-6">
-				                    <label>부서장</label>
-									<select id="LOWER_MEMBER_UPDATE" class="form-control">
-									<option value="">선택하세요</option>
+					<div class="card-body">
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-6">
+									<label>상위부서 코드</label> <input type="text" id="PARENT_ID_UPDATE"
+										class="form-control" readonly>
+								</div>
+								<div class="col-md-6">
+									<label>사용여부</label><br> <input id="USE_YN_Y" type="radio"
+										name="use_yn_update" value="Y"> 사용 &nbsp; <input
+										id="USE_YN_N" type="radio" name="use_yn_update" value="N">
+									미사용
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<label>부서</label> <input type="text" id="LOWER_DEPT_UPDATE"
+										class="form-control" readonly>
+								</div>
+								<div class="col-md-6">
+									<label>부서장</label> <select id="LOWER_MEMBER_UPDATE"
+										class="form-control">
+										<option value="">선택하세요</option>
 									</select>
-				                </div>
-				            </div>
-				        </div>
-				    </div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 				<!-- /.모달창 바디 -->
 				<!-- 모달창 푸터-->
@@ -364,18 +380,24 @@
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- DataTables  & Plugins -->
 	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script
+		src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script
+		src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script
+		src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 	<script src="../../plugins/jszip/jszip.min.js"></script>
 	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
 	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
 	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
 	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
 	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-	<script src="../../plugins/datatables-select/js/dataTables.select.min.js"></script>
+	<script
+		src="../../plugins/datatables-select/js/dataTables.select.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
 	<!-- AdminLTE for demo purposes -->
@@ -388,7 +410,6 @@
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-
 		const token = $("meta[name='_csrf']").attr("content")
 		const header = $("meta[name='_csrf_header']").attr("content");
 		const name = $("#userName").val();
@@ -398,7 +419,7 @@
 		function getSelectedRowUpper() {
 			let table = $('#upperDept').DataTable();
 			if (!$.fn.dataTable.isDataTable("#upperDept")
-				|| table.row('.selected').length == 0) {
+					|| table.row('.selected').length == 0) {
 				alert("상위부서를 선택하세요.");
 
 				return;
@@ -411,7 +432,7 @@
 		function getSelectedRowLower() {
 			if (!$.fn.dataTable.isDataTable("#lowerDept")) {
 				alert("상위부서를 선택하세요.");
-// 				$("#lowerDept").DataTable(); // 선택 상태 초기화
+				// 				$("#lowerDept").DataTable(); // 선택 상태 초기화
 				return;
 			}
 
@@ -435,104 +456,128 @@
 			}
 
 			let table = $("#upperDept").DataTable({
-				aaSorting: [], // 초기 정렬 비활성화
-				select: {
-					style: 'single'
+				aaSorting : [], // 초기 정렬 비활성화
+				select : {
+					style : 'single'
 				},
-				language: {
-					search: "검색",
-					paginate: {
-						"first": "처음",
-						"last": "마지막",
-						"next": "다음",
-						"previous": "이전"
+				language : {
+					search : "검색",
+					paginate : {
+						"first" : "처음",
+						"last" : "마지막",
+						"next" : "다음",
+						"previous" : "이전"
 					},
-					zeroRecords: "검색 결과 없음"
+					zeroRecords : "검색 결과 없음"
 				},
-				ajax: {
-					url: "/getUpperDept",
-					type: "POST",
+				ajax : {
+					url : "/getUpperDept",
+					type : "POST",
 					//추가해야 하는 부분
-					beforeSend: function (xhr) {
+					beforeSend : function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
-					data: {},
-					"dataSrc": function (res) {
+					data : {},
+					"dataSrc" : function(res) {
 						return res;
 					}
 				},
-				columns: [
-					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
-					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""},
-					{data: "MEMBER_NAME", title: "부서장", "defaultContent": ""},
-				],
-				responsive: true,
-				lengthChange: false,
-				autoWidth: false,
+				columns : [ {
+					data : "DEPT_ID",
+					title : "부서",
+					"defaultContent" : ""
+				}, {
+					data : "DEPT_NAME",
+					title : "부서명",
+					"defaultContent" : ""
+				}, {
+					data : "MEMBER_NAME",
+					title : "부서장",
+					"defaultContent" : ""
+				}, ],
+				responsive : true,
+				lengthChange : false,
+				autoWidth : false,
 			});
 		}
 
 		//부서조회
-		$(document).ready(function () {
-			$("#btnAddUpper").on("click", function () {
-				$("#CODE_ID").empty();
-				loadDeptIds();
-				$("#MEMBER_ID").empty(); // 부서장 초기화
-				$('input[name="use_yn"][value="Y"]').prop("checked", true); // 기본값 설정
-				$('#modalUpperDept').modal('show');
-			});
+		$(document)
+				.ready(
+						function() {
+							$("#btnAddUpper").on(
+									"click",
+									function() {
+										$("#CODE_ID").empty();
+										loadDeptIds();
+										$("#MEMBER_ID").empty(); // 부서장 초기화
+										$('input[name="use_yn"][value="Y"]')
+												.prop("checked", true); // 기본값 설정
+										$('#modalUpperDept').modal('show');
+									});
 
-			function loadDeptIds() {
-				$.ajax({
-					type: "GET",
-					url: "/getCommonCodeIds",
-					success: function (data) {
-						let selectBox = $("#CODE_ID");
-						data.forEach(function (item) {
-							console.log("item:", item); // 반환된 데이터 확인
-							selectBox.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
-						});
-					},
-					error: function () {
-						alert("부서 데이터를 불러오는 데 실패했습니다.");
-					}
-				});
-				loadDeptMng(); //부서장 호출 함수
-			}
+							function loadDeptIds() {
+								$
+										.ajax({
+											type : "GET",
+											url : "/getCommonCodeIds",
+											success : function(data) {
+												let selectBox = $("#CODE_ID");
+												data
+														.forEach(function(item) {
+															console.log(
+																	"item:",
+																	item); // 반환된 데이터 확인
+															selectBox
+																	.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
+														});
+											},
+											error : function() {
+												alert("부서 데이터를 불러오는 데 실패했습니다.");
+											}
+										});
+								loadDeptMng(); //부서장 호출 함수
+							}
 
-			//부서장 조회
-			function loadDeptMng() {
-				$.ajax({
-					type: "GET",
-					url: "/getDepMng",
-					success: function (data) {
-						let selectBox = $("#MEMBER_ID");
-						data.forEach(function (item) {
-							console.log("item:", item); // 반환된 데이터 확인
-							selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+							//부서장 조회
+							function loadDeptMng() {
+								$
+										.ajax({
+											type : "GET",
+											url : "/getDepMng",
+											success : function(data) {
+												let selectBox = $("#MEMBER_ID");
+												data
+														.forEach(function(item) {
+															console.log(
+																	"item:",
+																	item); // 반환된 데이터 확인
+															selectBox
+																	.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+														});
+											},
+											error : function() {
+												alert("멤버 데이터를 불러오는 데 실패했습니다.");
+											}
+										});
+							}
 						});
-					},
-					error: function () {
-						alert("멤버 데이터를 불러오는 데 실패했습니다.");
-					}
-				});
-			}
-		});
 
 		//등록
-		$(function () {
+		$(function() {
 			upperDeptDataTable();
 		});
 
-		$("#btnAddUpper").on("click", function () {
+		$("#btnAddUpper").on("click", function() {
 			$("#DEPT_ID").val('');
 			$("#MEMBER_ID").val('');
 			$("#USE_YN").val('');
 
 			$('#modalUpperDept').modal();
 		});
-
-		$("#upperDeptSave").on('click', function () {
+		
+		// 상위부서 등록
+		$("#upperDeptSave").on('click', function() {
 			let DEPT_ID = $("#CODE_ID").val();
 			let MEMBER_ID = $("#MEMBER_ID").val();
 			let CODE_USE_YN = $('input[name="use_yn"]:checked').val();
@@ -540,39 +585,38 @@
 			console.log("DEPT_ID", DEPT_ID)
 			console.log("부서장 : ", MEMBER_ID)
 
-
 			if (!DEPT_ID || !MEMBER_ID) {
 				alert("값을 입력해 주세요.");
 				return;
 			}
 
 			$.ajax({
-				type: "POST",
-				url: "/addUpperDept",
+				type : "POST",
+				url : "/addUpperDept",
 				//추가해야 하는 부분
-				beforeSend: function (xhr) {
+				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
-				data: {
-					DEPT_ID: DEPT_ID.toUpperCase(),
-					MEMBER_ID: MEMBER_ID,
-					USE_YN: CODE_USE_YN
+				data : {
+					DEPT_ID : DEPT_ID.toUpperCase(),
+					MEMBER_ID : MEMBER_ID,
+					USE_YN : CODE_USE_YN
 				},
-				success: function (res) {
+				success : function(res) {
 					alert(res.result);
 
 					if (res.resultCode == 1) {
 						location.reload();
 					}
 				},
-				error: function () {
+				error : function() {
 					console.log("addUpperDept() ajax 실패");
 				}
 			});
 		});
 
 		//상위부서 삭제
-		$("#btnDeleteUpper").on('click', function () {
+		$("#btnDeleteUpper").on('click', function() {
 			let code = getSelectedRowUpper();
 			console.log("Selected DEPT_ID:", code);
 			if (code == null) {
@@ -585,16 +629,16 @@
 			}
 
 			$.ajax({
-				type: "POST",
-				url: "/deleteUpperDept",
+				type : "POST",
+				url : "/deleteUpperDept",
 				//추가해야 하는 부분
-				beforeSend: function (xhr) {
+				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
-				data: {
-					DEPT_ID: code,
+				data : {
+					DEPT_ID : code,
 				},
-				success: function (res) {
+				success : function(res) {
 					console.log("Response:", res);
 					alert(res.result);
 
@@ -602,81 +646,88 @@
 						location.reload();
 					}
 				},
-				error: function (e) {
+				error : function(e) {
 					console.log("deleteUpperDept() ajax 실패");
 				}
 			});
 		});
 
 		//상위부서 수정 값 조회
-		$("#btnUpdateUpper").on('click', function (e) {
-			let code = getSelectedRowUpper();
-			if (code == null) {
-				return;
-			}
-
-			$.ajax({
-				type: "POST",
-				url: "/getUpperDept",
-				//추가해야 하는 부분
-				beforeSend: function (xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				data: {
-					DEPT_ID: code,
-				},
-				success: function (res) {
-					if (res.length == 0) {
-						alert("조회 실패");
-
+		$("#btnUpdateUpper").on(
+				'click',
+				function(e) {
+					let code = getSelectedRowUpper();
+					if (code == null) {
 						return;
 					}
 
-					$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
-					$("#MEMBER_ID_UPDATE").val(res[0].MEMBER_ID);
-					console.info("MEMBER_ID", res[0].MEMBER_ID);
-					$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
-					// 부서장 목록 로드 및 선택
-					loadDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
-				},
-				error: function (e) {
-					console.log("getUpperDept() ajax 실패");
-				}
-			});
+					$.ajax({
+						type : "POST",
+						url : "/getUpperDept",
+						//추가해야 하는 부분
+						beforeSend : function(xhr) {
+							xhr.setRequestHeader(header, token);
+						},
+						data : {
+							DEPT_ID : code,
+						},
+						success : function(res) {
+							if (res.length == 0) {
+								alert("조회 실패");
 
-			$('#modalUpperDeptEdit').modal();
-		});
+								return;
+							}
+
+							$("#DEPT_ID_UPDATE").val(res[0].DEPT_ID);
+							$("#MEMBER_ID_UPDATE").val(res[0].MEMBER_ID);
+							console.info("MEMBER_ID", res[0].MEMBER_ID);
+							$(
+									'input[name="use_yn"][value="'
+											+ res[0].USE_YN + '"]').prop(
+									"checked", true);
+							// 부서장 목록 로드 및 선택
+							loadDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+						},
+						error : function(e) {
+							console.log("getUpperDept() ajax 실패");
+						}
+					});
+
+					$('#modalUpperDeptEdit').modal();
+				});
 
 		// 상위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
 		function loadDeptMng(selectedMemberId) {
-			$.ajax({
-				type: "GET",
-				url: "/getDepMng",
-				//추가해야 하는 부분
-				beforeSend: function (xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				success: function (data) {
-					let selectBox = $("#MEMBER_ID_UPDATE");
-					selectBox.empty(); // 기존 옵션 제거
-					selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
+			$
+					.ajax({
+						type : "GET",
+						url : "/getDepMng",
+						//추가해야 하는 부분
+						beforeSend : function(xhr) {
+							xhr.setRequestHeader(header, token);
+						},
+						success : function(data) {
+							let selectBox = $("#MEMBER_ID_UPDATE");
+							selectBox.empty(); // 기존 옵션 제거
+							selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
 
-					data.forEach(function (item) {
-						console.log("item:", item); // 반환된 데이터 확인
-						let selected = item.MEMBERID === selectedMemberId ? "selected" : "";
-						selectBox.append(
-							`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`
-						);
+							data
+									.forEach(function(item) {
+										console.log("item:", item); // 반환된 데이터 확인
+										let selected = item.MEMBERID === selectedMemberId ? "selected"
+												: "";
+										selectBox
+												.append(`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`);
+									});
+						},
+						error : function() {
+							alert("부서장 데이터를 불러오는 데 실패했습니다.");
+						},
 					});
-				},
-				error: function () {
-					alert("부서장 데이터를 불러오는 데 실패했습니다.");
-				},
-			});
 		}
 
 		//상위부서 수정
-		$("#upperDeptUpdate").on('click', function () {
+		$("#upperDeptUpdate").on('click', function() {
 			let DEPT_ID = $("#DEPT_ID_UPDATE").val();
 			let MEMBER_ID = $("#MEMBER_ID_UPDATE").val();
 			let USE_YN = $('input[name="use_yn"]:checked').val();
@@ -687,18 +738,18 @@
 			}
 
 			$.ajax({
-				type: "POST",
-				url: "/updateUpperDept",
+				type : "POST",
+				url : "/updateUpperDept",
 				//추가해야 하는 부분
-				beforeSend: function (xhr) {
+				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
-				data: {
-					DEPT_ID: DEPT_ID,
-					MEMBER_ID: MEMBER_ID,
-					USE_YN: USE_YN,
+				data : {
+					DEPT_ID : DEPT_ID,
+					MEMBER_ID : MEMBER_ID,
+					USE_YN : USE_YN,
 				},
-				success: function (res) {
+				success : function(res) {
 					alert(res.result);
 
 					if (res.resultCode == 1) {
@@ -707,17 +758,16 @@
 						location.reload();
 					}
 				},
-				error: function (e) {
+				error : function(e) {
 					console.log("updateUpperDept() ajax 실패");
 					alert("수정 요청에 실패했습니다.");
 				}
 			});
 		});
 
-
-		$('#upperDept').on('click', 'tbody tr', function () {
+		$('#upperDept').on('click', 'tbody tr', function() {
 			// dataTables select적용 시간보다 늦어야함.
-			setTimeout(function () {
+			setTimeout(function() {
 				let table = $('#upperDept').DataTable();
 
 				// 대분류 선택 해제할 시 소분류 테이블 삭제
@@ -737,7 +787,6 @@
 			}, 10);
 		});
 
-	
 		//하위부서 리스트
 		function lowerDeptDataTable(code) {
 			// 기존 테이블 삭제
@@ -747,324 +796,363 @@
 			}
 
 			let table = $("#lowerDept").DataTable({
-				aaSorting: [], // 초기 정렬 비활성화
-				select: {
-					style: 'single'
+				aaSorting : [], // 초기 정렬 비활성화
+				select : {
+					style : 'single'
 				},
 
-				language: {
-					search: "검색",
-					paginate: {
-						"first": "처음",
-						"last": "마지막",
-						"next": "다음",
-						"previous": "이전"
+				language : {
+					search : "검색",
+					paginate : {
+						"first" : "처음",
+						"last" : "마지막",
+						"next" : "다음",
+						"previous" : "이전"
 					},
-					zeroRecords: "검색 결과 없음"
+					zeroRecords : "검색 결과 없음"
 				},
-				ajax: {
+				ajax : {
 
-					url: "/getLowerDept",
-					type: "POST",
+					url : "/getLowerDept",
+					type : "POST",
 					//추가해야 하는 부분
-					beforeSend: function (xhr) {
+					beforeSend : function(xhr) {
 						xhr.setRequestHeader(header, token);
 					},
-					data: {
-						DEPT_ID: code
+					data : {
+						DEPT_ID : code
 					},
-					"dataSrc": function (res) {
+					"dataSrc" : function(res) {
 						console.log("Response:", res); // 응답 데이터 확인
 						return res;
 					},
-					error: function (xhr, status, error) {
+					error : function(xhr, status, error) {
 						console.error("Ajax Error:", error);
 					}
 
 				},
-				columns: [
-					{data: "DEPT_ID", title: "부서", "defaultContent": ""},
-					{data: "DEPT_NAME", title: "부서명", "defaultContent": ""},
-					{data: "MEMBER_NAME", title: "부서장", "defaultContent": ""},
-					{data: "USE_YN", title: "사용여부", "defaultContent": ""}
-				],
+				columns : [ {
+					data : "DEPT_ID",
+					title : "부서",
+					"defaultContent" : ""
+				}, {
+					data : "DEPT_NAME",
+					title : "부서명",
+					"defaultContent" : ""
+				}, {
+					data : "MEMBER_NAME",
+					title : "부서장",
+					"defaultContent" : ""
+				}, {
+					data : "USE_YN",
+					title : "사용여부",
+					"defaultContent" : ""
+				} ],
 
-				responsive: true,
-				lengthChange: false,
-				autoWidth: false,
+				responsive : true,
+				lengthChange : false,
+				autoWidth : false,
 			});
 		}
 
-
 		//하위부서 조회
-		$(document).ready(function () {
-			$("#btnAddLower").on("click", function () {
-				let code = getSelectedRowUpper();
-				if (code == null) {
-					return;
-				}
+		$(document)
+				.ready(
+						function() {
+							$("#btnAddLower")
+									.on(
+											"click",
+											function() {
+												let code = getSelectedRowUpper();
+												if (code == null) {
+													return;
+												}
 
-				$("#LOWER_PARENT_ID").val(code);
-				$("#DEPT_ID").empty();
-				loadDeptIds();
-				$("#MEMBER_ID").val(''); // 부서장 초기화
-				$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked', true);
-				$('#modalLowerDept').modal();
-			});
+												$("#LOWER_PARENT_ID").val(code);
+												$("#DEPT_ID").empty();
+												loadDeptIds();
+												$("#MEMBER_ID").val(''); // 부서장 초기화
+												$(
+														'input:radio[name="use_yn"]:input[value="Y"]')
+														.prop('checked', true);
+												$('#modalLowerDept').modal();
+											});
 
-			function loadDeptIds() {
-				$.ajax({
-					type: "GET",
-					url: "/getCommonCodeIds",
-					//추가해야 하는 부분
-					beforeSend: function (xhr) {
-					xhr.setRequestHeader(header, token);
-					},
-					success: function (data) {
-						let selectBox = $("#DEPT_ID");
-						data.forEach(function (item) {
-							console.log("item:", item); // 반환된 데이터 확인
-							selectBox.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
+							function loadDeptIds() {
+								$
+										.ajax({
+											type : "GET",
+											url : "/getCommonCodeIds",
+											//추가해야 하는 부분
+											beforeSend : function(xhr) {
+												xhr.setRequestHeader(header,
+														token);
+											},
+											success : function(data) {
+												let selectBox = $("#DEPT_ID");
+												data
+														.forEach(function(item) {
+															console.log(
+																	"item:",
+																	item); // 반환된 데이터 확인
+															selectBox
+																	.append(`<option value="${item.CODEID}">${item.CODENAME}</option>`);
+														});
+											},
+											error : function() {
+												alert("부서 데이터를 불러오는 데 실패했습니다.");
+											}
+										});
+								loadDeptMng(); //부서장 호출 함수
+							}
+
+							//부서장 조회
+							function loadDeptMng() {
+								$
+										.ajax({
+											type : "GET",
+											url : "/getDepMng",
+											//추가해야 하는 부분
+											beforeSend : function(xhr) {
+												xhr.setRequestHeader(header,
+														token);
+											},
+											success : function(data) {
+												let selectBox = $("#MEMBER_ID_LOWER");
+												selectBox.empty(); // 기존 옵션 제거
+												selectBox
+														.append(`<option value="">선택하세요</option>`); // 기본값 추가
+
+												data
+														.forEach(function(item) {
+															console.log(
+																	"item:",
+																	item); // 반환된 데이터 확인
+															selectBox
+																	.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
+														});
+											},
+											error : function() {
+												alert("멤버 데이터를 불러오는 데 실패했습니다.");
+											}
+										});
+							}
 						});
-					},
-					error: function () {
-						alert("부서 데이터를 불러오는 데 실패했습니다.");
-					}
-				});
-				loadDeptMng(); //부서장 호출 함수
-			}
 
-			//부서장 조회
-			function loadDeptMng() {
-				$.ajax({
-					type: "GET",
-					url: "/getDepMng",
-					//추가해야 하는 부분
-					beforeSend: function (xhr) {
-					xhr.setRequestHeader(header, token);
-					},
-					success: function (data) {
-						let selectBox = $("#MEMBER_ID_LOWER");
-						selectBox.empty(); // 기존 옵션 제거
-						selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
-						
-						data.forEach(function (item) {
-							console.log("item:", item); // 반환된 데이터 확인
-							selectBox.append(`<option value="${item.MEMBERID}">${item.NAME}</option>`);
-						});
-					},
-					error: function () {
-						alert("멤버 데이터를 불러오는 데 실패했습니다.");
-					}
-				});
-			}
-		});
-		
 		//하위부서 등록
-		$("#lowerDeptSave").on('click', function () {
-			let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
-			let DEPT_ID = $("#DEPT_ID").val();
-			let MEMBER_ID = $("#MEMBER_ID_LOWER").val();
-			let USE_YN = $('input[name="use_yn"]:checked').val();
+		$("#lowerDeptSave").on(
+				'click',
+				function() {
+					let PARENT_DEPT_ID = $("#LOWER_PARENT_ID").val();
+					let DEPT_ID = $("#DEPT_ID").val();
+					let MEMBER_ID = $("#MEMBER_ID_LOWER").val();
+					let USE_YN = $('input[name="use_yn"]:checked').val();
 
-			if (DEPT_ID == null || DEPT_ID == ''
-				|| MEMBER_ID == null || MEMBER_ID == '') {
-				alert("값을 입력해 주세요.");
+					if (DEPT_ID == null || DEPT_ID == '' || MEMBER_ID == null
+							|| MEMBER_ID == '') {
+						alert("값을 입력해 주세요.");
+						return;
+					}
+
+					console.log({
+						DEPT_ID : DEPT_ID.toUpperCase(),
+						PARENT_DEPT_ID : PARENT_DEPT_ID.toUpperCase(),
+						MEMBER_ID : MEMBER_ID,
+						USE_YN : USE_YN
+					});
+
+					$.ajax({
+						type : "POST",
+						url : "/addLowerDept",
+						//추가해야 하는 부분
+						beforeSend : function(xhr) {
+							xhr.setRequestHeader(header, token);
+						},
+						data : {
+							DEPT_ID : DEPT_ID.toUpperCase(),
+							PARENT_DEPT_ID : PARENT_DEPT_ID.toUpperCase(),
+							MEMBER_ID : MEMBER_ID,
+							USE_YN : USE_YN
+						},
+						success : function(res) {
+							console.log("Response:", res); // 응답 데이터 확인
+							alert(res.result);
+
+							if (res.resultCode == 1) {
+								location.reload();
+							} else {
+								console.error("등록 실패:", res.result);
+								alert("등록 실패: " + res.result);
+							}
+						},
+						error : function(e) {
+							console.log("addLowerDept() ajax 실패");
+						}
+					});
+				});
+
+		//하위부서 삭제
+		$("#btnDeleteLower").on('click', function() {
+			let code = getSelectedRowLower();
+			if (code == null) {
 				return;
 			}
-			
-			console.log({
-			        DEPT_ID: DEPT_ID.toUpperCase(),
-			        PARENT_DEPT_ID: PARENT_DEPT_ID.toUpperCase(),
-			        MEMBER_ID: MEMBER_ID,
-			        USE_YN: USE_YN
-			    });
-			
+			let table = $("#lowerDept").DataTable();
+			let selectedRowData = table.row({
+				selected : true
+			}).data(); // 선택된 행 데이터 가져오기
+
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			console.info("selectedRowData", selectedRowData.DEPT_ID);
 			$.ajax({
-				type: "POST",
-				url: "/addLowerDept",
+				type : "POST",
+				url : "/deleteLowerDept",
 				//추가해야 하는 부분
-				beforeSend: function (xhr) {
-				xhr.setRequestHeader(header, token);
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
 				},
-				data: {
-					DEPT_ID: DEPT_ID.toUpperCase(),
-					PARENT_DEPT_ID: PARENT_DEPT_ID.toUpperCase(),
-					MEMBER_ID: MEMBER_ID,
-					USE_YN: USE_YN
+				data : {
+					DEPT_ID : selectedRowData.DEPT_ID,
 				},
-				success: function (res) {
-					console.log("Response:", res); // 응답 데이터 확인
+				success : function(res) {
 					alert(res.result);
 
 					if (res.resultCode == 1) {
 						location.reload();
-					} else {
-						console.error("등록 실패:", res.result);
-						alert("등록 실패: " + res.result);
 					}
 				},
-				error: function (e) {
-					console.log("addLowerDept() ajax 실패");
+				error : function(e) {
+					console.log("deleteLowerDept() ajax 실패");
 				}
 			});
 		});
-		
-			//하위부서 삭제
-			$("#btnDeleteLower").on('click', function() {
+
+		//하위부서 수정 값 조회
+		$("#btnUpdateLower").on(
+				'click',
+				function() {
 					let code = getSelectedRowLower();
+
 					if (code == null) {
 						return;
 					}
+
 					let table = $("#lowerDept").DataTable();
-					let selectedRowData = table.row({selected: true}).data(); // 선택된 행 데이터 가져오기
-					
-					
-					if (!confirm("삭제 하시겠습니까?")) {
-						return;
-					}
-					console.info("selectedRowData" , selectedRowData.DEPT_ID);
-			 		$.ajax({
-			            type : "POST",
-			            url : "/deleteLowerDept",
+					let selectedRowData = table.row({
+						selected : true
+					}).data();
+
+					console.log("Selected DEPT_ID:", code); // 전달되는 DEPT_ID 확인
+
+					$.ajax({
+						type : "POST",
+						url : "/getLowerDept",
 						//추가해야 하는 부분
-						beforeSend: function (xhr) {
-						xhr.setRequestHeader(header, token);
+						beforeSend : function(xhr) {
+							xhr.setRequestHeader(header, token);
 						},
-			            data : {
-			            	DEPT_ID : selectedRowData.DEPT_ID,
+						data : {
+							DEPT_ID : code,
+							UPPER_ID : selectedRowData.DEPT_ID
+
 						},
-			            success : function(res){
-			           		alert(res.result);
-			           		
-			            	if (res.resultCode == 1) {
-								location.reload();
-			            	}
-			            },
-			            error : function(e){
-			                console.log("deleteLowerDept() ajax 실패");
-			            }
-			        });
-				});
-		
-				
-				//하위부서 수정 값 조회
-						$("#btnUpdateLower").on('click', function () {
-							let code = getSelectedRowLower();
-							
-							if (code == null) {
+						success : function(res) {
+							if (res.length == 0) {
+								alert("조회실패");
 								return;
 							}
-							
-							let table = $("#lowerDept").DataTable();
-							let selectedRowData = table.row({selected: true}).data();
-							
-							
-							 console.log("Selected DEPT_ID:", code); // 전달되는 DEPT_ID 확인
-							
-							$.ajax({
-								type: "POST",
-								url: "/getLowerDept",
-								//추가해야 하는 부분
-								beforeSend: function (xhr) {
-									xhr.setRequestHeader(header, token);
-								},
-								data: {
-									DEPT_ID: code,
-									UPPER_ID: selectedRowData.DEPT_ID
-									
-								},
-								success: function (res) {
-									if (res.length == 0) {
-										alert("조회실패");
-										return;
-									}
-									console.log("res", res)
-									$("#PARENT_ID_UPDATE").val(res[0].PARENT_DEPT_ID);
-									$("#LOWER_DEPT_UPDATE").val(res[0].DEPT_ID);
-									$("#LOWER_MEMBER_UPDATE").val(res[0].MEMBER_ID);
-									console.info("MEMBER_ID", res[0].MEMBER_ID);
-									$('input[name="use_yn"][value="' + res[0].USE_YN + '"]').prop("checked", true);
-									// 부서장 목록 로드 및 선택
-									loadLowerDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
-								},
-								error: function (e) {
-									console.log("getLowerDept() ajax 실패");
-								}
-							});
-									$('#modalLowerDeptEdit').modal('show');
-
-						});
-
-						// 하위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
-						function loadLowerDeptMng(selectedMemberId) {
-							console.log("selectedMemberId:", selectedMemberId); // 전달되는 DEPT_ID 확인
-							$.ajax({
-								type: "GET",
-								url: "/getDepMng",
-								//추가해야 하는 부분
-								beforeSend: function (xhr) {
-									xhr.setRequestHeader(header, token);
-								},
-								success: function (data) {
-									console.log("Response from /getDepMng:", data); // 응답 데이터 확인
-									
-									let selectBox = $("#LOWER_MEMBER_UPDATE");
-									selectBox.empty(); // 기존 옵션 제거
-									selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
-
-									data.forEach(function (item) {
-										console.log("item:", item); // 반환된 데이터 확인
-										let selected = item.MEMBERID === selectedMemberId ? "selected" : "";
-										selectBox.append(
-											`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`
-										);
-									});
-								},
-								error: function () {
-									alert("부서장 데이터를 불러오는 데 실패했습니다.");
-								},
-							});
+							console.log("res", res)
+							$("#PARENT_ID_UPDATE").val(res[0].PARENT_DEPT_ID);
+							$("#LOWER_DEPT_UPDATE").val(res[0].DEPT_ID);
+							$("#LOWER_MEMBER_UPDATE").val(res[0].MEMBER_ID);
+							console.info("MEMBER_ID", res[0].MEMBER_ID);
+							$(
+									'input[name="use_yn"][value="'
+											+ res[0].USE_YN + '"]').prop(
+									"checked", true);
+							// 부서장 목록 로드 및 선택
+							loadLowerDeptMng(res[0].MEMBER_ID); // 부서장 목록을 로드하며 기존 부서장을 기본값으로 설정
+						},
+						error : function(e) {
+							console.log("getLowerDept() ajax 실패");
 						}
+					});
+					$('#modalLowerDeptEdit').modal('show');
 
-						//하위부서 수정
-						$("#lowerDeptUpdate").on('click', function () {
-							let PARENT_DEPT_ID = $("#PARENT_ID_UPDATE").val();
-							let DEPT_ID = $("#LOWER_DEPT_UPDATE").val();
-							let MEMBER_ID = $("#LOWER_MEMBER_UPDATE").val();
-							let USE_YN = $('input[name="use_yn"]:checked').val();
+				});
 
-							if (MEMBER_ID == null || MEMBER_ID == '') {
-								alert("값을 입력해 주세요.");
-								return;
-							}
+		// 하위부서 수정 모달창 부서장 목록 로드 및 기본값 설정 함수
+		function loadLowerDeptMng(selectedMemberId) {
+			console.log("selectedMemberId:", selectedMemberId); // 전달되는 DEPT_ID 확인
+			$
+					.ajax({
+						type : "GET",
+						url : "/getDepMng",
+						//추가해야 하는 부분
+						beforeSend : function(xhr) {
+							xhr.setRequestHeader(header, token);
+						},
+						success : function(data) {
+							console.log("Response from /getDepMng:", data); // 응답 데이터 확인
 
-							$.ajax({
-								type: "POST",
-								url: "/updateLowerDept",
-								//추가해야 하는 부분
-								beforeSend: function (xhr) {
-									xhr.setRequestHeader(header, token);
-								},
-								data: {
-									PARENT_DEPT_ID: PARENT_DEPT_ID,
-									DEPT_ID: DEPT_ID,
-									MEMBER_ID: MEMBER_ID,
-									USE_YN: USE_YN,
-								},
-								success: function (res) {
-									alert(res.result);
+							let selectBox = $("#LOWER_MEMBER_UPDATE");
+							selectBox.empty(); // 기존 옵션 제거
+							selectBox.append(`<option value="">선택하세요</option>`); // 기본값 추가
 
-									if (res.resultCode == 1) {
-										$('#modalLowerDeptEdit').modal('hide');
-										location.reload();
-									}
-								},
-								error: function (e) {
-									console.log("updateLowerDept() ajax 실패");
-									alert("수정 요청에 실패했습니다.");
-								}
-							});
-						});
+							data
+									.forEach(function(item) {
+										console.log("item:", item); // 반환된 데이터 확인
+										let selected = item.MEMBERID === selectedMemberId ? "selected"
+												: "";
+										selectBox
+												.append(`<option value="${item.MEMBERID}" ${selected}>${item.NAME}</option>`);
+									});
+						},
+						error : function() {
+							alert("부서장 데이터를 불러오는 데 실패했습니다.");
+						},
+					});
+		}
 
+		//하위부서 수정
+		$("#lowerDeptUpdate").on('click', function() {
+			let PARENT_DEPT_ID = $("#PARENT_ID_UPDATE").val();
+			let DEPT_ID = $("#LOWER_DEPT_UPDATE").val();
+			let MEMBER_ID = $("#LOWER_MEMBER_UPDATE").val();
+			let USE_YN = $('input[name="use_yn"]:checked').val();
+
+			if (MEMBER_ID == null || MEMBER_ID == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+
+			$.ajax({
+				type : "POST",
+				url : "/updateLowerDept",
+				//추가해야 하는 부분
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					PARENT_DEPT_ID : PARENT_DEPT_ID,
+					DEPT_ID : DEPT_ID,
+					MEMBER_ID : MEMBER_ID,
+					USE_YN : USE_YN,
+				},
+				success : function(res) {
+					alert(res.result);
+
+					if (res.resultCode == 1) {
+						$('#modalLowerDeptEdit').modal('hide');
+						location.reload();
+					}
+				},
+				error : function(e) {
+					console.log("updateLowerDept() ajax 실패");
+					alert("수정 요청에 실패했습니다.");
+				}
+			});
+		});
 	</script>

@@ -54,6 +54,7 @@ public class NoticeController {
     	return "/notice/noticeList";
     }
     
+// 목록 가져오고 ADMIN 추가 
     @PostMapping("/getNoticeList")
     @ResponseBody
     public List<Map<String, Object>> getNoticeList(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
@@ -142,9 +143,4 @@ public class NoticeController {
 		noticeService.deleteNotice(map);
 		return "redirect:/notice/noticeList";
 	}
-    
-    @GetMapping("/test")
-    public String test(HttpSession session, @RequestParam Map<String, Object> map, Model model) {
-    	return "/editors";
-    }
 }

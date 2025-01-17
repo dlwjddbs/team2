@@ -15,11 +15,13 @@ import lombok.RequiredArgsConstructor;
 public class DeptService {
 
 	private final DeptMapper deptMapper;
-
+	
+	//상위부서 리스트
 	public List<Map<String, Object>> getUpperDept(Map<String, Object> map) {
 		return deptMapper.getUpperDept(map);
 	}
-
+	
+	//상위부서 등록
 	public Map<String, Object> insertUpperDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 
@@ -60,7 +62,8 @@ public class DeptService {
 	public List<Map<String, Object>> getDepMngList(Map<String, Object> map) {
 		return deptMapper.getDepMngList(map);
 	}
-
+	
+	// 상위부서 삭제
 	public Map<String, Object> deleteUpperDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 
@@ -113,12 +116,14 @@ public class DeptService {
 
 		return message;
 	}
-
+	
+	//하위부서 리스트
 	public List<Map<String, Object>> getLowerDept(Map<String, Object> map) {
 		System.out.println("Input Map for SQL: " + map);
 		return deptMapper.getLowerDept(map);
 	}
-
+	
+	// 하위부서 등록
 	public Map<String, Object> insertLowerDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 
@@ -146,7 +151,8 @@ public class DeptService {
 
 		return message;
 	}
-
+	
+	// 하위부서 삭제
 	public Map<String, Object> deleteLowerDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 
@@ -169,7 +175,8 @@ public class DeptService {
 
 		return message;
 	}
-
+	
+	// 하위부서 수정
 	public Map<String, Object> updateLowerDept(Map<String, Object> map) {
 		Map<String, Object> message = new HashMap<>();
 		
@@ -195,7 +202,8 @@ public class DeptService {
 		
 		return message;
 	}
-
+	
+	// 부서목록
 	public List<Map<String, Object>> getDepartmentList(Map<String, Object> map) {
 		return deptMapper.getDepartmentList(map);
 	}
