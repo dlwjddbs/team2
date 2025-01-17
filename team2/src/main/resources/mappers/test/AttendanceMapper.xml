@@ -107,6 +107,7 @@
 						  FROM HOLIDAY h 
 							   INNER JOIN MEMBER m
 									   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+									  AND h.IS_BUSINESS_DAY = 'Y'
 										<if test='id != null and id != ""'>
 											AND m.member_id = #{id}
 							         	</if>
@@ -192,6 +193,7 @@
 									  FROM HOLIDAY h 
 										   INNER JOIN MEMBER m
 												   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+												  AND h.IS_BUSINESS_DAY = 'Y'
 													<if test='id != null and id != ""'>
 														AND m.member_id = #{id}
 										         	</if>
@@ -571,6 +573,7 @@
 								  FROM HOLIDAY h 
 									   INNER JOIN MEMBER m
 											   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+											  AND h.IS_BUSINESS_DAY = 'Y'
 												<if test='id != null and id != ""'>
 													AND m.member_id = #{id}
 									         	</if>
