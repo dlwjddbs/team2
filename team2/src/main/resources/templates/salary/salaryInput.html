@@ -255,7 +255,7 @@
 				  			// 받은 데이터를 각 입력 필드에 설정
 				  			// 만약 야간 수당이 나오지 않으면 0으로 설정
 				  			if(nightBonusData.OVERTIME_BONUS != null) {
-								$('#nightBonus').val(nightBonusData.OVERTIME_BONUS);
+								$('#nightBonus').val(formatNumberWithComma(nightBonusData.OVERTIME_BONUS));
 							} else {
 								$('#nightBonus').val(0);				
 							}
