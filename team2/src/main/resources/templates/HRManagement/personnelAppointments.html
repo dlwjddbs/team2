@@ -346,16 +346,18 @@
     $(document).ready(function () {
         // Select2 초기화
         $('.appointGubun').select2();
-        $('#reservationdate').datetimepicker();
+        $('#reservationdate').datetimepicker({
+        	format: 'YYYY-MM-DD',
+        	locale: 'ko',        	
+        });
         
         let defaultDate = moment(); 
         
 
         $('#reservationdate').datetimepicker({
-            format: 'YYYY-MM-DD',
-            locale: 'ko',
+
             defaultDate: defaultDate, 
-            minDate: moment() 
+            minDate: moment(),
         });
 
         initializeDateRangePicker();
@@ -811,7 +813,7 @@
         $("#confirmBtn").on("click", function () {
 			const changeDate = $("#reservationdate input").val(); 
 			console.log("changeDate", changeDate)
-			const formattedDate = moment(changeDate, "MM/DD/YYYY hh:mm A").format("YYYY-MM-DD");
+			//const formattedDate = moment(changeDate, "MM/DD/YYYY hh:mm A").format("YYYY-MM-DD");
 			
             const selectedData = {
 				MEMBER_ID: $("#memberId").text().trim(),
@@ -821,7 +823,7 @@
 				OLD_GRADE: gradeMapping[$("#oldGrade").text().trim()],
 				OLD_GRADE_NAME: $("#oldGrade").text().trim(),
 				ASSIGNMENT_TYPE: $("#appointGubun").val(),
-				CHANGE_DATE: formattedDate,
+				CHANGE_DATE: changeDate,
 				NEW_DEPT_NAME: $("#deptSelectBox option:selected").text().trim(),
 				NEW_DEPT: deptMapping[ $("#deptSelectBox option:selected").text().trim()],
 				NEW_GRADE_NAME: $("#rankSelectBox option:selected").text(),
