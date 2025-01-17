@@ -102,40 +102,54 @@
 	<!-- 조직도 조회 -->
 	<select id="getOrgTree" resultType="map">
 		SELECT
-		d1.DEPT_ID AS deptId, 
+		d1.DEPT_ID AS deptId,
 		c1.CODE_NAME AS deptName,
-		c2.CODE_NAME AS parentDeptName, 
-		e.MEMBER_ID AS memberId, 
+		c2.CODE_NAME AS parentDeptName,
+		e.MEMBER_ID AS memberId,
 		e.NAME AS memberName,
 		e.EMAIL AS email,
 		e.PHONE AS phone,
 		e.PROFILE_PIC AS profile,
 		g.CODE_NAME AS gradeName,
-		d1.PARENT_DEPT_ID AS parentDeptId, 
-		d1.DEPT_ID AS deptId 
+		d1.PARENT_DEPT_ID AS parentDeptId,
+		d1.DEPT_ID AS deptId
 		FROM
 		MEMBER e
 		LEFT JOIN DEPARTMENT d1
 		ON e.DEPT_ID = d1.DEPT_ID
 		LEFT JOIN COMMON_CODE c1
 		ON d1.DEPT_ID = c1.CODE_ID
-		AND c1.GROUP_ID = 'DEP' 
+		AND c1.GROUP_ID = 'DEP'
 		LEFT JOIN DEPARTMENT d2
-		ON d1.PARENT_DEPT_ID = d2.DEPT_ID 
+		ON d1.PARENT_DEPT_ID = d2.DEPT_ID
 		LEFT JOIN COMMON_CODE c2
 		ON d2.DEPT_ID = c2.CODE_ID
 		AND c2.GROUP_ID = 'DEP'
 		LEFT JOIN COMMON_CODE g
 		ON e.GRADE_ID = g.CODE_ID
-		AND g.GROUP_ID = 'RANK' 
+		AND g.GROUP_ID = 'RANK'
 		WHERE
-		e.USE_YN = 'Y' 
-		ORDER BY
-		c2.CODE_NAME,
-		c1.CODE_NAME,
-		g.CODE_NAME,
+		e.USE_YN = 'Y'
+		ORDER BY		
+		CASE g.CODE_NAME
+		WHEN '사장' THEN 1
+		WHEN '부사장' THEN 2
+		WHEN '전무' THEN 3
+		WHEN '상무' THEN 4
+		WHEN '이사' THEN 5
+		WHEN '부장' THEN 6
+		WHEN '차장' THEN 7
+		WHEN '과장' THEN 8
+		WHEN '대리' THEN 9
+		WHEN '주임' THEN 10
+		WHEN '사원' THEN 11
+		ELSE 12
+		END,
+<!-- 		c2.CODE_NAME,
+		c1.CODE_NAME, -->
 		e.NAME
 	</select>
+
 
 
 	<!-- MEMBER_HISTORY에 변경 이력 삽입 -->

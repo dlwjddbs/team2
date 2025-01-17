@@ -358,12 +358,10 @@
             minDate: moment() 
         });
 
-        // 날짜 범위 선택기 설정 및 테이블 초기 로드
         initializeDateRangePicker();
         loadDataTable();
         loadOrgTree();
 
-        // 버튼 이벤트
         $('#btnAdd').on('click', function () {
         	 resetModalFields();
             $("#addModal").modal("show");
@@ -379,19 +377,15 @@
     });
 
     function resetModalFields() {
-        // 텍스트 입력 필드 초기화
         $('#addModal input[type="text"]').val('');
         $('#addModal input[type="date"]').val('');
         $('#addModal textarea').val('');
         
-        // 선택 필드 초기화
         $('#addModal select').prop('selectedIndex', 0).trigger('change');
 
-        // 체크박스 초기화
         $('#addModal input[type="checkbox"]').prop('checked', false);
 
-        // 커스텀 필드 초기화 (필요한 경우)
-        $('#checkedEmployees').empty(); // 체크된 직원 목록 초기화
+        $('#checkedEmployees').empty(); 
         $('#memberId').text('');
         $('#memberName').text('');
         $('#oldDept').text('');
@@ -399,7 +393,7 @@
     }
 
     
-    // 날짜 범위 선택기 초기화
+    // 날짜 범위 초기화
     function initializeDateRangePicker() {
         $.ajax({
             url: "/appoint/getMinMaxDate",
@@ -431,7 +425,7 @@
         });
     }
 
-    // 데이터 테이블 로드 함수
+    // 테이블 로드
     function loadDataTable(appointGubun = null, startDate = null, endDate = null, isUpdate = false) {
         if (isUpdate) {
             $("#appointments").DataTable().destroy();
@@ -451,13 +445,11 @@
 			        selectBox.append('<option selected disabled>부서를 선택하세요</option>');
 
 			        const groupedOptions = groupedDeptOptions(data);
-			        selectBox.append(groupedOptions);
-			       
-					 //console.log("부서 옵션:", selectBox.html());
+			        selectBox.append(groupedOptions);			       
 					 
 					 // 부서 목록을 deptMapping 객체로 변환
 			        data.forEach(department => {
-			            deptMapping[department.DEPTNAME.trim()] = department.DEPTID; // DEPTNAME을 키로, DEPTID를 값으로 매핑
+			            deptMapping[department.DEPTNAME.trim()] = department.DEPTID;
 			        });
 
 			        console.log("deptMapping:", deptMapping);  // deptMapping 객체 확인
@@ -467,6 +459,7 @@
 			        console.error('Error fetching departments:', error);
 			    }
 			}),
+			
             $.ajax({
                 url: '/appoint/getAllRanks',
                 method: 'GET',
@@ -584,14 +577,13 @@
                         }                    
                     },
 					{
-                        data: null, // 데이터를 사용하지 않고 전체 옵션 목록에서 렌더링
+                        data: null,
                         title: "부서",
                         defaultContent: "",
                         render: function (data, type, row) {
-                            // 이전 부서 (읽기 전용)
+                        	
                             const oldDept = deptOptions.find(dept => dept.DEPTID === row.OLD_DEPT)?.DEPTNAME || "없음";
 
-                            // 새로운 부서 (선택 가능)
                             const currentDeptSelect = `
                                 <select class="form-control-custom2 current-dept" disabled>
                                     <option selected>${oldDept}</option>
@@ -601,11 +593,10 @@
                             const newDeptSelect = `
                                 <select class="form-control-custom new-dept">
                                     <option disabled ${!row.NEW_DEPT ? "selected" : ""}>부서 선택</option>
-                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} <!-- 옵션 생성 -->
+                                    ${groupedDeptOptions(deptOptions, row.NEW_DEPT)} 
                                 </select>
                             `;
 
-                            // 렌더링 결과 반환
                             return `
                                 <div class="d-flex">
                                     ${currentDeptSelect} <span class="mx-2 mt-1"> → </span>
@@ -650,47 +641,40 @@
         
     }
 
-	function groupedDeptOptions(deptOptions, selectedDeptId) {
-	    if (!Array.isArray(deptOptions) || deptOptions.length === 0) {
-	        console.warn("Invalid or empty deptOptions:", deptOptions);
-	        return ""; // 빈 옵션 반환
-	    }
+    function groupedDeptOptions(deptOptions, selectedDeptId) {
+    	
+        // 부서 데이터를 그룹화
+        const groupedData = deptOptions.reduce((acc, dept) => {
+            const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
+            if (!parentDept) return acc; 
 
-	    // 부서 데이터를 그룹화
-	    const groupedData = deptOptions.reduce((acc, dept) => {
-	        const parentDept = dept.PARENTDEPTNAME || dept.DEPTNAME; // 상위 부서 이름
-	        if (!parentDept) return acc; // null, undefined는 그룹화에서 제외
+            if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
+            acc[parentDept].push(dept); // 그룹에 데이터 추가
+            return acc;
+        }, {});
 
-	        if (!acc[parentDept]) acc[parentDept] = []; // 그룹 초기화
-	        acc[parentDept].push(dept); // 그룹에 데이터 추가
-	        return acc;
-	    }, {});
+        const parentKeys = Object.keys(groupedData); // 모든 상위 부서 키 가져오기
 
-	    //console.log("Grouped Data:", groupedData); // groupedData 출력
+        const html = parentKeys
+            .map(parent => {
+                const childDepts = groupedData[parent].filter(dept => dept.PARENTDEPTNAME === parent); // 해당 상위 부서의 하위 부서만 필터링
 
-	    const parentKeys = Object.keys(groupedData).slice(0, 3); // 최대 3개의 상위 부서만 가져옴
+                return `
+                    <optgroup label="${parent}" class="parent-dept" data-parent="${parent}">
+                        ${childDepts
+                            .map(dept => {
+                                const isSelected = dept.DEPTID === selectedDeptId ? "selected" : ""; // 선택된 부서 검사
+                                return `<option value="${dept.DEPTID}" ${isSelected} data-dept-info='${JSON.stringify(dept)}'>
+                                    ${dept.DEPTNAME}
+                                </option>`;
+                            }).join('')}
+                    </optgroup>
+                `;
+            }).join('');
 
-	    const html = parentKeys
-	        .map(parent => {
-	            const childDepts = groupedData[parent].filter(dept => dept.PARENTDEPTNAME); // 하위 부서만 필터링
+        return html;
+    }
 
-	            return `
-	                <optgroup label="${parent}" class="parent-dept" data-parent="${parent}">
-	                    ${childDepts
-	                        .map(dept => {
-	                            const isSelected = dept.DEPTID === selectedDeptId ? "selected" : ""; // 선택된 부서 검사
-	                            return `<option value="${dept.DEPTID}" ${isSelected} data-dept-info='${JSON.stringify(dept)}'>
-	                                ${dept.DEPTNAME}
-	                            </option>`;
-	                        }).join('')}
-	                </optgroup>
-	            `;
-	        }).join('');
-
-	    //console.log("Generated HTML:", html);
-
-	    return html;
-	}
 
 
     $("#appointments").on("change", "#checkAll", function () {
@@ -704,7 +688,7 @@
         checkbox.prop('checked', true);
     });
         
-    // 조직도 데이터 로드
+    // 조직도 로드
     function loadOrgTree() {
         $.ajax({
             url: "/appoint/getOrgTree",
@@ -721,7 +705,7 @@
     // 조직도 렌더링
 	function renderOrgTree(data) {
 	    const treeContainer = $("#orgTree");
-	    treeContainer.empty(); // 기존 트리 초기화
+	    treeContainer.empty();
 
 	    // 데이터를 부서와 팀으로 그룹화
 	    const groupedData = data.reduce((acc, item) => {
@@ -764,7 +748,7 @@
 	        }
 	    });
 
-	    // 그룹화된 데이터를 UI로 렌더링
+	    // 그룹화된 데이터
 	    Object.keys(groupedData).forEach(parentDeptName => {
 	        const parentDept = groupedData[parentDeptName];
 	        const deptHtml = `
@@ -809,6 +793,7 @@
 		    const deptName = $(this).data("team-name");
 		
 		    if (memberId && memberName && gradeName && deptName) {
+		    	
 		        // 팝업에 데이터 설정
 		        $("#memberId").text(memberId);
 		        $("#memberName").text(memberName);
@@ -824,7 +809,7 @@
 
 		 
         $("#confirmBtn").on("click", function () {
-			const changeDate = $("#reservationdate input").val(); // 예: "01/08/2025 12:49 AM"
+			const changeDate = $("#reservationdate input").val(); 
 			console.log("changeDate", changeDate)
 			const formattedDate = moment(changeDate, "MM/DD/YYYY hh:mm A").format("YYYY-MM-DD");
 			
@@ -915,34 +900,30 @@
                 `;
                 $("#checkedEmployees").append(employeeItem);
                 
-                $(this).attr("aria-hidden", "true"); // aria-hidden 추가
+                $(this).attr("aria-hidden", "true"); 
                 $(this).find("input, select, button").attr("tabindex", "-1");
 
-                // 데이터 초기화
                 $(this).removeData("selectedData");
             }
             
-         // 발령 구분 초기화
             $("#appointGubun").val("발령구분").trigger("change");
-            $("#reservationdate input").val(moment().format("YYYY-MM-DD")); // 오늘 날짜로 설정
+            $("#reservationdate input").val(moment().format("YYYY-MM-DD")); 
             $("#deptSelectBox").val("부서를 선택하세요").trigger("change");
             $("#rankSelectBox").val("직급을 선택하세요").trigger("change");
             $("input[name='etc']").val("");
         });
         
         
-     // 삭제 버튼 이벤트 처리
         $("#checkedEmployees").on("click", "#memberDelete", function () {
-            $(this).closest(".newPosition").remove(); // 해당 직원 정보 삭제
+            $(this).closest(".newPosition").remove(); 
         });
     }
     
-    // 재확인 팝업
     $('#confirmOkBtn').on('click', function () {
         $("#confirmModal").modal("show");
     });
 
-    
+
     $("#confirmSaveBtn").on("click", function () {
         const checkedEmployees = [];
         $("#checkedEmployees .newPosition").each(function () {
@@ -968,7 +949,7 @@
         console.log("checkedEmployees", checkedEmployees)
 
          $.ajax({
-            url: "/appoint/updateAppointments", // 백엔드 API 엔드포인트
+            url: "/appoint/updateAppointments", 
             method: "POST",
             contentType: "application/json",
             data: JSON.stringify(checkedEmployees),
@@ -987,18 +968,18 @@
         });       
     });
     
-    // btnSave 클릭 이벤트
+    // btnSave 
 	$("#btnSave").on("click", function () {
-	    const updatedRows = []; // 변경된 행 데이터를 저장
+	    const updatedRows = []; 
 	
 	    // 체크된 행만 처리
 	    $("#appointments tbody .row-checkbox:checked").each(function () {
 	        const $row = $(this).closest("tr");
 	        const rowData = $("#appointments").DataTable().row($row).data(); // DataTable에서 행 데이터 가져오기
 	
-	        // 변경된 데이터만 수집
+	        // 변경된 데이터만
 	        const updatedData = {
-	            HISTORY_ID: rowData.HISTORY_ID, // 숨겨진 데이터도 포함
+	            HISTORY_ID: rowData.HISTORY_ID, 
 	            MEMBER_ID: rowData.MEMBER_ID,
 	            ASSIGNMENT_TYPE: $row.find(".appointGubun option:selected").val(),
 	            OLD_DEPT: $row.find(".current-dept").val(),
@@ -1018,7 +999,7 @@
 	
 	        // 변경된 데이터가 있는 경우 HISTORY_ID 추가
 	        if (Object.keys(changes).length > 0) {
-	            changes.HISTORY_ID = rowData.HISTORY_ID; // 기본 키
+	            changes.HISTORY_ID = rowData.HISTORY_ID; 
 	            updatedRows.push(changes);
 	        }
 	    });
@@ -1028,7 +1009,6 @@
 	        return;
 	    }
 	
-	    // 서버로 데이터 전송
 	    $.ajax({
 	        url: "/appoint/updateChangedColumns",
 	        type: "POST",
@@ -1036,7 +1016,7 @@
 	        data: JSON.stringify(updatedRows),
 	        success: function () {
 	            alert("변경 사항이 저장되었습니다.");
-	            $("#appointments").DataTable().ajax.reload(); // 테이블 갱신
+	            $("#appointments").DataTable().ajax.reload();
 	        },
 	        error: function (error) {
 	            console.error("저장 중 오류 발생:", error);
@@ -1045,15 +1025,15 @@
 	    });
 	});
     
-	 // btnDelete 클릭 이벤트
+	 // btnDelete 
 	$("#btnDelete").on("click", function () {
     const selectedIds = [];
 
     // 선택된 체크박스에서 HISTORY_ID 추출
     $("#appointments tbody .row-checkbox:checked").each(function () {
-        const data = JSON.parse($(this).val()); // JSON.parse로 객체 복원
+        const data = JSON.parse($(this).val()); 
         if (data && data.HISTORY_ID) {
-            selectedIds.push(data.HISTORY_ID); // HISTORY_ID만 추출
+            selectedIds.push(data.HISTORY_ID);
         }
     });
 
@@ -1062,15 +1042,14 @@
         return;
     }
 
-    // AJAX 호출
     $.ajax({
         url: "/appoint/deleteAppointments",
         type: "POST",
         contentType: "application/json",
-        data: JSON.stringify(selectedIds), // List<String> 형식으로 전송
+        data: JSON.stringify(selectedIds), 
         success: function (response) {
             alert(response);
-            $("#appointments").DataTable().ajax.reload(); // 테이블 갱신
+            $("#appointments").DataTable().ajax.reload(); 
         },
         error: function (error) {
             console.error("삭제 오류:", error);

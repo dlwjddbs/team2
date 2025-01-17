@@ -182,7 +182,7 @@
 	                "data-member-id": item.MEMBERID,
 	                "data-member-name": item.MEMBERNAME,
 	                "data-member-grade": item.GRADENAME,
-	                "data-member-profile": item.PROFILE || '/images/default.jpg',
+	                "data-member-profile": item.PROFILE || 'default.jpg',
 	                "data-member-phone": item.PHONE || '없음',
 	                "data-member-email": item.EMAIL || '없음',
 	                "children": []
@@ -256,6 +256,7 @@
 	            "state": { "opened": true },
 				"data-member-grade": ceo["data-member-grade"],
 				"data-member-id":ceo["data-member-id"],
+				"data-member-id":ceo["data-member-id"],
 	            "children": []
 	        };
 	        companyNode.children.push(ceoNode);
@@ -305,21 +306,6 @@
 	        }
 	    });
 
-	    // 부서 클릭 이벤트
-	    $('#orgTree').on("select_node.jstree", function (e, data) {
-	        const departmentName = data.node.original['data-department'];
-	        if (departmentName) {
-	            showEmployeesInDepartment(departmentName);
-	        } else if (data.node.original['data-team-id']) {
-	            const teamId = data.node.original['data-team-id'];
-	            const teamName = data.node.original['data-team-name'];
-	            showEmployeesInTeam(teamId, teamName);
-			} else if (data.node.original['data-member-id'] && data.node.original['data-member-grade'] === "사장") {
-	            // 사장 노드를 클릭한 경우, 모든 직원 정보를 표시
-	            showEmployeesInAllTeams();
-	        }
-	    });
-		
 		// "기타" 부서를 클릭했을 때 직원 리스트를 테이블에 표시하는 이벤트 처리
 	   $('#orgTree').on("select_node.jstree", function (e, data) {
 		console.log("기타 클릭")
@@ -331,29 +317,6 @@
 
 	}
 
-	function initializeDataTable() {
-	    $('#employeeTable').DataTable({
-	        "destroy": true,  
-	        "paging": true,   
-	        "searching": true, 
-	        "ordering": true,  
-	        "dom": '<"top"f>rt<"bottom"ip><"clear">',
-	        "language": {
-	            "search": "검색:",
-	            "zeroRecords": "검색된 결과가 없습니다.",
-	            "paginate": {
-	                "previous": "이전",
-	                "next": "다음"
-	            }
-	        },
-			"columnDefs": [
-				   { width: "80px", className: "text-center", targets: 0 },
-	               { width: "160px", targets: 3 },
-	               { width: "120px", className: "text-center", targets: 4 },
-	               { className: "text-center", targets: 5 },
-			    ]
-	    });
-	}
 	
 	// 기타 직원
 	function showEmployeesInOtherDepartment() {
@@ -391,53 +354,97 @@
 	function showEmployeesInAllTeams() {
 	    const employeeTableBody = $("#employeeTree tbody");
 	    employeeTableBody.empty();  // 기존 내용 삭제
-
-	    let employeeListHtml = '';
-
-	    // 사장 정보도 포함하여 모든 직원 리스트 출력
+	
+	    let allEmployees = [];
+	
+	    // 사장 정보 추가
 	    if (ceo) {
-	        employeeListHtml += `
-	            <tr>
-	                <td><img src="${ceo['data-member-profile']}" alt="${ceo['data-member-name']}" width="30" height="30"></td>
-	                <td>${ceo['data-member-id']}</td>
-	                <td>${ceo['data-member-name']}</td>
-	                <td>회사</td>
-	                <td>${ceo['data-member-grade']}</td>
-	                <td>${ceo['data-member-phone']}</td>
-	                <td>${ceo['data-member-email']}</td>
-	            </tr>
-	        `;
+	        allEmployees.push(ceo);  // 사장 정보를 allEmployees 배열에 추가
 	    }
-
-	    // 부서 및 팀의 직원들 목록을 출력
+	
+	    // 모든 부서와 팀의 데이터 수집
 	    Object.keys(groupedData).forEach(departmentName => {
 	        Object.keys(groupedData[departmentName].teams).forEach(team => {
-	            const teamMembers = groupedData[departmentName].teams[team];
-	            if (teamMembers.length > 0) {
-	                teamMembers.forEach(member => {
-	                    employeeListHtml += `
-	                        <tr>
-	                            <td><img src="/images/${member['data-member-profile']}" alt="${member['data-member-name']}" width="30" height="30"></td>
-	                            <td>${member['data-member-id']}</td>
-	                            <td>${member['data-member-name']}</td>
-	                            <td>${departmentName}</td>
-	                            <td>${member['data-member-grade']}</td>
-	                            <td>${member['data-member-phone']}</td>
-	                            <td>${member['data-member-email']}</td>
-	                        </tr>
-	                    `;
-	                });
-	            }
+	            groupedData[departmentName].teams[team].forEach(member => {
+	                member.departmentName = departmentName; // 부서 이름을 멤버 객체에 추가
+	                allEmployees.push(member);
+	            });
 	        });
 	    });
-
+	    
+	    console.log("allEmployees", allEmployees)
+		
+	    // 직급별 우선순위를 매핑하는 객체
+		const gradePriority = {
+		    '사장': 1,
+		    '부사장': 2,
+		    '전무': 3,
+		    '상무': 4,
+		    '이사': 5,
+		    '부장': 6,
+		    '차장': 7,
+		    '과장': 8,
+		    '대리': 9,
+		    '주임': 10,
+		    '사원': 11,
+		    '기타': 12 // '기타'와 같은 예상치 못한 직급에 대한 처리도 포함
+		};
+		
+		// 직급에 따라 배열 정렬
+		allEmployees.sort((a, b) => {
+		    // 직급을 가져오고, 매핑된 우선순위에 따라 비교
+		    let gradeA = gradePriority[a['data-member-grade']] || gradePriority['기타']; // 매핑되지 않은 직급은 '기타'로 처리
+		    let gradeB = gradePriority[b['data-member-grade']] || gradePriority['기타'];
+		    return gradeA - gradeB;
+		});
+	
+		console.log("allEmployees", allEmployees)
+	    // HTML 테이블 행 생성
+	    let employeeListHtml = allEmployees.map(member => `
+	        <tr>
+	            <td><img src="/images/${member['data-member-profile']}" alt="${member['data-member-name']}" width="30" height="30"></td>
+	            <td>${member['data-member-id']}</td>
+	            <td>${member['data-member-name']}</td>
+	            <td>${member.departmentName  || ''}</td>
+	            <td>${member['data-member-grade']}</td>
+	            <td>${member['data-member-phone']}</td>
+	            <td>${member['data-member-email']}</td>
+	        </tr>
+	    `).join('');
+	
 	    // 테이블 내용 업데이트
 	    employeeTableBody.html(employeeListHtml);
-
-	    // DataTables 초기화
+	
+	    // DataTables 초기화 (새로운 데이터로 테이블을 채워야 할 경우)
 	    var table = $('#employeeTable').DataTable();
 	    table.clear();
 	    table.rows.add($(employeeTableBody).find('tr')).draw();
+	}
+	
+
+	function initializeDataTable() {
+	    $('#employeeTable').DataTable({
+	        "destroy": true,  
+	        "paging": true,   
+	        "searching": true, 
+	        "dom": '<"top"f>rt<"bottom"ip><"clear">',
+	        "language": {
+	            "search": "검색:",
+	            "zeroRecords": "검색된 결과가 없습니다.",
+	            "paginate": {
+	                "previous": "이전",
+	                "next": "다음"
+	            }
+	        },
+			"columnDefs": [
+				   { width: "80px", className: "text-center", targets: 0 },
+	               { width: "160px", targets: 3 },
+	               { width: "120px", className: "text-center", targets: 4 },
+	               { className: "text-center", targets: 5 },
+	               { orderable: true, targets: 4 }, 
+	               { orderable: false, targets: '_all' } 
+			    ]
+	    });
 	}
 
 	$('#orgTree').on("select_node.jstree", function (e, data) {
@@ -445,16 +452,16 @@
 		console.log("data-member-grade:", data.node.original['data-member-grade']);
 	    const departmentName = data.node.original['data-department'];
 	    if (departmentName) {
-	        console.log("Department selected:", departmentName);
+	        //console.log("Department selected:", departmentName);
 			
 	        showEmployeesInDepartment(departmentName);
 	    } else if (data.node.original['data-team-id']) {
 	        const teamId = data.node.original['data-team-id'];
 	        const teamName = data.node.original['data-team-name'];
-	        console.log("Team selected:", teamId, teamName);
+	        //console.log("Team selected:", teamId, teamName);
 	        showEmployeesInTeam(teamId, teamName);
 	    } else if (data.node.original['data-member-id'] && data.node.original['data-member-grade'] === "사장") {
-	        console.log("CEO selected, showing all employees");
+	        console.log("CEO selected");
 	        // 사장 노드를 클릭한 경우, 모든 직원 정보를 표시
 	        showEmployeesInAllTeams();
 	    }
@@ -470,39 +477,55 @@
 
 	    console.log("Department Data: ", departmentData);
 
-	    if (departmentData && departmentData.teams) {
-	        let employeeListHtml = "";
-	        // 부서의 모든 팀을 순회하여 팀원 추가
-	        Object.keys(departmentData.teams).forEach(team => {
-	            const teamMembers = departmentData.teams[team];
-	            if (teamMembers.length > 0) {
+	    let allEmployees = [];
 
-	                employeeListHtml += teamMembers.map(member =>
-	                    `<tr>
-	                        <td><img src="/images/${member['data-member-profile']}" alt="${member['data-member-name']}" width="30" height="30"></td>
-	                        <td>${member['data-member-id']}</td>
-	                        <td>${member['data-member-name']}</td>
-	                        <td>${departmentName}</td>
-	                        <td>${member['data-member-grade']}</td>
-	                        <td>${member['data-member-phone']}</td>
-	                        <td>${member['data-member-email']}</td>
-	                    </tr>`).join('');
-	            } else {
-	                employeeListHtml += `<tr><td colspan="7">소속된 직원이 없습니다.</td></tr>`;
-	            }
+	    // 부서의 모든 팀을 순회하여 팀원 추가
+	    if (departmentData && departmentData.teams) {
+	        Object.keys(departmentData.teams).forEach(team => {
+	            departmentData.teams[team].forEach(member => {
+	                member.departmentName = departmentName; // 부서 이름을 멤버 객체에 추가
+	                allEmployees.push(member);
+	            });
 	        });
+
+	        // 직급별 우선순위에 따라 배열 정렬
+	        const gradePriority = {
+	            '사장': 1, '부사장': 2, '전무': 3, '상무': 4,
+	            '이사': 5, '부장': 6, '차장': 7, '과장': 8,
+	            '대리': 9, '주임': 10, '사원': 11, '기타': 12
+	        };
+
+	        allEmployees.sort((a, b) => {
+	            let gradeA = gradePriority[a['data-member-grade']] || gradePriority['기타'];
+	            let gradeB = gradePriority[b['data-member-grade']] || gradePriority['기타'];
+	            return gradeA - gradeB;
+	        });
+
+	        // HTML 테이블 행 생성
+	        let employeeListHtml = allEmployees.map(member => `
+	            <tr>
+	                <td><img src="/images/${member['data-member-profile']}" alt="${member['data-member-name']}" width="30" height="30"></td>
+	                <td>${member['data-member-id']}</td>
+	                <td>${member['data-member-name']}</td>
+	                <td>${member.departmentName}</td>
+	                <td>${member['data-member-grade']}</td>
+	                <td>${member['data-member-phone']}</td>
+	                <td>${member['data-member-email']}</td>
+	            </tr>
+	        `).join('');
+
 	        employeeTableBody.html(employeeListHtml);
 
-	       var table = $('#employeeTable').DataTable();
-	       table.clear();  
-	       table.rows.add($(employeeTableBody).find('tr')).draw(); 
-		   
+	        // DataTables 초기화
+	        var table = $('#employeeTable').DataTable();
+		    table.clear();
+		    table.rows.add($(employeeTableBody).find('tr')).draw();
 	    } else {
-	        const table = $('#employeeTable').DataTable();
-	        table.clear();
-	        table.rows.add($("<tr><td colspan='7'>이 부서에 소속된 직원이 없습니다.</td></tr>")).draw();
+	        // 부서에 직원이 없는 경우
+	        employeeTableBody.html('<tr><td colspan="7">이 부서에 소속된 직원이 없습니다.</td></tr>');
 	    }
 	}
+
 
 	// 부서 내 총 인원 수 구하기
 	function getTotalMembersInDepartment(departmentName) {
