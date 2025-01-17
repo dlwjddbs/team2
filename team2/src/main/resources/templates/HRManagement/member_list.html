@@ -56,7 +56,7 @@
 					<div class="row">
 						<div class="col-12">
 							<div class="card">
-								<div class="card-header">
+								<div class="card-header"  sec:authorize="hasRole('ADMIN')">
 									<div class="card-tools">
 										<!-- new member modal -->
 										<button type="button" class="btn btn-primary" id="newMember" data-toggle="modal" data-target="#modal-lg">
@@ -244,6 +244,13 @@
 			$("#join_date").attr("readonly",true); 
 		}
 		
+		function resetModalFields() {
+			$('#modal-lg').find('form').trigger('reset');
+			$('#modal-lg').find('input, select, textarea').each(function () {
+				$(this).val('');
+			});
+		}
+		
 		$(document).ready(function () {
 			dateRangePicker();
 			
@@ -294,12 +301,7 @@
 				}
 			});
 
-			function resetModalFields() {
-				$('#modal-lg').find('form').trigger('reset');
-				$('#modal-lg').find('input, select, textarea').each(function () {
-					$(this).val('');
-				});
-			}
+			
 
 			$("#newMember").on("click", function () {
 				resetModalFields();
