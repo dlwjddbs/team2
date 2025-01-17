@@ -51,7 +51,7 @@
  							<div class="col-md-6"> 
 								<div class="form-group">
 									<label for="exampleInputEmail1">부서명</label>
-									<select class="form-control select" id="deptId" name="department">
+									<select class="form-control select" id="deptId" name="department" disabled>
 										<option selected="selected" disabled>부서선택</option>
 										<option value="HR">인사팀</option>												
 										<option value="AC">회계팀</option>												
@@ -68,7 +68,7 @@
  							<div class="col-md-6"> 
  								<div class="form-group"> 
 									<label for="exampleInputEmail1">직급</label>
-									<select class="form-control select" id="gradeId" name="gradeId">
+									<select class="form-control select" id="gradeId" name="gradeId" disabled>
 										<option selected="selected" disabled>직급선택</option>												
 										<option value="AS">대리</option>												
 										<option value="MG">과장</option>												
@@ -101,7 +101,7 @@
 							<div class="col-md-8">
 								<div class="form-group">
 								    <label>금액</label>
-								    <input type="text" id="salary" name="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
+								    <input type="text" id="salary" readonly name="salary" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
 						            <input type="text" id="positionBonus" name="positionBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
 						            <input type="text" id="holidayBonus" name="holidayBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>
 						            <input type="text" id="nightBonus" name="nightBonus" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)"><br>

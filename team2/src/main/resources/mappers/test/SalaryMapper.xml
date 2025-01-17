@@ -239,7 +239,7 @@
 	<update id="updateMemberSalary" parameterType="map">
 	    UPDATE MEMBER
 	       SET 
-	           SALARY = #{salary}
+	           SALARY = NVL(TO_NUMBER(REPLACE(#{salary}, ',', '')), 0)
 	     WHERE MEMBER_ID = #{memberId}
 	       AND EXISTS (
 	           SELECT 1
@@ -256,12 +256,12 @@
 		UPDATE SALARY 
 	   	   SET 
 	   	   	   PAYDAY = #{payday}
-	   	   	 , POSITION_BONUS = NVL(#{positionBonus}, 0) 
-	       	 , HOLIDAY_BONUS = NVL(#{holidayBonus}, 0) 
-	       	 , NIGHT_BONUS = NVL(#{nightBonus}, 0) 
-	       	 , YEAREND_BONUS = NVL(#{yearendBonus}, 0) 
-	       	 , FULLSERVICE_BONUS = NVL(#{fullserviceBonus}, 0) 
-	       	 , PERFORMANCE_BONUS = NVL(#{performanceBonus}, 0)
+	   	   	 , POSITION_BONUS = NVL(TO_NUMBER(REPLACE(#{positionBonus}, ',', '')), 0)
+	       	 , HOLIDAY_BONUS = NVL(TO_NUMBER(REPLACE(#{holidayBonus}, ',', '')), 0)
+	       	 , NIGHT_BONUS = NVL(TO_NUMBER(REPLACE(#{nightBonus}, ',', '')), 0)
+	       	 , YEAREND_BONUS = NVL(TO_NUMBER(REPLACE(#{yearendBonus}, ',', '')), 0)
+	       	 , FULLSERVICE_BONUS = NVL(TO_NUMBER(REPLACE(#{fullserviceBonus}, ',', '')), 0)
+	       	 , PERFORMANCE_BONUS = NVL(TO_NUMBER(REPLACE(#{performanceBonus}, ',', '')), 0)
 	       	 , TOTAL = (NVL((SELECT SALARY 
 	       	 			 FROM MEMBER 
 	       	 			 WHERE MEMBER_ID = #{memberId}
@@ -269,12 +269,12 @@
 	       	 			 	   		AND PAYDAY = #{payday}
 	       	 			 	   	</if> 
 						 ), 0) 
-			       	 + NVL(#{positionBonus}, 0) 
-			       	 + NVL(#{holidayBonus}, 0) 
-			       	 + NVL(#{nightBonus}, 0) 
-		             + NVL(#{yearendBonus}, 0) 
-		             + NVL(#{fullserviceBonus}, 0) 
-		             + NVL(#{performanceBonus}, 0)
+			       	 + NVL(TO_NUMBER(REPLACE(#{positionBonus}, ',', '')), 0)
+			       	 + NVL(TO_NUMBER(REPLACE(#{holidayBonus}, ',', '')), 0)
+			       	 + NVL(TO_NUMBER(REPLACE(#{nightBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{yearendBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{fullserviceBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{performanceBonus}, ',', '')), 0)
 		             )
 	       	 , UPDATE_DATE = SYSDATE
 		WHERE 
