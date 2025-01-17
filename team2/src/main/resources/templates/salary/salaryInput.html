@@ -308,7 +308,14 @@
 			    value = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 			    return value;
 			}
+			
+			// 닫기 버튼을 클릭시 입력값 초기화
+			$('#closeBtn').click(function () {    
+	            $('#positionBonus, #holidayBonus, #nightBonus, #yearendBonus, #fullserviceBonus, #performanceBonus').val(''); // 입력 필드 초기화
+	            return; // 추가 처리 방지
 
+			});
+			
 			// 급여 등록 버튼을 클릭시 이벤트 발생
 			$('#submitBtn2').click(function () {    
 				var writeSalaryForm = $("#writeSalaryForm").serialize();
