@@ -36,14 +36,9 @@ public class ApprovalController {
 	
 	@PostMapping("/approval/createApprovalRequest")
 	@ResponseBody
-	public Map<String, Object> createApprovalRequest(@RequestParam Map<String, Object> map) {
-		map.put("APPROVAL_TYPE", "AN");
+	public Map<String, Object> createApprovalRequest(@AuthenticationPrincipal User user, @RequestParam Map<String, Object> map) {
 		map.put("TITLE", "휴가신청");
-		map.put("CONTENT", "개인사유");
-		map.put("MEMBER_ID", "2025010050");
-		map.put("START_DATE", "2025-01-27");
-		map.put("END_DATE", "2025-01-27");
-		map.put("REQUEST_FILE", null);
+		map.put("MEMBER_ID", user.getUsername());
 		
 		Map<String, Object> message = approvalService.createApprovalRequest(map);
 		

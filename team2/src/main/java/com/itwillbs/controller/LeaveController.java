@@ -31,7 +31,6 @@ public class LeaveController {
 		if (user == null) {
             return "redirect:/login"; 
         }
-		
 		return "/leave/admin/leave_manage";
 	}
 	

@@ -395,16 +395,17 @@
 	            }
 	        });
 		}
-		/*
 		$(document).ready(function () {
 			$.ajax({
 		        type : "POST",
-		        url : "/getMyLeave",
+		        url : "/ajax/getMyLeave",
 		        data : {},
 		        success : function(res){
 					$("#totalVacation").text(res.TOTAL_DAYS);
-					$("#usedVacation").text(res.USED_DAYS);
 					$("#remainingVacation").text(res.REMAINING_DAYS);
+					$("#totalVacationM").text(res.TOTAL_DAYS);
+					$("#usedVacationM").text(res.USED_DAYS);
+					$("#remainingVacationM").text(res.REMAINING_DAYS);
 		        },
 		        error : function(XMLHttpRequest, textStatus, errorThrown){
 		            console.log("getUserInfo() ajax 실패");
@@ -413,7 +414,7 @@
 		
 			$.ajax({
 				type : "POST",
-				url: "/getLeaveType",
+				url: "/ajax/getLeaveType",
 				data: {},
 				success : function(res){
 					var selectBox = $("#leaveType");
@@ -430,13 +431,36 @@
 			});
 			
 			$('#submitBtn').on('click', function () {
+				debugger;
+				
 				let reservation = $("#reservation").val();
 				let days = reservation.split('~').map(day => day.trim());
+				
 				$('#startDate').val(days[0]);
 				$('#endDate').val(days[1]);
+				
+				let formData = $('#leaveRequest').serialize();
+				
+				console.log(formData);
+				
+				$.ajax({
+		           url: '/approval/createApprovalRequest',
+		           type: 'POST',
+		           data: formData,
+		           dataType: 'json',
+		           success: function(response) {
+						$('#myModal').modal('hide');
+						location.reload();
+					},
+		           error: function(xhr, status, error) {
+						alert("제출 오류");
+						location.reload();
+		           }
+		       });
+				
+				
 			});
 		});
-		*/
 	</script>
 </body>
 </html>
