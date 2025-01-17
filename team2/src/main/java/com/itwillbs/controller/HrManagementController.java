@@ -26,14 +26,13 @@ import lombok.extern.java.Log;
 public class HrManagementController {
 	
 	private final HrManagementService hrManagementService;
-	
 	// 신규 사원 추가
 	@PostMapping("/ajax/addMember")
 	public String addMember(@RequestParam Map<String, Object> param, Model model) {
 		
 		int insertCount = hrManagementService.addMember(param);
 		
-		return "redirect:/memberList";
+		return "redirect:/appoint/memberList";
 	}
 //======================================================================================================
 	
@@ -45,16 +44,16 @@ public class HrManagementController {
 		
 		// update 판별 추가 예정
 		
-		return "redirect:/memberList";
+		return "redirect:/appoint/memberList";
 	}
 	
 	// 사원 정보
-	@GetMapping("/admin/memberList")
-	public String memberList(@AuthenticationPrincipal User user) {
+	@GetMapping("/appoint/memberList")
+	public String memberList(@AuthenticationPrincipal User user, Model model) {
 		if (user == null) {
             return "redirect:/login"; 
         }
-		
+    	
 		return "/HRManagement/member_list";
 	}
 	
