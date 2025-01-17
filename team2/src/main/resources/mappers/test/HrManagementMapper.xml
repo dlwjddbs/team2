@@ -95,7 +95,7 @@
 	 								ON M.GRADE_ID = CC_GRADE.CODE_ID 
 	 							   AND CC_GRADE.GROUP_ID = 'RANK'
 		 WHERE M.USE_YN = 'Y'
-    
+      ORDER BY M.CREATE_DATE DESC
     </select>
     
     <!-- 사원 상세 정보 -->
