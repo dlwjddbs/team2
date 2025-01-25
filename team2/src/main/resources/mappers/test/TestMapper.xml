@@ -12,12 +12,17 @@
   			  dual
     </select>
 
-<!--    <select id="selectTest" resultType="string">-->
-<!--        select -->
-<!--        	  join_date-->
-<!--          from -->
-<!--        	  member -->
-<!--         where -->
-<!--        	  id = '20241220'-->
-<!--    </select>-->
+    <select id="selectToastTest" resultType="map">
+        select *
+          from test
+    </select>
+    
+    <insert id="insertToastTest">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO TEST (ID, COL_1, COL_2, COL_3)
+				VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3})
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
 </mapper>
