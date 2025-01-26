@@ -89,7 +89,7 @@ public class TestService {
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "deleteToastTest 성공";
+		String message = "updateToastTest 성공";
 		
 		try {
 			testMapper.updateToastTest(updatedRows);

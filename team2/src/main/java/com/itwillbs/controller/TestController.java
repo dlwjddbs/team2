@@ -111,6 +111,11 @@ public class TestController {
 		return "testToast";
 	}
 	
+	@GetMapping("/testToast2")
+	public String test2() {
+		return "testToast2";
+	}
+	
 //	@GetMapping("/ajax/toastTest")
 //	@ResponseBody
 //	public Map<String, Object> getToastTest(@RequestParam Map<String, Object> param) {

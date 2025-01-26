@@ -19,8 +19,8 @@
 	
 	<select id="countExistingIds" parameterType="list" resultType="int">
 	    SELECT COUNT(*) AS count
-	    FROM TEST
-	    WHERE ID IN
+	      FROM TEST
+	     WHERE ID IN
 	    <foreach collection="list" item="row" open="(" separator="," close=")">
 	        #{row.ID}
 	    </foreach>
@@ -30,7 +30,7 @@
 	    INSERT ALL
 		<foreach collection="list" item="item">
 			INTO TEST (ID, COL_1, COL_2, COL_3)
-				VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3})
+			VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3})
 		</foreach>
 		SELECT * FROM DUAL
     </insert>
@@ -47,9 +47,9 @@
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE TEST
 	           SET 
-				   COL_1 = #{row.COL_1},
-	               COL_2 = #{row.COL_2},
-	               COL_3 = #{row.COL_3}
+				   COL_1 = #{row.COL_1}
+	             , COL_2 = #{row.COL_2}
+	             , COL_3 = #{row.COL_3}
 	         WHERE ID = #{row.ID}
 	    </foreach>
     </update>

@@ -35,32 +35,30 @@ import lombok.extern.java.Log;
 @RestController
 public class ToastController {
 	
+	private final String URL = "/ajax/toastTest";
+	
 	private final TestService testService;
 	
-	@GetMapping("/ajax/toastTest")
-	@ResponseBody
+	@GetMapping(URL)
 	public Map<String, Object> getToastTest() {
 		return testService.selectToastTest();
 	}	
 	
-	@PostMapping("/ajax/toastTest")
-	@ResponseBody
+	@PostMapping(URL)
 	public Map<String, Object> insertToastTest(@RequestBody Map<String, Object> requestData) {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
         return testService.insertToastTest(createdRows);
 	}	
 	
-	@DeleteMapping("/ajax/toastTest")
-	@ResponseBody
+	@DeleteMapping(URL)
 	public Map<String, Object> deleteToastTest(@RequestHeader("X-Delete-IDs") String ids) {
         List<String> idList = Arrays.asList(ids.split(","));
         
         return testService.deleteToastTest(idList);
 	}	
 	
-	@PutMapping("/ajax/toastTest")
-	@ResponseBody
+	@PutMapping(URL)
 	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		
