@@ -1,6 +1,7 @@
-package com.itwillbs.controller;
+package com.itwillbs.restController;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +39,7 @@ public class ToastController {
 	
 	@GetMapping("/ajax/toastTest")
 	@ResponseBody
-	public Map<String, Object> getToastTest(@RequestParam Map<String, Object> param) {
+	public Map<String, Object> getToastTest() {
 		return testService.selectToastTest();
 	}	
 	
@@ -47,17 +49,22 @@ public class ToastController {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
         return testService.insertToastTest(createdRows);
-
 	}	
 	
 	@DeleteMapping("/ajax/toastTest")
 	@ResponseBody
-	public Map<String, Object> deleteToastTest(@PathVariable("deletedRows") String requestData) {
-		System.out.println("------");
-		System.out.println(requestData);
-//		return testService.deleteToastTest(requestData);
-		return null;
+	public Map<String, Object> deleteToastTest(@RequestHeader("X-Delete-IDs") String ids) {
+        List<String> idList = Arrays.asList(ids.split(","));
+        
+        return testService.deleteToastTest(idList);
+	}	
+	
+	@PutMapping("/ajax/toastTest")
+	@ResponseBody
+	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		
+		return testService.updateToastTest(updatedRows);
 	}	
 	
 }

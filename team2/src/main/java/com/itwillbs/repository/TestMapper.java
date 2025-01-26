@@ -11,6 +11,13 @@ public interface TestMapper {
 	String selectTest();
 
 	List<Map<String, Object>> selectToastTest();
+	
+	int countExistingIds(List<Map<String, Object>> createdRows);
 
 	int insertToastTest(List<Map<String, Object>> createdRows);
+
+	int deleteToastTest(List<String> idList);
+
+	int updateToastTest(List<Map<String, Object>> updatedRows);
+
 }

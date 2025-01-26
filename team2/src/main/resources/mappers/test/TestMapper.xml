@@ -13,9 +13,18 @@
     </select>
 
     <select id="selectToastTest" resultType="map">
-        select *
-          from test
+        SELECT *
+          FROM TEST
     </select>
+	
+	<select id="countExistingIds" parameterType="list" resultType="int">
+	    SELECT COUNT(*) AS count
+	    FROM TEST
+	    WHERE ID IN
+	    <foreach collection="list" item="row" open="(" separator="," close=")">
+	        #{row.ID}
+	    </foreach>
+	</select>
     
     <insert id="insertToastTest">
 	    INSERT ALL
@@ -25,4 +34,23 @@
 		</foreach>
 		SELECT * FROM DUAL
     </insert>
+    
+    <delete id="deleteToastTest">
+	    DELETE FROM TEST
+	     WHERE ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <update id="updateToastTest">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE TEST
+	           SET 
+				   COL_1 = #{row.COL_1},
+	               COL_2 = #{row.COL_2},
+	               COL_3 = #{row.COL_3}
+	         WHERE ID = #{row.ID}
+	    </foreach>
+    </update>
 </mapper>
