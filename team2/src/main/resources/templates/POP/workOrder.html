@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!-- jQuery OrgChart CSS CDN -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css" integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	
+	<style>
+		#keyboard .btn {
+		    width: 60px;
+		    height: 60px;
+		    margin: 1px; 
+		    display: flex; 
+		    align-items: center; 
+		    justify-content: center;
+		}
+		
+		i {
+			font-size: 1.5rem;
+		}
+	</style>
+	
+</head>
+<body class="layout-top-nav">
+	<div class="wrapper">
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+		<div class="content-wrapper">
+			<!-- Main content -->
+			<section class="content pt-2">
+				<div class="content-fluid">
+					<div class="card">
+						<div class="card-header">
+							<div class="row mb-2">
+								<div class="col-6">
+									<button type="button" class="btn btn-default btn-lg"><i class="fas fa-rotate-right"></i></button>
+									<button type="button" class="btn btn-default" data-toggle="modal" data-target="#orderDetail">
+										test
+									</button>
+									
+								</div>
+								<div class="col-6">
+									<button type="button" class="btn btn-outline-primary btn-lg">Primary</button>
+									<button type="button" class="btn btn-success btn-lg">작업시작</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+								</div>
+								<div class="col-6">
+									<button type="button" class="btn btn-danger btn-lg">작업종료</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-11">
+									<div id="toast_single">
+											<!-- Toast Grid Ajax -->
+									</div>
+								</div>
+								<div class="col-1 d-flex flex-column justify-content-between">
+									<button type="button" id="btnUp" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-up-long"></i></button>
+									<button type="button" id="btnDown" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-down-long"></i></button>
+								</div>
+							</div>
+						</div>
+						<div th:insert="~{POP/orderDetail :: orderDetail}"></div>
+						
+					</div>
+				</div>
+			</section>
+			<!-- /.Main content -->
+		</div>
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- DataTables  & Plugins -->
+	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script src="../../plugins/jszip/jszip.min.js"></script>
+	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="../../dist/js/demo.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/moment/moment.min.js"></script>
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	<!-- jQuery OrgChart JS CDN -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/js/jquery.orgchart.min.js" integrity="sha512-IUNqrYw8R7mj0iBzb0FOTGTgEFrxZCHVCHnePUEmcjJ/XQE/0sqRhBmGpp20N2lVzAkIBs0Sz+ibRN8/W9YFnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		let grid1;
+		const url = '/ajax/toastTest';
+		const dataSource = {
+	        api: {
+	            readData: {url: url, method: 'GET'},
+	        },
+			contentType: 'application/json',
+	    };
+		
+		
+		$(function () {
+		    grid();
+		});
+		
+		function grid() {
+			// Button 
+			class ButtonRenderer {
+				constructor(props) {
+					const el = document.createElement('button');
+					el.textContent = '상세보기';
+					el.classList.add('btn');
+					el.classList.add('btn-primary');
+					el.classList.add('btn-lg');
+					
+					el.addEventListener('click', () => {
+						const rowKey = props.rowKey;
+						const rowData = props.grid.getRow(rowKey);
+						alert(`Row Data: ${JSON.stringify(rowData)}`); //rowDate.ID
+						
+						
+					});
+					
+					this.el = el;
+				}
+				getElement() {
+					return this.el;
+				}
+			}
+			
+		    grid1 = new tui.Grid({
+		        el: document.getElementById('toast_single'),
+		        data: dataSource,
+		        scrollX: true,
+		        scrollY: false,
+		        rowHeaders: ['rowNum'],
+		        columns: [
+		            {header: 'ID', name: 'ID', align: 'center', editor: 'text'},
+		            {header: 'COL_1', name: 'COL_1', align: 'center', editor: 'text'},
+		            {header: 'COL_2', name: 'COL_2', align: 'center', editor: 'text'},
+		            {header: 'COL_3', name: 'COL_3', align: 'center', editor: 'text'},
+		            /*
+					{header: '지시일자', name: 'COL_1', align: 'center', editor: 'text'},
+		            {header: '품목코드', name: 'COL_2', align: 'center', editor: 'text'},
+		            {header: '품목명', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '공정', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '상태', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '기준단위', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '지시', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '생산수', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '양품수', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: '불량수', name: 'COL_3', align: 'center', editor: 'text'},
+					*/
+		            {header: '작업상세', name: '', renderer: {type: ButtonRenderer}, align: 'center'},
+		        ],
+				editingEvent: 'none',
+				rowHeight: 60,
+				
+		    });
+			
+			// cell 선택 -> 전체 row 선택
+			grid1.on('focusChange', (ev) => {
+			  grid1.setSelectionRange({
+			    start: [ev.rowKey, 0],
+			    end: [ev.rowKey, grid1.getColumns().length]
+			  });
+			});
+			
+		} //function grid() 끝
+		
+		
+
+	</script>
+	<script th:src="@{/js/orderDetail.js}"></script>
+</body>
+</html>
