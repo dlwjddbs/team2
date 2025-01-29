@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!-- jQuery OrgChart CSS CDN -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css" integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	
+	<!-- jQuery OrgChart CSS -->
+	<style>
+		.orgchart{
+			background-image : none;
+			display: inline-block; /* 크기를 내용에 맞춤 */
+			text-align: center; /* 텍스트 중앙 정렬 */
+		}
+	</style>
+	
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>Lots</h1>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 헤더 (Page header) -->
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="col-2">
+				</div>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-5">
+							<div class="card">
+								<div class="card-header">
+									<h3>Lot Tracking Grid Test</h3>
+								</div>
+								<div class="card-body">
+									<div id="toast_single">
+											<!-- Toast Grid Ajax -->
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-7">
+							<div class="card">
+								<div class="card-header">
+									<h3>Lot Tracking Node Test</h3>
+								</div>
+								<div class="row">
+									<div class="card-body d-flex justify-content-center align-items-center">
+										<div id="chart_container">
+											<!-- jQuery Org Chart -->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /.col -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- DataTables  & Plugins -->
+	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+	<script src="../../plugins/jszip/jszip.min.js"></script>
+	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- AdminLTE for demo purposes -->
+	<script src="../../dist/js/demo.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/moment/moment.min.js"></script>
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	<!-- jQuery OrgChart JS CDN -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/js/jquery.orgchart.min.js" integrity="sha512-IUNqrYw8R7mj0iBzb0FOTGTgEFrxZCHVCHnePUEmcjJ/XQE/0sqRhBmGpp20N2lVzAkIBs0Sz+ibRN8/W9YFnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		let grid1;
+		const url = '/ajax/toastTest';
+		const dataSource = {
+	        api: {
+				createData: {url: url, method: 'POST'},
+	            readData: {url: url, method: 'GET'},
+				updateData: {url: url, method: 'PUT'},
+				deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+	        },
+			contentType: 'application/json',
+	    };
+
+		$(function () {
+		    grid();
+		});
+
+		function grid() {
+		    grid1 = new tui.Grid({
+		        el: document.getElementById('toast_single'),
+		        data: dataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        rowHeaders: ['checkbox'],
+		        columns: [
+		            {header: 'ID', name: 'ID', align: 'center', editor: 'text'},
+		            {header: 'COL_1', name: 'COL_1', align: 'center', editor: 'text'},
+		            {header: 'COL_2', name: 'COL_2', align: 'center', editor: 'text'},
+		            {header: 'COL_3', name: 'COL_3', align: 'center', editor: 'text'},
+		        ],
+		    });
+
+		    grid1.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+			
+			
+			grid1.on('editingStart', function(ev) {
+			    const {rowKey, columnName, value} = ev;
+			    const rowData = grid1.getRow(rowKey);
+				
+				// PK 수정 불가 && 새로 추가된 행은 작성 가능
+				if (columnName == 'ID' && !rowData.isNew) {
+					ev.stop();
+				}
+			});
+		}
+
+		$("#btn_add_row").on("click", function () {
+		    const newRowKey = grid1.appendRow(
+		        {
+		            "ID": '',
+		            "COL_1": '',
+		            "COL_2": '',
+		            "COL_3": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+		});
+
+        $("#btn_insert").on("click", function() {
+			grid1.request('createData');
+			grid1.reloadData();  // 실패시 테이블 리로드
+			// GET 요청시 데이터 보낼려면 header 설정
+		});
+		
+		$("#btn_update").on("click", function() {
+			grid1.request('updateData');
+		});
+		
+        $("#btn_delete").on("click", function() {
+			grid1.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = grid1.getModifiedRows().deletedRows.map(row => row.ID).join(',');
+			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+		    grid1.request('deleteData');
+			grid1.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		
+		// jQuery Org Chart
+		$("#toast_single").on("click", function() {
+			
+			console.log("toast click");
+			
+			var data = {
+		        id: '1',
+		        name: 'Root Node',
+		        title: 'CEO',
+		        children: [
+		          {
+		            id: '2',
+		            name: 'Child Node 1',
+		            title: 'Manager',
+		            children: [
+		              { id: '3', name: 'Grandchild Node 1', title: 'Engineer' },
+		              { id: '4', name: 'Grandchild Node 2', title: 'Engineer' }
+		            ]
+		          },
+		          {
+		            id: '5',
+		            name: 'Child Node 2',
+		            title: 'Manager'
+		          }
+		        ]
+		      };
+				
+			  console.log(data);
+		      // OrgChart 초기화
+		      $('#chart_container').orgchart({
+				
+		        'data': data, // 데이터 입력
+		        'nodeContent': 'title', // 노드에 표시할 속성
+		        'pan': true, // 패닝 활성화
+		        'zoom': false, // 줌 활성화
+				'direction': 'b2t' // 방향 설정 (bottom to top)
+		      });
+		});
+		
+		
+	</script>
+</body>
+</html>
