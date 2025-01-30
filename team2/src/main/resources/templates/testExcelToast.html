@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<section class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1>엑셀 TUI-TEST</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a href="#">토스트테스트</a></li>
+								<li class="breadcrumb-item active">엑셀 TUI-TEST</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /.콘텐츠 헤더 (Page header) -->
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="card-tools">
+										<input type="button" id="btn_excel_download" class="btn btn-success" value="엑셀 다운로드">
+										<input type="file" id="excelFile" accept=".xls, .xlsx">
+										<input type="button" id="btn_excel_upload" class="btn btn-primary" value="엑셀 업로드">
+									</div>
+								</div>
+								<div class="card-body" id="toast_single">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	
+	<!-- SheetJS (Excel 변환 라이브러리) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		let grid1;
+		const url = '/ajax/excelToastTest';
+		const dataSource = {
+	        api: {
+				createData: {url: url, method: 'POST'},
+	            readData: {url: url, method: 'GET'},
+				updateData: {url: url, method: 'PUT'},
+				deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+	        },
+			contentType: 'application/json',
+	    };
+
+		$(function () {
+		    grid();
+			
+			// 엑셀 업로드 버튼 클릭 이벤트
+			$('#btn_excel_upload').on('click', function () {
+			    uploadExcel();
+			});
+			
+			// 엑셀 다운로드 버튼 클릭 이벤트
+			$('#btn_excel_download').on('click', function () {
+			    downloadExcel();
+			});
+		});
+
+		function grid() {
+		    grid1 = new tui.Grid({
+		        el: document.getElementById('toast_single'),
+		        //data: dataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        rowHeaders: ['checkbox'],
+		        columns: [
+					{ header: '귀속연월', name: 'PAYDAY', align: 'center', editor: 'text' },
+					{ header: '사원번호', name: 'MEMBER_ID', align: 'center', editor: 'text' },
+					{ header: '사원명', name: 'NAME', align: 'center', editor: 'text' },
+					{ header: '직급', name: 'GRADE_ID', align: 'center', editor: 'text' },
+					{ header: '부서', name: 'DEPT_ID', align: 'center', editor: 'text' },
+					{ header: '기본급', name: 'SALARY', align: 'center', editor: 'text' },
+					{ header: '직책수당', name: 'POSITION_BONUS', align: 'center', editor: 'text' },
+					{ header: '연휴수당', name: 'HOLIDAY_BONUS', align: 'center', editor: 'text' },
+					{ header: '야근수당', name: 'NIGHT_BONUS', align: 'center', editor: 'text' },
+					{ header: '연말수당', name: 'YEAREND_BONUS', align: 'center', editor: 'text' },
+					{ header: '만기근속자포상', name: 'FULLSERVICE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실적우수자포상', name: 'PERFORMANCE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실지급액', name: 'TOTAL', align: 'center', editor: 'text' }
+		        ],
+		    });
+		}
+		
+		// 엑셀 파일 업로드 및 데이터 출력
+		function uploadExcel() {
+		    let fileInput = document.getElementById('excelFile');
+		    let file = fileInput.files[0];
+
+		    if (!file) {
+		        alert("파일을 선택하세요.");
+		        return;
+		    }
+
+		    let formData = new FormData();
+		    formData.append("file", file);
+
+		    $.ajax({
+		        url: "/salary/uploadExcel", // 서버 업로드 URL
+		        type: "POST",
+		        data: formData,
+		        processData: false,
+		        contentType: false,
+		        success: function (res) {
+		            console.log("엑셀 데이터:", res);
+		            grid1.resetData(res); // Toast UI Grid에 데이터 바인딩
+		        },
+		        error: function (err) {
+		            console.error("업로드 실패:", err);
+		            alert("엑셀 업로드 중 오류가 발생했습니다.");
+		        }
+		    });
+		}
+		
+		// 엑셀 파일 다운로드
+		function downloadExcel() {
+			/*
+			const options = {
+			  includeHiddenColumns: true,
+			  onlySelected: true,
+			  fileName: "test_salary_data.xlsx"
+			};
+			
+			grid.export('csv');
+			grid.export('xlsx');
+			grid.export('xlsx', options);
+			*/
+			
+		    const sheetName = "급여 데이터";
+		    const fileName = "test_salary_data.xlsx";
+			
+		    // Grid 데이터 가져오기
+			// DataSource를 사용하는 경우 getRowData()를 사용
+		    const jsonData = grid1.getData();
+		    //const jsonData = grid1.getRowData();
+		    
+		    // 엑셀 헤더 생성
+		    const headers = grid1.getColumns().map(col => col.header);
+	
+		    // 데이터 변환 (JSON → 2차원 배열)
+		    const data = jsonData.map(row => grid1.getColumns().map(col => row[col.name] || ""));
+	
+		    // 엑셀 시트 생성
+		    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
+	
+		    // 워크북 생성
+		    const workbook = XLSX.utils.book_new();
+		    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+	
+		    // 엑셀 파일 다운로드
+		    XLSX.writeFile(workbook, fileName);
+		}
+	</script>
+</body>
+</html>

@@ -64,6 +64,12 @@ dependencies {
 	// CoolSMS
 	implementation 'net.nurigo:sdk:4.3.2'
 	
+	// Apache POI API
+	// https://mvnrepository.com/artifact/org.apache.poi/poi
+	implementation 'org.apache.poi:poi:5.4.0'
+	// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	implementation 'org.apache.poi:poi-ooxml:5.4.0'
+	
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 

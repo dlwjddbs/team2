@@ -411,4 +411,24 @@ public class SalaryController {
  		return salaryTransferData;
  	}
  	
+ 	// 엑셀 테스트
+    @GetMapping("/salary/excelAPITest")
+    public String excelTest(@AuthenticationPrincipal User user) {
+    	log.info("============= excelTest =============");
+    	
+        if (user == null) {
+            return "redirect:/login"; 
+        }  
+        
+        return "/salary/excelAPITest";
+    }
+    
+    // 엑셀 테스트 (Toast)
+	@GetMapping("/testExcelToast")
+	public String excelToastTest() {
+		log.info("============= excelToastTest =============");
+		
+		return "testExcelToast";
+	}
+ 	
 }
