@@ -19,5 +19,7 @@ public interface TestMapper {
 	int deleteToastTest(List<String> idList);
 
 	int updateToastTest(List<Map<String, Object>> updatedRows);
+	
+	List<String> getColumnNames(String tableName);
 
 }

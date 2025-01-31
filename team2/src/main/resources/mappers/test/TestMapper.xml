@@ -53,4 +53,17 @@
 	         WHERE ID = #{row.ID}
 	    </foreach>
     </update>
+    
+<!--     <select id="getColumnNames" parameterType="map" resultType="map">
+	    SELECT LISTAGG(COLUMN_NAME, ',') WITHIN GROUP (ORDER BY COLUMN_ID) AS COLUMN_NAME
+	    FROM USER_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+	</select> -->
+	
+	<select id="getColumnNames" parameterType="map" resultType="string">
+	    SELECT COLUMN_NAME 
+	    FROM ALL_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+    	ORDER BY COLUMN_ID
+	</select>
 </mapper>

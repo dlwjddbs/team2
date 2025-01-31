@@ -1,23 +1,27 @@
 package com.itwillbs.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.itwillbs.repository.TestMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -26,6 +30,10 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Log
 public class ExcelService {
+	
+	private final TestMapper testMapper;
+	
+	// 엑셀 파일 파싱
 	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {
 		List<Map<String, Object>> dataList = new ArrayList<>();
 
@@ -93,4 +101,47 @@ public class ExcelService {
 			return ""; // 기타 (날짜 등) 처리
 		}
 	}
+	
+	// 엑셀 양식 생성
+    public byte[] createExcelTemplate(String tableName) throws IOException {
+    	
+        List<String> columnNames = testMapper.getColumnNames(tableName);   // 컬럼명 가져오기
+        
+        log.info("columnNames : " + columnNames);
+        
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Template");
+            
+//            // 컬럼 너비 설정 (단위: 1/256 글자 크기)
+//            for (int i = 0; i < columnNames.size(); i++) {
+//                sheet.setColumnWidth(i, 5000);  // 5000 = 약 20글자 정도의 너비
+//            }
+//
+//            // row0 - 양식 규칙 (높이 지정)
+//            Row row0 = sheet.createRow(0);
+//            row0.setHeight((short) 600);  // 높이 지정 (단위: 1/20 포인트)
+//            row0.createCell(0).setCellValue("양식 규칙");
+            
+            // row0 - 양식 규칙 추가
+            Row row0 = sheet.createRow(0);
+            row0.createCell(0).setCellValue("양식 규칙");
+
+            // row1 - 컬럼명 추가
+            Row row1 = sheet.createRow(1);
+            for (int i = 0; i < columnNames.size(); i++) {
+                row1.createCell(i).setCellValue(columnNames.get(i));  // 여기서 바로 추가
+            }
+            
+            // 셀 크기 자동 조정 (각 컬럼의 내용에 맞게 조정)
+            for (int i = 0; i < columnNames.size(); i++) {
+                sheet.autoSizeColumn(i);  // 자동 조정 적용
+            }
+            
+            // 엑셀 바이너리 변환
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+	
 }
