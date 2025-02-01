@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,34 @@ import lombok.extern.java.Log;
 public class ExcelService {
 	
 	private final TestMapper testMapper;
+	private final SalaryService salaryService;
+	
+	public Map<String, Object> selectExcelToastTest() {
+		log.info("============= selectExcelToastTest =============");
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectExcelToastTest 성공!";
+		
+		Map<String, Object> idMap = new HashMap<>();
+		idMap.put("id", "admin");
+		
+		try {
+		    List<Map<String, Object>> salaryData = salaryService.getSalaryList(idMap);
+		    
+			content.put("contents", salaryData);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectExcelToastTest 실패!";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 	// 엑셀 파일 파싱
 	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {

@@ -425,9 +425,13 @@ public class SalaryController {
     
     // 엑셀 테스트 (Toast)
 	@GetMapping("/testExcelToast")
-	public String excelToastTest() {
+	public String excelToastTest(@AuthenticationPrincipal User user) {
 		log.info("============= excelToastTest =============");
 		
+        if (user == null) {
+            return "redirect:/login"; 
+        } 
+        
 		return "testExcelToast";
 	}
  	

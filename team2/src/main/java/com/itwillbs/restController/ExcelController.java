@@ -2,6 +2,7 @@ package com.itwillbs.restController;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.itwillbs.service.ExcelService;
+import com.itwillbs.service.SalaryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -25,6 +27,13 @@ import lombok.extern.java.Log;
 public class ExcelController {
 
 	private final ExcelService excelService;
+	
+	@GetMapping("/ajax/excelToastTest")
+	public Map<String, Object> getExcelToastTest() {
+		log.info("============= getExcelToastTest =============");
+
+		return excelService.selectExcelToastTest();
+	}
 	
 	// 엑셀 업로드
 	@PostMapping("/ajax/uploadExcel")

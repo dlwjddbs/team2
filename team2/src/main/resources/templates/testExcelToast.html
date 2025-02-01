@@ -139,27 +139,43 @@
 		function grid() {
 		    grid1 = new tui.Grid({
 		        el: document.getElementById('toast_single'),
-		        //data: dataSource,
+		        data: dataSource,
 		        scrollX: true,
 		        scrollY: true,
 		        rowHeaders: ['checkbox'],
 		        columns: [
 		        	// 급여 테이블 기준
-		            { header: '사원번호', name: 'MEMBER_ID', align: 'center', editor: 'text' },
-		            { header: '직급', name: 'GRADE_ID', align: 'center', editor: 'text' },
-		            { header: '귀속연월', name: 'PAYDAY', align: 'center', editor: 'text' },
-		            { header: '직책수당', name: 'POSITION_BONUS', align: 'center', editor: 'text' },
-		            { header: '연휴수당', name: 'HOLIDAY_BONUS', align: 'center', editor: 'text' },
-		            { header: '야근수당', name: 'NIGHT_BONUS', align: 'center', editor: 'text' },
-		            { header: '연말수당', name: 'YEAREND_BONUS', align: 'center', editor: 'text' },
-		            { header: '만기근속자포상', name: 'FULLSERVICE_BONUS', align: 'center', editor: 'text' },
-		            { header: '실적우수자포상', name: 'PERFORMANCE_BONUS', align: 'center', editor: 'text' },
-		            { header: '실지급액', name: 'TOTAL', align: 'center', editor: 'text' }
+					{ header: '귀속연월', name: 'PAYDAY', align: 'center', editor: 'text' },
+					{ header: '사원번호', name: 'MEMBER_ID', align: 'center', editor: 'text' },
+					{ header: '사원명', name: 'NAME', align: 'center', editor: 'text' },
+					{ header: '직급', name: 'GRADE_ID', align: 'center', editor: 'text' },
+					{ header: '부서', name: 'DEPT_ID', align: 'center', editor: 'text' },
+					{ header: '기본급', name: 'SALARY', align: 'center', editor: 'text' },
+					{ header: '직책수당', name: 'POSITION_BONUS', align: 'center', editor: 'text' },
+					{ header: '연휴수당', name: 'HOLIDAY_BONUS', align: 'center', editor: 'text' },
+					{ header: '야근수당', name: 'NIGHT_BONUS', align: 'center', editor: 'text' },
+					{ header: '연말수당', name: 'YEAREND_BONUS', align: 'center', editor: 'text' },
+					{ header: '만기근속자포상', name: 'FULLSERVICE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실적우수자포상', name: 'PERFORMANCE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실지급액', name: 'TOTAL', align: 'center', editor: 'text' }
+					/*
+					{ header: '사원번호', name: 'MEMBER_ID', align: 'center', editor: 'text' },
+					{ header: '직급', name: 'GRADE_ID', align: 'center', editor: 'text' },
+					{ header: '귀속연월', name: 'PAYDAY', align: 'center', editor: 'text' },
+					{ header: '직책수당', name: 'POSITION_BONUS', align: 'center', editor: 'text' },
+					{ header: '연휴수당', name: 'HOLIDAY_BONUS', align: 'center', editor: 'text' },
+					{ header: '야근수당', name: 'NIGHT_BONUS', align: 'center', editor: 'text' },
+					{ header: '연말수당', name: 'YEAREND_BONUS', align: 'center', editor: 'text' },
+					{ header: '만기근속자포상', name: 'FULLSERVICE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실적우수자포상', name: 'PERFORMANCE_BONUS', align: 'center', editor: 'text' },
+					{ header: '실지급액', name: 'TOTAL', align: 'center', editor: 'text' }
+					*/
 		        ],
 		    });
 		    
 		    grid1.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
+				alert("Response 실패");
 		    });
 			
 			grid1.on('editingStart', function(ev) {
