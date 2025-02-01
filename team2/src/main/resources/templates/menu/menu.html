@@ -32,6 +32,7 @@
 		
 		<nav th:replace="~{includes/modals/menuAdd :: menuAdd}"></nav>
 		<nav th:replace="~{includes/modals/menuEdit :: menuEdit}"></nav>
+		<nav th:replace="~{includes/modals/categoryAdd :: categoryAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -40,7 +41,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>메뉴관리</h1>
+							<h1>메뉴 관리</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -57,14 +58,18 @@
 				<div class="container-fluid">
 					<div class="card">
 						<div class="card-header">
-							<h3 class="card-title">메뉴관리</h3>
-<!--							<div class="card-tools">-->
-<!--								<div class="d-flex">-->
-<!--									<button type="button" class="btn btn-primary" id="btnAddGroup">등록</button>-->
-<!--									<button type="button" class="btn btn-primary mx-1" id="btnUpdateGroup">수정</button>-->
-<!--									<button type="button" class="btn btn-primary" id="btnDeleteGroup">삭제</button>-->
-<!--								</div>-->
-<!--							</div>-->
+							<h3 class="card-title">메뉴 카테고리 관리</h3>
+						</div>
+						<div class="card-body">
+							<table id="category" class="table table-bordered table-striped">
+								<!-- dataTable Ajax -->
+							</table>
+						</div>
+					<!-- /.card-body -->
+					</div>
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">메뉴 관리</h3>
 						</div>
 						<div class="card-body">
 							<table id="groupCode" class="table table-bordered table-striped">
@@ -125,19 +130,112 @@
 		  			   + '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>'
 		  			   + '<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>'
 					   + '</svg>';
+		const dom = "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
+				  + "<'row'<'col-sm-12'tr>>"
+				  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>";
+		const tableHtml = `<tr><td style="text-align: center;">카테고리를 선택하세요.</td></tr>`;
 		
 		$(function () {
-			groupCodeDataTable("groupCode");
+			categoryDataTable("category");
+			$("#groupCode").html(tableHtml);
 		});
 		
-		function groupCodeDataTable(id) {
+		function categoryDataTable(id) {
+			let table = $("#" + id).DataTable({
+				dom : dom,
+				aaSorting: [], // 초기 정렬 비활성화
+				select : {
+					style : 'single'
+				},
+				language : {
+					search : "검색",
+					paginate: {
+		                "first" : "처음",
+		                "last" : "마지막",
+		                "next" : "다음",
+		                "previous" : "이전"
+		            },
+		            zeroRecords : "검색 결과 없음"
+				},
+				ajax : {
+					url : "/system/getMenuCategoryList",
+					type:"POST",
+					data : {},
+					"dataSrc": function (res) {
+		                return res;
+		            }
+				},
+				columns : [
+					{data : "CATEGORY_ID", title : "카테고리ID", "defaultContent": "" },
+					{data : "CATEGORY_NAME", title : "카테고리명", "defaultContent": "" },
+					{data : "CATEGORY_ROLE", title : "접근권한", "defaultContent": "" },
+					{data : "CATEGORY_SORT_ORDER", title : "정렬순서", "defaultContent": "" },
+					{data : "CATEGORY_USE_YN", title : "사용여부", "defaultContent": "" },
+				],
+				responsive : true, 
+				lengthChange : false, 
+				autoWidth : false,
+					buttons : [
+						{
+				            text: "등록",
+				            action: function () {
+								addCategory();
+				            }
+						},
+						{
+				            text: "수정",
+				            action: function () {
+								selectRow(id, 'update');
+				            }
+						},
+						{
+				            text: "삭제",
+				            action: function () {
+								selectRow(id, 'delete');
+				            }
+						}
+					]
+				}).buttons()
+				  .container()
+				  .appendTo('#example1_wrapper .col-md-6:eq(0)');
+		}
+		
+		function addCategory() {
+			$('#categoryAdd').modal();
+		}
+		
+		$('#category').on('click', 'tbody tr', function() {
+			// dataTables select적용 시간보다 늦어야함.
+			setTimeout(function(){
+				let table = $('#category').DataTable();
+				
+				// 대분류 선택 해제할 시 소분류 테이블 삭제
+				if (table.row('.selected').length == 0) {
+					$("#groupCode").DataTable().destroy();
+					$("#groupCode").empty();
+					
+					$("#groupCode").html(tableHtml);
+					return;
+				}
+				
+				let categoryID = table.rows('.selected').data()[0].CATEGORY_ID;
+				groupCodeDataTable("groupCode", categoryID);
+			}, 10);
+		});
+		
+		function groupCodeDataTable(id, categoryID) {
+			// 기존 테이블 삭제
+			if ($.fn.dataTable.isDataTable("#" + id)) {
+				$("#" + id).DataTable().destroy();
+			}
+			
+			$("#groupCode").html('');
+			
 			let depth = 1;
 			let parent_id = null;
 			
 			let table = $("#" + id).DataTable({
-				dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-									  + "<'row'<'col-sm-12'tr>>"
-									  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+				dom : dom,
 				aaSorting: [], // 초기 정렬 비활성화
 				select : {
 					style : 'single'
@@ -156,7 +254,8 @@
 					url : "/system/getMenuList",
 					type:"POST",
 					data : {
-						depth : depth
+						depth : depth,
+						categoryID : categoryID
 					},
 					"dataSrc": function (res) {
 		                return res;
@@ -192,7 +291,7 @@
 					{
 			            text: "등록",
 			            action: function () {
-							addMenu(depth, parent_id);
+							addMenu(depth, parent_id, categoryID);
 			            }
 					},
 					{
@@ -212,7 +311,9 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			  
-		  $("#" + id).on('click', 'tbody td.details-control', function(e) {
+			$("#" + id)
+				.off('click', 'tbody td.details-control')
+		  		.on('click', 'tbody td.details-control', function(e) {
 	  			// dataTables select적용 시간보다 늦어야함.
 	  			setTimeout(function(){
 	  				let table = $("#" + id).DataTable();
@@ -225,14 +326,14 @@
 	  				} else {
 						let menu_id = row.data().MENU_ID;
 						if (row.data().TYPE == '폴더') {
-							createChild(row, menu_id, depth + 1);
+							createChild(row, menu_id, depth + 1, categoryID);
 						}
 	  				}
 	  			}, 10);
 	  		});
 		}
 		
-		function addMenu(depth, parent_id) {
+		function addMenu(depth, parent_id, categoryID) {
 			$("#DEPTH").val(depth);
 			$("#PARENT_ID").val(parent_id);
 			$("#NAME").val('');
@@ -242,6 +343,7 @@
 			$('input:checkbox[name="role"]:input[value="USER"]').prop('checked',true);
 			$('input:checkbox[name="role"]:input[value="ADMIN"]').prop('checked',false);
 			$("#SORT_ORDER").val('');
+			$("#MENU_CATEGORY_ID").val(categoryID);
 			
 			$('#menuAdd').modal();
 		}
@@ -252,6 +354,7 @@
 			let NAME = $("#NAME").val();
 			let URL = $("#URL").val();
 			let SORT_ORDER = $("#SORT_ORDER").val();
+			let MENU_CATEGORY_ID = $("#MENU_CATEGORY_ID").val();
 			
 			let ROLE = '';
 			$('input:checkbox[name=role]').each(function (index) {
@@ -280,7 +383,8 @@
 	            	URL : URL,
 	            	ROLE : ROLE,
 	            	SORT_ORDER : SORT_ORDER,
-					USE_YN : USE_YN
+					USE_YN : USE_YN,
+					MENU_CATEGORY_ID : MENU_CATEGORY_ID
 				},
 	            success : function(res){
 	           		alert(res.result);
@@ -325,6 +429,7 @@
 						return;
 					}
 
+					$("#MENU_CATEGORY_ID_EDIT").val(res[0].MENU_CATEGORY_ID);
 					$("#MENU_ID_EDIT").val(menu_id);
 					$("#PARENT_ID_EDIT").val(res[0].PARENT_ID);
 					$("#NAME_EDIT").val(res[0].NAME);
@@ -429,21 +534,20 @@
 		    let table = $("table", row.child());
 		    table.detach();
 		    table.DataTable().destroy();
-		 
+			
 		    row.child.hide();
+			//row.child.remove();
 		}
 		
-		function createChild(row, menu_id, depth) {
-		    let table = $('<table class="display" width="100%"/>');
+		function createChild(row, menu_id, depth, categoryID) {
+			let table = $('<table class="display" width="100%"/>');
 		 
 		    row.child(table).show();
 			
 			let tableId = table.attr('id');
 			
 		    let usersTable = table.DataTable({
-				dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-					  + "<'row'<'col-sm-12'tr>>"
-					  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+				dom : dom,
 				aaSorting: [], // 초기 정렬 비활성화
 				select : {
 					style : 'single'
@@ -462,7 +566,8 @@
 					url : "/system/getMenuList",
 					type:"POST",
 					data : {
-						parent_id : menu_id
+						parent_id : menu_id,
+						categoryID : categoryID
 					},
 					"dataSrc": function (res) {
 		                return res;
@@ -498,7 +603,7 @@
 					{
 			            text: "등록",
 			            action: function () {
-							addMenu(depth, menu_id);
+							addMenu(depth, menu_id, categoryID);
 			            }
 					},
 					{
@@ -518,11 +623,13 @@
 			  .container()
 			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
 			  
-		  // setTimeout으로 DOM 접근 시점을 지연
-		  setTimeout(function() {
-		      tableId = table.attr('id');
+		  	// setTimeout으로 DOM 접근 시점을 지연
+			setTimeout(function() {
+		      	tableId = table.attr('id');
 			  
-			  $("#" + tableId).on('click', 'tbody td.details-control', function(e) {
+				$("#" + tableId)
+			  		.off('click', 'tbody td.details-control')
+			  		.on('click', 'tbody td.details-control', function(e) {
   		  			// dataTables select적용 시간보다 늦어야함.
   		  			setTimeout(function(){
   		  				let table = $("#" + tableId).DataTable();
@@ -535,7 +642,7 @@
   		  				} else {
 							let menu_id = row.data().MENU_ID;
 							if (row.data().TYPE == '폴더') {
-								createChild(row, menu_id, depth + 1);
+								createChild(row, menu_id, depth + 1, categoryID);
 							}
   		  				}
   		  			}, 10);

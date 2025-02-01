@@ -66,6 +66,14 @@ public class MenuController {
 		return message;
 	}
 	
+	@PostMapping("/system/getMenuCategoryList")
+	@ResponseBody
+	public List<Map<String, Object>> getMenuCategoryList() {
+		List<Map<String, Object>> menuCategoryList = menuService.selectMenuCategoryList();
+		
+		return menuCategoryList;
+	}
+	
 }
 
 

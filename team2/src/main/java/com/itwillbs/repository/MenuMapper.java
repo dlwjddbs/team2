@@ -27,5 +27,7 @@ public interface MenuMapper {
 	Map<String, Object> selectUser(String id);
 
 	List<Map<String, Object>> selectTopMenu(String auth);
+
+	List<Map<String, Object>> selectMenuCategoryList();
 	
 }

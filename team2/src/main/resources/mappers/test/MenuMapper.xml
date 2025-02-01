@@ -56,6 +56,7 @@
 			 , SORT_ORDER
 			 , DEPTH
 			 , USE_YN 
+			 , MENU_CATEGORY_ID
 			 , CASE 
 			 		WHEN URL IS NULL THEN '폴더'
 			 		ELSE '페이지'
@@ -72,6 +73,9 @@
 		   <if test="menu_id != null and menu_id != ''">
 		   	   AND MENU_ID = #{menu_id}
 		   </if>
+		   <if test="categoryID != null and categoryID != ''">
+		   	   AND MENU_CATEGORY_ID = #{categoryID}
+		   </if>
 		 ORDER BY SORT_ORDER ASC
     </select>
     
@@ -85,6 +89,7 @@
 			, SORT_ORDER
 			, DEPTH
 			, USE_YN
+			, MENU_CATEGORY_ID
 		) VALUES (
 			  (SELECT 'ME' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(MENU_ID, 3))), 0) + 1, 10, '0') FROM MENU)
 			, #{NAME}
@@ -94,6 +99,7 @@
 			, #{SORT_ORDER}
 			, #{DEPTH}
 			, #{USE_YN}
+			, #{MENU_CATEGORY_ID}
 		)
     </insert>
     
@@ -148,4 +154,15 @@
     	DELETE FROM MENU
     	 WHERE MENU_ID = #{MENU_ID}
     </delete>
+    
+    <select id="selectMenuCategoryList">
+    	SELECT
+			   ID			AS CATEGORY_ID
+			 , NAME 		AS CATEGORY_NAME
+			 , ROLE 		AS CATEGORY_ROLE
+			 , SORT_ORDER 	AS CATEGORY_SORT_ORDER
+			 , USE_YN 		AS CATEGORY_USE_YN
+		  FROM MENU_CATEGORY
+		 ORDER BY SORT_ORDER ASC
+    </select>
 </mapper>

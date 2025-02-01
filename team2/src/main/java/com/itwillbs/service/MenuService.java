@@ -125,4 +125,8 @@ public class MenuService {
 	public List<Map<String, Object>> selectTopMenu(String auth) {
 		return menuMapper.selectTopMenu(auth);
 	}
+
+	public List<Map<String, Object>> selectMenuCategoryList() {
+		return menuMapper.selectMenuCategoryList();
+	}
 }
