@@ -6,10 +6,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public class MesCommonCodeMapper {
+public interface MesCommonCodeMapper {
 
-	public List<Map<String, Object>> getGroupMesCommonCode(Map<String, Object> map) {
-		return null;
-	}
+	public List<Map<String, Object>> getGroupMesCommonCode(Map<String, Object> map);
 
 }
