@@ -165,4 +165,27 @@
 		  FROM MENU_CATEGORY
 		 ORDER BY SORT_ORDER ASC
     </select>
+    
+    <select id="isDuplicateMenuCategorySortOrder" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU_CATEGORY
+		 WHERE 1 = 1
+		   AND SORT_ORDER = #{SORT_ORDER}
+    </select>
+    
+    <insert id="insertMenuCategory">
+    	INSERT INTO MENU_CATEGORY (
+			  ID
+			, NAME
+			, ROLE
+			, SORT_ORDER
+			, USE_YN
+		) VALUES (
+			  (SELECT 'MEC' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ID, 4))), 0) + 1, 10, '0') FROM MENU_CATEGORY)
+			, #{NAME}
+			, #{ROLE}
+			, #{SORT_ORDER}
+			, #{USE_YN}
+		)
+    </insert>
 </mapper>

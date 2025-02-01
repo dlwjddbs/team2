@@ -74,6 +74,13 @@ public class MenuController {
 		return menuCategoryList;
 	}
 	
+	@PostMapping("/system/addMenuCategory")
+	@ResponseBody
+	public Map<String, Object> addMenuCategory(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.addMenuCategory(map);
+		
+		return message;
+	}
 }
 
 

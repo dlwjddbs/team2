@@ -17,29 +17,24 @@
 					<div class="form-group">
 						<div class="row">
 							<div class="col-md-6">
-								<input type="hidden" id="DEPTH" class="form-control">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
 								<label>카테고리명</label>
-								<input type="text" id="NAME" class="form-control">
+								<input type="text" id="NAME_CATE" class="form-control">
 							</div>
 							<div class="col-md-6">
 								<label>정렬순서</label>
-								<input type="number" min="1" id="SORT_ORDER" class="form-control">
+								<input type="number" id="SORT_ORDER_CATE" class="form-control">
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-6">
 								<label>사용여부</label><br>
-								<input type="radio" name="use_yn123" value="Y" checked> 사용 &nbsp;
-								<input type="radio" name="use_yn123" value="N"> 미사용
+								<input type="radio" name="use_yn_cate" value="Y" checked> 사용 &nbsp;
+								<input type="radio" name="use_yn_cate" value="N"> 미사용
 							</div>
 							<div class="col-md-6">
 								<label>접근권한</label><br>
-								<input type='checkbox' name='role123' value='USER' checked/> 일반 &nbsp;
-								<input type='checkbox' name='role123' value='ADMIN' /> 관리자
+								<input type='checkbox' name='role_cate' value='USER' checked/> 일반 &nbsp;
+								<input type='checkbox' name='role_cate' value='ADMIN' /> 관리자
 							</div>
 						</div>
 					</div>
@@ -50,7 +45,7 @@
 			<div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-primary" id="menuSave">저장</button>
+					<button type="submit" class="btn btn-primary" id="categorySave">저장</button>
 				</div>
 			</div>
 			<!-- /.모달창 푸터-->

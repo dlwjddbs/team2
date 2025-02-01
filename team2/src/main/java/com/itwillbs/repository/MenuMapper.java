@@ -29,5 +29,9 @@ public interface MenuMapper {
 	List<Map<String, Object>> selectTopMenu(String auth);
 
 	List<Map<String, Object>> selectMenuCategoryList();
+
+	int isDuplicateMenuCategorySortOrder(Map<String, Object> map);
+
+	int insertMenuCategory(Map<String, Object> map);
 	
 }

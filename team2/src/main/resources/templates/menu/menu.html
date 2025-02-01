@@ -185,13 +185,13 @@
 						{
 				            text: "수정",
 				            action: function () {
-								selectRow(id, 'update');
+								//selectRow(id, 'update');
 				            }
 						},
 						{
 				            text: "삭제",
 				            action: function () {
-								selectRow(id, 'delete');
+								//selectRow(id, 'delete');
 				            }
 						}
 					]
@@ -201,8 +201,57 @@
 		}
 		
 		function addCategory() {
+			$("#NAME_CATE").val('');
+			$("#SORT_ORDER_CATE").val('');
+			$('input:radio[name="use_yn_cate"]:input[value="Y"]').prop('checked',true);
+			$('input:checkbox[name="role_cate"]:input[value="USER"]').prop('checked',true);
+			$('input:checkbox[name="role_cate"]:input[value="ADMIN"]').prop('checked',false);
+			
 			$('#categoryAdd').modal();
 		}
+		
+		$("#categorySave").on("click", function() {
+			let NAME = $("#NAME_CATE").val();
+			let SORT_ORDER = $("#SORT_ORDER_CATE").val();
+			
+			let ROLE = '';
+			$('input:checkbox[name=role_cate]').each(function (index) {
+				if($(this).is(":checked")){
+					ROLE += $(this).val() + ',';
+			    }
+			});
+			
+			let USE_YN = $('input[name="use_yn_cate"]:checked').val();
+			
+			if (NAME == null || NAME == ''
+				|| SORT_ORDER == null || SORT_ORDER == ''
+				|| USE_YN == null || USE_YN == ''
+				|| ROLE == null || ROLE == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/system/addMenuCategory",
+	            data : {
+	            	NAME : NAME,
+	            	SORT_ORDER : SORT_ORDER,
+	            	USE_YN : USE_YN,
+	            	ROLE : ROLE
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("addMenuCategory() ajax 실패");
+	            }
+	        });
+		});
 		
 		$('#category').on('click', 'tbody tr', function() {
 			// dataTables select적용 시간보다 늦어야함.

@@ -129,4 +129,34 @@ public class MenuService {
 	public List<Map<String, Object>> selectMenuCategoryList() {
 		return menuMapper.selectMenuCategoryList();
 	}
+
+	public Map<String, Object> addMenuCategory(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "이미 등록된 카테고리입니다.";
+		String resultCode = "0";
+		
+		try {
+			int duplicateCnt = menuMapper.isDuplicateMenuCategorySortOrder(map);
+			if (duplicateCnt > 0) {
+				result = "중복된 순서입니다.";
+				resultCode = "0";
+			} else {
+				int resultCnt = menuMapper.insertMenuCategory(map);
+				if (resultCnt > 0) {
+					result = "등록 되었습니다.";
+					resultCode = "1";
+				} else {
+					result = "등록 실패.";
+				}
+			}
+		} catch (Exception e) {
+			result = "등록 실패.";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
 }
