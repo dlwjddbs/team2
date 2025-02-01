@@ -1,19 +1,8 @@
 <nav class="main-header navbar navbar-expand navbar-white navbar-light" th:fragment="navbar">
 	<!-- 상단 왼쪽 -->
-<!-- 	<ul class="navbar-nav"> -->
-		<!-- 햄버거 버튼 -->
-<!-- 		<li class="nav-item"> -->
-<!-- 			<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a> -->
-<!-- 		</li> -->
-		<!-- 홈버튼 -->
-<!-- 		<li class="nav-item d-none d-sm-inline-block"> -->
-<!-- 			<a href="../../index3.html" class="nav-link">Home</a> -->
-<!-- 		</li> -->
-		<!-- 콘텐츠 버튼 -->
-<!-- 		<li class="nav-item d-none d-sm-inline-block"> -->
-<!-- 			<a href="#" class="nav-link">Contact</a> -->
-<!-- 		</li> -->
-<!-- 	</ul> -->
+ 	<ul class="navbar-nav"> 
+		<!-- 메뉴 -->
+ 	</ul> 
 	<!-- /.상단 왼쪽-->
 	
 	<!-- 상단 오른쪽 -->
@@ -30,3 +19,35 @@
 	</ul>
 	<!-- /.상단 오른쪽-->
 </nav>
+
+<script th:fragment="navbar" th:inline="javascript">
+	let topMenuData = /*[[${top_menus}]]*/
+	
+	document.addEventListener("DOMContentLoaded", () => {
+	    const navbar = document.querySelector(".navbar-nav");
+	    if (navbar) {
+	        navbar.innerHTML = generateTopMenu(topMenuData);
+	    }
+	});
+	
+	function generateTopMenu(topMenuData) {
+        if (!topMenuData.length) {
+			return '';
+		}
+        let html = '';
+        topMenuData.forEach(item => {
+            html += `
+                <li class="nav-item d-none d-sm-inline-block">
+					<a href="" onclick="test('${item.ID}')" class="nav-link">${item.NAME}</a>
+                </li>
+            `;
+        });
+		
+        return html;
+    }
+	
+	function test(id) {
+		document.cookie = "menuCategory=" + id + "; path=/";
+		window.location.reload();
+	}
+</script>

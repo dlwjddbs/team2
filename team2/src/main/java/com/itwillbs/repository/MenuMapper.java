@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MenuMapper {
 
-	List<Map<String, Object>> selectMenu(String auth);
+	List<Map<String, Object>> selectMenu(Map<String, String> map);
 
 	List<Map<String, Object>> getMenuList(Map<String, Object> map);
 
@@ -25,5 +25,7 @@ public interface MenuMapper {
 	int deleteMenu(Map<String, Object> map);
 
 	Map<String, Object> selectUser(String id);
+
+	List<Map<String, Object>> selectTopMenu(String auth);
 	
 }

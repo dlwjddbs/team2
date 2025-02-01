@@ -12,7 +12,29 @@
          	   1 = 1
            AND ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
            AND USE_YN = 'Y'
+           <choose>
+           		<when test="menuCategory != null and menuCategory != ''">
+           			AND MENU_CATEGORY_ID = #{menuCategory}
+           		</when>
+           		<otherwise>
+           			AND MENU_CATEGORY_ID = (SELECT *
+											FROM (SELECT ID
+													FROM MENU_CATEGORY
+													ORDER BY SORT_ORDER ASC)
+											WHERE ROWNUM = 1)
+           		</otherwise>
+           </choose>
          ORDER BY DEPTH, SORT_ORDER ASC 
+    </select>
+    
+    <select id="selectTopMenu" resultType="map">
+        SELECT *
+          FROM MENU_CATEGORY
+         WHERE 
+         	   1 = 1
+           AND ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+           AND USE_YN = 'Y'
+         ORDER BY SORT_ORDER ASC
     </select>
     
     <select id="selectUser" parameterType="String" resultType="map">

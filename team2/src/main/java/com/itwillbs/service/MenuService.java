@@ -19,8 +19,8 @@ public class MenuService {
 	
 	private final MenuMapper menuMapper;
 
-	public List<Map<String, Object>> selectMenu(String auth) {
-		return menuMapper.selectMenu(auth);
+	public List<Map<String, Object>> selectMenu(Map<String, String> map) {
+		return menuMapper.selectMenu(map);
 	}
 
 	public List<Map<String, Object>> getMenuList(Map<String, Object> map) {
@@ -120,5 +120,9 @@ public class MenuService {
 
 	public Map<String, Object> selectUser(String id) {
 		return menuMapper.selectUser(id);
+	}
+
+	public List<Map<String, Object>> selectTopMenu(String auth) {
+		return menuMapper.selectTopMenu(auth);
 	}
 }
