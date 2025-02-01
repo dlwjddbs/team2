@@ -172,5 +172,15 @@ public class ExcelService {
             return outputStream.toByteArray();
         }
     }
+    
+    // 엑셀 수정된 데이터만 update
+    public int updateModifiedData(List<Map<String, Object>> modifiedRows) {
+        int updateCount = 0;
+        for (Map<String, Object> row : modifiedRows) {
+            int result = salaryService.updateSalaryTest(row);
+            updateCount += result;
+        }
+        return updateCount;
+    }
 	
 }

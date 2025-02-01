@@ -370,5 +370,38 @@
         	AND PAYDAY = #{payday}
         	AND SALARY_YN = 'N'
 	</update>
-
+	
+	<!-- 급여 수정 - 엑셀 테스트용 -->
+	<!-- 급여 테이블 부분만 수정 -->
+	<update id="updateSalaryTest" parameterType="map">
+		UPDATE SALARY 
+	   	   SET 
+	   	   	   PAYDAY = #{payday}
+	   	   	 , POSITION_BONUS = NVL(TO_NUMBER(REPLACE(#{positionBonus}, ',', '')), 0)
+	       	 , HOLIDAY_BONUS = NVL(TO_NUMBER(REPLACE(#{holidayBonus}, ',', '')), 0)
+	       	 , NIGHT_BONUS = NVL(TO_NUMBER(REPLACE(#{nightBonus}, ',', '')), 0)
+	       	 , YEAREND_BONUS = NVL(TO_NUMBER(REPLACE(#{yearendBonus}, ',', '')), 0)
+	       	 , FULLSERVICE_BONUS = NVL(TO_NUMBER(REPLACE(#{fullserviceBonus}, ',', '')), 0)
+	       	 , PERFORMANCE_BONUS = NVL(TO_NUMBER(REPLACE(#{performanceBonus}, ',', '')), 0)
+	       	 , TOTAL = (NVL((SELECT SALARY 
+	       	 			 FROM MEMBER 
+	       	 			 WHERE MEMBER_ID = #{memberId}
+	       	 			 		<if test="payday != null and payday != ''">
+	       	 			 	   		AND PAYDAY = #{payday}
+	       	 			 	   	</if> 
+						 ), 0) 
+			       	 + NVL(TO_NUMBER(REPLACE(#{positionBonus}, ',', '')), 0)
+			       	 + NVL(TO_NUMBER(REPLACE(#{holidayBonus}, ',', '')), 0)
+			       	 + NVL(TO_NUMBER(REPLACE(#{nightBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{yearendBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{fullserviceBonus}, ',', '')), 0)
+		             + NVL(TO_NUMBER(REPLACE(#{performanceBonus}, ',', '')), 0)
+		             )
+	       	 , UPDATE_DATE = SYSDATE
+		WHERE 
+			 MEMBER_ID = #{memberId}
+			 <if test="payday != null and payday != ''">
+	         	AND PAYDAY = #{payday}
+	         </if>
+	</update>
 </mapper>

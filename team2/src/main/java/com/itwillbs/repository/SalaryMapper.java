@@ -53,6 +53,7 @@ public interface SalaryMapper {
 	// 급여 확정 - 버튼 비활성화
 	void updatefixedSalary(Map<String, Object> param);
 
-
+	// 급여 수정 (엑셀 테스트용)
+	int updateSalaryTest(Map<String, Object> map);
 
 }

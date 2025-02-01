@@ -187,6 +187,17 @@
 					ev.stop();
 				}
 			});
+			
+			// 수정된 행만 DB에 update
+			grid.on('afterChange', ev => {
+			    ev.changes.forEach(change => {
+			        const { rowKey, columnName, value } = change;
+			        const rowData = grid.getRow(rowKey);
+			        if (rowData) {
+			            rowData._modified = true;  // 수정된 데이터 표시
+			        }
+			    });
+			});
 		}
 		
 		// 엑셀 파일 업로드 및 데이터 출력
@@ -217,6 +228,11 @@
 		            alert("엑셀 업로드 중 오류가 발생했습니다.");
 		        }
 		    });
+		}
+		
+		// 수정된 데이터 추출
+		function getModifiedRows() {
+		    return grid.getData().filter(row => row._modified);
 		}
 		
 		// 엑셀 파일 다운로드

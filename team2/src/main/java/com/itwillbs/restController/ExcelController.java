@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,6 +52,16 @@ public class ExcelController {
 
 		// JSON 반환
 		return ResponseEntity.ok(dataList);
+	}
+	
+	// 엑셀 업로드 (수정된 데이터만 DB에 update)
+	@PostMapping("/ajax/updateExcelData")
+	public ResponseEntity<?> updateExcelData(@RequestBody List<Map<String, Object>> modifiedRows) {
+		log.info("============= 엑셀 업로드 시작 (db 수정 동작) =============");
+		
+		int updatedCount = excelService.updateModifiedData(modifiedRows);
+	    
+		return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
 	}
 
 	// 엑셀 양식 다운로드

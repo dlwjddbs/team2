@@ -84,5 +84,10 @@ public class SalaryService {
 		salaryMapper.updatefixedSalary(param);
 	}
 	
+	// 급여 수정 (엑셀 테스트용)
+	public int updateSalaryTest(Map<String, Object> map) {
+		return salaryMapper.updateSalaryTest(map);
+
+	}
 
 }
