@@ -28,6 +28,12 @@
 	    if (navbar) {
 	        navbar.innerHTML = generateTopMenu(topMenuData);
 	    }
+		
+		let menuCategoryID = getCookie('menuCategory');
+		let nav = document.getElementById(menuCategoryID);
+		nav.style.background = "#343a40";
+		nav.style.borderRadius = "30px";
+		nav.style.color = "white";
 	});
 	
 	function generateTopMenu(topMenuData) {
@@ -38,7 +44,7 @@
         topMenuData.forEach(item => {
             html += `
                 <li class="nav-item d-none d-sm-inline-block">
-					<a href="" onclick="test('${item.CATEGORY_ID}')" class="nav-link">${item.NAME}</a>
+					<a href="" id="${item.CATEGORY_ID}" onclick="navbarChange('${item.CATEGORY_ID}')" class="nav-link">${item.NAME}</a>
                 </li>
             `;
         });
@@ -46,8 +52,14 @@
         return html;
     }
 	
-	function test(id) {
+	function navbarChange(id) {
 		document.cookie = "menuCategory=" + id + "; path=/";
 		window.location.reload();
+	}
+	
+	function getCookie(name) {
+	  let regex = new RegExp('(?:^|; )' + name + '=([^;]*)');
+	  let matches = document.cookie.match(regex);
+	  return matches ? decodeURIComponent(matches[1]) : null;
 	}
 </script>

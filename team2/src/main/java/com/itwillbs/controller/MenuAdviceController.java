@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.itwillbs.service.MenuService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -30,7 +32,8 @@ public class MenuAdviceController {
 							, HttpServletRequest request
 							, Model model
 							, @AuthenticationPrincipal UserDetails userDetails
-							, @CookieValue(value = "menuCategory", defaultValue = "") String menuCategory) {
+							, @CookieValue(value = "menuCategory", defaultValue = "") String menuCategory
+							, HttpServletResponse response) {
 	    // 페이지 로딩 시만 조회 -> ajax는 제외.
 		if (!"GET".equalsIgnoreCase(request.getMethod())) {
 			log.info("MenuController - sideMenuList() UserDetails IS NULL");
@@ -58,6 +61,13 @@ public class MenuAdviceController {
     		map.put("menuCategory", menuCategory);
             List<Map<String, Object>> menus = menuService.selectMenu(map);
             model.addAttribute("menus", menus);
+            
+            // 쿠키가 없는 경우 최초에 넣어줌.
+        	if (menuCategory.equals("") && menus.size() > 0) {
+	    		Cookie cookie = new Cookie("menuCategory", menus.get(0).get("MENU_CATEGORY_ID").toString());
+	    		cookie.setPath("/");
+	    		response.addCookie(cookie);
+	    	}
             
             List<Map<String, Object>> top_menus = menuService.selectTopMenu(auth2);
             model.addAttribute("top_menus", top_menus);

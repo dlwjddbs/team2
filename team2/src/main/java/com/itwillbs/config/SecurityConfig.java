@@ -59,6 +59,7 @@ public class SecurityConfig {
 						-> logoutCustomizer
 						.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 						.logoutSuccessUrl("/login")
+						.deleteCookies("menuCategory")  // 권한이 다른 유저 로그인 시 카테고리 출력 문제처리 위함.
 						)
 				.userDetailsService(myUserDetailsService)
 				.build();
