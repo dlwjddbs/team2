@@ -1,0 +1,60 @@
+<!-- 모달창 -->
+<div class="modal fade" id="modalMesCommonCode" th:fragment="modalMesCommonCode">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">공통코드 소분류 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+			    <div class="card-body">
+			        <div class="form-group">
+			            <div class="row">
+			                <div class="col-md-6">
+			                    <label>상위 대분류 코드</label>
+			                    <input type="text" id="SUB_MAIN_ID" class="form-control" readonly>
+			                </div>
+			                <div class="col-md-6">
+			                    <label>사용여부</label><br>
+			                    <input type="radio" name="use_status" value="Y" checked> 사용 &nbsp;
+			                    <input type="radio" name="use_status" value="N"> 미사용
+			                </div>
+			            </div>
+			            <div class="row">
+			            	<div class="col-md-6">
+			                    <label>코드</label>
+			                    <input type="text" id="SUB_ID" class="form-control">
+			                </div>
+			                <div class="col-md-6">
+			                    <label>코드명</label>
+			                    <input type="text" id="SUB_NAME" class="form-control">
+			                </div>
+			            </div>
+			            <div class="row">
+			                <div class="col-md-12">
+			                    <label>코드 설명</label>
+			                    <textarea id="SUB_DESCRIPTION" class="form-control" maxlength="200"></textarea>
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="mesCommonCodeSave">저장</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->

@@ -51,5 +51,53 @@ public class MesCommonCodeController {
 		return message;
 	}
 	
+	@PostMapping("/system/deleteMesCommonCodeGroup")
+	@ResponseBody
+	public Map<String, Object> deleteMesCommonCodeGroup(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = mesCommonCodeService.deleteMesCommonCodeGroup(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/updateMesCommonCodeGroup")
+	@ResponseBody
+	public Map<String, Object> updateMesCommonCodeGroup(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = mesCommonCodeService.updateMesCommonCodeGroup(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/getMesCommonCode")
+	@ResponseBody
+	public List<Map<String, Object>> getMesCommonCode(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> codeList = mesCommonCodeService.getMesCommonCode(map);
+		
+		return codeList;
+	}
+	
+	@PostMapping("/system/addMesCommonCode")
+	@ResponseBody
+	public Map<String, Object> addMesCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = mesCommonCodeService.insertMesCommonCode(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/deleteMesCommonCode")
+	@ResponseBody
+	public Map<String, Object> deleteMesCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = mesCommonCodeService.deleteMesCommonCode(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/updateMesCommonCode")
+	@ResponseBody
+	public Map<String, Object> updateMesCommonCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = mesCommonCodeService.updateMesCommonCode(map);
+		
+		return message;
+	}
+	
 }
 

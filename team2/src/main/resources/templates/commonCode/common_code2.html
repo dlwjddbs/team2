@@ -30,10 +30,10 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 		
-		<nav th:replace="~{includes/modals/commonCodeGroup :: commonCodeGroup}"></nav>
-		<nav th:replace="~{includes/modals/commonCodeGroupEdit :: commonCodeGroupEdit}"></nav>
-		<nav th:replace="~{includes/modals/modalCommonCode :: modalCommonCode}"></nav>
-		<nav th:replace="~{includes/modals/modalCommonCodeEdit :: modalCommonCodeEdit}"></nav>
+		<nav th:replace="~{includes/modals/mesCommonCodeGroup :: mesCommonCodeGroup}"></nav>
+		<nav th:replace="~{includes/modals/mesCommonCodeGroupEdit :: mesCommonCodeGroupEdit}"></nav>
+		<nav th:replace="~{includes/modals/modalMesCommonCode :: modalMesCommonCode}"></nav>
+		<nav th:replace="~{includes/modals/modalMesCommonCodeEdit :: modalMesCommonCodeEdit}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -92,7 +92,7 @@
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="commonCode" class="table table-bordered table-striped">
+									<table id="mesCommonCode" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -157,11 +157,11 @@
 		});
 		
 		$("#btnAddGroup").on("click", function() {
-			$("#GROUP_ID").val('');
-			$("#GROUP_NAME").val('');
+			$("#MAIN_ID").val('');
+			$("#MAIN_NAME").val('');
 			$("#DESCRIPTION").val('');
 			
-			$('#modalGroupCode').modal();
+			$('#mesCommonCodeGroup').modal();
 		});
 		
 		$("#btnDeleteGroup").on('click', function() {
@@ -176,7 +176,7 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/deleteCommonCodeGroup",
+	            url : "/system/deleteMesCommonCodeGroup",
 	            data : {
 	            	GROUP_ID : code,
 				},
@@ -188,28 +188,28 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("deleteCommonCodeGroup() ajax 실패");
+	                console.log("deleteMesCommonCodeGroup() ajax 실패");
 	            }
 	        });
 		});
 		
-		$("#groupCodeSave").on('click', function() {
-			let GROUP_ID = $("#GROUP_ID").val();
-			let GROUP_NAME = $("#GROUP_NAME").val();
+		$("#mainCodeSave").on('click', function() {
+			let MAIN_ID = $("#MAIN_ID").val();
+			let MAIN_NAME = $("#MAIN_NAME").val();
 			let DESCRIPTION = $("#DESCRIPTION").val();
 			
-			if (GROUP_ID == null || GROUP_ID == ''
-				|| GROUP_NAME == null || GROUP_NAME == '') {
+			if (MAIN_ID == null || MAIN_ID == ''
+				|| MAIN_NAME == null || MAIN_NAME == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/addCommonCodeGroup",
+	            url : "/system/addMesCommonCodeGroup",
 	            data : {
-	            	GROUP_ID : GROUP_ID.toUpperCase(),
-	            	GROUP_NAME : GROUP_NAME,
+	            	MAIN_ID : MAIN_ID.toUpperCase(),
+	            	MAIN_NAME : MAIN_NAME,
 	            	DESCRIPTION : DESCRIPTION
 				},
 	            success : function(res){
@@ -220,7 +220,7 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("addCommonCodeGroup() ajax 실패");
+	                console.log("addMesCommonCodeGroup() ajax 실패");
 	            }
 	        });
 		});
@@ -233,9 +233,9 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/system/getGroupCommonCode",
+	            url : "/system/getGroupMesCommonCode",
 	            data : {
-	            	GROUP_ID : code,
+	            	MAIN_ID : code,
 				},
 	            success : function(res){
 					if (res.length == 0) {
@@ -244,34 +244,34 @@
 						return;
 					}
 					
-					$("#GROUP_ID_UPDATE").val(res[0].GROUP_ID);
-					$("#GROUP_NAME_UPDATE").val(res[0].GROUP_NAME);
+					$("#MAIN_ID_UPDATE").val(res[0].GROUP_ID);
+					$("#MAIN_NAME_UPDATE").val(res[0].GROUP_NAME);
 					$("#DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 	            },
 	            error : function(e){
-	                console.log("getGroupCommonCode() ajax 실패");
+	                console.log("getGroupMesCommonCode() ajax 실패");
 	            }
 	        });
 			
-			$('#modalGroupCodeEdit').modal();
+			$('#mesCommonCodeGroupEdit').modal();
 		});
 		
-		$("#groupCodeUpdate").on('click', function() {
-			let GROUP_ID = $("#GROUP_ID_UPDATE").val();
-			let GROUP_NAME = $("#GROUP_NAME_UPDATE").val();
+		$("#mainCodeUpdate").on('click', function() {
+			let MAIN_ID = $("#GROUP_ID_UPDATE").val();
+			let MAIN_NAME = $("#GROUP_NAME_UPDATE").val();
 			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
 
-			if (GROUP_NAME == null || GROUP_NAME == '') {
+			if (MAIN_NAME == null || MAIN_NAME == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/updateCommonCodeGroup",
+	            url : "/system/updateMesCommonCodeGroup",
 	            data : {
-					GROUP_ID : GROUP_ID,
-	            	GROUP_NAME : GROUP_NAME,
+					MAIN_ID : MAIN_ID,
+	            	MAIN_NAME : MAIN_NAME,
 	            	DESCRIPTION : DESCRIPTION
 				},
 	            success : function(res){
@@ -282,7 +282,7 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("updateCommonCodeGroup() ajax 실패");
+	                console.log("updateMesCommonCodeGroup() ajax 실패");
 	            }
 	        });
 		});
@@ -295,7 +295,7 @@
 				
 				return;
 			}
-			let code = table.rows('.selected').data()[0].GROUP_ID;
+			let code = table.rows('.selected').data()[0].MAIN_ID;
 			
 			return code;
 		}
@@ -340,7 +340,7 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/system/getGroupCommonCode",
+					url : "/system/getGroupMesCommonCode",
 					type:"POST",
 					data : {},
 					"dataSrc": function (res) {
@@ -348,8 +348,8 @@
 		            }
 				},
 				columns : [
-					{data : "GROUP_ID", title : "코드", "defaultContent": "" },
-					{data : "GROUP_NAME", title : "코드명", "defaultContent": "" }
+					{data : "MAIN_ID", title : "코드", "defaultContent": "" },
+					{data : "MAIN_NAME", title : "코드명", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -402,19 +402,19 @@
 		            zeroRecords : "검색 결과 없음"
 				},
 				ajax : {
-					url : "/system/getCommonCode",
+					url : "/system/getMesCommonCode",
 					type:"POST",
 					data : {
-						GROUP_ID : code
+						MAIN_ID : code
 					},
 					"dataSrc": function (res) {
 		                return res;
 		            }
 				},
 				columns : [
-					{data : "CODE_ID", title : "코드", "defaultContent": "" },
-					{data : "CODE_NAME", title : "코드명", "defaultContent": "" },
-					{data : "USE_YN", title : "사용여부", "defaultContent": "" }
+					{data : "SUB_ID", title : "코드", "defaultContent": "" },
+					{data : "SUB_NAME", title : "코드명", "defaultContent": "" },
+					{data : "USE_STATUS", title : "사용여부", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -428,37 +428,37 @@
 				return;
 			}
 			
-			$("#CODE_GROUP_ID").val(code);
-			$("#CODE_ID").val('');
-			$("#CODE_NAME").val('');
-			$("#CODE_DESCRIPTION").val('');
-			$('input:radio[name="use_yn"]:input[value="Y"]').prop('checked',true);
+			$("#SUB_GROUP_ID").val(code);
+			$("#SUB_ID").val('');
+			$("#SUB_NAME").val('');
+			$("#SUB_DESCRIPTION").val('');
+			$('input:radio[name="use_status"]:input[value="Y"]').prop('checked',true);
 			
-			$('#modalCommonCode').modal();
+			$('#modalMesCommonCode').modal();
 		});
 		
 		$("#commonCodeSave").on('click', function() {
-			let CODE_GROUP_ID = $("#CODE_GROUP_ID").val();
-			let CODE_ID = $("#CODE_ID").val();
-			let CODE_NAME = $("#CODE_NAME").val();
-			let CODE_DESCRIPTION = $("#CODE_DESCRIPTION").val();
-			let CODE_USE_YN = $('input[name="use_yn"]:checked').val();
+			let SUB_GROUP_ID = $("#SUB_GROUP_ID").val();
+			let SUB_ID = $("#SUB_ID").val();
+			let SUB_NAME = $("#SUB_NAME").val();
+			let SUB_DESCRIPTION = $("#SUB_DESCRIPTION").val();
+			let SUB_USE_STATUS = $('input[name="use_status"]:checked').val();
 			
-			if (CODE_ID == null || CODE_ID == ''
-				|| CODE_NAME == null || CODE_NAME == '') {
+			if (SUB_ID == null || SUB_ID == ''
+				|| SUB_NAME == null || SUB_NAME == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/addCommonCode",
+	            url : "/system/addMesCommonCode",
 	            data : {
-	            	CODE_ID : CODE_ID.toUpperCase(),
-	            	GROUP_ID : CODE_GROUP_ID.toUpperCase(),
-	            	CODE_NAME : CODE_NAME,
-	            	DESCRIPTION : CODE_DESCRIPTION,
-	            	USE_YN : CODE_USE_YN
+	            	SUB_ID : SUB_ID.toUpperCase(),
+	            	MAIN_ID : SUB_GROUP_ID.toUpperCase(),
+	            	SUB_NAME : SUB_NAME,
+	            	DESCRIPTION : SUB_DESCRIPTION,
+	            	USE_STATUS : SUB_USE_STATUS
 				},
 	            success : function(res){
 	           		alert(res.result);
@@ -468,7 +468,7 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("addCommonCode() ajax 실패");
+	                console.log("addMesCommonCode() ajax 실패");
 	            }
 	        });
 		});
@@ -485,9 +485,9 @@
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/deleteCommonCode",
+	            url : "/system/deleteMesCommonCode",
 	            data : {
-	            	CODE_ID : code,
+	            	SUB_ID : code,
 				},
 	            success : function(res){
 	           		alert(res.result);
@@ -497,7 +497,7 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("deleteCommonCode() ajax 실패");
+	                console.log("deleteMesCommonCode() ajax 실패");
 	            }
 	        });
 		});
@@ -510,9 +510,9 @@
 			
 			$.ajax({
 	            type : "POST",
-	            url : "/system/getCommonCode",
+	            url : "/system/getMesCommonCode",
 	            data : {
-	            	CODE_ID : code
+	            	SUB_ID : code
 				},
 	            success : function(res){
 					if (res.length == 0) {
@@ -521,11 +521,11 @@
 						return;
 					}
 					
-					$("#CODE_GROUP_ID_UPDATE").val(res[0].GROUP_ID);
-					$("#CODE_ID_UPDATE").val(res[0].CODE_ID);
-					$("#CODE_NAME_UPDATE").val(res[0].CODE_NAME);
-					$("#CODE_DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
-					$("#USE_YN_" + res[0].USE_YN).prop("checked", true);
+					$("#SUB_MAIN_ID_UPDATE").val(res[0].MAIN_ID);
+					$("#SUB_ID_UPDATE").val(res[0].CODE_ID);
+					$("#SUB_NAME_UPDATE").val(res[0].CODE_NAME);
+					$("#SUB_DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
+					$("#USE_STATUS_" + res[0].USE_STATUS).prop("checked", true);
 	            },
 	            error : function(e){
 	                console.log("getCommonCode() ajax 실패");

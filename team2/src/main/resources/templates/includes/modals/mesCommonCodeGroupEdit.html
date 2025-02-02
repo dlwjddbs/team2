@@ -1,0 +1,50 @@
+<!-- 모달창 -->
+<div class="modal fade" id="mesCommonCodeGroupEdit" th:fragment="mesCommonCodeGroupEdit">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">공통코드 대분류 수정</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+					
+						<div class="row">
+							<div class="col-md-6">
+								<label>코드</label>
+								<input type="text" id="MAIN_ID_UPDATE" class="form-control" readonly>
+							</div>
+							<div class="col-md-6">
+								<label>코드명</label>
+								<input type="text" id="MAIN_NAME_UPDATE" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<label>코드 설명</label>
+								<textarea id="DESCRIPTION_UPDATE" class="form-control" maxlength="200"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="mainCodeUpdate">수정</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
