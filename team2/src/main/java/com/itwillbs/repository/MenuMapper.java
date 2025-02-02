@@ -35,5 +35,9 @@ public interface MenuMapper {
 	int insertMenuCategory(Map<String, Object> map);
 
 	int updateMenuCategory(Map<String, Object> map);
+
+	int isExistChildMenuCategory(Map<String, Object> map);
+
+	int deleteMenuCategory(Map<String, Object> map);
 	
 }

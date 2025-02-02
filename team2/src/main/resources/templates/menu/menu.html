@@ -192,7 +192,7 @@
 						{
 				            text: "삭제",
 				            action: function () {
-								//selectRow(id, 'delete');
+								selectRow(id, 'deleteCate');
 				            }
 						}
 					]
@@ -464,6 +464,7 @@
 				case 'update' : updateMenu(menu_id); break; 
 				case 'delete' : deleteMenu(menu_id); break;	
 				case 'updateCate' : updateCategory(cate_id); break;	
+				case 'deleteCate' : deleteCategory(cate_id); break;	
 			}
 		}
 		
@@ -641,6 +642,30 @@
 	            }
 	        });
 		});
+		
+		function deleteCategory(cate_id) {
+			if (!confirm("삭제 하시겠습니까?")) {
+				return;
+			}
+			
+	 		$.ajax({
+	            type : "POST",
+	            url : "/system/deleteMenuCategory",
+	            data : {
+	            	MENU_CATEGORY_ID : cate_id,
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("deleteMenuCategory() ajax 실패");
+	            }
+	        });
+		}
 		
 		function deleteMenu(menu_id) {
 			if (!confirm("삭제 하시겠습니까?")) {

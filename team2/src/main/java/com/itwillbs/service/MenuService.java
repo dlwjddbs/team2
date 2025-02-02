@@ -185,4 +185,29 @@ public class MenuService {
 		
 		return message;
 	}
+
+	public Map<String, Object> deleteMenuCategory(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "삭제 실패.";
+		String resultCode = "0";
+		
+		try {
+			if (menuMapper.isExistChildMenuCategory(map) > 0) {
+				result = "하위 메뉴가 존재합니다.";
+			} else {
+				if (menuMapper.deleteMenuCategory(map) > 0) {
+					result = "삭제 되었습니다.";
+					resultCode = "1";
+				}
+			}
+		} catch (Exception e) {
+			log.info(e.toString());
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
 }

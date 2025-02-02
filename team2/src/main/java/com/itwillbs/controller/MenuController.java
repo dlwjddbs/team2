@@ -89,6 +89,14 @@ public class MenuController {
 		
 		return message;
 	}
+	
+	@PostMapping("/system/deleteMenuCategory")
+	@ResponseBody
+	public Map<String, Object> deleteMenuCategory(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.deleteMenuCategory(map);
+		
+		return message;
+	}
 }
 
 

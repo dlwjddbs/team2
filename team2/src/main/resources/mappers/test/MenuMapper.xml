@@ -206,4 +206,17 @@
 			   , USE_YN = #{USE_YN}
 		 WHERE CATEGORY_ID = #{CATEGORY_ID}
     </update>
+    
+    <select id="isExistChildMenuCategory" resultType="Integer">
+	    SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 
+		 	   1 = 1
+		   AND MENU_CATEGORY_ID = #{MENU_CATEGORY_ID}
+    </select>
+    
+    <delete id="deleteMenuCategory">
+    	DELETE FROM MENU_CATEGORY
+    	 WHERE CATEGORY_ID = #{MENU_CATEGORY_ID}
+    </delete>
 </mapper>
