@@ -186,7 +186,7 @@
 						{
 				            text: "수정",
 				            action: function () {
-								//selectRow(id, 'update');
+								selectRow(id, 'updateCate');
 				            }
 						},
 						{
@@ -458,14 +458,98 @@
 			}
 			
 			let menu_id = selectedData[0].MENU_ID;
-			// TODO
-			//console.log(selectedData[0].CATEGORY_ID)
+			let cate_id = selectedData[0].CATEGORY_ID;
 			
 			switch (type) {
 				case 'update' : updateMenu(menu_id); break; 
 				case 'delete' : deleteMenu(menu_id); break;	
+				case 'updateCate' : updateCategory(cate_id); break;	
 			}
 		}
+		
+		function updateCategory(cate_id) {
+			$.ajax({
+	            type : "POST",
+	            url : "/system/getMenuCategoryList",
+	            data : {
+	            	cate_id : cate_id,
+				},
+	            success : function(res){
+					if (res.length == 0) {
+						alert("조회 실패");
+						
+						return;
+					}
+					
+					$("#CATEGORY_ID_UPDATE").val(res[0].CATEGORY_ID);
+					$("#NAME_CATE_UPDATE").val(res[0].CATEGORY_NAME);
+					$("#SORT_ORDER_CATE_UPDATE").val(res[0].CATEGORY_SORT_ORDER);
+					$("#CATE_USE_YN_" + res[0].CATEGORY_USE_YN).prop("checked", true);
+					
+					let role = res[0].CATEGORY_ROLE;
+					if (role.includes('USER')) {
+						$("#CATE_ROLE_USER").prop("checked", true);
+					} else {
+						// ROLE_USER default가 checked라 해제해줘야됨.
+						$("#CATE_ROLE_USER").prop("checked", false);
+					}
+					
+					if (role.includes('ADMIN')) {
+						$("#CATE_ROLE_ADMIN").prop("checked", true);
+					}
+	            },
+	            error : function(e){
+	                console.log("updateCategory() ajax 실패");
+	            }
+	        });
+			
+			$('#categoryEdit').modal();
+		}
+		
+		$("#categoryUpdate").on("click", function() {
+			let CATEGORY_ID = $("#CATEGORY_ID_UPDATE").val();
+			let NAME = $("#NAME_CATE_UPDATE").val();
+			let SORT_ORDER = $("#SORT_ORDER_CATE_UPDATE").val();
+			
+			let ROLE = '';
+			$('input:checkbox[name=role_cate_edit]').each(function (index) {
+				if($(this).is(":checked")){
+					ROLE += $(this).val() + ',';
+			    }
+			});
+			
+			let USE_YN = $('input[name="use_yn_cate_edit"]:checked').val();
+			
+			if (NAME == null || NAME == ''
+				|| SORT_ORDER == null || SORT_ORDER == ''
+				|| USE_YN == null || USE_YN == ''
+				|| ROLE == null || ROLE == '') {
+				alert("값을 입력해 주세요.");
+				return;
+			}
+			
+			$.ajax({
+	            type : "POST",
+	            url : "/system/updateMenuCategory",
+	            data : {
+	            	CATEGORY_ID : CATEGORY_ID,
+	            	NAME : NAME,
+	            	SORT_ORDER : SORT_ORDER,
+	            	ROLE : ROLE,
+	            	USE_YN : USE_YN
+				},
+	            success : function(res){
+	           		alert(res.result);
+	           		
+	            	if (res.resultCode == 1) {
+						location.reload();
+	            	}
+	            },
+	            error : function(e){
+	                console.log("updateMenuCategory() ajax 실패");
+	            }
+	        });
+		});
 		
 		function updateMenu(menu_id) {
 			$.ajax({

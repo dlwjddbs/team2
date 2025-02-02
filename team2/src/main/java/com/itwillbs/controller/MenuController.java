@@ -68,8 +68,8 @@ public class MenuController {
 	
 	@PostMapping("/system/getMenuCategoryList")
 	@ResponseBody
-	public List<Map<String, Object>> getMenuCategoryList() {
-		List<Map<String, Object>> menuCategoryList = menuService.selectMenuCategoryList();
+	public List<Map<String, Object>> getMenuCategoryList(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> menuCategoryList = menuService.selectMenuCategoryList(map);
 		
 		return menuCategoryList;
 	}
@@ -78,6 +78,14 @@ public class MenuController {
 	@ResponseBody
 	public Map<String, Object> addMenuCategory(@RequestParam Map<String, Object> map) {
 		Map<String, Object> message = menuService.addMenuCategory(map);
+		
+		return message;
+	}
+	
+	@PostMapping("/system/updateMenuCategory")
+	@ResponseBody
+	public Map<String, Object> updateMenuCategory(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = menuService.updateMenuCategory(map);
 		
 		return message;
 	}

@@ -126,8 +126,8 @@ public class MenuService {
 		return menuMapper.selectTopMenu(auth);
 	}
 
-	public List<Map<String, Object>> selectMenuCategoryList() {
-		return menuMapper.selectMenuCategoryList();
+	public List<Map<String, Object>> selectMenuCategoryList(Map<String, Object> map) {
+		return menuMapper.selectMenuCategoryList(map);
 	}
 
 	public Map<String, Object> addMenuCategory(Map<String, Object> map) {
@@ -152,6 +152,32 @@ public class MenuService {
 			}
 		} catch (Exception e) {
 			result = "등록 실패.";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+
+	public Map<String, Object> updateMenuCategory(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "수정 실패";
+		String resultCode = "0";
+		
+		try {
+			if (menuMapper.isDuplicateMenuCategorySortOrder(map) > 0) {
+				result = "중복된 순서입니다.";
+			} else {
+				if (menuMapper.updateMenuCategory(map) > 0) {
+					result = "수정 되었습니다.";
+					resultCode = "1";
+				}
+			}
+		} catch (Exception e) {
+			log.info(e.toString());
+			result = "수정 실패.";
 		}
 		
 		message.put("result", result);

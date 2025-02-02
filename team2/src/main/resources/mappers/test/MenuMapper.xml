@@ -163,6 +163,11 @@
 			 , SORT_ORDER 	AS CATEGORY_SORT_ORDER
 			 , USE_YN 		AS CATEGORY_USE_YN
 		  FROM MENU_CATEGORY
+		 WHERE 
+		 	   1 = 1
+		 <if test="cate_id != null and cate_id != ''">
+		   	   AND CATEGORY_ID = #{cate_id}
+		 </if>
 		 ORDER BY SORT_ORDER ASC
     </select>
     
@@ -171,6 +176,9 @@
 		  FROM MENU_CATEGORY
 		 WHERE 1 = 1
 		   AND SORT_ORDER = #{SORT_ORDER}
+			<if test="CATEGORY_ID != null and CATEGORY_ID != ''">
+				AND CATEGORY_ID != #{CATEGORY_ID}
+			</if>
     </select>
     
     <insert id="insertMenuCategory">
@@ -188,4 +196,14 @@
 			, #{USE_YN}
 		)
     </insert>
+    
+    <update id="updateMenuCategory">
+		UPDATE MENU_CATEGORY
+		   SET 
+			     NAME = #{NAME}
+			   , SORT_ORDER = #{SORT_ORDER}
+			   , ROLE = #{ROLE}
+			   , USE_YN = #{USE_YN}
+		 WHERE CATEGORY_ID = #{CATEGORY_ID}
+    </update>
 </mapper>
