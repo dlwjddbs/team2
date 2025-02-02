@@ -595,6 +595,7 @@
 		}
 		
 		$("#menuUpdate").on("click", function() {
+			let MENU_CATEGORY_ID = $("#MENU_CATEGORY_ID_EDIT").val();
 			let MENU_ID = $("#MENU_ID_EDIT").val();
 			let PARENT_ID = $("#PARENT_ID_EDIT").val();
 			let NAME = $("#NAME_EDIT").val();
@@ -622,6 +623,7 @@
 	            type : "POST",
 	            url : "/system/updateMenu",
 	            data : {
+	            	MENU_CATEGORY_ID : MENU_CATEGORY_ID,
 	            	MENU_ID : MENU_ID,
 	            	PARENT_ID : PARENT_ID,
 	            	NAME : NAME,

@@ -39,5 +39,7 @@ public interface MenuMapper {
 	int isExistChildMenuCategory(Map<String, Object> map);
 
 	int deleteMenuCategory(Map<String, Object> map);
+
+	int isDuplicateMenuCategoryName(Map<String, Object> map);
 	
 }

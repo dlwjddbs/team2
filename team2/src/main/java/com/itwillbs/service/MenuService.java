@@ -141,6 +141,8 @@ public class MenuService {
 			if (duplicateCnt > 0) {
 				result = "중복된 순서입니다.";
 				resultCode = "0";
+			} else if (menuMapper.isDuplicateMenuCategoryName(map) > 0) {
+				result = "중복된 이름입니다.";
 			} else {
 				int resultCnt = menuMapper.insertMenuCategory(map);
 				if (resultCnt > 0) {
@@ -169,6 +171,8 @@ public class MenuService {
 		try {
 			if (menuMapper.isDuplicateMenuCategorySortOrder(map) > 0) {
 				result = "중복된 순서입니다.";
+			} else if (menuMapper.isDuplicateMenuCategoryName(map) > 0) {
+				result = "중복된 이름입니다.";
 			} else {
 				if (menuMapper.updateMenuCategory(map) > 0) {
 					result = "수정 되었습니다.";

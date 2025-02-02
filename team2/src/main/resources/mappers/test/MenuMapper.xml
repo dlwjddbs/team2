@@ -118,6 +118,7 @@
 		   <if test="MENU_ID != null and MENU_ID != ''">
 		   		AND MENU_ID != #{MENU_ID}
 		   </if>
+		   AND MENU_CATEGORY_ID = #{MENU_CATEGORY_ID}
 		   AND SORT_ORDER = #{SORT_ORDER}
     </select>
     
@@ -219,4 +220,15 @@
     	DELETE FROM MENU_CATEGORY
     	 WHERE CATEGORY_ID = #{MENU_CATEGORY_ID}
     </delete>
+    
+    <select id="isDuplicateMenuCategoryName" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU_CATEGORY
+		 WHERE 
+		 	   1 = 1
+		   AND NAME = #{NAME}
+			<if test="CATEGORY_ID != null and CATEGORY_ID != ''">
+				AND CATEGORY_ID != #{CATEGORY_ID}
+			</if>
+    </select>
 </mapper>
