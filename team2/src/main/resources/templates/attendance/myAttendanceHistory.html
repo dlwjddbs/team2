@@ -32,37 +32,13 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>지각/조퇴/결근 내역</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">Home</a></li>
-								<li class="breadcrumb-item active">DataTables</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
-			<!-- /.콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
-<!--						<div class="d-flex">-->
-<!--							<label class="col-form-label mr-3">발령구분</label> <select class="appointGubun" name="appointGubun"-->
-<!--								style="min-width: 120px">-->
-<!--								<option selected="selected" disabled>발령구분</option>-->
-<!--								<option>승진</option>-->
-<!--								<option>부서이동</option>-->
-<!--								<option>퇴사</option>-->
-<!--							</select>-->
-<!--						</div>-->
-					
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 70px;">조회기간</label>
