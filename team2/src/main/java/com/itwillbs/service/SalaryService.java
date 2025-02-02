@@ -70,24 +70,16 @@ public class SalaryService {
 		salaryMapper.updateMemberSalary(map);
 		// 사원의 상여금 수정
 		salaryMapper.updateSalaryBonus(map);
-
 	}
 	
 	// 급여 삭제
 	public void deleteteSalary(Map<String, Object> map) {
 		salaryMapper.deleteSalary(map);
-		
 	}
 	
 	// 급여 확정 상태 변경
 	public void updatefixedSalary(Map<String, Object> param) {
 		salaryMapper.updatefixedSalary(param);
-	}
-	
-	// 급여 수정 (엑셀 테스트용)
-	public int updateSalaryTest(Map<String, Object> map) {
-		return salaryMapper.updateSalaryTest(map);
-
 	}
 
 }

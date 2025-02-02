@@ -66,4 +66,19 @@
 	    WHERE TABLE_NAME = UPPER(#{tableName})
     	ORDER BY COLUMN_ID
 	</select>
+	
+	<select id="selectToastTestById" resultType="map">
+        SELECT *
+          FROM TEST
+        WHERE ID = #{ID}
+    </select>
+    
+	<update id="updateToastTestById">
+        UPDATE TEST
+           SET 
+			   COL_1 = #{COL_1}
+             , COL_2 = #{COL_2}
+             , COL_3 = #{COL_3}
+         WHERE ID = #{ID}
+    </update>
 </mapper>

@@ -371,6 +371,56 @@
         	AND SALARY_YN = 'N'
 	</update>
 	
+	<!-- 급여 조회 (엑셀 테스트용) -->
+	<select id="selectSalaryListTest" resultType="map">
+        SELECT
+            MEMBER_ID,
+            GRADE_ID,
+            PAYDAY,
+            POSITION_BONUS,
+            HOLIDAY_BONUS,
+            NIGHT_BONUS,
+            YEAREND_BONUS,
+            FULLSERVICE_BONUS,
+            PERFORMANCE_BONUS,
+			TOTAL      
+        FROM 
+        	SALARY 
+		WHERE
+			1 = 1
+			<if test='id != "admin"'>
+			   AND
+				  MEMBER_ID = #{id}
+		  	</if>
+		ORDER BY
+			PAYDAY DESC
+    </select>
+	
+	<!-- 급여 테이블 조회 (엑셀 테스트용) -->
+	<select id="selectSalaryTest" resultType="map">
+        SELECT
+            MEMBER_ID,
+            GRADE_ID,
+            PAYDAY,
+            POSITION_BONUS,
+            HOLIDAY_BONUS,
+            NIGHT_BONUS,
+            YEAREND_BONUS,
+            FULLSERVICE_BONUS,
+            PERFORMANCE_BONUS,
+			TOTAL      
+        FROM 
+        	SALARY 
+		WHERE
+			1 = 1
+			<if test='id != "admin"'>
+			   AND
+				  MEMBER_ID = #{id}
+		  	</if>
+		ORDER BY
+			PAYDAY DESC
+    </select>
+    
 	<!-- 급여 수정 - 엑셀 테스트용 -->
 	<!-- 급여 테이블 부분만 수정 -->
 	<update id="updateSalaryTest" parameterType="map">

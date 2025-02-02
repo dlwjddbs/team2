@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,14 +57,36 @@ public class ExcelController {
 	}
 	
 	// 엑셀 업로드 (수정된 데이터만 DB에 update)
+	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
 	@PostMapping("/ajax/updateExcelData")
-	public ResponseEntity<?> updateExcelData(@RequestBody List<Map<String, Object>> modifiedRows) {
+	public ResponseEntity<?> updateExcelData(@RequestParam("file") MultipartFile file) {
 		log.info("============= 엑셀 업로드 시작 (db 수정 동작) =============");
 		
-		int updatedCount = excelService.updateModifiedData(modifiedRows);
+	    try {
+	    	 // 엑셀 데이터 파싱
+	        List<Map<String, Object>> uploadedData = excelService.parseExcelFile(file);
+	        
+	        int updatedCount = excelService.updateModifiedData(uploadedData);
+	        
+	        return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
+	    }
 	    
-		return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
+//		int updatedCount = excelService.updateModifiedData(modifiedRows);
+    
+//		return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
 	}
+	
+	// 엑셀 업로드 (수정된 데이터만 DB에 update)
+	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
+    // 현재 그리드에 있는 내용을 db에 업데이트
+	@PutMapping("/ajax/excelToastTest")
+	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		
+		return excelService.updateToastTest(updatedRows);
+	}	
 
 	// 엑셀 양식 다운로드
 	@GetMapping("/ajax/downloadTemplate")
