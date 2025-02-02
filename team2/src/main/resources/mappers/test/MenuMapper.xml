@@ -231,4 +231,13 @@
 				AND CATEGORY_ID != #{CATEGORY_ID}
 			</if>
     </select>
+    
+    <select id="getPageHeader">
+    	SELECT LISTAGG(NAME, ' / ') WITHIN GROUP (ORDER BY DEPTH ASC) AS BREADCRUMB
+		FROM MENU
+		CONNECT BY PRIOR PARENT_ID = MENU_ID
+		START WITH MENU_ID = (
+		    SELECT MENU_ID FROM MENU WHERE URL = #{url}
+		)
+    </select>
 </mapper>

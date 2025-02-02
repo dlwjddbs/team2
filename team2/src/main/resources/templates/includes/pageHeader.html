@@ -1,0 +1,35 @@
+<section class="content-header" th:fragment="pageHeader">
+	<div class="container-fluid">
+		<div class="row mb-2">
+			<div class="col-sm-6">
+				<h1 id="pageHeaderTitle"></h1>
+			</div>
+			<div class="col-sm-6">
+				<ol class="breadcrumb float-sm-right">
+					<li class="breadcrumb-item active" id="breadcrumb"></li>
+				</ol>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script th:fragment="pageHeader" th:inline="javascript">
+	fetch('/system/getPageHeader', {
+		method: 'POST',
+	  	headers: {'Content-Type': 'application/json'},
+	  	body: JSON.stringify({'url': window.location.pathname})
+	})
+	.then(response => response.json())
+	.then(data => {
+		let breadcrumb = data.BREADCRUMB;
+		
+		let arr = breadcrumb.split(" / ");
+		let menuName = arr[arr.length - 1];
+		
+		document.getElementById("pageHeaderTitle").innerText = menuName;
+		document.getElementById("breadcrumb").innerText = breadcrumb;
+	})
+	.catch(error => {
+		console.error('/system/getPageHeader 실패');
+	});
+</script>

@@ -36,8 +36,6 @@ public class MenuAdviceController {
 							, HttpServletResponse response) {
 	    // 페이지 로딩 시만 조회 -> ajax는 제외.
 		if (!"GET".equalsIgnoreCase(request.getMethod())) {
-			log.info("MenuController - sideMenuList() UserDetails IS NULL");
-			
 			return;
 		}
 		

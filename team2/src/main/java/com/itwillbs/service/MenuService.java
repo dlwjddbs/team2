@@ -214,4 +214,8 @@ public class MenuService {
 		
 		return message;
 	}
+
+	public Map<String, Object> getPageHeader(Map<String, Object> map) {
+		return menuMapper.getPageHeader(map);
+	}
 }

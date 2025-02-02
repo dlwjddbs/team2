@@ -41,5 +41,7 @@ public interface MenuMapper {
 	int deleteMenuCategory(Map<String, Object> map);
 
 	int isDuplicateMenuCategoryName(Map<String, Object> map);
+
+	Map<String, Object> getPageHeader(Map<String, Object> map);
 	
 }
