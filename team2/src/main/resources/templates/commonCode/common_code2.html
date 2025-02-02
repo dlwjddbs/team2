@@ -244,8 +244,8 @@
 						return;
 					}
 					
-					$("#MAIN_ID_UPDATE").val(res[0].GROUP_ID);
-					$("#MAIN_NAME_UPDATE").val(res[0].GROUP_NAME);
+					$("#MAIN_ID_UPDATE").val(res[0].MAIN_ID);
+					$("#MAIN_NAME_UPDATE").val(res[0].MAIN_NAME);
 					$("#DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 	            },
 	            error : function(e){
@@ -257,8 +257,8 @@
 		});
 		
 		$("#mainCodeUpdate").on('click', function() {
-			let MAIN_ID = $("#GROUP_ID_UPDATE").val();
-			let MAIN_NAME = $("#GROUP_NAME_UPDATE").val();
+			let MAIN_ID = $("#MAIN_ID_UPDATE").val();
+			let MAIN_NAME = $("#MAIN_NAME_UPDATE").val();
 			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
 
 			if (MAIN_NAME == null || MAIN_NAME == '') {
@@ -313,7 +313,7 @@
 				
 				return;
 			}
-			let code = table.rows('.selected').data()[0].CODE_ID;
+			let code = table.rows('.selected').data()[0].SUB_ID;
 			
 			return code;
 		}
@@ -522,40 +522,40 @@
 					}
 					
 					$("#SUB_MAIN_ID_UPDATE").val(res[0].MAIN_ID);
-					$("#SUB_ID_UPDATE").val(res[0].CODE_ID);
-					$("#SUB_NAME_UPDATE").val(res[0].CODE_NAME);
+					$("#SUB_ID_UPDATE").val(res[0].SUB_ID);
+					$("#SUB_NAME_UPDATE").val(res[0].SUB_NAME);
 					$("#SUB_DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 					$("#USE_STATUS_" + res[0].USE_STATUS).prop("checked", true);
 	            },
 	            error : function(e){
-	                console.log("getCommonCode() ajax 실패");
+	                console.log("getMesCommonCode() ajax 실패");
 	            }
 	        });
 			
-			$('#modalCommonCodeEdit').modal();
+			$('#modalMesCommonCodeEdit').modal();
 		});
 		
-		$("#commonCodeUpdate").on('click', function() {
-			let CODE_GROUP_ID = $("#CODE_GROUP_ID_UPDATE").val();
-			let CODE_ID = $("#CODE_ID_UPDATE").val();
-			let CODE_NAME = $("#CODE_NAME_UPDATE").val();
-			let CODE_DESCRIPTION = $("#CODE_DESCRIPTION_UPDATE").val();
-			let CODE_USE_YN = $('input[name="use_yn_update"]:checked').val();
+		$("#mesCommonCodeUpdate").on('click', function() {
+			let SUB_MAIN_ID = $("#SUB_MAIN_ID_UPDATE").val();
+			let SUB_ID = $("#SUB_ID_UPDATE").val();
+			let SUB_NAME = $("#SUB_NAME_UPDATE").val();
+			let SUB_DESCRIPTION = $("#SUB_DESCRIPTION_UPDATE").val();
+			let SUB_USE_STATUS = $('input[name="use_status_update"]:checked').val();
 
-			if (CODE_NAME == null || CODE_NAME == '') {
+			if (SUB_NAME == null || SUB_NAME == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
 			
 	 		$.ajax({
 	            type : "POST",
-	            url : "/system/updateCommonCode",
+	            url : "/system/updateMesCommonCode",
 	            data : {
-	            	GROUP_ID : CODE_GROUP_ID,
-					CODE_ID : CODE_ID,
-					CODE_NAME : CODE_NAME,
-					DESCRIPTION : CODE_DESCRIPTION,
-					USE_YN : CODE_USE_YN
+	            	MAIN_ID : SUB_MAIN_ID,
+					SUB_ID : SUB_ID,
+					SUB_NAME : SUB_NAME,
+					DESCRIPTION : SUB_DESCRIPTION,
+					USE_STATUS : SUB_USE_STATUS
 				},
 	            success : function(res){
 	           		alert(res.result);
@@ -565,7 +565,7 @@
 	            	}
 	            },
 	            error : function(e){
-	                console.log("commonCodeUpdate() ajax 실패");
+	                console.log("mesCommonCodeUpdate() ajax 실패");
 	            }
 	        });
 		});
