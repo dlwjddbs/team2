@@ -18,7 +18,7 @@
            		</when>
            		<otherwise>
            			AND MENU_CATEGORY_ID = (SELECT *
-											FROM (SELECT ID
+											FROM (SELECT CATEGORY_ID
 													FROM MENU_CATEGORY
 													ORDER BY SORT_ORDER ASC)
 											WHERE ROWNUM = 1)
@@ -157,7 +157,7 @@
     
     <select id="selectMenuCategoryList">
     	SELECT
-			   ID			AS CATEGORY_ID
+			   CATEGORY_ID	AS CATEGORY_ID
 			 , NAME 		AS CATEGORY_NAME
 			 , ROLE 		AS CATEGORY_ROLE
 			 , SORT_ORDER 	AS CATEGORY_SORT_ORDER
@@ -175,13 +175,13 @@
     
     <insert id="insertMenuCategory">
     	INSERT INTO MENU_CATEGORY (
-			  ID
+			  CATEGORY_ID
 			, NAME
 			, ROLE
 			, SORT_ORDER
 			, USE_YN
 		) VALUES (
-			  (SELECT 'MEC' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ID, 4))), 0) + 1, 10, '0') FROM MENU_CATEGORY)
+			  (SELECT 'MEC' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(CATEGORY_ID, 4))), 0) + 1, 10, '0') FROM MENU_CATEGORY)
 			, #{NAME}
 			, #{ROLE}
 			, #{SORT_ORDER}

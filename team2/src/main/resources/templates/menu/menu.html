@@ -33,6 +33,7 @@
 		<nav th:replace="~{includes/modals/menuAdd :: menuAdd}"></nav>
 		<nav th:replace="~{includes/modals/menuEdit :: menuEdit}"></nav>
 		<nav th:replace="~{includes/modals/categoryAdd :: categoryAdd}"></nav>
+		<nav th:replace="~{includes/modals/categoryEdit :: categoryEdit}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -457,6 +458,8 @@
 			}
 			
 			let menu_id = selectedData[0].MENU_ID;
+			// TODO
+			//console.log(selectedData[0].CATEGORY_ID)
 			
 			switch (type) {
 				case 'update' : updateMenu(menu_id); break; 
