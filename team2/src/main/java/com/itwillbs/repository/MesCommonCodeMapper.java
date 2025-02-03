@@ -12,6 +12,8 @@ public interface MesCommonCodeMapper {
 
 	public int isDuplicateMesCommonCodeGroup(Map<String, Object> map);
 
+	public int isDuplicateMainOrder(Map<String, Object> map);
+
 	public int insertMesCommonCodeGroup(Map<String, Object> map);
 
 	public int isExistMesCommonCodeGroupChild(Map<String, Object> map);
@@ -24,11 +26,15 @@ public interface MesCommonCodeMapper {
 
 	public int isDuplicateMesCommonCode(Map<String, Object> map);
 
+	public int isDuplicateSubOrder(Map<String, Object> map);
+
 	public int insertMesCommonCode(Map<String, Object> map);
 
 	public int deleteMesCommonCode(Map<String, Object> map);
 
 	public int updateMesCommonCode(Map<String, Object> map);
+
+
 
 
 }

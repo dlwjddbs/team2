@@ -38,21 +38,8 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>공통코드</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">설정</a></li>
-								<li class="breadcrumb-item active">공통코드</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
 			<!-- /.콘텐츠 헤더 (Page header) -->
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
@@ -92,7 +79,7 @@
 									</div>
 								</div>
 								<div class="card-body">
-									<table id="mesCommonCode" class="table table-bordered table-striped">
+									<table id="commonCode" class="table table-bordered table-striped">
 										<!-- dataTable Ajax -->
 									</table>
 								</div>
@@ -159,6 +146,7 @@
 		$("#btnAddGroup").on("click", function() {
 			$("#MAIN_ID").val('');
 			$("#MAIN_NAME").val('');
+			$("#MAIN_ORDER").val('');
 			$("#DESCRIPTION").val('');
 			
 			$('#mesCommonCodeGroup').modal();
@@ -178,7 +166,7 @@
 	            type : "POST",
 	            url : "/system/deleteMesCommonCodeGroup",
 	            data : {
-	            	GROUP_ID : code,
+	            	MAIN_ID : code,
 				},
 	            success : function(res){
 	           		alert(res.result);
@@ -196,10 +184,12 @@
 		$("#mainCodeSave").on('click', function() {
 			let MAIN_ID = $("#MAIN_ID").val();
 			let MAIN_NAME = $("#MAIN_NAME").val();
+			let MAIN_ORDER = $("#MAIN_ORDER").val();
 			let DESCRIPTION = $("#DESCRIPTION").val();
 			
 			if (MAIN_ID == null || MAIN_ID == ''
-				|| MAIN_NAME == null || MAIN_NAME == '') {
+				|| MAIN_NAME == null || MAIN_NAME == ''
+				|| MAIN_ORDER == null || MAIN_ORDER == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
@@ -210,6 +200,7 @@
 	            data : {
 	            	MAIN_ID : MAIN_ID.toUpperCase(),
 	            	MAIN_NAME : MAIN_NAME,
+					MAIN_ORDER : MAIN_ORDER,
 	            	DESCRIPTION : DESCRIPTION
 				},
 	            success : function(res){
@@ -246,6 +237,7 @@
 					
 					$("#MAIN_ID_UPDATE").val(res[0].MAIN_ID);
 					$("#MAIN_NAME_UPDATE").val(res[0].MAIN_NAME);
+					$("#MAIN_ORDER_UPDATE").val(res[0].MAIN_ORDER);
 					$("#DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 	            },
 	            error : function(e){
@@ -259,6 +251,7 @@
 		$("#mainCodeUpdate").on('click', function() {
 			let MAIN_ID = $("#MAIN_ID_UPDATE").val();
 			let MAIN_NAME = $("#MAIN_NAME_UPDATE").val();
+			let MAIN_ORDER = $("#MAIN_ORDER_UPDATE").val();
 			let DESCRIPTION = $("#DESCRIPTION_UPDATE").val();
 
 			if (MAIN_NAME == null || MAIN_NAME == '') {
@@ -272,6 +265,7 @@
 	            data : {
 					MAIN_ID : MAIN_ID,
 	            	MAIN_NAME : MAIN_NAME,
+					MAIN_ORDER : MAIN_ORDER,
 	            	DESCRIPTION : DESCRIPTION
 				},
 	            success : function(res){
@@ -349,7 +343,8 @@
 				},
 				columns : [
 					{data : "MAIN_ID", title : "코드", "defaultContent": "" },
-					{data : "MAIN_NAME", title : "코드명", "defaultContent": "" }
+					{data : "MAIN_NAME", title : "코드명", "defaultContent": "" },
+					{data : "MAIN_ORDER", title : "순서", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -372,7 +367,7 @@
 					return;
 				}
 				
-				let code = table.rows('.selected').data()[0].GROUP_ID;
+				let code = table.rows('.selected').data()[0].MAIN_ID; // 확인 필요
 				commonCodeDataTable(code);
 				if (!isUpdate) {
 					isUpdate = true;
@@ -414,7 +409,9 @@
 				columns : [
 					{data : "SUB_ID", title : "코드", "defaultContent": "" },
 					{data : "SUB_NAME", title : "코드명", "defaultContent": "" },
-					{data : "USE_STATUS", title : "사용여부", "defaultContent": "" }
+					{data : "CLASSIFICATION_ID", title : "(대분류+소분류)", "defaultContent": "" },
+					{data : "USE_STATUS", title : "사용여부", "defaultContent": "" },
+					{data : "SUB_ORDER", title : "순서", "defaultContent": "" }
 				],
 				responsive : true, 
 				lengthChange : false, 
@@ -428,24 +425,27 @@
 				return;
 			}
 			
-			$("#SUB_GROUP_ID").val(code);
+			$("#SUB_MAIN_ID").val(code);
 			$("#SUB_ID").val('');
 			$("#SUB_NAME").val('');
+			$("#SUB_ORDER").val('');
 			$("#SUB_DESCRIPTION").val('');
 			$('input:radio[name="use_status"]:input[value="Y"]').prop('checked',true);
 			
 			$('#modalMesCommonCode').modal();
 		});
 		
-		$("#commonCodeSave").on('click', function() {
-			let SUB_GROUP_ID = $("#SUB_GROUP_ID").val();
+		$("#mesCommonCodeSave").on('click', function() {
+			let SUB_MAIN_ID = $("#SUB_MAIN_ID").val();
 			let SUB_ID = $("#SUB_ID").val();
 			let SUB_NAME = $("#SUB_NAME").val();
+			let SUB_ORDER = $("#SUB_ORDER").val();
 			let SUB_DESCRIPTION = $("#SUB_DESCRIPTION").val();
 			let SUB_USE_STATUS = $('input[name="use_status"]:checked').val();
 			
 			if (SUB_ID == null || SUB_ID == ''
-				|| SUB_NAME == null || SUB_NAME == '') {
+				|| SUB_NAME == null || SUB_NAME == ''
+				|| SUB_ORDER == null || SUB_ORDER == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
@@ -455,8 +455,9 @@
 	            url : "/system/addMesCommonCode",
 	            data : {
 	            	SUB_ID : SUB_ID.toUpperCase(),
-	            	MAIN_ID : SUB_GROUP_ID.toUpperCase(),
+	            	MAIN_ID : SUB_MAIN_ID.toUpperCase(),
 	            	SUB_NAME : SUB_NAME,
+	            	SUB_ORDER : SUB_ORDER,
 	            	DESCRIPTION : SUB_DESCRIPTION,
 	            	USE_STATUS : SUB_USE_STATUS
 				},
@@ -524,6 +525,7 @@
 					$("#SUB_MAIN_ID_UPDATE").val(res[0].MAIN_ID);
 					$("#SUB_ID_UPDATE").val(res[0].SUB_ID);
 					$("#SUB_NAME_UPDATE").val(res[0].SUB_NAME);
+					$("#SUB_ORDER_UPDATE").val(res[0].SUB_ORDER);
 					$("#SUB_DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 					$("#USE_STATUS_" + res[0].USE_STATUS).prop("checked", true);
 	            },
@@ -539,6 +541,7 @@
 			let SUB_MAIN_ID = $("#SUB_MAIN_ID_UPDATE").val();
 			let SUB_ID = $("#SUB_ID_UPDATE").val();
 			let SUB_NAME = $("#SUB_NAME_UPDATE").val();
+			let SUB_ORDER = $("#SUB_ORDER_UPDATE").val();
 			let SUB_DESCRIPTION = $("#SUB_DESCRIPTION_UPDATE").val();
 			let SUB_USE_STATUS = $('input[name="use_status_update"]:checked').val();
 
@@ -554,6 +557,7 @@
 	            	MAIN_ID : SUB_MAIN_ID,
 					SUB_ID : SUB_ID,
 					SUB_NAME : SUB_NAME,
+					SUB_ORDER : SUB_ORDER,
 					DESCRIPTION : SUB_DESCRIPTION,
 					USE_STATUS : SUB_USE_STATUS
 				},
