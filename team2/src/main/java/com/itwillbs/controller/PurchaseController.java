@@ -1,9 +1,11 @@
 package com.itwillbs.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -43,9 +45,9 @@ public class PurchaseController {
 		}
 		
 		
-		@PostMapping("/savePurchases")
+		@PostMapping("/savePurchase")
 		@ResponseBody
-		public int savePurchases(@RequestBody List<Map<String, Object>> dataList) {
+		public ResponseEntity<Map<String, Object>> savePurchase(@RequestBody List<Map<String, Object>> dataList) {
 		    int result = 0;
 
 		    List<Map<String, Object>> insertList = new ArrayList<>();
@@ -54,6 +56,7 @@ public class PurchaseController {
 
 		    for (Map<String, Object> data : dataList) {
 		        String rowType = (String) data.get("rowType");
+		        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
 
 		        if ("insert".equals(rowType)) {
 		            insertList.add(data);
@@ -64,11 +67,18 @@ public class PurchaseController {
 		        }
 		    }
 
-		    result += purchaseService.insertPurchases(insertList);
-		    result += purchaseService.updatePurchases(updateList);
-		    result += purchaseService.deletePurchases(deleteList);
-
-		    return result;
+		    result += purchaseService.insertPurchase(insertList);
+		    result += purchaseService.updatePurchase(updateList);
+		    result += purchaseService.deletePurchase(deleteList);
+		    
+		    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
+		 // JSON 형태로 응답 반환 (undefined 방지)
+		    Map<String, Object> responseMap = new HashMap<>();
+		    responseMap.put("status", "success");
+		    responseMap.put("message", "저장이 완료되었습니다!");
+		    responseMap.put("affectedRows", result);
+		    
+		    return ResponseEntity.ok(responseMap);
 		}
 		
 		

@@ -133,6 +133,7 @@
 			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 			<!-- AdminLTE App -->
 			<script src="../../dist/js/adminlte.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
 
 			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 
@@ -173,15 +174,16 @@
 					contentType: 'application/json',
 				};
 				const columns = [
-					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: null},
+					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
 					{header: 'P/O번호', name: 'PO_ID', align: 'center', editor: null},
-					{header: '담당자', name: 'MEMBER_ID', align: 'center', editor: null},
-					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', editor: null},
+					{header: '담당자', name: 'MEMBER_ID', align: 'center', editor: 'text'},
+					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', editor: 'text'},
 					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
 					{header: '금액', name: 'PO_PRICE', align: 'center', editor: 'text'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center', editor: null},
-					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center', editor: null},
-					{header: '상태', name: 'PO_STATUS', align: 'center', editor: null},
+					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center', editor: 'text'},
+					{header: '상태', name: 'PO_STATUS', align: 'center', editor: 'text'},
+					{ header: '주문번호', name: 'PO_NUM', hidden: true }
 				];
 				
 				fetch('/getPurchase', {
@@ -334,36 +336,139 @@
 						{focus: true}
 					);
 				});
-
-				// 삭제 버튼 이벤트
-				// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
-				btn_delete.addEventListener('mousedown', () => {
-					grid1.blur(); // 포커스 해제
-
-					// delRows 저장된 인덱스에 대한 행 삭제 처리
-					delRows.forEach((index) => {
-						// 삭제된 행일 경우 rowType을 update로 변경
-						grid1.removeRow(index);
-					});
-				});
-
-				// 저장 버튼 이벤트
-				// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
-				save.addEventListener('mousedown', () => {
-					grid1.blur(); // 포커스 해제
 				
-				const createRows = grid1.getModifiedRows().createRows;
-				createdRows.forEach(row => {
-			        grid1.setValue(row.rowKey, "rowType", "insert");
-			    });
-					// 수정된 행일 경우 rowType을 update로 변경
-					const updatedRows = grid1.getModifiedRows().updatedRows;
-					updatedRows.forEach((row, index) => {
-						grid1.setValue(row.rowKey, "rowType", "update")
-					});
-				});
-				
+				// ✅ 저장 버튼 이벤트
+				save.addEventListener('mousedown', handleSave);
 
+				// ✅ 삭제 버튼 이벤트
+				del.addEventListener('mousedown', handleDelete);
+
+				// ✅ 체크된 행 저장 배열
+				let delRows = [];
+				grid1.on('check', (ev) => delRows.push(ev.rowKey));
+				
+				// ✅ 저장 함수
+				function handleSave() {
+				    grid1.blur(); // 포커스 해제
+
+				    const modifiedRows = grid1.getModifiedRows();
+				    const createdRows = modifiedRows.createdRows.map(row => ({ ...row, rowType: "insert" }));
+				    const updatedRows = modifiedRows.updatedRows.map(row => ({ ...row, rowType: "update" }));
+				    const deletedRows = modifiedRows.deletedRows.map(row => ({ ...row, rowType: "delete" }));
+
+				    const allData = [...createdRows, ...updatedRows, ...deletedRows];
+
+				    if (allData.length === 0) {
+				        alert("변경된 데이터가 없습니다.");
+				        return;
+				    }
+
+				    console.log("서버로 전송할 데이터:", allData);
+
+				    $.ajax({
+				        url: "/savePurchase",
+				        type: 'POST',
+				        contentType: "application/json",
+				        data: JSON.stringify(allData),
+				        beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+				        success: (res) => {
+				            if (res == "success") {
+				                showSuccess("저장 성공!", true);
+				            } else {
+				                showError("저장 실패");
+				            }
+				        },
+				        error: () => showError("서버 오류 발생"),
+				    });
+				}
+
+				// ✅ 삭제 함수
+				function handleDelete() {
+				    grid1.blur(); // 포커스 해제
+
+				    delRows.forEach(index => {
+				        grid1.setValue(index, "rowType", "delete");
+				        grid1.removeRow(index);
+				    });
+
+				    delRows = []; // 삭제 목록 초기화
+				}
+
+				// 메시지
+				function showSuccess(message, reload = false) {
+					Notiflix.Notify.success('저장 성공!');
+				}
+
+				function showError(message) {
+				   Notiflix.Notify.failure('저장 실패!');
+				}
+				
+			/*	// 저장 이벤트
+				// 데이터 저장 함수
+				async function saveData() {
+				    grid1.blur(); // 포커스 해제
+
+				    const modifiedRows = grid1.getModifiedRows();
+				    console.log("getModifiedRows() 반환값:", modifiedRows);
+
+				    // 각 행 타입을 추가하여 데이터를 가공
+				    const createdRows = modifiedRows.createdRows.map(row => ({ ...row, rowType: "insert" }));
+				    const updatedRows = modifiedRows.updatedRows.map(row => ({ ...row, rowType: "update" }));
+					const deletedRows = modifiedRows.deletedRows.map(row => ({ ...row, rowType: "delete" }));; // 삭제된 행
+					const allData = [...createdRows, ...updatedRows, ...deletedRows];
+					
+					
+
+					
+				    // 변경된 데이터가 없으면 저장하지 않음
+				    if (allData.length === 0) {
+				        alert("변경된 데이터가 없습니다.");
+				        return;
+				    }
+
+				    console.log("서버로 전송할 데이터:", allData);
+
+				    try {
+				        const response = await fetch('/savePurchase', {
+				            method: 'POST',
+				            headers: {
+				                'Content-Type': 'application/json',
+				                [header]: token
+				            },
+				            body: JSON.stringify(allData)
+				        });
+
+				        const result = await response.json();
+				        console.log("서버 응답:", result);
+				        alert(result.message || "저장 성공!");
+
+				        // 데이터 다시 불러오기
+				        grid1.reloadData();
+				    } catch (error) {
+				        console.error("저장 실패:", error);
+				        alert("저장 중 오류가 발생했습니다.");
+				    }
+				}
+
+				// 삭제 이벤트 처리 함수
+				function deleteSelectedRows() {
+				    grid1.blur(); // 포커스 해제
+
+				    // 선택된 행 삭제
+				    delRows.forEach(index => {
+				        grid1.removeRow(index);
+				    });
+
+				    // 삭제 목록 초기화
+				    delRows = [];
+				}
+
+				// 저장 버튼 이벤트 리스너
+				save.addEventListener('mousedown', saveData);
+
+				// 삭제 버튼 이벤트 리스너
+				btn_delete.addEventListener('mousedown', deleteSelectedRows);
+			*/
 			</script>
 </body>
 

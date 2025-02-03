@@ -33,19 +33,37 @@
 		  , UPDATE_MEMBER
 		  , PO_NUM		
 		) VALUES (
-        #{PO_ID}, 
+        SYS_GUID(), 
         #{PO_COUNT}, 
         #{PO_PRICE}, 
-        NOW(), 
+        CURRENT_DATE, 
         #{MEMBER_ID}, 
         #{CUSTOMER_ID}, 
-        #{PO_STATUS}, 
-        NOW(), 
+        NVL(#{PO_STATUS, jdbcType=VARCHAR}, '미결'), 
+        CURRENT_DATE, 
         #{UPDATE_MEMBER}, 
-        #{PO_NUM}
+        #{PO_NUM, jdbcType=VARCHAR}
     )
 	</insert>
 	
+	<update id="updatePurchase">
+    UPDATE PURCHASE_ORDER
+    	SET 
+       	 	PO_COUNT = #{PO_COUNT},
+       	 	PO_PRICE = #{PO_PRICE},
+       	 	CREATE_DATE = CURRENT_DATE,
+       	 	MEMBER_ID = #{MEMBER_ID},
+       	 	CUSTOMER_ID = #{CUSTOMER_ID},
+       	 	PO_STATUS = NVL(#{PO_STATUS, jdbcType=VARCHAR}, '미결'),
+       	 	UPDATE_DATE = CURRENT_DATE,
+       	 	UPDATE_MEMBER = #{UPDATE_MEMBER},
+       	 	PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
+    WHERE PO_ID = #{PO_ID}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
 	
-	
+	<!-- DELETE (데이터 삭제) -->
+    <delete id="deletePurchase">
+        DELETE FROM PURCHASE_ORDER WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}
+    </delete>
+    
 </mapper>

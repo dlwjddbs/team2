@@ -19,7 +19,7 @@ public class PurchaseService {
 		return purchaseMapper.getPurchaseList(map);
 	}
 
-	public int insertPurchases(List<Map<String, Object>> insertList) {
+	public int insertPurchase(List<Map<String, Object>> insertList) {
 		int count = 0;
         for (Map<String, Object> data : insertList) {
             count += purchaseMapper.insertPurchase(data);
@@ -27,7 +27,7 @@ public class PurchaseService {
         return count;
 	}
 
-	public int updatePurchases(List<Map<String, Object>> updateList) {
+	public int updatePurchase(List<Map<String, Object>> updateList) {
 		 int count = 0;
 	        for (Map<String, Object> data : updateList) {
 	            count += purchaseMapper.updatePurchase(data);
@@ -35,7 +35,7 @@ public class PurchaseService {
 	        return count;
 	}
 
-	public int deletePurchases(List<Map<String, Object>> deleteList) {
+	public int deletePurchase(List<Map<String, Object>> deleteList) {
 		 int count = 0;
 	        for (Map<String, Object> data : deleteList) {
 	            count += purchaseMapper.deletePurchase(data);
