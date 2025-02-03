@@ -193,6 +193,7 @@ public class MesCommonCodeService {
 	    } catch (Exception e) {
 	        System.out.println(e);
 	        result = "수정 실패.";
+	        resultCode = "0";
 	    }
 
 	    message.put("result", result);

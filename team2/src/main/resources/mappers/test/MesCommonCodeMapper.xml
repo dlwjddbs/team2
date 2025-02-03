@@ -16,6 +16,7 @@
 		  <if test='MAIN_ID != null and MAIN_ID != ""'>
 		  		WHERE MAIN_ID = #{MAIN_ID}
 		  </if>
+		  ORDER BY MAIN_ORDER ASC
 	</select>
 	
 	<select id="isDuplicateMesCommonCodeGroup" resultType="Integer">
@@ -78,18 +79,21 @@
 		SELECT 
 			   SUB_ID 
 			 , MAIN_ID 
-			 , SUB_NAME 
+			 , SUB_NAME
+			 , CONCAT(MAIN_ID, SUB_ID) AS CLASSIFICATION_ID
+			 , SUB_ORDER
 			 , DESCRIPTION 
 			 , USE_STATUS
 		  FROM MES_COMMON
 		 WHERE 
 		 	   1 = 1
 			<if test='MAIN_ID != null and MAIN_ID != ""'>
-		   		AND GROUP_ID = #{GROUP_ID}
+		   		AND MAIN_ID = #{MAIN_ID}
 		   	</if>
 			<if test='SUB_ID != null and SUB_ID != ""'>
 		   		AND SUB_ID = #{SUB_ID}
 		   	</if>
+		   	ORDER BY SUB_ORDER ASC
 	</select>
 	
 	<select id="isDuplicateMesCommonCode" resultType="Integer">

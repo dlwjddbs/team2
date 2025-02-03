@@ -428,9 +428,9 @@
 			$("#SUB_MAIN_ID").val(code);
 			$("#SUB_ID").val('');
 			$("#SUB_NAME").val('');
-			$("#SUB_ORDER").val('');
 			$("#SUB_DESCRIPTION").val('');
 			$('input:radio[name="use_status"]:input[value="Y"]').prop('checked',true);
+			$("#SUB_ORDER").val('');
 			
 			$('#modalMesCommonCode').modal();
 		});
@@ -439,13 +439,12 @@
 			let SUB_MAIN_ID = $("#SUB_MAIN_ID").val();
 			let SUB_ID = $("#SUB_ID").val();
 			let SUB_NAME = $("#SUB_NAME").val();
-			let SUB_ORDER = $("#SUB_ORDER").val();
 			let SUB_DESCRIPTION = $("#SUB_DESCRIPTION").val();
 			let SUB_USE_STATUS = $('input[name="use_status"]:checked').val();
+			let SUB_ORDER = $("#SUB_ORDER").val();
 			
 			if (SUB_ID == null || SUB_ID == ''
-				|| SUB_NAME == null || SUB_NAME == ''
-				|| SUB_ORDER == null || SUB_ORDER == '') {
+				|| SUB_NAME == null || SUB_NAME == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
