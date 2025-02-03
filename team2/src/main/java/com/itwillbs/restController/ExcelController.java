@@ -57,7 +57,6 @@ public class ExcelController {
 	
 	// 엑셀 업로드 (수정된 데이터만 DB에 update)
 	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
-    // 현재 그리드에 있는 내용을 db에 업데이트
 	@PutMapping(URL)
 	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
@@ -99,10 +98,6 @@ public class ExcelController {
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
 	    }
-	    
-//		int updatedCount = excelService.updateModifiedData(modifiedRows);
-    
-//		return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
 	}
 
 	// 엑셀 양식 다운로드
@@ -118,7 +113,8 @@ public class ExcelController {
 			HttpHeaders headers = new HttpHeaders();
 			// headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 			headers.setContentType(
-					MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")); // MIME 타입 변경 (xlsx)
+					// MIME 타입 변경 (xlsx)
+					MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 			headers.setContentDispositionFormData("attachment", tableName + "_template.xlsx");
 
 			return ResponseEntity.ok().headers(headers).body(excelData);

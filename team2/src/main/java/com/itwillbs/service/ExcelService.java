@@ -15,10 +15,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,7 +110,7 @@ public class ExcelService {
 		return resultMap;
 	}
 
-	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입
+	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입하는 메서드
 	public int updateModifiedData(List<Map<String, Object>> uploadedData) {
 
 		if (uploadedData.isEmpty()) {
@@ -198,7 +204,7 @@ public class ExcelService {
 		return updateCount + insertCount + deleteCount;
 	}
 
-	// 기존 데이터와 업로드된 데이터 비교 (변경 여부 체크)
+	// 기존 데이터와 업로드된 데이터 비교 메서드 (변경 여부 체크)
 	// 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
 	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
 		for (String key : oldData.keySet()) {
@@ -224,7 +230,7 @@ public class ExcelService {
 //        return true; // 모든 값이 동일하면 변경 없음
 //    }
 
-	// 엑셀 파일 파싱
+	// 엑셀 파일 파싱 메서드
 	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {
 		List<Map<String, Object>> dataList = new ArrayList<>();
 
@@ -240,7 +246,7 @@ public class ExcelService {
 
 			// 2번째 행의 모든 셀을 읽어서 headers 리스트에 저장
 			for (Cell cell : headerRow) {
-				headers.add(cell.getStringCellValue());
+				headers.add(cell.getStringCellValue().trim());
 			}
 
 			// 데이터 읽기 (3번째 행부터)
@@ -270,7 +276,7 @@ public class ExcelService {
 		return dataList;
 	}
 
-	// 엑셀 셀 데이터 변환
+	// 엑셀 셀 데이터 변환 메서드
 	// 데이터의 안정성과 일관성을 위해 사용 (데이터 타입이 혼합된 경우 예외 발생 가능성 높음)
 	private Object getCellValue(Cell cell) {
 		if (cell == null) {
@@ -293,8 +299,18 @@ public class ExcelService {
 			return ""; // 기타 (날짜 등) 처리
 		}
 	}
+	
+	// 빈 행인지 확인하는 메서드 
+	private boolean isRowEmpty(Row row) {
+	    for (Cell cell : row) {
+	        if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).toString().trim().isEmpty()) {
+	            return false; // 하나라도 값이 있으면 빈 행이 아님
+	        }
+	    }
+	    return true; // 모든 셀이 비어있으면 빈 행
+	}
 
-	// 엑셀 양식 생성
+	// 엑셀 양식 생성 메서드
 	public byte[] createExcelTemplate(String tableName) throws IOException {
 
 		List<String> columnNames = testMapper.getColumnNames(tableName); // 컬럼명 가져오기
@@ -303,12 +319,7 @@ public class ExcelService {
 
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			Sheet sheet = workbook.createSheet("Template");
-
-//            // 컬럼 너비 설정 (단위: 1/256 글자 크기)
-//            for (int i = 0; i < columnNames.size(); i++) {
-//                sheet.setColumnWidth(i, 5000);  // 5000 = 약 20글자 정도의 너비
-//            }
-//
+			
 //            // row0 - 양식 규칙 (높이 지정)
 //            Row row0 = sheet.createRow(0);
 //            row0.setHeight((short) 600);  // 높이 지정 (단위: 1/20 포인트)
@@ -316,17 +327,36 @@ public class ExcelService {
 
 			// row0 - 양식 규칙 추가
 			Row row0 = sheet.createRow(0);
-			row0.createCell(0).setCellValue("양식 규칙");
+			row0.createCell(0).setCellValue("양식 규칙 (이 부분은 지우고 사용해주세요)");
+			
+		    // 셀 병합 (A1 ~ D1)
+		    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
 
+		    // 병합된 셀에 내용 추가
+		    Cell cell = row0.createCell(0);
+		    cell.setCellValue("양식 규칙 (이 부분은 지우고 사용해주세요)");
+
+		    // 스타일 적용 (선택 사항)
+		    CellStyle style = sheet.getWorkbook().createCellStyle();
+		    style.setAlignment(HorizontalAlignment.CENTER); // 가운데 정렬
+		    style.setVerticalAlignment(VerticalAlignment.CENTER); // 수직 가운데 정렬
+
+		    Font font = sheet.getWorkbook().createFont();
+		    font.setBold(true); // 글씨 굵게
+		    style.setFont(font);
+
+		    cell.setCellStyle(style);
+		    
 			// row1 - 컬럼명 추가
 			Row row1 = sheet.createRow(1);
 			for (int i = 0; i < columnNames.size(); i++) {
 				row1.createCell(i).setCellValue(columnNames.get(i)); // 여기서 바로 추가
 			}
-
-			// 셀 크기 자동 조정 (각 컬럼의 내용에 맞게 조정)
+			
+			// 열 너비 설정 (단위: 1/256 * 글자 크기)
 			for (int i = 0; i < columnNames.size(); i++) {
-				sheet.autoSizeColumn(i); // 자동 조정 적용
+				sheet.setColumnWidth(i, 5000);	// 5000 = 약 20글자 정도의 너비
+				//sheet.autoSizeColumn(i);	// (각 컬럼의 내용에 맞게 셀 크기 자동 조정)
 			}
 
 			// 엑셀 바이너리 변환
@@ -335,8 +365,9 @@ public class ExcelService {
 		}
 	}
 
-	// 엑셀 데이터 타입 변환
+	// 엑셀 데이터 타입 변환 메서드 (미구현)
 	// 테이블 컬럼 타입을 기반으로 변환 적용
+	// 현재 테이블 이름을 어떻게 찾을건지 생각해야함 
 	public Map<String, Object> convertDataTypes(Map<String, Object> rowData, Map<String, String> columnTypes) {
 		Map<String, Object> convertedRow = new HashMap<>();
 
@@ -372,7 +403,7 @@ public class ExcelService {
 		return convertedRow;
 	}
 
-	// 엑셀 수정된 데이터만 db에 업데이트
+	// 엑셀 수정된 데이터만 db에 업데이트하는 메서드 (미구현)
 	// 현재 그리드에 있는 내용을 db에 업데이트
 	public Map<String, Object> updateToastTest(List<Map<String, Object>> updatedRows) {
 		Map<String, Object> resultMap = new HashMap<>();
