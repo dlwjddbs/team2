@@ -43,6 +43,7 @@
 	</insert>
 	
     <select id="isDuplicateMainOrder" resultType="Integer">
+    <!-- isDuplicateMainOrder 공통코드 순서 중복 확인 -->
     	SELECT COUNT(*) AS COUNT
 		  FROM MES_COMMON_GROUP
 		  WHERE MAIN_ORDER = #{MAIN_ORDER}
@@ -104,6 +105,7 @@
 			  SUB_ID
 			, MAIN_ID
 			, SUB_NAME
+			, SUB_ORDER
 			, DESCRIPTION
 			, USE_STATUS
 			, CREATE_DATE
@@ -111,11 +113,19 @@
 			  #{SUB_ID}
 			, #{MAIN_ID}
 			, #{SUB_NAME}
+			, #{SUB_ORDER}
 			, #{DESCRIPTION}
 			, #{USE_STATUS}
 			, CURRENT_DATE
 		)
 	</insert>
+
+    <select id="isDuplicateSubOrder" resultType="Integer">
+    <!-- isDuplicateSubOrder 공통코드 순서 중복 확인 -->
+    	SELECT COUNT(*) AS COUNT
+		  FROM MES_COMMON
+		  WHERE SUB_ORDER = #{SUB_ORDER}
+    </select>	
 	
 	<delete id="deleteMesCommonCode">
 	<!-- deleteMesCommonCode 공통코드 소분류 삭제 -->
@@ -129,6 +139,7 @@
 		   SET 
 			   SUB_NAME = #{SUB_NAME}
 			 , DESCRIPTION = #{DESCRIPTION}
+			 , SUB_ORDER = #{SUB_ORDER}
 			 , USE_STATUS = #{USE_STATUS}
 			 , UPDATE_DATE = CURRENT_DATE
 		 WHERE SUB_ID = #{SUB_ID}
