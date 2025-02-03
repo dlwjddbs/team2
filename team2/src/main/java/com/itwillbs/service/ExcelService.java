@@ -2,13 +2,17 @@ package com.itwillbs.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -29,18 +33,18 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Log
 public class ExcelService {
-	
+
 	private final TestMapper testMapper;
-	
+
 	public Map<String, Object> selectExcelToastTest() {
 		log.info("============= selectExcelToastTest =============");
-		
+
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
-		
+
 		Boolean result = true;
 		String message = "selectToastTest 성공";
-		
+
 		try {
 			List<Map<String, Object>> testList = testMapper.selectToastTest();
 			content.put("contents", testList);
@@ -49,13 +53,177 @@ public class ExcelService {
 			result = false;
 			message = "selectToastTest 실패";
 		}
-		
+
 		resultMap.put("result", result);
 		resultMap.put("message", message);
-		
+
 		return resultMap;
 	}
-	
+
+	public Map<String, Object> insertToastTest(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+
+		Boolean result = true;
+		String message = "insertToastTest 성공";
+
+		try {
+			int cnt = testMapper.countExistingIds(createdRows);
+			if (cnt > 0) {
+				result = false;
+				message = "중복된 ToastTest값";
+			} else {
+				testMapper.insertToastTest(createdRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "insertToastTest 실패";
+		}
+
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+
+		return resultMap;
+	}
+
+	public Map<String, Object> deleteToastTest(List<String> idList) {
+		Map<String, Object> resultMap = new HashMap<>();
+
+		Boolean result = true;
+		String message = "deleteToastTest 성공";
+
+		try {
+			testMapper.deleteToastTest(idList);
+		} catch (Exception e) {
+			result = false;
+			message = "deleteToastTest 실패";
+		}
+
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+
+		return resultMap;
+	}
+
+	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입
+	public int updateModifiedData(List<Map<String, Object>> uploadedData) {
+
+		if (uploadedData.isEmpty()) {
+			return 0; // 데이터가 없으면 처리할 필요 없음
+		}
+
+		int updateCount = 0;
+		int insertCount = 0;
+		int deleteCount = 0;
+		int result = 0;
+		
+		// 유효한 데이터 리스트 생성
+		List<Map<String, Object>> validDataList = new ArrayList<>();
+
+		// 업로드된 데이터에서 유효한 데이터만 필터링
+		for (Map<String, Object> row : uploadedData) {
+		    String id = (String) row.get("ID");
+		    // ID가 null이 아니고, 빈 문자열이 아닌 경우
+		    if (id != null && !id.trim().isEmpty()) {
+		        // ID를 포함한 유효한 데이터 추가
+		        validDataList.add(row);
+		    }
+		}
+		
+		// 유효한 데이터가 비어 있는지 체크
+		if (validDataList.isEmpty()) {
+		    return 0; // 유효한 데이터가 없으면 처리할 필요 없음
+		}
+
+		// 기존 데이터를 한 번에 조회
+		List<Map<String, Object>> existingDataList = testMapper.selectToastTest();
+		
+		// DB에서 컬럼 타입 조회
+	    //Map<String, String> columnTypes = testMapper.getColumnTypes(tableName);
+	    
+		// 기존 데이터를 Map<ID, Map<String, Object>> 형태로 변환 (조회 속도 개선)
+		Map<String, Map<String, Object>> existingDataMap = existingDataList.stream()
+				.collect(Collectors.toMap(row -> (String) row.get("ID"), row -> row));
+
+		// 변경된 데이터만 추려서 업데이트, 삽입, 삭제 리스트 생성
+		List<Map<String, Object>> dataToUpdate = new ArrayList<>();
+		List<Map<String, Object>> dataToInsert = new ArrayList<>();
+		List<String> dataToDelete = new ArrayList<>(existingDataMap.keySet()); // 기존 데이터 ID 목록
+
+		for (Map<String, Object> newRow : validDataList) {
+			String id = (String) newRow.get("ID");
+			Map<String, Object> existingRow = existingDataMap.get(id);
+			log.info("existingRow : " + existingRow);
+
+			if (existingRow != null) {
+				// 기존 데이터가 있고, 변경된 경우 업데이트 리스트에 추가
+				if (!isSameData(existingRow, newRow)) {
+//					Map<String, Object> convertedRow = convertDataTypes(newRow, columnTypes);
+//			        dataToUpdate.add(convertedRow);
+					dataToUpdate.add(newRow);
+					log.info("dataToUpdate : " + dataToUpdate);
+				}
+				// 기존 데이터가 존재하면 삭제 후보에서 제외
+				dataToDelete.remove(id);
+				log.info("dataToDelete : " + dataToDelete);
+			} else {
+				// 기존 데이터가 없는 경우 삽입 리스트에 추가
+				dataToInsert.add(newRow);
+				log.info("dataToInsert : " + dataToInsert);
+			}
+		}
+
+		// 변경된 데이터만 일괄 업데이트 실행
+		if (!dataToUpdate.isEmpty()) {
+			result = testMapper.updateToastTestById(dataToUpdate);
+			updateCount += result;
+			log.info("updateCount : " + updateCount);
+		}
+
+		// 새로운 데이터 일괄 삽입 실행
+		if (!dataToInsert.isEmpty()) {
+			result = testMapper.insertToastTest(dataToInsert);
+			insertCount += result;
+			log.info("insertCount : " + insertCount);
+		}
+
+		// 삭제 실행
+		if (!dataToDelete.isEmpty()) {
+			result = testMapper.deleteToastTest(dataToDelete);
+			deleteCount += result;
+			log.info("deleteCount : " + deleteCount);
+		}
+
+		// 결과 로깅
+		log.info("Total processed rows (updated + inserted + deleted): " + result);
+		return updateCount + insertCount + deleteCount;
+	}
+
+	// 기존 데이터와 업로드된 데이터 비교 (변경 여부 체크)
+	// 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
+	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
+		for (String key : oldData.keySet()) {
+			if (!Objects.equals(oldData.get(key), newData.get(key))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+//    private boolean isSameData(Map<String, Object> existingRow, Map<String, Object> newRow) {
+//        for (String key : newRow.keySet()) {
+//            Object oldValue = existingRow.get(key);
+//            log.info("oldValue : " + oldValue);
+//            Object newValue = newRow.get(key);
+//            log.info("newValue : " + newValue);
+//            
+//            if (!Objects.equals(oldValue, newValue)) {
+//            	log.info("다른거 확인됨!");
+//                return false; // 하나라도 다르면 변경됨
+//            }
+//        }
+//        return true; // 모든 값이 동일하면 변경 없음
+//    }
+
 	// 엑셀 파일 파싱
 	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {
 		List<Map<String, Object>> dataList = new ArrayList<>();
@@ -112,7 +280,8 @@ public class ExcelService {
 		case STRING:
 			return cell.getStringCellValue(); // 문자열
 		case NUMERIC:
-			if (DateUtil.isCellDateFormatted(cell)) { // 날짜 포맷이면 변환
+			if (DateUtil.isCellDateFormatted(cell)) { 
+				// 날짜 포맷이면 변환
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				return sdf.format(cell.getDateCellValue());
 			}
@@ -124,18 +293,17 @@ public class ExcelService {
 			return ""; // 기타 (날짜 등) 처리
 		}
 	}
-	
+
 	// 엑셀 양식 생성
-    public byte[] createExcelTemplate(String tableName) throws IOException {
-    	
-        List<String> columnNames = testMapper.getColumnNames(tableName);   // 컬럼명 가져오기
-        
-        log.info("columnNames : " + columnNames);
-        
-        try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Template");
-            
+	public byte[] createExcelTemplate(String tableName) throws IOException {
+
+		List<String> columnNames = testMapper.getColumnNames(tableName); // 컬럼명 가져오기
+
+		log.info("columnNames : " + columnNames);
+
+		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+			Sheet sheet = workbook.createSheet("Template");
+
 //            // 컬럼 너비 설정 (단위: 1/256 글자 크기)
 //            for (int i = 0; i < columnNames.size(); i++) {
 //                sheet.setColumnWidth(i, 5000);  // 5000 = 약 20글자 정도의 너비
@@ -145,92 +313,84 @@ public class ExcelService {
 //            Row row0 = sheet.createRow(0);
 //            row0.setHeight((short) 600);  // 높이 지정 (단위: 1/20 포인트)
 //            row0.createCell(0).setCellValue("양식 규칙");
-            
-            // row0 - 양식 규칙 추가
-            Row row0 = sheet.createRow(0);
-            row0.createCell(0).setCellValue("양식 규칙");
 
-            // row1 - 컬럼명 추가
-            Row row1 = sheet.createRow(1);
-            for (int i = 0; i < columnNames.size(); i++) {
-                row1.createCell(i).setCellValue(columnNames.get(i));  // 여기서 바로 추가
-            }
-            
-            // 셀 크기 자동 조정 (각 컬럼의 내용에 맞게 조정)
-            for (int i = 0; i < columnNames.size(); i++) {
-                sheet.autoSizeColumn(i);  // 자동 조정 적용
-            }
-            
-            // 엑셀 바이너리 변환
-            workbook.write(outputStream);
-            return outputStream.toByteArray();
-        }
-    }
-    
-    // 엑셀 수정된 데이터만 db에 업데이트
-    public int updateModifiedData(List<Map<String, Object>> uploadedData) {
-        int updateCount = 0;
+			// row0 - 양식 규칙 추가
+			Row row0 = sheet.createRow(0);
+			row0.createCell(0).setCellValue("양식 규칙");
 
-        for (Map<String, Object> newRow : uploadedData) {
-            String id = (String) newRow.get("ID");
-            log.info("id : " + id);
+			// row1 - 컬럼명 추가
+			Row row1 = sheet.createRow(1);
+			for (int i = 0; i < columnNames.size(); i++) {
+				row1.createCell(i).setCellValue(columnNames.get(i)); // 여기서 바로 추가
+			}
 
-            if (id == null) {
-                continue; // ID가 없으면 업데이트 불가
-            }
+			// 셀 크기 자동 조정 (각 컬럼의 내용에 맞게 조정)
+			for (int i = 0; i < columnNames.size(); i++) {
+				sheet.autoSizeColumn(i); // 자동 조정 적용
+			}
 
-            // 기존 데이터 조회 (ID 기준)
-            Map<String, Object> existingRow = testMapper.selectToastTestById(id);
-            log.info("existingRow : " + existingRow.toString());
+			// 엑셀 바이너리 변환
+			workbook.write(outputStream);
+			return outputStream.toByteArray();
+		}
+	}
 
-            // 기존 데이터와 비교하여 변경된 항목이 있는 경우만 업데이트
-            if (existingRow != null && !isSameData(existingRow, newRow)) {
-            	log.info("update 실행 시작!");
-                int result = testMapper.updateToastTestById(newRow);
-                updateCount += result;
-                log.info("updateCount : " + updateCount);
-            }
-        }
-        
-        return updateCount;
-    }
-    
-    // 기존 데이터와 업로드된 데이터 비교
-    // 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
-    private boolean isSameData(Map<String, Object> existingRow, Map<String, Object> newRow) {
-        for (String key : newRow.keySet()) {
-            Object oldValue = existingRow.get(key);
-            log.info("oldValue : " + oldValue);
-            Object newValue = newRow.get(key);
-            log.info("newValue : " + newValue);
-            
-            if (!Objects.equals(oldValue, newValue)) {
-            	log.info("다른거 확인됨!");
-                return false; // 하나라도 다르면 변경됨
-            }
-        }
-        return true; // 모든 값이 동일하면 변경 없음
-    }
-    
-    // 엑셀 수정된 데이터만 db에 업데이트
-    // 현재 그리드에 있는 내용을 db에 업데이트
+	// 엑셀 데이터 타입 변환
+	// 테이블 컬럼 타입을 기반으로 변환 적용
+	public Map<String, Object> convertDataTypes(Map<String, Object> rowData, Map<String, String> columnTypes) {
+		Map<String, Object> convertedRow = new HashMap<>();
+
+		for (Map.Entry<String, Object> entry : rowData.entrySet()) {
+			String columnName = entry.getKey();
+			Object value = entry.getValue();
+			String dataType = columnTypes.get(columnName);
+
+			if (dataType == null) {
+				convertedRow.put(columnName, value);
+				continue;
+			}
+
+			switch (dataType.toUpperCase()) {
+			case "NUMBER":
+				convertedRow.put(columnName, value != null ? new BigDecimal(value.toString()) : null);
+				break;
+			case "DATE":
+			case "TIMESTAMP":
+				convertedRow.put(columnName,
+						value != null
+								? LocalDateTime.parse(value.toString(),
+										DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+								: null);
+				break;
+			case "VARCHAR2":
+			default:
+				convertedRow.put(columnName, value);
+				break;
+			}
+		}
+
+		return convertedRow;
+	}
+
+	// 엑셀 수정된 데이터만 db에 업데이트
+	// 현재 그리드에 있는 내용을 db에 업데이트
 	public Map<String, Object> updateToastTest(List<Map<String, Object>> updatedRows) {
 		Map<String, Object> resultMap = new HashMap<>();
-		
+
 		Boolean result = true;
 		String message = "updateToastTest 성공";
-		
+
 		try {
 			testMapper.updateToastTest(updatedRows);
 		} catch (Exception e) {
 			result = false;
 			message = "updateToastTest 실패";
 		}
-		
+
 		resultMap.put("result", result);
 		resultMap.put("message", message);
-		
+
 		return resultMap;
 	}
-	
+
 }

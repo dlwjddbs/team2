@@ -22,8 +22,14 @@ public interface TestMapper {
 	
 	List<String> getColumnNames(String tableName);
 	
-	Map<String, Object> selectToastTestById(String id);
+	Map<String, Object> getColumnTypes(String tableName);
 	
-	int updateToastTestById(Map<String, Object> updatedRows);
+	List<Map<String, Object>> selectToastTestById(List<String> idList);
+	
+	int insertToastTestById(List<Map<String, Object>> dataToInsert);
+	
+	int updateToastTestById(List<Map<String, Object>> dataToUpdate);
+	
+	//int updateToastTestById(Map<String, Object> updatedRows);
 
 }

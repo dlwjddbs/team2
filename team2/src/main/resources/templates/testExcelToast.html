@@ -30,22 +30,8 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>엑셀 TUI-TEST</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">토스트테스트</a></li>
-								<li class="breadcrumb-item active">엑셀 TUI-TEST</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
-			<!-- /.콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
 				<div class="container-fluid">
@@ -58,11 +44,13 @@
 							            <input type="button" id="btn_excel_download" class="btn btn-success" value="엑셀 다운로드">
 							            <input type="file" id="excelFile" accept=".xls, .xlsx">
 							            <input type="button" id="btn_excel_upload" class="btn btn-primary" value="엑셀 업로드">
+							            <input type="button" id="btn_db_update" class="btn btn-primary" value="DB 수정(엑셀)">
 							        	<!-- <input type="button" id="btn_excel_add_row" class="btn btn-primary" value="행추가"> -->
 							            <!-- <input type="button" id="btn_db_insert" class="btn btn-primary" value="DB 저장"> -->
-							            <input type="button" id="btn_db_update" class="btn btn-primary" value="DB 수정">
-							            <input type="button" id="btn_update" class="btn btn-primary" value="DB 수정(그리드)">
-							            <!-- <input type="button" id="btn_db_delete" class="btn btn-primary" value="DB 삭제"> -->
+							            <input type="button" id="btn_add_row" class="btn btn-primary" value="행추가">
+										<input type="button" id="btn_insert" class="btn btn-primary" value="DB 등록">
+							            <input type="button" id="btn_update" class="btn btn-primary" value="DB 수정">
+										<input type="button" id="btn_delete" class="btn btn-primary" value="DB 삭제">
 									</div>
 								</div>
 								<div class="card-body" id="toast_single">
@@ -155,19 +143,6 @@
 					{header: 'COL_1', name: 'COL_1', align: 'center', editor: 'text'},
 					{header: 'COL_2', name: 'COL_2', align: 'center', editor: 'text'},
 					{header: 'COL_3', name: 'COL_3', align: 'center', editor: 'text'},
-					// 급여 테이블 기준
-					/*
-					{ header: '사원번호', name: 'MEMBER_ID', align: 'center', editor: 'text' },
-					{ header: '직급', name: 'GRADE_ID', align: 'center', editor: 'text' },
-					{ header: '귀속연월', name: 'PAYDAY', align: 'center', editor: 'text' },
-					{ header: '직책수당', name: 'POSITION_BONUS', align: 'center', editor: 'text' },
-					{ header: '연휴수당', name: 'HOLIDAY_BONUS', align: 'center', editor: 'text' },
-					{ header: '야근수당', name: 'NIGHT_BONUS', align: 'center', editor: 'text' },
-					{ header: '연말수당', name: 'YEAREND_BONUS', align: 'center', editor: 'text' },
-					{ header: '만기근속자포상', name: 'FULLSERVICE_BONUS', align: 'center', editor: 'text' },
-					{ header: '실적우수자포상', name: 'PERFORMANCE_BONUS', align: 'center', editor: 'text' },
-					{ header: '실지급액', name: 'TOTAL', align: 'center', editor: 'text' }
-					*/
 		        ],
 		    });
 		    
@@ -238,7 +213,7 @@
 			    contentType: false,
 			    success: function (res) {
 			        alert(res.message);
-			        reloadGrid();  // 업로드 후 그리드 새로고침
+			        grid1.reloadData();  // 업로드 후 그리드 새로고침
 			    },
 			    error: function (xhr, status, err) {
 					console.error("db 업데이트 실패 : ", err);
@@ -281,7 +256,7 @@
 		// 엑셀 양식 다운로드 (test)
 		function downloadExcelTemplate() {
 			// 급여 테이블로 테스트
-		    const tableName = prompt("다운로드할 테이블(양식)명을 입력하세요.", "SALARY");
+		    const tableName = prompt("다운로드할 테이블(양식)명을 입력하세요.", "TEST");
 		    
 		    if (!tableName) {
 		    	alert("테이블(양식)명을 입력하세요.");
@@ -319,8 +294,39 @@
 		    });
 		}
 		
+		$("#btn_add_row").on("click", function () {
+		    const newRowKey = grid1.appendRow(
+		        {
+		            "ID": '',
+		            "COL_1": '',
+		            "COL_2": '',
+		            "COL_3": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+		});
+		
+        $("#btn_insert").on("click", function() {
+			grid1.request('createData');
+			grid1.reloadData();  // 실패시 테이블 리로드
+			// GET 요청시 데이터 보낼려면 header 설정
+		});
+		
 		$("#btn_update").on("click", function() {
 			grid1.request('updateData');
+		});
+		
+        $("#btn_delete").on("click", function() {
+			grid1.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = grid1.getModifiedRows().deletedRows.map(row => row.ID).join(',');
+			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+		    grid1.request('deleteData');
+			grid1.reloadData();  // 실패시 테이블 리로드
 		});
 		
 	</script>

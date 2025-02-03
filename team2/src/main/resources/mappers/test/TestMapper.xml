@@ -67,18 +67,76 @@
     	ORDER BY COLUMN_ID
 	</select>
 	
-	<select id="selectToastTestById" resultType="map">
-        SELECT *
-          FROM TEST
-        WHERE ID = #{ID}
+	<select id="getColumnTypes" resultType="map">
+	    SELECT COLUMN_NAME, DATA_TYPE 
+	    FROM USER_TAB_COLUMNS 
+	    WHERE TABLE_NAME = #{tableName}
+	</select>
+	
+	<select id="selectToastTestById" parameterType="list" resultType="map">
+		SELECT *
+	    FROM TEST
+	    WHERE ID IN
+	    <foreach collection="list" item="id" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
     </select>
     
+    <insert id="insertToastTestById" parameterType="list">
+	    INSERT INTO TEST (ID, COL_1, COL_2, COL_3)
+	    VALUES
+	    <foreach collection="list" item="row" separator=", ">
+	    	<if test='id != null and id != ""'>
+	        	(#{row.ID}, #{row.COL_1}, #{row.COL_2}, #{row.COL_3})
+	    	</if>
+	    </foreach>
+	</insert>
+    
 	<update id="updateToastTestById">
-        UPDATE TEST
-           SET 
-			   COL_1 = #{COL_1}
-             , COL_2 = #{COL_2}
-             , COL_3 = #{COL_3}
-         WHERE ID = #{ID}
-    </update>
+	    DECLARE 
+	    BEGIN
+	        MERGE INTO TEST t
+	        USING (
+	            <foreach collection="list" item="row" separator=" UNION ALL ">
+	                SELECT #{row.ID} AS ID, 
+	                       #{row.COL_1} AS COL_1, 
+	                       #{row.COL_2} AS COL_2, 
+	                       #{row.COL_3} AS COL_3
+	                FROM DUAL
+	            </foreach>
+	        ) src
+	        ON (TRIM(t.ID) = TRIM(src.ID))
+	        WHEN MATCHED THEN 
+	            UPDATE SET t.COL_1 = src.COL_1,
+	                       t.COL_2 = src.COL_2,
+	                       t.COL_3 = src.COL_3;
+	    END;
+	    <!-- 
+	    DECLARE 
+	    	v_update_count NUMBER := 0;
+	    BEGIN
+	        MERGE INTO TEST t
+	        USING (
+	            <foreach collection="list" item="row" separator=" UNION ALL ">
+	                SELECT #{row.ID} AS ID, 
+	                       #{row.COL_1} AS COL_1, 
+	                       #{row.COL_2} AS COL_2, 
+	                       #{row.COL_3} AS COL_3
+	                FROM DUAL
+	            </foreach>
+	        ) src
+	        ON (TRIM(t.ID) = TRIM(src.ID))
+	        WHEN MATCHED THEN 
+	            UPDATE SET t.COL_1 = src.COL_1,
+	                       t.COL_2 = src.COL_2,
+	                       t.COL_3 = src.COL_3;
+	        
+	        v_update_count := SQL%ROWCOUNT;
+	        DBMS_OUTPUT.PUT_LINE('Updated Rows: ' || v_update_count);
+	        
+	        :updateCount := v_update_count;
+	    END;
+	     -->
+	</update>
+
 </mapper>
