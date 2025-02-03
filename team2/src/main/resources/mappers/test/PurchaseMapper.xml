@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.PurchaseMapper">
+
+	<select id="getPurchaseList" resultType="map">	
+	SELECT PO_ID,
+		   PO_COUNT,
+		   PO_PRICE,
+		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+		   MEMBER_ID,
+		   CUSTOMER_ID,
+		   PO_STATUS,
+		   TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+		   UPDATE_MEMBER
+	FROM 
+		PURCHASE_ORDER
+	</select>
+	
+	<insert id="insertPurchase">
+	INSERT INTO PURCHASE_ORDER (
+			PO_ID
+		  , PO_COUNT
+		  , PO_PRICE
+		  , CREATE_DATE
+		  , MEMBER_ID
+		  , CUSTOMER_ID
+		  , PO_STATUS
+		  , UPDATE_DATE
+		  , UPDATE_MEMBER
+		  , PO_NUM		
+		) VALUES (
+        #{PO_ID}, 
+        #{PO_COUNT}, 
+        #{PO_PRICE}, 
+        NOW(), 
+        #{MEMBER_ID}, 
+        #{CUSTOMER_ID}, 
+        #{PO_STATUS}, 
+        NOW(), 
+        #{UPDATE_MEMBER}, 
+        #{PO_NUM}
+    )
+	</insert>
+	
+	
+	
+</mapper>

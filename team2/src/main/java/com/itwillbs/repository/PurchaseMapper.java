@@ -8,5 +8,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface PurchaseMapper {
 	
-	List<Map<String, Object>> getPurchase(Map<String, Object> map);
+	List<Map<String, Object>> getPurchaseList(Map<String, Object> map);
+
+	int insertPurchase(Map<String, Object> data);
+
+	int updatePurchase(Map<String, Object> data);
+
+	int deletePurchase(Map<String, Object> data);
 }

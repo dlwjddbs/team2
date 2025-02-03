@@ -4,8 +4,6 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="_csrf" th:content="${_csrf.token}" />
-	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 	<title>구매발주등록</title>
 
 	<!-- Google Font: Source Sans Pro -->
@@ -27,6 +25,9 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
 		integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
 		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
 
 	<style>
 		.table-container {
@@ -61,6 +62,8 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
+			
+<!-- 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> -->
 			<section class="content-header">
 				<div class="container-fluid">
 					<div class="row mb-2">
@@ -89,8 +92,7 @@
 									<h5>구매발주</h5>
 									<div class="card-tools">
 										<input type="button" id="btn_add_row" class="btn btn-primary" value="행추가">
-										<input type="button" id="btn_insert" class="btn btn-primary" value="등록">
-										<input type="button" id="btn_update" class="btn btn-primary" value="수정">
+										<input type="button" id="save" class="btn btn-primary" value="저장">
 										<input type="button" id="btn_delete" class="btn btn-primary" value="삭제">
 									</div>
 								</div>
@@ -112,8 +114,7 @@
 									<h5>구매발주 상세</h5>
 									<div class="card-tools">
 										<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">
-										<input type="button" id="btn_insert2" class="btn btn-primary" value="등록">
-										<input type="button" id="btn_update2" class="btn btn-primary" value="수정">
+										<input type="button" id="saveDetail" class="btn btn-primary" value="저장">
 										<input type="button" id="btn_delete2" class="btn btn-primary" value="삭제">
 									</div>
 								</div>
@@ -146,6 +147,10 @@
 			</style>
 			<!-- Page specific script -->
 			<script>
+			const token = $("meta[name='_csrf']").attr("content")
+			const header = $("meta[name='_csrf_header']").attr("content");
+			const name = $("#userName").val();
+			
 				$(document).ready(function () {
 
 				});
@@ -154,31 +159,45 @@
 
 				// Toast Grid 설정
 
-				let grid1 = "";
-				let grid2 = "";
+				let grid1;
+				let grid2;
 
-				const url = '/ajax/toastTest';
+				const url = 'getPurchase';
 				const dataSource = {
 					api: {
-						createData: {url: url, method: 'POST'},
-						readData: {url: url, method: 'GET'},
-						updateData: {url: url, method: 'PUT'},
+						createData: {url: url, method: 'POST', headers: { [header]: token } },
+						readData: {url: url, method: 'POST', headers: { [header]: token }},
+						updateData: {url: url, method: 'PUT', headers: { [header]: token }},
 						deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 					},
 					contentType: 'application/json',
 				};
 				const columns = [
-					{header: 'P/O일자', name: 'PO_DATE', align: 'center', editor: null},
+					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: null},
 					{header: 'P/O번호', name: 'PO_ID', align: 'center', editor: null},
 					{header: '담당자', name: 'MEMBER_ID', align: 'center', editor: null},
-
-					{header: '거래처', name: 'COL_1', align: 'center', editor: null},
+					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', editor: null},
 					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
 					{header: '금액', name: 'PO_PRICE', align: 'center', editor: 'text'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center', editor: null},
-					{header: '수정자', name: 'COL_3', align: 'center', editor: null},
+					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center', editor: null},
+					{header: '상태', name: 'PO_STATUS', align: 'center', editor: null},
 				];
-
+				
+				fetch('/getPurchase', {
+				    method: 'POST',
+				    headers: {
+				        'Content-Type': 'application/json',
+				        [header]: token
+				    },
+				    body: JSON.stringify({})
+				})
+				.then(response => response.json())
+				.then(data => {
+				    console.log("서버 응답 데이터:", data);
+				    grid1.resetData(data);
+				})
+				.catch(error => console.error("데이터 불러오기 실패:", error));
 
 				$(function () {
 					initGrids();
@@ -186,11 +205,6 @@
 
 				});
 
-				// 구매발주 상세 리스트를 숨김 상태에서 시작
-				$("#detail_section").hide();
-				$("#divider").hide();
-
-				let delRows = [];
 
 				function initGrids() {
 					grid1 = new tui.Grid({
@@ -203,6 +217,11 @@
 						columns: columns,
 					});
 
+				// 구매발주 상세 리스트를 숨김 상태에서 시작
+				$("#detail_section").hide();
+				$("#divider").hide();
+
+				let delRows = [];
 					// 행 클릭 시 상세 리스트 보이기
 					grid1.on('click', function (ev) {
 						if (ev.rowKey === null) {
@@ -289,7 +308,7 @@
 					let date = String(today.getDate()).padStart(2, "0");  // 날짜
 					const newRowKey = grid1.appendRow(
 						{
-							"PO_DATE": year + '-' + month + '-' + date,
+							"CREATE_DATE": year + '-' + month + '-' + date,
 							//"COL_1": '',
 							//"COL_2": '',
 							//"COL_3": '',
@@ -316,9 +335,6 @@
 					);
 				});
 
-
-
-
 				// 삭제 버튼 이벤트
 				// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
 				btn_delete.addEventListener('mousedown', () => {
@@ -334,14 +350,19 @@
 				// 저장 버튼 이벤트
 				// 마지막 셀에 대한 값이 인식 안 돼서 저장 버튼에 마우스다운 이벤트 처리
 				save.addEventListener('mousedown', () => {
-					grid.blur(); // 포커스 해제
-
+					grid1.blur(); // 포커스 해제
+				
+				const createRows = grid1.getModifiedRows().createRows;
+				createdRows.forEach(row => {
+			        grid1.setValue(row.rowKey, "rowType", "insert");
+			    });
 					// 수정된 행일 경우 rowType을 update로 변경
-					const updatedRows = grid.getModifiedRows().updatedRows;
+					const updatedRows = grid1.getModifiedRows().updatedRows;
 					updatedRows.forEach((row, index) => {
-						grid.setValue(row.rowKey, "rowType", "update")
+						grid1.setValue(row.rowKey, "rowType", "update")
 					});
 				});
+				
 
 			</script>
 </body>
