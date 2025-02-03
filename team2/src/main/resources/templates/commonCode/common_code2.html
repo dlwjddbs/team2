@@ -188,7 +188,8 @@
 			let DESCRIPTION = $("#DESCRIPTION").val();
 			
 			if (MAIN_ID == null || MAIN_ID == ''
-				|| MAIN_NAME == null || MAIN_NAME == '') {
+				|| MAIN_NAME == null || MAIN_NAME == ''
+				|| MAIN_ORDER == null || MAIN_ORDER == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
@@ -236,7 +237,7 @@
 					
 					$("#MAIN_ID_UPDATE").val(res[0].MAIN_ID);
 					$("#MAIN_NAME_UPDATE").val(res[0].MAIN_NAME);
-					$("#MAIN_ORDER_UPDATE").val(res[0].MAIN_NAME);
+					$("#MAIN_ORDER_UPDATE").val(res[0].MAIN_ORDER);
 					$("#DESCRIPTION_UPDATE").val(res[0].DESCRIPTION);
 	            },
 	            error : function(e){
@@ -366,7 +367,7 @@
 					return;
 				}
 				
-				let code = table.rows('.selected').data()[0].SUB_ID; // 확인 필요
+				let code = table.rows('.selected').data()[0].MAIN_ID; // 확인 필요
 				commonCodeDataTable(code);
 				if (!isUpdate) {
 					isUpdate = true;
@@ -443,7 +444,8 @@
 			let SUB_USE_STATUS = $('input[name="use_status"]:checked').val();
 			
 			if (SUB_ID == null || SUB_ID == ''
-				|| SUB_NAME == null || SUB_NAME == '') {
+				|| SUB_NAME == null || SUB_NAME == ''
+				|| SUB_ORDER == null || SUB_ORDER == '') {
 				alert("값을 입력해 주세요.");
 				return;
 			}
