@@ -11,6 +11,7 @@
 			   MAIN_ID
 			 , MAIN_NAME 
 			 , DESCRIPTION
+			 , MAIN_ORDER
 		  FROM MES_COMMON_GROUP
 		  <if test='MAIN_ID != null and MAIN_ID != ""'>
 		  		WHERE MAIN_ID = #{MAIN_ID}
@@ -29,15 +30,23 @@
 		INSERT INTO MES_COMMON_GROUP (
 			  MAIN_ID 
 			, MAIN_NAME
+			, MAIN_ORDER
 			, DESCRIPTION 
 			, CREATE_DATE 
 		) VALUES (
 			  #{MAIN_ID}
 			, #{MAIN_NAME}
+			, #{MAIN_ORDER}
 			, #{DESCRIPTION}
 			, CURRENT_DATE
 		)
 	</insert>
+	
+    <select id="isDuplicateMainOrder" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MES_COMMON_GROUP
+		  WHERE MAIN_ORDER = #{MAIN_ORDER}
+    </select>	
 	
 	<select id="isExistMesCommonCodeGroupChild" resultType="Integer">
 	<!-- isExistMesCommonCodeGroupChild 공통코드 대분류 삭제전 하위 코드 존재 확인 -->
@@ -58,6 +67,7 @@
 		   SET 
 			   MAIN_NAME = #{MAIN_NAME}
 			 , DESCRIPTION = #{DESCRIPTION}
+			 , MAIN_ORDER = #{MAIN_ORDER}
 			 , UPDATE_DATE = CURRENT_DATE
 		 WHERE MAIN_ID = #{MAIN_ID}
 	</update>

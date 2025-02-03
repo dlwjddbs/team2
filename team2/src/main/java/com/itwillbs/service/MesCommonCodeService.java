@@ -29,7 +29,12 @@ public class MesCommonCodeService {
 		
 		try {
 			int duplicateCnt = mesCommonCodeMapper.isDuplicateMesCommonCodeGroup(map);
-			if (duplicateCnt == 0) {
+			int duplicateCnt2 = mesCommonCodeMapper.isDuplicateMainOrder(map); // 중복된 순서 확인
+			
+			if (duplicateCnt2 > 0) {
+	            result = "중복된 순서입니다.";
+
+			} else if (duplicateCnt == 0) {
 				int resultCnt = mesCommonCodeMapper.insertMesCommonCodeGroup(map);
 				if (resultCnt > 0) {
 					result = "등록 되었습니다.";
@@ -77,26 +82,32 @@ public class MesCommonCodeService {
 
 
 	public Map<String, Object> updateMesCommonCodeGroup(Map<String, Object> map) {
-		Map<String, Object> message = new HashMap<>();
-		
-		String result = "";
-		String resultCode = "";
-		
-		try {
-			int resultCnt = mesCommonCodeMapper.updateMesCommonCodeGroup(map);
-			if (resultCnt > 0) {
-				result = "수정 되었습니다.";
-				resultCode = "1";
-			}
-		} catch (Exception e) {
-			result = "수정 실패.";
-			resultCode = "0";
-		}
-		
-		message.put("result", result);
-		message.put("resultCode", resultCode);
-		
-		return message;
+	    Map<String, Object> message = new HashMap<>();
+
+	    String result = "수정 실패.";
+	    String resultCode = "0";
+
+	    try {
+	        // 중복된 순서 체크
+	        int duplicateCnt = mesCommonCodeMapper.isDuplicateMainOrder(map);
+	        if (duplicateCnt > 0) {
+	            result = "중복된 순서입니다.";
+	        } else {
+	            int resultCnt = mesCommonCodeMapper.updateMesCommonCodeGroup(map);
+	            if (resultCnt > 0) {
+	                result = "수정 되었습니다.";
+	                resultCode = "1";
+	            }
+	        }
+	    } catch (Exception e) {
+	        result = "수정 실패.";
+	        resultCode = "0";
+	    }
+
+	    message.put("result", result);
+	    message.put("resultCode", resultCode);
+
+	    return message;
 	}
 
 
