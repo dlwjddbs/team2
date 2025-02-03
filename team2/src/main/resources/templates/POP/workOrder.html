@@ -24,16 +24,20 @@
 	
 	<style>
 		#keyboard .btn {
-		    width: 60px;
-		    height: 60px;
+			flex: 1;
+			aspect-ratio: 1 / 1;
 		    margin: 1px; 
 		    display: flex; 
 		    align-items: center; 
 		    justify-content: center;
 		}
 		
-		i {
+		#keyboard i {
 			font-size: 1.5rem;
+		}
+
+		.tui-grid-cell-has-input  {
+		    background-color: white !important;
 		}
 	</style>
 	
@@ -53,20 +57,27 @@
 								<div class="col-6">
 									<button type="button" class="btn btn-default btn-lg"><i class="fas fa-rotate-right"></i></button>
 									<button type="button" class="btn btn-default" data-toggle="modal" data-target="#orderDetail">
-										test
+										orderDetail.html
+									</button>
+									<button type="button" class="btn btn-default" data-toggle="modal" data-target="#materialInput">
+										materialInput.html
 									</button>
 									
 								</div>
-								<div class="col-6">
-									<button type="button" class="btn btn-outline-primary btn-lg">Primary</button>
-									<button type="button" class="btn btn-success btn-lg">작업시작</button>
+								<div class="col-6 ">
+									<button type="button" class="btn btn-secondary btn-lg"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 비가동</button>
+									<button type="button" class="btn btn-secondary btn-lg"><i class="fa-solid fa-code-fork mr-1"></i> 자재투입/불량</button>
+									<button type="button" class="btn btn-success btn-lg"><i class="fa-solid fa-circle-plus mr-1"></i> 양품등록</button>
+									<button type="button" class="btn btn-warning btn-lg"><i class="fa-solid fa-circle-minus mr-1"></i> 불량등록</button>
+									<button type="button" class="btn btn-primary btn-lg"><i class="fa-solid fa-play mr-1"></i> 작업시작</button>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-6">
+								<div class="col-6 ">
 								</div>
-								<div class="col-6">
-									<button type="button" class="btn btn-danger btn-lg">작업종료</button>
+								<div class="col-6 flex-end">
+									<button type="button" class="btn btn-danger btn-lg"><i class="fa-solid fa-vest mr-1"></i> 작업자등록</button>
+									<button type="button" class="btn btn-danger btn-lg"><i class="fa-solid fa-stop mr-1"></i> 작업종료</button>
 								</div>
 							</div>
 						</div>
@@ -84,6 +95,7 @@
 							</div>
 						</div>
 						<div th:insert="~{POP/orderDetail :: orderDetail}"></div>
+						<div th:insert="~{POP/materialInput :: materialInput}"></div>
 						
 					</div>
 				</div>
@@ -146,7 +158,7 @@
 					const el = document.createElement('button');
 					el.textContent = '상세보기';
 					el.classList.add('btn');
-					el.classList.add('btn-primary');
+					el.classList.add('btn-outline-primary');
 					el.classList.add('btn-lg');
 					
 					el.addEventListener('click', () => {
@@ -169,9 +181,8 @@
 		        data: dataSource,
 		        scrollX: true,
 		        scrollY: false,
-		        rowHeaders: ['rowNum'],
 		        columns: [
-		            {header: 'ID', name: 'ID', align: 'center', editor: 'text'},
+		            {header: 'ID', name: 'ID', align: 'center', editor: 'text', width: 'auto'},
 		            {header: 'COL_1', name: 'COL_1', align: 'center', editor: 'text'},
 		            {header: 'COL_2', name: 'COL_2', align: 'center', editor: 'text'},
 		            {header: 'COL_3', name: 'COL_3', align: 'center', editor: 'text'},
@@ -187,7 +198,7 @@
 		            {header: '양품수', name: 'COL_3', align: 'center', editor: 'text'},
 		            {header: '불량수', name: 'COL_3', align: 'center', editor: 'text'},
 					*/
-		            {header: '작업상세', name: '', renderer: {type: ButtonRenderer}, align: 'center'},
+		            {header: '작업상세', name: '', renderer: {type: ButtonRenderer}, align: 'center', width: 150},
 		        ],
 				editingEvent: 'none',
 				rowHeight: 60,
@@ -208,5 +219,6 @@
 
 	</script>
 	<script th:src="@{/js/orderDetail.js}"></script>
+	<script th:src="@{/js/materialInput.js}"></script>
 </body>
 </html>

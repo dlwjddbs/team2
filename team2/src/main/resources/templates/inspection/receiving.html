@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-6">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">입고예정</h3>
+								</div>
+								<div class="card-body" id="toast_single">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+						<div class="col-6">
+							<div class="card" id="grid2_div" style="display: none;">
+								<div class="card-header">
+									<h3 class="card-title">입고상세</h3>
+								</div>
+								<div class="card-body" id="toast_single2">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	
+	<style>
+		#keyboard .btn {
+			flex: 1;
+			aspect-ratio: 1 / 1;
+		    margin: 1px; 
+		    display: flex; 
+		    align-items: center; 
+		    justify-content: center;
+		}
+		
+		#keyboard i {
+			font-size: 1.5rem;
+		}
+
+		.tui-grid-cell-has-input  {
+		    background-color: white !important;
+		}
+	</style>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		let grid1 = null;
+		const url = '/ajax/toastTest';
+		const dataSource = {
+			api: {
+				createData: {url: url, method: 'POST'},
+			    readData: {url: url, method: 'GET'},
+				updateData: {url: url, method: 'PUT'},
+				deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+	    };
+		let currentSelectedRowKey = null;
+		let isEditModeEnabled = false; 
+		const columns = [
+            {header: 'ID', name: 'ID', align: 'center', editor: null},
+            {header: 'COL_1', name: 'COL_1', align: 'center', editor: null},
+            {header: 'COL_2', name: 'COL_2', align: 'center', editor: null},
+            {header: 'COL_3', name: 'COL_3', align: 'center', editor: null},
+        ];
+		let TextInputRenderer = function(props) {
+			let el = document.createElement('input');
+		  	el.type = 'text';
+		  
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+		  
+		  	this.el = el;
+		  	this.render(props);
+		}
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+
+		$(function () {
+		    grid();
+		});
+		
+		function grid() {
+		    grid1 = new tui.Grid({
+		        el: document.getElementById('toast_single'),
+		        data: dataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        rowHeaders: ['rowNum'],
+				editingEvent: 'click',
+		        columns: columns,
+		    });
+			grid1.on('focusChange', (ev) => {
+				grid1.setSelectionRange({
+					start: [ev.rowKey, 0],
+					end: [ev.rowKey, grid1.getColumns().length]
+				});
+				
+				if (!$("#grid2_div").is(":visible")) {
+		            $("#grid2_div").show();
+		        }
+				
+				
+				
+			});
+		}
+	</script>
+</body>
+</html>

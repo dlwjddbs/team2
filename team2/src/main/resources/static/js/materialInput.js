@@ -1,27 +1,29 @@
 
-let orderDetailGrid  = undefined;
+let bomGrid  = undefined;
+let test1Grid = undefined;
+let inputGrid = undefined;
 
-$(document).on("shown.bs.modal", "#orderDetail", function() {
+$(document).on("shown.bs.modal", "#materialInput", function() {
 	
 //	---------------- Modal Number Pad ----------------
-    console.log("모달 열림");
-    $("#keyboard").on("click", ".key", function() {
-        let value = $(this).data("value");
-		console.log(value);
-        $("#input").val(function(index, currentVal) {
-            return currentVal + value;
-        });
-    });
-
-    $("#delete").click(function() {
-        $("#input").val(function(index, currentVal) {
-            return currentVal.slice(0, -1);
-        });
-    });
-
-    $("#clear").click(function() {
-        $("#input").val("");
-    });
+//	console.log("모달 열림");
+//	$("#keyboard").on("click", ".key", function() {
+//		let value = $(this).data("value");
+//		console.log(value);
+//		$("#input").val(function(index, currentVal) {
+//			return currentVal + value;
+//		});
+//	});
+//	
+//	$("#delete").click(function() {
+//		$("#input").val(function(index, currentVal) {
+//			return currentVal.slice(0, -1);
+//		});
+//	});
+//	
+//	$("#clear").click(function() {
+//		$("#input").val("");
+//	});
 
 	
 //	------------------- Toast Grid -------------------
@@ -33,13 +35,8 @@ $(document).on("shown.bs.modal", "#orderDetail", function() {
         return;
     }
 
-	const url = '/ajax/toastTest';
+//	const url = '/ajax/toastTest';
 	const dataSource = {
-	    api: {
-	        readData: {url: url, method: 'GET'},
-			updateData: {url: url, method: 'PUT'},
-	    },
-		contentType: 'application/json',
 	};
 	
 	$(function () {
@@ -48,7 +45,7 @@ $(document).on("shown.bs.modal", "#orderDetail", function() {
 	
 	function grid() {
 	    orderDetailGrid = new tui.Grid({
-	        el: document.getElementById('detail_toast_single'),
+	        el: document.getElementById('bom_grid'),
 	        data: dataSource,
 	        scrollX: true,
 	        scrollY: true,
