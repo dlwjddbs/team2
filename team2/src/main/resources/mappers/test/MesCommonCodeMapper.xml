@@ -47,7 +47,11 @@
     <!-- isDuplicateMainOrder 공통코드 순서 중복 확인 -->
     	SELECT COUNT(*) AS COUNT
 		  FROM MES_COMMON_GROUP
-		  WHERE MAIN_ORDER = #{MAIN_ORDER}
+		WHERE 1 = 1
+		  AND MAIN_ORDER = #{MAIN_ORDER}
+		  <if test="MAIN_ID != null and MAIN_ID != ''">
+		  	   AND MAIN_ID != #{MAIN_ID}
+		  </if>
     </select>	
 	
 	<select id="isExistMesCommonCodeGroupChild" resultType="Integer">
@@ -100,7 +104,9 @@
 	<!-- isDuplicateMesCommonCode 공통코드 소분류 insert전 중복 확인 -->
 		SELECT COUNT(*)	AS COUNT
 		  FROM MES_COMMON
-		 WHERE SUB_ID = #{SUB_ID}
+		WHERE 1 = 1
+		  AND SUB_ORDER = #{SUB_ORDER}
+		  AND MAIN_ID = #{MAIN_ID}
 	</select>
 	
 	<insert id="insertMesCommonCode">
@@ -128,7 +134,12 @@
     <!-- isDuplicateSubOrder 공통코드 순서 중복 확인 -->
     	SELECT COUNT(*) AS COUNT
 		  FROM MES_COMMON
-		  WHERE SUB_ORDER = #{SUB_ORDER}
+		WHERE SUB_ORDER = #{SUB_ORDER}
+		  AND MAIN_ID = #{MAIN_ID}
+		  <if test="SUB_ORDER != null and SUB_ORDER != ''">
+		  	   AND SUB_ORDER != #{SUB_ORDER}
+		  </if>
+		  
     </select>	
 	
 	<delete id="deleteMesCommonCode">
