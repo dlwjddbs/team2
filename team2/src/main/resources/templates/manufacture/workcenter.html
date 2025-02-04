@@ -52,6 +52,7 @@
 												<input type="button" id="btn_workcenter_toggleEditMode" class="btn btn-primary" value="편집">
 												<input type="button" id="btn_workcenter_modify" class="btn btn-primary" value="저장">
 												<input type="button" id="btn_workcenter_delete" class="btn btn-primary" value="삭제">
+												<input type="button" id="test" class="btn btn-primary" value="test">
 											</div>
 										</div>
 									</div>
@@ -158,6 +159,12 @@
             {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
         ];
 		
+		$("#test").on('click', function() {
+			// TODO 값 업데이트
+			// 로우, 컬럼명, 입력할값
+            workcenterGrid.setValue(0, "NAME", "test1231231231");
+		});
+		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
 			el.type = 'text';
@@ -169,7 +176,7 @@
 		  	this.el = el;
 		  	this.render(props);
 		}
-		
+
 		TextInputRenderer.prototype.getElement = function () {
 			return this.el;
 		}
@@ -177,6 +184,58 @@
 		TextInputRenderer.prototype.render = function (props) {
 			this.el.value = props.value;
 		}
+		
+		const TextInputBtnRenderer = function(props) {
+		    const container = document.createElement('div');
+		    container.style.display = 'flex';
+		    container.style.alignItems = 'center';
+		    container.style.gap = '5px';
+		    
+		    const el = document.createElement('input');
+		    el.type = 'text';
+		    el.style.width = 'calc(100% - 40px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.color = 'solid 1px #ddd';
+		    el.style.marginLeft = '1px';
+		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+		    
+		    const button = document.createElement('button');
+		    button.textContent = '🔍';
+		    button.style.border = 'solid 1px #007BFF';
+		    button.style.background = 'white';
+		    button.style.color = 'white';
+		    button.style.padding = '6px 10px';
+		    button.style.cursor = 'pointer';
+		    button.style.borderRadius = '4px';
+		    button.style.marginRight = '5px';
+		
+		    button.addEventListener('click', function() {
+			    console.log("props:", props);
+			    console.log(props.formattedValue);
+			    console.log(props.rowKey);
+			    console.log(props.columnInfo.name);
+			    // TODO 모달 워크센터 코드, 담당자, 라우팅 코드
+			    $('#categoryAdd').modal();
+		    });
+		
+		    container.appendChild(el);
+		    container.appendChild(button);
+		
+		    this.el = container;
+		    this.input = el;
+		    this.render(props);
+		}
+
+		TextInputBtnRenderer.prototype.getElement = function () {
+		    return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+		    this.input.value = props.value;
+		}
+
+
 		
 		const CheckboxRenderer = function(props) {
 		    const el = document.createElement('input');
@@ -271,7 +330,7 @@
 		    
 		    if (workcenterIsEditModeEnabled) {
 		        workcenterGrid.setColumns([
-		        	{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		        	{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '워크센터명', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 				    {
 				        header: '사용여부',
@@ -283,8 +342,8 @@
 				        renderer: { type: CheckboxRenderer }
 				    },
 		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '담당자', name: 'MANAGER_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '담당자', name: 'MANAGER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		        ]);
 		    } else {
 		        workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
