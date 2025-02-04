@@ -11,15 +11,57 @@
 			   WORKCENTER_ID
 			 , NAME
 			 , USE_YN
-<!--  			 , CASE WHEN USE_YN = 'Y' THEN 'TRUE' -->
-<!-- 			   		ELSE 'FALSE' -->
-<!-- 			   END AS USE_YN -->
 			 , NOTE
 			 , MANAGER_ID
 			 , ROUTING_ID
           FROM WORKCENTER
     </select>
-	
+    
+    <insert id="insertWorkcenter">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO WORKCENTER (
+				  MANAGER_ID
+				, NAME
+				, NOTE
+				, ROUTING_ID
+				, USE_YN
+				, WORKCENTER_ID
+			)
+			VALUES (
+				  #{item.MANAGER_ID, jdbcType=VARCHAR}
+				, #{item.NAME}
+				, #{item.NOTE, jdbcType=VARCHAR}
+				, #{item.ROUTING_ID, jdbcType=VARCHAR}
+				, #{item.USE_YN}
+				, #{item.WORKCENTER_ID}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <delete id="deleteWorkcenter">
+	    DELETE FROM WORKCENTER
+	     WHERE WORKCENTER_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <update id="updateWorkcenter">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE WORKCENTER
+	           SET 
+	               WORKCENTER_ID = #{row.WORKCENTER_ID}
+	             , NAME = #{row.NAME}
+	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+	             , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
+	             , USE_YN = #{row.USE_YN}
+				 , MANAGER_ID = #{row.MANAGER_ID, jdbcType=VARCHAR}
+	         WHERE WORKCENTER_ID = #{row.WORKCENTER_ID}
+	    </foreach>
+    </update>
+    	
 <!-- 	<select id="countExistingIds" parameterType="list" resultType="int"> -->
 <!-- 	    SELECT COUNT(*) AS count -->
 <!-- 	      FROM TEST -->
@@ -28,34 +70,6 @@
 <!-- 	        #{row.ID} -->
 <!-- 	    </foreach> -->
 <!-- 	</select> -->
-    
-<!--     <insert id="insertToastTest"> -->
-<!-- 	    INSERT ALL -->
-<!-- 		<foreach collection="list" item="item"> -->
-<!-- 			INTO TEST (ID, COL_1, COL_2, COL_3) -->
-<!-- 			VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3}) -->
-<!-- 		</foreach> -->
-<!-- 		SELECT * FROM DUAL -->
-<!--     </insert> -->
-    
-<!--     <delete id="deleteToastTest"> -->
-<!-- 	    DELETE FROM TEST -->
-<!-- 	     WHERE ID IN -->
-<!-- 	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")"> -->
-<!-- 	        #{id} -->
-<!-- 	    </foreach> -->
-<!--     </delete> -->
-    
-<!--     <update id="updateToastTest"> -->
-<!-- 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;"> -->
-<!-- 	        UPDATE TEST -->
-<!-- 	           SET  -->
-<!-- 				   COL_1 = #{row.COL_1} -->
-<!-- 	             , COL_2 = #{row.COL_2} -->
-<!-- 	             , COL_3 = #{row.COL_3} -->
-<!-- 	         WHERE ID = #{row.ID} -->
-<!-- 	    </foreach> -->
-<!--     </update> -->
     
 <!--     <select id="getColumnNames" parameterType="map" resultType="map">
 	    SELECT LISTAGG(COLUMN_NAME, ',') WITHIN GROUP (ORDER BY COLUMN_ID) AS COLUMN_NAME

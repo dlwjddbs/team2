@@ -9,14 +9,14 @@ import org.apache.ibatis.annotations.Mapper;
 public interface ManufactureMapper {
 	
 	List<Map<String, Object>> selectWorkcenter();
-//	
+	
+	int insertWorkcenter(List<Map<String, Object>> createdRows);
+	
+	int updateWorkcenter(List<Map<String, Object>> updatedRows);
+	
+	int deleteWorkcenter(List<String> idList);
+
 //	int countExistingIds(List<Map<String, Object>> createdRows);
-//
-//	int insertToastTest(List<Map<String, Object>> createdRows);
-//
-//	int deleteToastTest(List<String> idList);
-//
-//	int updateToastTest(List<Map<String, Object>> updatedRows);
 //	
 //	List<String> getColumnNames(String tableName);
 //	
