@@ -88,4 +88,28 @@ public class ManufactureService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> checkDuplicateWorkcenterCode(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "중복된 코드입니다.";
+		String resultCode = "0";
+		
+		try {
+			int resultCnt = manufactureMapper.checkDuplicateWorkcenterCode(map);
+			if (resultCnt == 0) {
+				result = "사용가능한 코드입니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			result = "조회 실패. 재시도 하세요.";
+			resultCode = "0";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
+	}
+	
 }
