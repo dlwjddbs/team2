@@ -1,0 +1,23 @@
+package com.itwillbs.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.itwillbs.service.EquipmentService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+
+@Controller
+@RequiredArgsConstructor
+@Log
+public class EquipmentController {
+	
+	private final EquipmentService equipmentService;
+	
+	@GetMapping("/equip")
+	public String equip() {
+		return "/equipment/equip";
+	}
+	
+}
