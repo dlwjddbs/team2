@@ -13,21 +13,28 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-	
+	<!-- Toast Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
 
 		<!-- 상단 메뉴 -->
 		<nav th:replace="~{includes/navbar :: navbar}"></nav>
-		<!-- /.상단 메뉴 -->
 
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
-		<!-- /.좌측 메뉴 -->
-		
-		<nav th:replace="~{includes/modals/categoryAdd :: categoryAdd}"></nav>
+
+		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -52,7 +59,6 @@
 												<input type="button" id="btn_workcenter_toggleEditMode" class="btn btn-primary" value="편집">
 												<input type="button" id="btn_workcenter_modify" class="btn btn-primary" value="저장">
 												<input type="button" id="btn_workcenter_delete" class="btn btn-primary" value="삭제">
-												<input type="button" id="test" class="btn btn-primary" value="test">
 											</div>
 										</div>
 									</div>
@@ -110,15 +116,6 @@
 	<!-- /.control-sidebar -->
 	</div>
 	<!-- ./wrapper -->
-
-	<!-- jQuery -->
-	<script src="../../plugins/jquery/jquery.min.js"></script>
-	<!-- Bootstrap 4 -->
-	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<!-- AdminLTE App -->
-	<script src="../../dist/js/adminlte.min.js"></script>
-	
-	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	
 	<style>
 	    .selected-row {
@@ -159,12 +156,6 @@
             {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
         ];
 		
-		$("#test").on('click', function() {
-			// TODO 값 업데이트
-			// 로우, 컬럼명, 입력할값
-            workcenterGrid.setValue(0, "NAME", "test1231231231");
-		});
-		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
 			el.type = 'text';
@@ -193,35 +184,56 @@
 		    
 		    const el = document.createElement('input');
 		    el.type = 'text';
-		    el.style.width = 'calc(100% - 40px)';
+		    el.style.width = 'calc(100% - 10px)';
 		    el.style.padding = '6px 7px';
 		    el.style.border = 'solid 1px #ddd';
 		    el.style.color = 'solid 1px #ddd';
 		    el.style.marginLeft = '1px';
 		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
-		    
-		    const button = document.createElement('button');
-		    button.textContent = '🔍';
-		    button.style.border = 'solid 1px #007BFF';
-		    button.style.background = 'white';
-		    button.style.color = 'white';
-		    button.style.padding = '6px 10px';
-		    button.style.cursor = 'pointer';
-		    button.style.borderRadius = '4px';
-		    button.style.marginRight = '5px';
-		
-		    button.addEventListener('click', function() {
-			    console.log("props:", props);
-			    console.log(props.formattedValue);
-			    console.log(props.rowKey);
-			    console.log(props.columnInfo.name);
-			    // TODO 모달 워크센터 코드, 담당자, 라우팅 코드
-			    $('#categoryAdd').modal();
-		    });
-		
-		    container.appendChild(el);
-		    container.appendChild(button);
-		
+			
+			container.appendChild(el);
+			
+			// WORKCENTER_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'WORKCENTER_ID'
+				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+			    button.textContent = '🔍';
+			    button.style.border = 'solid 1px #007BFF';
+			    button.style.background = 'white';
+			    button.style.color = 'white';
+			    button.style.padding = '6px 10px';
+			    button.style.cursor = 'pointer';
+			    button.style.borderRadius = '4px';
+			    button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = workcenterGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'WORKCENTER_ID':
+							$("#workcenterCode").val(value);
+							$("#workcenterRow").val(row);
+							$("#workcenterColumn").val(column);
+							
+							$("#checkDuplicateCodeBtn").show();
+							$("#modifyCodeBtn").hide();
+							$("#saveCode").attr("disabled", true);
+							$("#workcenterCode").attr("disabled", false);
+							$("#validationWorkcenterCodeMessage").text('');
+							
+							$('#workcenterCodeAdd').modal();
+						break;
+	//					case 'MANAGER_ID': $('#categoryAdd').modal(); break;
+	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
+					}
+			    });
+			}
+			
 		    this.el = container;
 		    this.input = el;
 		    this.render(props);
@@ -234,8 +246,6 @@
 		TextInputBtnRenderer.prototype.render = function (props) {
 		    this.input.value = props.value;
 		}
-
-
 		
 		const CheckboxRenderer = function(props) {
 		    const el = document.createElement('input');

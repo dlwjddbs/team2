@@ -16,12 +16,6 @@ public interface ManufactureMapper {
 	
 	int deleteWorkcenter(List<String> idList);
 
-//	int countExistingIds(List<Map<String, Object>> createdRows);
-//	
-//	List<String> getColumnNames(String tableName);
-//	
-//	Map<String, Object> selectToastTestById(String id);
-//	
-//	int updateToastTestById(Map<String, Object> updatedRows);
+	int checkDuplicateWorkcenterCode(Map<String, Object> map);
 
 }
