@@ -26,7 +26,7 @@ public class MesCommonCodeController {
 	
 	private final MesCommonCodeService mesCommonCodeService;
 	
-	@GetMapping("/admin/mesCommonCode")
+	@GetMapping("/mesCommonCode")
 	public String commonCode(@AuthenticationPrincipal User user, HttpSession session) {
         if (user == null) {
             return "redirect:/login"; 
