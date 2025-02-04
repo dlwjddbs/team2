@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.OrderMapper">
+
+    <select id="getOrder" resultType="map">
+       SELECT
+            ORDER_ID,
+            ORDER_STATUS,
+            CUSTOMER_ID,
+            ITEM_ID,
+            TO_CHAR(ORDER_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ORDER_DATE,
+            ORDER_PR,
+            TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD HH24:MI:SS') AS DELIVERY_DATE,
+            ITEM_ID AS UNIT,
+            ITEM_ID AS STANDARD,
+            SALES_REP_ID,
+            ORDER_QTY,
+            ORDER_QTY AS SHIPPED_QTY,
+            ORDER_QTY AS BACKLOG,
+            REGIST_BY,
+            TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE,
+            REMARKS,
+            TO_CHAR(CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
+        FROM ORDERS
+    </select>
+	
+</mapper>
