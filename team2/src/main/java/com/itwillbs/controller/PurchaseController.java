@@ -47,14 +47,17 @@ public class PurchaseController {
 		
 		@PostMapping("/savePurchase")
 		@ResponseBody
-		public ResponseEntity<Map<String, Object>> savePurchase(@RequestBody List<Map<String, Object>> dataList) {
+		public ResponseEntity<Map<String, Object>> savePurchase(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {
 		    int result = 0;
-
+		    String id = user.getUsername();
+		    
 		    List<Map<String, Object>> insertList = new ArrayList<>();
 		    List<Map<String, Object>> updateList = new ArrayList<>();
 		    List<Map<String, Object>> deleteList = new ArrayList<>();
 
 		    for (Map<String, Object> data : dataList) {
+		    	data.put("INSERT_MEM", id);
+		    	data.put("UPDATE_MEM", id);
 		        String rowType = (String) data.get("rowType");
 		        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
 

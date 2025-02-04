@@ -3,6 +3,8 @@ package com.itwillbs.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import com.itwillbs.repository.PurchaseMapper;
@@ -29,6 +31,7 @@ public class PurchaseService {
 
 	public int updatePurchase(List<Map<String, Object>> updateList) {
 		 int count = 0;
+		 
 	        for (Map<String, Object> data : updateList) {
 	            count += purchaseMapper.updatePurchase(data);
 	        }

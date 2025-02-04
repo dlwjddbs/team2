@@ -7,63 +7,52 @@
 <mapper namespace="com.itwillbs.repository.PurchaseMapper">
 
 	<select id="getPurchaseList" resultType="map">	
-	SELECT PO_ID,
+	SELECT PO_NUM,
 		   PO_COUNT,
 		   PO_PRICE,
 		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
-		   MEMBER_ID,
+		   (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = PO.MEMBER_ID) AS MEMBER_NAME,
 		   CUSTOMER_ID,
 		   PO_STATUS,
 		   TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
-		   UPDATE_MEMBER
+		   (SELECT NAME FROM MEMBER M2 WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
 	FROM 
-		PURCHASE_ORDER
+		PURCHASE_ORDER PO
 	</select>
 	
 	<insert id="insertPurchase">
 	INSERT INTO PURCHASE_ORDER (
-			PO_ID
-		  , PO_COUNT
-		  , PO_PRICE
-		  , CREATE_DATE
+<!-- 			PO_ID -->
+		    CREATE_DATE
 		  , MEMBER_ID
 		  , CUSTOMER_ID
 		  , PO_STATUS
-		  , UPDATE_DATE
-		  , UPDATE_MEMBER
 		  , PO_NUM		
 		) VALUES (
-        SYS_GUID(), 
-        #{PO_COUNT}, 
-        #{PO_PRICE}, 
-        CURRENT_DATE, 
-        #{MEMBER_ID}, 
+<!--         #{PO_ID},  -->
+          CURRENT_DATE, 
+        #{INSERT_MEM}, 
         #{CUSTOMER_ID}, 
-        NVL(#{PO_STATUS, jdbcType=VARCHAR}, '미결'), 
-        CURRENT_DATE, 
-        #{UPDATE_MEMBER}, 
-        #{PO_NUM, jdbcType=VARCHAR}
+        #{PO_STATUS}, 
+        'PO' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD-HH24MISS')
     )
 	</insert>
 	
 	<update id="updatePurchase">
     UPDATE PURCHASE_ORDER
     	SET 
-       	 	PO_COUNT = #{PO_COUNT},
-       	 	PO_PRICE = #{PO_PRICE},
        	 	CREATE_DATE = CURRENT_DATE,
-       	 	MEMBER_ID = #{MEMBER_ID},
        	 	CUSTOMER_ID = #{CUSTOMER_ID},
-       	 	PO_STATUS = NVL(#{PO_STATUS, jdbcType=VARCHAR}, '미결'),
        	 	UPDATE_DATE = CURRENT_DATE,
-       	 	UPDATE_MEMBER = #{UPDATE_MEMBER},
+       	 	UPDATE_MEMBER = #{UPDATE_MEM},
        	 	PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
-    WHERE PO_ID = #{PO_ID}  <!-- PO_ID를 기준으로 업데이트 -->
+    WHERE PO_NUM = #{PO_NUM, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
 	</update>
 	
 	<!-- DELETE (데이터 삭제) -->
     <delete id="deletePurchase">
-        DELETE FROM PURCHASE_ORDER WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}
+        DELETE FROM PURCHASE_ORDER 
+        	WHERE PO_NUM = #{PO_NUM}
     </delete>
     
 </mapper>
