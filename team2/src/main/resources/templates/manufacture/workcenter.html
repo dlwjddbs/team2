@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+		
+		<nav th:replace="~{includes/modals/categoryAdd :: categoryAdd}"></nav>
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-6">
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터</p>
+										</div>
+										<div class="col-6">
+											<div class="card-tools" style="text-align: right;">
+												<input type="button" id="btn_workcenter_add_row" class="btn btn-primary" value="행추가">
+												<input type="button" id="btn_workcenter_insert" class="btn btn-primary" value="등록">
+												<input type="button" id="btn_workcenter_update" class="btn btn-primary" value="수정">
+												<input type="button" id="btn_workcenter_delete" class="btn btn-primary" value="삭제">
+												<input type="button" id="btn_workcenter_toggleEditMode" class="btn btn-primary" value="수정모드">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body" id="workcenterGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<div class="row">
+									<div class="col-6">
+										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터설비</p>
+									</div>
+									<div class="col-6">
+										<div class="card-tools" style="text-align: right;">
+											<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">
+											<input type="button" id="btn_insert2" class="btn btn-primary" value="등록">
+											<input type="button" id="btn_update2" class="btn btn-primary" value="수정">
+											<input type="button" id="btn_delete2" class="btn btn-primary" value="삭제">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body" id="toast_single2">
+								<!-- Toast Grid Ajax -->
+							</div>
+						<!-- /.card-body -->
+						</div>
+					<!-- /.card -->
+					</div>
+				</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	
+	<style>
+	    .selected-row {
+	        background-color: #d1ffd6;
+	    }
+	    .deselected-row {
+	        background-color: #ffd1d1;
+	    }
+	</style>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		let workcenterGrid = null;
+		const workcenterUrl = '/manufacture/workcenter';
+		const workcenterDataSource = {
+			api: {
+				createData: {url: workcenterUrl, method: 'POST'},
+			    readData: {url: workcenterUrl, method: 'GET'},
+				updateData: {url: workcenterUrl, method: 'PUT'},
+				deleteData: {url: workcenterUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+	    };
+		let workcenterCurrentSelectedRowKey = null;
+		let workcenterIsEditModeEnabled = false; 
+		const workcenter_columns = [
+            {header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: null},
+            {header: '워크센터명', name: 'NAME', align: 'left', editor: null},
+			{
+			    header: '사용여부', 
+			    name: 'USE_YN', 
+			    align: 'center',
+			    formatter: function({value}) {
+			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
+			    }
+			},
+            {header: '비고', name: 'NOTE', align: 'left', editor: null},
+            {header: '담당자', name: 'MANAGER_ID', align: 'center', editor: null},
+            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
+        ];
+		
+		const TextInputRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+		  	
+		  	this.el = el;
+		  	this.render(props);
+		}
+		
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+		
+		const CheckboxRenderer = function(props) {
+		    const el = document.createElement('input');
+		    el.type = 'checkbox';
+		    el.checked = (props.value === 'Y');  // 초기값 지정
+		
+			el.addEventListener('change', function() {
+		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+		    });
+		    		
+		    this.el = el;
+		};
+
+		CheckboxRenderer.prototype.getElement = function() {
+		    return this.el;
+		};
+
+		CheckboxRenderer.prototype.getValue = function() {
+		    return this.el.checked ? 'Y' : 'N';
+		};
+
+		CheckboxRenderer.prototype.mounted = function() {
+		    this.el.focus();
+		};
+
+		$(function () {
+			workcenterInit();
+		});
+		
+		function workcenterInit() {
+			workcenterGrid = new tui.Grid({
+		        el: document.getElementById('workcenterGrid'),
+		        data: workcenterDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+				editingEvent: 'click',
+		        columns: workcenter_columns,
+		    });
+
+		    workcenterGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+			
+			workcenterGrid.on('editingStart', function(ev) {
+			    const {rowKey, columnName, value} = ev;
+			    const rowData = workcenterGrid.getRow(rowKey);
+				
+				// PK 수정 불가 && 새로 추가된 행은 작성 가능
+// 				if (columnName == 'WORKCENTER_ID' && !rowData.isNew) {
+				if (columnName == 'MANAGER_ID') {
+					console.log(rowKey)
+					$('#categoryAdd').modal();
+					ev.stop();
+				}
+			});
+			
+			workcenterGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || workcenterIsEditModeEnabled) {
+					return;
+				}
+
+			    const newRowKey = ev.rowKey;
+
+			    if (workcenterCurrentSelectedRowKey != null) {
+			        workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');
+			    }
+
+			    if (workcenterCurrentSelectedRowKey != newRowKey) {
+			        workcenterGrid.addRowClassName(newRowKey, 'selected-row');
+			        workcenterCurrentSelectedRowKey = newRowKey;
+					// 추가 그리드 생성시 사용할 ID값
+			        //console.log('Selected ID:' + workcenterGrid.getRow(newRowKey).ID);
+			    } else {
+			        // 같은 행을 클릭한 경우 선택 해제
+			        workcenterCurrentSelectedRowKey = null;
+			    }
+			});
+		}
+		
+		// 수정 모드 토글 버튼 이벤트
+		$("#btn_workcenter_toggleEditMode").on("click", function () {
+		    workcenterIsEditModeEnabled = !workcenterIsEditModeEnabled; // 수정 모드 상태 토글
+
+		    if (workcenterIsEditModeEnabled) {
+		        workcenterGrid.setColumns([
+		        	{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '워크센터명', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+				    {
+				        header: '사용여부',
+				        name: 'USE_YN',
+				        align: 'center',
+				        formatter: function({value}) {
+				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+				        },
+				        renderer: { type: CheckboxRenderer }
+				    },
+		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '담당자', name: 'MANAGER_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		        ]);
+		    } else {
+		        workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        const currentData = workcenterGrid.getData();
+		        workcenterGrid.setColumns(workcenter_columns);
+		    }
+		});
+
+		$("#btn_workcenter_add_row").on("click", function () {
+		    const newRowKey = workcenterGrid.appendRow(
+		        {
+		        	"WORKCENTER_ID": '',
+		        	"NAME": '',
+		        	"USE_YN": 'N',
+		        	"NOTE": '',
+		        	"MANAGER_ID": '',
+		        	"ROUTING_ID": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+		});
+
+        $("#btn_workcenter_insert").on("click", function() {
+			workcenterGrid.request('createData');
+			workcenterGrid.reloadData();  // 실패시 테이블 리로드
+			// GET 요청시 데이터 보낼려면 header 설정
+		});
+		
+		$("#btn_workcenter_update").on("click", function() {
+			workcenterGrid.request('updateData');
+			workcenterGrid.setColumns(workcenter_columns);
+		});
+		
+        $("#btn_workcenter_delete").on("click", function() {
+			workcenterGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = workcenterGrid.getModifiedRows().deletedRows.map(row => row.ID).join(',');
+			workcenterDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+		    workcenterGrid.request('deleteData');
+			workcenterGrid.reloadData();  // 실패시 테이블 리로드
+		});
+	</script>
+</body>
+</html>

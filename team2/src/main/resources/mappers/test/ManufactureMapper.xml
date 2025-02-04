@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.ManufactureMapper">
+
+    <select id="selectWorkcenter" resultType="map">
+        SELECT
+			   WORKCENTER_ID
+			 , NAME
+			 , USE_YN
+<!--  			 , CASE WHEN USE_YN = 'Y' THEN 'TRUE' -->
+<!-- 			   		ELSE 'FALSE' -->
+<!-- 			   END AS USE_YN -->
+			 , NOTE
+			 , MANAGER_ID
+			 , ROUTING_ID
+          FROM WORKCENTER
+    </select>
+	
+<!-- 	<select id="countExistingIds" parameterType="list" resultType="int"> -->
+<!-- 	    SELECT COUNT(*) AS count -->
+<!-- 	      FROM TEST -->
+<!-- 	     WHERE ID IN -->
+<!-- 	    <foreach collection="list" item="row" open="(" separator="," close=")"> -->
+<!-- 	        #{row.ID} -->
+<!-- 	    </foreach> -->
+<!-- 	</select> -->
+    
+<!--     <insert id="insertToastTest"> -->
+<!-- 	    INSERT ALL -->
+<!-- 		<foreach collection="list" item="item"> -->
+<!-- 			INTO TEST (ID, COL_1, COL_2, COL_3) -->
+<!-- 			VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3}) -->
+<!-- 		</foreach> -->
+<!-- 		SELECT * FROM DUAL -->
+<!--     </insert> -->
+    
+<!--     <delete id="deleteToastTest"> -->
+<!-- 	    DELETE FROM TEST -->
+<!-- 	     WHERE ID IN -->
+<!-- 	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")"> -->
+<!-- 	        #{id} -->
+<!-- 	    </foreach> -->
+<!--     </delete> -->
+    
+<!--     <update id="updateToastTest"> -->
+<!-- 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;"> -->
+<!-- 	        UPDATE TEST -->
+<!-- 	           SET  -->
+<!-- 				   COL_1 = #{row.COL_1} -->
+<!-- 	             , COL_2 = #{row.COL_2} -->
+<!-- 	             , COL_3 = #{row.COL_3} -->
+<!-- 	         WHERE ID = #{row.ID} -->
+<!-- 	    </foreach> -->
+<!--     </update> -->
+    
+<!--     <select id="getColumnNames" parameterType="map" resultType="map">
+	    SELECT LISTAGG(COLUMN_NAME, ',') WITHIN GROUP (ORDER BY COLUMN_ID) AS COLUMN_NAME
+	    FROM USER_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+	</select> -->
+	
+<!-- 	<select id="getColumnNames" parameterType="map" resultType="string"> -->
+<!-- 	    SELECT COLUMN_NAME  -->
+<!-- 	    FROM ALL_TAB_COLUMNS -->
+<!-- 	    WHERE TABLE_NAME = UPPER(#{tableName}) -->
+<!--     	ORDER BY COLUMN_ID -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="selectToastTestById" resultType="map"> -->
+<!--         SELECT * -->
+<!--           FROM TEST -->
+<!--         WHERE ID = #{ID} -->
+<!--     </select> -->
+    
+<!-- 	<update id="updateToastTestById"> -->
+<!--         UPDATE TEST -->
+<!--            SET  -->
+<!-- 			   COL_1 = #{COL_1} -->
+<!--              , COL_2 = #{COL_2} -->
+<!--              , COL_3 = #{COL_3} -->
+<!--          WHERE ID = #{ID} -->
+<!--     </update> -->
+</mapper>

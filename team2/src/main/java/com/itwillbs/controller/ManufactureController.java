@@ -1,0 +1,22 @@
+package com.itwillbs.controller;
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+
+@Controller
+@RequiredArgsConstructor
+@Log
+public class ManufactureController {
+	
+	@GetMapping("/workcenter")
+	public String workcenter() {
+		return "/manufacture/workcenter";
+	}
+	
+}
+
+
