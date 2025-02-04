@@ -15,4 +15,12 @@ public interface PurchaseMapper {
 	int updatePurchase(Map<String, Object> data);
 
 	int deletePurchase(Map<String, Object> data);
+
+	List<Map<String, Object>> getPurchaseDetail(Map<String, Object> map);
+
+	int insertDetail(Map<String, Object> data);
+
+	int updateDetail(Map<String, Object> data);
+
+	int deleteDetail(Map<String, Object> data);
 }

@@ -5,7 +5,8 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.PurchaseMapper">
-
+	
+<!--	발주 리스트-->
 	<select id="getPurchaseList" resultType="map">	
 	SELECT PO_NUM,
 		   PO_COUNT,
@@ -20,6 +21,7 @@
 		PURCHASE_ORDER PO
 	</select>
 	
+<!--	발주 등록-->
 	<insert id="insertPurchase">
 	INSERT INTO PURCHASE_ORDER (
 <!-- 			PO_ID -->
@@ -38,6 +40,7 @@
     )
 	</insert>
 	
+<!--	발주 수정-->
 	<update id="updatePurchase">
     UPDATE PURCHASE_ORDER
     	SET 
@@ -54,5 +57,44 @@
         DELETE FROM PURCHASE_ORDER 
         	WHERE PO_NUM = #{PO_NUM}
     </delete>
+    
+    
+<!--   발주 상세 유니온 -->
+   <select id="getPurchaseDetail" resultType="map">	
+	SELECT
+  		MATERIAL_ID,
+  		MATERIAL_NM,
+  		<!--  		NULL AS PO_COUNT,  -->
+  		PO_PRICE,
+  		<!--  		NULL AS TOTAL_PRICE,  -->  
+  		CAST(NULL AS VARCHAR2(10)) AS UPDATE_DATE,  
+  		CAST(NULL AS VARCHAR2(100)) AS UPDATE_MEMBER  
+	FROM (
+  		SELECT '1' AS MATERIAL_ID, '유리강판' AS MATERIAL_NM, '2000' AS PO_PRICE, NULL AS UPDATE_DATE, NULL AS UPDATE_MEMBER FROM DUAL
+  		UNION ALL
+  		SELECT '2', '철강', '3000', NULL, NULL FROM DUAL
+  		UNION ALL
+  		SELECT '3', '알루미늄', '4000', NULL, NULL FROM DUAL
+  		UNION ALL
+  		SELECT '4', '철판', '5000', NULL, NULL FROM DUAL
+  		UNION ALL
+  		SELECT '5', '강철발판', '6000', NULL, NULL FROM DUAL
+  	)
+</select>
+    
+    <insert id="insertDetail">
+	INSERT INTO PURCHASE_ORDER (
+		    MATERIAL_ID
+		  , PO_COUNT
+		  , PO_PRICE
+		) VALUES (
+        #{MATERIAL_ID}, 
+        #{PO_COUNT}, 
+        #{PO_PRICE} 
+    )
+	</insert>
+    
+    
+    
     
 </mapper>

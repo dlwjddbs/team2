@@ -2,59 +2,52 @@
 <html lang="en">
 
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>구매발주등록</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>구매발주등록</title>
 
-<!-- Google Font: Source Sans Pro -->
-<link rel="stylesheet"
-	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome -->
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-<!-- DataTables -->
-<link rel="stylesheet"
-	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet"
-	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-<link rel="stylesheet"
-	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-<!-- Theme style -->
-<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-<!-- daterange picker -->
-<link rel="stylesheet"
-	href="../../plugins/daterangepicker/daterangepicker.css">
-<!-- Toast Grid -->
-<link rel="stylesheet"
-	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-<!-- jQuery OrgChart CSS CDN -->
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
-	integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
-	crossorigin="anonymous" referrerpolicy="no-referrer" />
-<meta name="_csrf" th:content="${_csrf.token}" />
-<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+	<!-- jQuery OrgChart CSS CDN -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
+		integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 
-<style>
-.table-container {
-	margin-top: 20px;
-}
+	<style>
+		.table-container {
+			margin-top: 20px;
+		}
 
-.divider {
-	border-top: 4px solid #000;
-	margin: 30px 0;
-}
+		.divider {
+			border-top: 4px solid #000;
+			margin: 30px 0;
+		}
 
-.btn-actions {
-	display: flex;
-	gap: 10px;
-}
+		.btn-actions {
+			display: flex;
+			gap: 10px;
+		}
 
-.hidden {
-	display: none;
-}
-</style>
+		.hidden {
+			display: none;
+		}
+	</style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -98,11 +91,11 @@
 								<div class="card-header">
 									<h5>구매발주</h5>
 									<div class="card-tools">
-										<input type="button" id="btn_add_row" class="btn btn-primary"
-											value="신규"> <input type="button" id="save"
-											class="btn btn-primary" value="저장"> <input
+										<input type="button" id="btn_add_row" class="btn btn-primary" value="신규"> <input
+											type="button" id="save" class="btn btn-primary" 
+											onclick="saveData(this.id)" value="저장"> <input
 											type="button" id="btn_delete" class="btn btn-primary"
-											value="삭제">
+											onclick="deleteRows(this.id)" value="삭제">
 									</div>
 								</div>
 								<div class="card-body">
@@ -122,11 +115,11 @@
 								<div class="card-header">
 									<h5>구매발주 상세</h5>
 									<div class="card-tools">
-										<input type="button" id="btn_add_row2" class="btn btn-primary"
-											value="행추가"> <input type="button" id="saveDetail"
-											class="btn btn-primary" value="저장"> <input
+										<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">
+										<input type="button" id="saveDetail" class="btn btn-primary" 
+											onclick="saveData(this.id)" value="저장"> <input
 											type="button" id="btn_delete2" class="btn btn-primary"
-											value="삭제">
+											onclick="deleteRows(this.id)" value="삭제">
 									</div>
 								</div>
 								<div class="card-body">
@@ -145,31 +138,29 @@
 			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 			<!-- AdminLTE App -->
 			<script src="../../dist/js/adminlte.min.js"></script>
-			<script
-				src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
 
 			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 
 			<style>
-.selected-row {
-	background-color: #d1ffd6;
-}
+				.selected-row {
+					background-color: #d1ffd6;
+				}
 
-.deselected-row {
-	background-color: #ffd1d1;
-}
-</style>
+				.deselected-row {
+					background-color: #ffd1d1;
+				}
+			</style>
 			<!-- Page specific script -->
 			<script>
-			const token = $("meta[name='_csrf']").attr("content")
-			const header = $("meta[name='_csrf_header']").attr("content");
-			const name = $("#userName").val();
-			
-				$(document).ready(function () {
+				const token = $("meta[name='_csrf']").attr("content")
+				const header = $("meta[name='_csrf_header']").attr("content");
+				const name = $("#userName").val();
+				
 
+				$(function () {
+					initGrids();
 				});
-
-
 
 				// Toast Grid 설정
 
@@ -179,9 +170,9 @@
 				const url = 'getPurchase';
 				const dataSource = {
 					api: {
-						createData: {url: url, method: 'POST', headers: { [header]: token } },
-						readData: {url: url, method: 'POST', headers: { [header]: token }},
-						updateData: {url: url, method: 'PUT', headers: { [header]: token }},
+						createData: {url: url, method: 'POST', headers: {[header]: token}},
+						readData: {url: url, method: 'POST', headers: {[header]: token}},
+						updateData: {url: url, method: 'PUT', headers: {[header]: token}},
 						deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 					},
 					contentType: 'application/json',
@@ -190,43 +181,47 @@
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
 					{header: 'P/O번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
-					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', editor: 'text'},
+					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', 	formatter: function({ row }) {
+						return `
+						<div style="display: flex; justify-content: flex-end; align-items: center;">
+						          <button class="open-modal-btn" data-row-key="${row.rowKey}" 
+						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+						              🔍
+						          </button>
+						      </div>
+						                `;
+					            }
+},
 					{header: '품목(수)', name: 'PO_COUNT', align: 'center'},
 					{header: '금액', name: 'PO_PRICE', align: 'center'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-					
-					{header: '상태', name: 'PO_STATUS', align: 'center', 
-				formatter: ({ value }) => { 
-					const color = { "미결": "red", "마감": "blue" }[value] || "black";
-				    return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
-				  }
-				}
-// 					{header: '주문번호', name: 'PO_ID', hidden: true }
+
+					{
+						header: '상태', name: 'PO_STATUS', align: 'center',
+						formatter: ({value}) => {
+							const color = {"미결": "red", "마감": "blue"}[value] || "black";
+							return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
+						}
+					}
+					// 					{header: '주문번호', name: 'PO_ID', hidden: true }
 				];
-				
-				fetch('/getPurchase', {
-				    method: 'POST',
-				    headers: {
-				        'Content-Type': 'application/json',
-				        [header]: token
-				    },
-				    body: JSON.stringify({})
-				})
-				.then(response => response.json())
-				.then(data => {
-				    console.log("서버 응답 데이터:", data);
-				    grid1.resetData(data);
-				})
-				.catch(error => console.error("데이터 불러오기 실패:", error));
 
-				$(function () {
-					initGrids();
+				// grid2 컬럼 설정 (구매 발주 상세)
+				const columns2 = [
+					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', editor: 'text'},
+					{header: '품목명', name: 'MATERIAL_NM', align: 'center', editor: 'text'},
+					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
+					{header: '단가', name: 'PO_PRICE', align: 'center', editor: 'text'},
+					{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
+					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
+					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
+					//{header: '납기일', name: 'DELIVERY_DATE', align: 'center', editor: 'text'},
+					//{header: '상태', name: 'PO_STATUS', align: 'center'},
+				];
 
 
-				});
-
-
+				let rowIdx;
 				function initGrids() {
 					grid1 = new tui.Grid({
 						el: document.getElementById('toast_single'),
@@ -238,27 +233,54 @@
 						columns: columns,
 					});
 
-				// 구매발주 상세 리스트를 숨김 상태에서 시작
-				$("#detail_section").hide();
-				$("#divider").hide();
 
-				let delRows = [];
+					fetch('/getPurchase', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							[header]: token
+						},
+						body: JSON.stringify({})
+					})
+						.then(response => response.json())
+						.then(data => {
+							console.log("서버 응답 데이터:", data);
+							grid1.resetData(data);
+						})
+						.catch(error => console.error("데이터 불러오기 실패:", error));
+
+					// 구매발주 상세 리스트를 숨김 상태에서 시작
+					$("#detail_section").hide();
+					$("#divider").hide();
+
 					// 행 클릭 시 상세 리스트 보이기
 					grid1.on('click', function (ev) {
-						if (ev.rowKey === null) {
+						if (ev.rowKey === null)
 							return;
-						}
-
 						const selectedRow = grid1.getRow(ev.rowKey);
-						if (selectedRow) {
-							$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
-							$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
+						
+						if (!selectedRow) return;
+						rowIdx = ev.rowKey;
 
-							// grid2 데이터 업데이트
-							dtlGrid([selectedRow]);
-							//grid.resetData([selectedRow]);
 
-						}
+						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
+						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
+
+						// 선택한 발주번호(PO_NUM)로 상세 데이터 요청
+						fetch('/getPurchaseDetail', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								[header]: token
+							},
+							body: JSON.stringify({PO_NUM: selectedRow.PO_NUM})
+						})
+							.then(response => response.json())
+							.then(data => {
+								console.log("[grid2] 서버 응답 데이터:", data);
+								dtlGrid(data);
+							})
+							.catch(error => console.error("grid2 데이터 불러오기 실패:", error));
 					});
 
 					// 더블 클릭하면 상세 리스트 숨기기
@@ -268,58 +290,39 @@
 						grid2.resetData([]);
 					});
 
-					// 체크박스가 활성화된 행의 index를 배열에 저장
-					grid1.on('check', (ev) => {
-						delRows.push(ev.rowKey);
-					});
-				}
-
-				function dtlGrid(parentData) {
-					console.info(parentData);
-
-					if (grid2) {
-						grid2.resetData(parentData);
-					} else {
-
-						grid2 = new tui.Grid({
+					// -----------------
+					function dtlGrid(data) {
+						
+						if (!grid2) {
+							grid2 = new tui.Grid({
 							el: document.getElementById('toast_single2'),
-							data: parentData,
+							data: [],
 							scrollX: true,
 							scrollY: true,
 							rowHeaders: ['checkbox'],
 							editingEvent: 'click',
-							columns: columns,
+							columns: columns2,
 						});
+						} 
+
+						grid2.resetData(data);
+
+						// 체크박스가 활성화된 행의 index를 배열에 저장
+						grid2.on('check', (ev) => {
+							delRows.push(ev.rowKey);
+						});
+						
+						let sum = 0;
+						
+						grid2.on('afterChange', ev => {
+							ev.changes.forEach(change =>  {
+								sum += Number(change.value);
+								grid1.setValue(rowIdx, "PO_COUNT", sum);
+						   })
+				    	});
 					}
 
-					grid1.on('failResponse', function (ev) {
-						alert(JSON.parse(ev.xhr.responseText).message);
-					});
 
-					grid1.on('editingStart', function (ev) {
-						const {rowKey, columnName, value} = ev;
-						const rowData = grid1.getRow(rowKey);
-
-						// PK 수정 불가 && 새로 추가된 행은 작성 가능
-						if (columnName == 'ID' && !rowData.isNew) {
-							ev.stop();
-						}
-					});
-
-
-					grid1.on('failResponse', function (ev) {
-						alert(JSON.parse(ev.xhr.responseText).message);
-					});
-
-					grid1.on('editingStart', function (ev) {
-						const {rowKey, columnName, value} = ev;
-						const rowData = grid1.getRow(rowKey);
-
-						// PK 수정 불가 && 새로 추가된 행은 작성 가능
-						if (columnName == 'ID' && !rowData.isNew) {
-							ev.stop();
-						}
-					});
 				}
 
 				$("#btn_add_row").on("click", function () {
@@ -344,74 +347,121 @@
 					const newRowKey = grid2.appendRow(
 						{
 							"PO_DATE": year + '-' + month + '-' + date,
-							
+
 						},
 						{focus: true}
 					);
 				});
-				
+
 				// 저장 버튼 이벤트
 				save.addEventListener('mousedown', handleSave);
-
-// 				// 삭제 버튼 이벤트
-// 				btn_delete.addEventListener('mousedown', handleDelete);
-
-				// 체크된 행 저장 배열 (삭제할 행을 저장)
+				saveDetail.addEventListener('mousedown', detailSave);
+				
+				
+				//삭제
 				let delRows = [];
 
-				// 삭제 버튼 이벤트
-				document.getElementById("btn_delete").addEventListener("click", function () {
-				    const checkedRows = grid1.getCheckedRows(); // 체크된 행 가져오기
+				function deleteRows(btnId) {
 
-				    if (checkedRows.length === 0) {
-				        alert("삭제할 행을 선택하세요.");
-				        return;
-				    }
+					let gridNm = "";
 
-				    checkedRows.forEach(row => {
-				        delRows.push({ ...row, rowType: "delete" }); // 삭제할 데이터를 delRows 배열에 저장
-				        grid1.removeRow(row.rowKey); // 화면에서 행 삭제
-				    });
+					if (btnId == "btn_delete") {
+						gridNm = grid1;
+					} else {
+						gridNm = grid2;
+					}
 
-				    console.log("삭제할 데이터 목록:", delRows);
-				});
-				// 저장 함수
-				function handleSave() {
-				    grid1.blur(); // 포커스 해제
+					const checkedRows = gridNm.getCheckedRows(); // 체크된 행 가져오기
 
-				    const modifiedRows = grid1.getModifiedRows();
-				    const createdRows = modifiedRows.createdRows.map(row => ({ ...row, rowType: "insert" }));
-				    const updatedRows = modifiedRows.updatedRows.map(row => ({ ...row, rowType: "update" }));
-				    const deletedRows = modifiedRows.deletedRows.map(row => ({ ...row, rowType: "delete" }));
-				    
-				    const allData = [...createdRows, ...updatedRows, ...deletedRows];
+					if (checkedRows.length === 0) {
+						alert("삭제할 행을 선택하세요.");
+						return;
+					}
 
-				    if (allData.length === 0) {
-				        alert("변경된 데이터가 없습니다.");
-				        return;
-				    }
+					checkedRows.forEach(row => {
+						delRows.push({...row, rowType: "delete"}); // 삭제할 데이터를 delRows 배열에 저장
+						gridNm.removeRow(row.rowKey); // 화면에서 행 삭제
+					});
 
-				    console.log("서버로 전송할 데이터:", allData);
-
-				    $.ajax({
-				        url: "/savePurchase",
-				        type: 'POST',
-				        contentType: "application/json",
-				        data: JSON.stringify(allData),
-				        beforeSend: (xhr) => xhr.setRequestHeader(header, token),
-				        success: (res) => {
-				        	console.log("서버 응답:", res); // 응답 값 확인
-				            if (res.status == "success") {
-				                showSuccess("저장 성공!", true);
-				                delRows = []; // 삭제 목록 초기화 (성공 시)
-				            } else {
-				                showError("저장 실패");
-				            }
-				        },
-				        error: () => showError("서버 오류 발생"),
-				    });
+					console.info("삭제할 데이터 목록:", delRows);
 				}
 
+
+
+				// 저장 함수
+				function handleSave() {
+					grid1.blur(); // 포커스 해제
+
+					const modifiedRows = grid1.getModifiedRows();
+					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert"}));
+					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update"}));
+					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete"}));
+
+					const allData = [...createdRows, ...updatedRows, ...deletedRows];
+
+					if (allData.length === 0) {
+						alert("변경된 데이터가 없습니다.");
+						return;
+					}
+
+					console.log("서버로 전송할 데이터:", allData);
+
+					$.ajax({
+						url: "/savePurchase",
+						type: 'POST',
+						contentType: "application/json",
+						data: JSON.stringify(allData),
+						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+						success: (res) => {
+							console.log("서버 응답:", res); // 응답 값 확인
+							if (res.status == "success") {
+								showSuccess("저장 성공!", true);
+								delRows = []; // 삭제 목록 초기화 (성공 시)
+							} else {
+								showError("저장 실패");
+							}
+						},
+						error: () => showError("서버 오류 발생"),
+					});
+				}
+
+				// 저장 함수
+				function detailSave() {
+					grid2.blur(); // 포커스 해제
+
+					const modifiedRows2 = grid2.getModifiedRows();
+					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert"}));
+					const updatedRows2 = modifiedRows2.updatedRows.map(row => ({...row, rowType: "update"}));
+					const deletedRows2 = modifiedRows2.deletedRows.map(row => ({...row, rowType: "delete"}));
+
+					const allData = [...createdRows2, ...updatedRows2, ...deletedRows2];
+
+					if (allData.length === 0) {
+						alert("변경된 데이터가 없습니다.");
+						return;
+					}
+
+					console.log("서버로 전송할 데이터:", allData);
+
+					$.ajax({
+						url: "/saveDetail",
+						type: 'POST',
+						contentType: "application/json",
+						data: JSON.stringify(allData),
+						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+						success: (res) => {
+							console.log("상세 서버 응답:", res); // 응답 값 확인
+							if (res.status == "success") {
+								showSuccess("상세 저장 성공!", true);
+								delRows = []; // 삭제 목록 초기화 (성공 시)
+							} else {
+								showError("상세 저장 실패");
+							}
+						},
+						error: () => showError("서버 오류 발생"),
+					});
+				}
+				
 				
 
 				// 메시지
@@ -420,9 +470,9 @@
 				}
 
 				function showError(message) {
-				   Notiflix.Notify.failure('저장 실패!');
+					Notiflix.Notify.failure('저장 실패!');
 				}
-				
+
 			</script>
 </body>
 
