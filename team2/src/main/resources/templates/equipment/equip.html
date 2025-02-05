@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-
+	<!-- Toast UI Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
 </head>
 <body class="hold-transition sidebar-mini">
@@ -27,10 +27,10 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
 		
-		<!-- 엑셀 기능 모달창 (미구현) -->
+		<!-- 엑셀 기능 모달 (미구현) -->
 		<!-- <nav th:replace="~{includes/modals/excelModal :: excelModal}"></nav> -->
 		
-		<!-- 설비 상세 내역 (미구현) -->
+		<!-- 설비 상세 내역 모달 (미구현) -->
 		<!-- <nav th:replace="~{includes/modals/equipEdit :: equipEdit}"></nav> -->
 
 		<!-- Content Wrapper. Contains page content -->
@@ -48,19 +48,8 @@
 									<div class="d-flex justify-content-between bg-light rounded p-3 mb-4 m-2">
 										<div class="d-flex">
 											<div class="d-flex mx-2">
-												<label class="col-form-label" style="min-width: 70px">설비구분</label>
+												<label class="col-form-label" style="min-width: 70px">설비명</label>
 												<input type="text" class="form-control float-right" id="equip1">
-											</div>
-
-											<div class="d-flex mx-2">
-												<label class="col-form-label" style="min-width: 70px">설비유형</label>
-												<select class="equip2 form-control" name="equip2" style="min-width: 120px">
-													<option selected="selected" disabled>설비유형</option>
-													<option>1</option>
-													<option>2</option>
-													<option>3</option>
-													<option>4</option>
-												</select>
 											</div>
 
 											<div class="d-flex mx-2">
@@ -87,21 +76,28 @@
 									</div>
 								</div>
 								<div class="card-body">
-									<div class="row mb-3">
-										<div class="col-6">
-											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">설비 목록 (예시, DB 연결 X)</p>
+									<div class="row mb-2">
+										<div class="col-5">
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">설비 목록 (예시)</p>
 										</div>
-										<div class="col-6">
+										<div class="col-3">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_add_row" class="btn btn-primary" value="행추가">
-												<input type="button" id="btn_insert" class="btn btn-success" value="DB 등록">
-												<input type="button" id="btn_update" class="btn btn-warning" value="DB 수정">
-												<input type="button" id="btn_delete" class="btn btn-danger" value="DB 삭제">
+												<input type="button" id="btn_equip_add_row" class="btn btn-primary" value="행추가">
+												<input type="button" id="btn_equip_remove_row" class="btn btn-danger" value="행삭제">
+												<input type="button" id="btn_equip_toggleEditMode" class="btn btn-warning" value="편집">
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="card-tools" style="text-align: right;">
+												<input type="button" id="btn_equip_insert" class="btn btn-success" value="DB 등록">
+												<input type="button" id="btn_equip_update" class="btn btn-warning" value="DB 수정">
+												<input type="button" id="btn_equip_delete" class="btn btn-danger" value="DB 삭제">
 												<!-- 엑셀 기능들을 모은 모달창 제작 예정 -->
 												<input type="button" id="btn_excel" class="btn btn-success" value="엑셀">
 											</div>
 										</div>
 									</div>
+								</div>
 									<div id="toast_single">
 										<!-- Toast Grid Ajax -->
 									</div>
@@ -136,27 +132,148 @@
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
-
+	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
-
 	<!-- SheetJS (Excel 변환 라이브러리) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+	
+	<style>
+	    .selected-row {
+	        background-color: #d1ffd6;
+	    }
+	    .deselected-row {
+	        background-color: #ffd1d1;
+	    }
+	</style>
+	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let equidGrid;
 		const equipUrl = '/equipment/equip';
 		const excelUrl = '/ajax/excelToastTest';
-		const dataSource = {
+		const equipDataSource = {
 			api: {
-				//createData: {url: equipUrl, method: 'POST'},
+				createData: {url: equipUrl, method: 'POST'},
 				readData: {url: equipUrl, method: 'GET'},
 				updateData: {url: equipUrl, method: 'PUT'},
 				deleteData: {url: equipUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 		};
+		
+		const TextInputRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+		  	
+		  	this.el = el;
+		  	this.render(props);
+		}
 
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+		
+		const TextInputBtnRenderer = function(props) {
+		    const container = document.createElement('div');
+		    container.style.display = 'flex';
+		    container.style.alignItems = 'center';
+		    container.style.gap = '5px';
+		    
+		    const el = document.createElement('input');
+		    el.type = 'text';
+		    el.style.width = 'calc(100% - 10px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.color = 'solid 1px #ddd';
+		    el.style.marginLeft = '1px';
+		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+			container.appendChild(el);
+			
+			// EQUIPMENT_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'EQUIPMENT_ID'
+				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+			    button.textContent = '🔍';
+			    button.style.border = 'solid 1px #007BFF';
+			    button.style.background = 'white';
+			    button.style.color = 'white';
+			    button.style.padding = '6px 10px';
+			    button.style.cursor = 'pointer';
+			    button.style.borderRadius = '4px';
+			    button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = workcenterGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'EQUIPMENT_ID':
+							$("#workcenterCode").val(value);
+							$("#workcenterRow").val(row);
+							$("#workcenterColumn").val(column);
+							
+							$("#checkDuplicateCodeBtn").show();
+							$("#modifyCodeBtn").hide();
+							$("#saveCode").attr("disabled", true);
+							$("#workcenterCode").attr("disabled", false);
+							$("#validationWorkcenterCodeMessage").text('');
+							
+							$('#workcenterCodeAdd').modal();
+						break;
+					}
+			    });
+			}
+			
+		    this.el = container;
+		    this.input = el;
+		    this.render(props);
+		}
+
+		TextInputBtnRenderer.prototype.getElement = function () {
+		    return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+		    this.input.value = props.value;
+		}
+		
+		const CheckboxRenderer = function(props) {
+		    const el = document.createElement('input');
+		    el.type = 'checkbox';
+		    el.checked = (props.value === 'Y');  // 초기값 지정
+		
+			el.addEventListener('change', function() {
+		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+		    });
+		    		
+		    this.el = el;
+		};
+
+		CheckboxRenderer.prototype.getElement = function() {
+		    return this.el;
+		};
+
+		CheckboxRenderer.prototype.getValue = function() {
+		    return this.el.checked ? 'Y' : 'N';
+		};
+
+		CheckboxRenderer.prototype.mounted = function() {
+		    this.el.focus();
+		};
+		
 		$(function () {
 			grid();
 
@@ -183,42 +300,181 @@
 		});
 
 		function grid() {
-			grid1 = new tui.Grid({
+			equipGrid = new tui.Grid({
 				el: document.getElementById('toast_single'),
-				data: dataSource,
-				/*
-				data: [
-					{id: 1, code: 'EQ001(예시)', name: '레이저 절단기', type: '절단', manufacturer: '삼성', date: '2023-01-15', status: '사용', remark: '-'}
-				],
-				*/
+				data: equipDataSource,
 				scrollX: true,
 				scrollY: true,
 				rowHeaders: ['checkbox'],
 				columns: [
 					{header: '설비코드', name: 'EQUIPMENT_ID', width: 100},
 					{header: '설비명', name: 'EQUIPMENT_NAME', width: 200},
-					{header: '구입일자', name: 'date', width: 200},
+					{header: '구입일자', name: 'CREATE_DATE', width: 200},
 					{header: '사용여부', name: 'EQUIPMENT_STATUS', width: 100},
 					{header: '비고', name: 'EQUIPMENT_NOTE', width: 300}
 				],
 			});
 
-			grid1.on('failResponse', function (ev) {
+			equipGrid.on('failResponse', function (ev) {
 				alert(JSON.parse(ev.xhr.responseText).message);
 				alert("Response 실패");
 			});
 
-			grid1.on('editingStart', function (ev) {
+			equipGrid.on('editingStart', function (ev) {
 				const {rowKey, columnName, value} = ev;
-				const rowData = grid1.getRow(rowKey);
+				const rowData = equidGrid.getRow(rowKey);
 
 				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-				if (columnName == 'ID' && !rowData.isNew) {
-					ev.stop();
+				//if (columnName == 'ID' && !rowData.isNew) {
+				//	ev.stop();
+				//}
+			});
+			
+			equipGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || equipIsEditModeEnabled) {
+					return;
 				}
+
+			    const newRowKey = ev.rowKey;
+
+			    if (equipCurrentSelectedRowKey != null) {
+			    	equipGrid.removeRowClassName(equipCurrentSelectedRowKey, 'selected-row');
+			    }
+
+			    if (equipCurrentSelectedRowKey != newRowKey) {
+			    	equipGrid.addRowClassName(newRowKey, 'selected-row');
+			    	equipCurrentSelectedRowKey = newRowKey;
+			    } else {
+			        // 같은 행을 클릭한 경우 선택 해제
+			        equipCurrentSelectedRowKey = null;
+			    }
 			});
 		}
+		
+		$("#btn_equip_add_row").on("click", function () {
+			const newRowKey = grid1.appendRow(
+				{
+					"EQUIPMENT_ID": '',
+					"EQUIPMENT_NAME": '',
+					"CREATE_DATE": '',
+					"EQUIPMENT_STATUS": '',
+					"EQUIPMENT_NOTE": '',
+					isNew: true
+				},
+				{focus: true}
+			);
+		});
+		
+		$("#btn_equip_remove_row").on("click", function () {
+		    const rowCount = equidGrid.getRowCount(); // 현재 행 개수 가져오기
+		    
+		    const allRows = equidGrid.getData(); // 전체 데이터 가져오기
+		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
+		    
+		    if (newRows.length === 0) {
+		        alert("삭제할 수 있는 신규 행이 없습니다.");
+		        return;
+		    }
 
+		    const lastRowKey = equidGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    equidGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		});
+		
+		// 수정 모드 토글 버튼 이벤트
+		$("#btn_equip_toggleEditMode").on("click", function () {
+			equipIsEditModeEnabled = !equipIsEditModeEnabled; // 수정 모드 상태 토글
+		    
+		    if (equipIsEditModeEnabled) {
+				$("#btn_equip_add_row").show();
+				$("#btn_equip_remove_row").show();
+		    } else {
+		    	$("#btn_equip_add_row").hide();
+				$("#btn_equip_remove_row").hide();
+		    }
+		    
+		    if (equipIsEditModeEnabled) {
+		    	equipGrid.setColumns([
+					{header: '설비코드', name: 'EQUIPMENT_ID', width: 100},
+					{header: '설비명', name: 'EQUIPMENT_NAME', width: 200},
+					{header: '구입일자', name: 'CREATE_DATE', width: 200},
+					{header: '사용여부', name: 'EQUIPMENT_STATUS', width: 100},
+					{header: '비고', name: 'EQUIPMENT_NOTE', width: 300}
+		        ]);
+		    } else {
+		    	equipGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		    	equipGrid.setColumns(equip_columns);
+		    }
+		});
+		
+		$("#btn_equip_modify").on("click", function() {
+			equipGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+			
+		    let createdRows = equipGrid.getModifiedRows().createdRows;
+		    let updatedRows = equipGrid.getModifiedRows().updatedRows;
+		    
+		    // 필수 입력 컬럼
+		    const requiredFields = ["EQUIPMENT_ID", "EQUIPMENT_NAME", "EQUIPMENT_STATUS"];
+
+		    let validCreatedRows = createdRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    let validUpdatedRows = updatedRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    if (createdRows.length == 0 && updatedRows.length == 0) {
+		    	alert("수정된 데이터가 없습니다.");
+		        return;
+		    }
+
+			if (createdRows.length > 0) {
+				if ((validCreatedRows.length == 0)
+					|| (validCreatedRows.length != createdRows.length)) {
+					alert("필수값을 모두 입력해주세요.");
+			        return;
+				}
+			}
+				
+			if (updatedRows.length > 0 && validUpdatedRows.length == 0) {
+				alert("필수값을 모두 입력해주세요.");
+		        return;
+			}
+			
+			equipGrid.request('modifyData');
+			equipGrid.setColumns(equip_columns);
+			
+			equipIsEditModeEnabled = false;
+	    	$("#btn_equip_add_row").hide();
+			$("#btn_equip_remove_row").hide();
+		});
+		
+		$("#btn_equip_insert").on("click", function () {
+			equidGrid.request('createData');
+			equidGrid.reloadData();  // 실패시 테이블 리로드
+			// GET 요청시 데이터 보낼려면 header 설정
+		});
+
+		$("#btn_equip_update").on("click", function () {
+			equidGrid.request('updateData');
+		});
+
+		$("#btn_equip_delete").on("click", function () {
+			equidGrid.removeCheckedRows();
+
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = equidGrid.getModifiedRows().deletedRows.map(row => row.ID).join(',');
+			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+
+			equidGrid.request('deleteData');
+			equidGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
 		// 엑셀 파일 업로드 및 데이터 출력
 		function uploadExcel() {
 			let fileInput = document.getElementById('excelFile');
@@ -345,41 +601,6 @@
 				}
 			});
 		}
-
-		$("#btn_add_row").on("click", function () {
-			const newRowKey = grid1.appendRow(
-				{
-					"ID": '',
-					"COL_1": '',
-					"COL_2": '',
-					"COL_3": '',
-					isNew: true
-				},
-				{focus: true}
-			);
-		});
-
-		$("#btn_insert").on("click", function () {
-			grid1.request('createData');
-			grid1.reloadData();  // 실패시 테이블 리로드
-			// GET 요청시 데이터 보낼려면 header 설정
-		});
-
-		$("#btn_update").on("click", function () {
-			grid1.request('updateData');
-		});
-
-		$("#btn_delete").on("click", function () {
-			grid1.removeCheckedRows();
-
-			// 반드시 removeCheckedRows()후에 실행 순서
-			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = grid1.getModifiedRows().deletedRows.map(row => row.ID).join(',');
-			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
-
-			grid1.request('deleteData');
-			grid1.reloadData();  // 실패시 테이블 리로드
-		});
 
 	</script>
 </body>
