@@ -1,0 +1,199 @@
+<!-- Bootstrap & CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<!-- 납품처 조회 모달 -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="width: 20%; margin: auto;">
+			<div class="modal-header">
+				<h5 class="modal-title" id="materialModalLabel">품목 조회</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>품목코드</th>
+							<th>품목명</th>
+							<th>단가</th>
+							<th>선택</th>
+						</tr>
+					</thead>
+					<tbody id="modalMaterialList">
+<!--						 여기에 동적으로 데이터를 추가 -->
+					</tbody>
+				</table>
+
+<!--				 페이징 버튼을 표시할 영역 -->
+				<div id="paginationContainer" class="mt-3 d-flex justify-content-center">
+<!--					 여기에 이전, 페이지번호, 다음 버튼 생성 -->
+
+				</div>
+			</div>
+		</div>
+	</div>
+<!--	 Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script th:fragment="materialModal" th:inline="javascript">
+
+		// 전역 변수
+														let materialsData = [];   // 전체 품목 리스트
+														let currentPage = 1;      // 현재 페이지
+														const itemsPerPage = 5;   // 페이지당 표시할 품목 수
+														const maxPagesToShow = 5; // 한 번에 보여줄 페이지 번호 개수 (필요에 맞게 조절)
+
+														function loadMaterialList() {
+														  fetch('/getMaterialList')
+														    .then(response => response.json())
+														    .then(materials => {
+														      materialsData = materials;
+														      renderPage(1); // 첫 페이지 표시
+														    })
+														    .catch(error => console.error("품목 데이터 로드 실패:", error));
+														}
+
+														// 특정 페이지 렌더링
+														function renderPage(pageNumber) {
+														  currentPage = pageNumber;
+
+														  const startIndex = (pageNumber - 1) * itemsPerPage;
+														  const endIndex = startIndex + itemsPerPage;
+														  
+														  // 현재 페이지에 보여줄 데이터 추출
+														  const pageMaterials = materialsData.slice(startIndex, endIndex);
+														  
+														  // "materials" 대신 "pageMaterials"를 사용해야 합니다.
+														  const materialRows = pageMaterials.map(mtl => `
+														    <tr>
+														      <td>${mtl.MATERIAL_ID}</td>
+														      <td>${mtl.MATERIAL_NAME}</td>
+														      <td>${mtl.MATERIAL_PRICE}</td>
+														      <td>
+														        <button class="btn btn-success select-material" 
+														          data-material-id="${mtl.MATERIAL_ID}" 
+														          data-material-name="${mtl.MATERIAL_NAME}" 
+														          data-material-price="${mtl.MATERIAL_PRICE}">
+														          선택
+														        </button>
+														      </td>
+														    </tr>
+														  `).join("");
+
+														  // jQuery 또는 순수 JavaScript 중 하나만 사용하세요.
+													$("#modalMaterialList").html(materialRows);												  // 또는
+														  // $("#modalMaterialList").html(materialRows);
+
+														  // 페이징 갱신
+														  renderPagination();
+														}
+
+														// 페이징 버튼 렌더링
+														function renderPagination() {
+														  const totalItems = materialsData.length;
+														  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+														  // 페이징 요소를 담을 변수
+														  let paginationHtml = "";
+
+														  // 이전 버튼 (맨 앞으로, 한 페이지 앞으로)
+														  paginationHtml += `
+														    <button class="btn btn-secondary me-2" 
+														      onclick="renderPage(1)" 
+														      ${currentPage === 1 ? "disabled" : ""}>
+														      << 
+														    </button>
+														  `;
+														  paginationHtml += `
+														    <button class="btn btn-secondary me-2" 
+														      onclick="renderPage(${currentPage - 1})" 
+														      ${currentPage === 1 ? "disabled" : ""}>
+														      <
+														    </button>
+														  `;
+
+														  // 중앙 페이지 번호들
+														  if (totalPages <= maxPagesToShow) {
+														    for (let i = 1; i <= totalPages; i++) {
+														      paginationHtml += createPageButton(i);
+														    }
+														  } else {
+														    const half = Math.floor(maxPagesToShow / 2);
+														    let startPage = currentPage - half;
+														    let endPage = currentPage + half;
+
+														    if (maxPagesToShow % 2 === 0) {
+														      endPage = currentPage + half - 1;
+														    }
+
+														    if (startPage < 1) {
+														      startPage = 1;
+														      endPage = maxPagesToShow;
+														    }
+														    if (endPage > totalPages) {
+														      endPage = totalPages;
+														      startPage = totalPages - (maxPagesToShow - 1);
+														    }
+
+														    if (startPage > 1) {
+														      paginationHtml += createPageButton(1);
+														      paginationHtml += `<span class="mx-2">...</span>`;
+														    }
+
+														    for (let i = startPage; i <= endPage; i++) {
+														      paginationHtml += createPageButton(i);
+														    }
+
+														    if (endPage < totalPages) {
+														      paginationHtml += `<span class="mx-2">...</span>`;
+														      paginationHtml += createPageButton(totalPages);
+														    }
+														  }
+
+														  // 다음 버튼 (한 페이지 뒤로, 맨 뒤로)
+														  paginationHtml += `
+														    <button class="btn btn-secondary ms-2" 
+														      onclick="renderPage(${currentPage + 1})" 
+														      ${currentPage === totalPages ? "disabled" : ""}>
+														      >
+														    </button>
+														  `;
+														  paginationHtml += `
+														    <button class="btn btn-secondary ms-2" 
+														      onclick="renderPage(${totalPages})" 
+														      ${currentPage === totalPages ? "disabled" : ""}>
+														      >>
+														    </button>
+														  `;
+
+														  document.getElementById("paginationContainer").innerHTML = paginationHtml;
+														}
+
+														// 페이지 번호 버튼 생성 함수
+														function createPageButton(pageNumber) {
+														  return `
+														    <button 
+														      class="btn ${pageNumber === currentPage ? 'btn-primary' : 'btn-outline-primary'} me-2" 
+														      onclick="renderPage(${pageNumber})">
+														      ${pageNumber}
+														    </button>
+														  `;
+														}
+										$(document).on("click", ".select-material", function () {
+													        const MATERIAL_ID = $(this).data("material-id");
+													        const MATERIAL_NAME = $(this).data("material-name");
+													        const MATERIAL_PRICE = $(this).data("material-price");
+													        
+													        if (selectedRowKey !== null) {
+													            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
+													            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
+													            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
+													            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
+													        }else {
+													            console.error("grid2에서 올바른 행을 찾을 수 없음!");
+													        }
+													        
+													        $("#materialModal").modal("hide");
+													    });
+	</script>
