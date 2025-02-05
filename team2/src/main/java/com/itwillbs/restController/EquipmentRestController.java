@@ -30,24 +30,22 @@ public class EquipmentRestController {
 	
 	@GetMapping(equipment_url)
 	public Map<String, Object> getEquipment() {
-		log.info("============= getEquipment =============");
-		
 		return equipmentService.selectEquipment();
 	}	
 	
-//	@PutMapping(equipment_url)
-//	public Map<String, Object> modifyEquipment(@RequestBody Map<String, Object> requestData) {
-//		return equipmentService.modifyEquipment(requestData);
-//	}	
-//	
-//	@DeleteMapping(equipment_url)
-//	public Map<String, Object> deletEquipment(@RequestHeader("X-Delete-IDs") String encodedIds) {
-//		// 한글ID 넘어올 시 변환
-//	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-//	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
-//        
-//        return equipmentService.deleteEquipment(equipmentIds);
-//	}	
+	@PutMapping(equipment_url)
+	public Map<String, Object> modifyEquipment(@RequestBody Map<String, Object> requestData) {
+		return equipmentService.modifyEquipment(requestData);
+	}	
+	
+	@DeleteMapping(equipment_url)
+	public Map<String, Object> deletEquipment(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
+        
+        return equipmentService.deleteEquipment(equipmentIds);
+	}	
 	
 }
 

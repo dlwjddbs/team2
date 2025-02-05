@@ -42,14 +42,14 @@ public class EquipmentService {
 	}
 	
 	@Transactional(rollbackFor = Exception.class)
-	public Map<String, Object> modifyWorkcenter(Map<String, Object> requestData) {
+	public Map<String, Object> modifyEquipment(Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "modifyToastTest 성공";
+		String message = "modifyEquipment 성공";
 		
 		try {
 			if (createdRows.size() > 0) {
@@ -70,11 +70,11 @@ public class EquipmentService {
 		return resultMap;
 	}
 
-	public Map<String, Object> deleteWorkcenter(List<String> idList) {
+	public Map<String, Object> deleteEquipment(List<String> idList) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "deleteWorkcenter 성공";
+		String message = "deleteEquipment 성공";
 		
 		try {
 			if (idList.size() > 0) {
@@ -82,7 +82,7 @@ public class EquipmentService {
 			}
 		} catch (Exception e) {
 			result = false;
-			message = "deleteWorkcenter 실패";
+			message = "deleteEquipment 실패";
 		}
 		
 		resultMap.put("result", result);
