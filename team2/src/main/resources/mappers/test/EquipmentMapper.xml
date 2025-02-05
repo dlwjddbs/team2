@@ -15,15 +15,47 @@
     </select>
     
     <insert id="insertEquipment">
-    
+    	INSERT ALL
+		<foreach collection="list" item="item">
+			INTO EQUIPMENT (
+				  EQUIPMENT_ID
+				, EQUIPMENT_NAME
+				, EQUIPMENT_STATUS
+				, EQUIPMENT_NOTE
+			)
+			VALUES (
+				  #{item.EQUIPMENT_ID}
+				, #{item.EQUIPMENT_NAME}
+				, #{item.EQUIPMENT_STATUS}
+				, #{item.EQUIPMENT_NOTE, jdbcType=VARCHAR}
+			)
+		</foreach>
+		SELECT * FROM DUAL
     </insert>
     
     <update id="updateEquipment">
-
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE EQUIPMENT
+	           SET 
+	               EQUIPMENT_ID = #{row.EQUIPMENT_ID}
+	             , EQUIPMENT_NAME = #{row.EQUIPMENT_NAME}
+	             , EQUIPMENT_STATUS = #{row.EQUIPMENT_STATUS}
+	             , EQUIPMENT_NOTE = #{row.EQUIPMENT_NOTE, jdbcType=VARCHAR}
+	         WHERE EQUIPMENT_ID = #{row.EQUIPMENT_ID}
+	    </foreach>
     </update>
     
     <delete id="deleteEquipment">
-
+	    DELETE FROM EQUIPMENT
+	     WHERE EQUIPMENT_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
     </delete>
     
+    <select id="checkDuplicateEquipCode">
+    	SELECT count(*) AS COUNT
+		  FROM EQUIPMENT
+		 WHERE EQUIPMENT_ID = #{EQUIPMENT_ID}
+    </select>
 </mapper>
