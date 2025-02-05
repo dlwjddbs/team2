@@ -92,8 +92,10 @@
 	$('#workcenterManagerAdd').on('shown.bs.modal', function () {
 		param.dept_id = '';
 		param.member_name = '';
+		selectedManagerId = '';
 		$("#DEP").val('');
 		$("#managerName").val('');
+		$("#saveManager").attr("disabled", true);
 		
 		if (managerGrid == null) {
 	        managerInit();
