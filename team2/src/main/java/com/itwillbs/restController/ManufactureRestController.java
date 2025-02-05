@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itwillbs.service.ManufactureService;
@@ -28,6 +29,7 @@ public class ManufactureRestController {
 	private final ManufactureService manufactureService;
 	
 	private final String workcenter_url = "/manufacture/workcenter";
+	private final String manager_url = "/manufacture/workcenterManager";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -46,6 +48,11 @@ public class ManufactureRestController {
 	    List<String> workcenterIds = Arrays.asList(decodedIds.split(","));
         
         return manufactureService.deleteWorkcenter(workcenterIds);
+	}	
+	
+	@GetMapping(manager_url)
+	public Map<String, Object> getMember(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectMember(requestData);
 	}	
 	
 }

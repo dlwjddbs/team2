@@ -35,6 +35,7 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
 		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>
+		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -227,8 +228,15 @@
 							$("#validationWorkcenterCodeMessage").text('');
 							
 							$('#workcenterCodeAdd').modal();
-						break;
-	//					case 'MANAGER_ID': $('#categoryAdd').modal(); break;
+							
+							break;
+						case 'MANAGER_ID':
+							$("#managerRow").val(row);
+							$("#managerColumn").val(column);
+							
+							$('#workcenterManagerAdd').modal(); 
+							break;
+							// TODO
 	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
 					}
 			    });
@@ -340,10 +348,10 @@
 		    
 		    if (workcenterIsEditModeEnabled) {
 		        workcenterGrid.setColumns([
-		        	{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '워크센터명', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		        	{header: '워크센터 코드 *', name: 'WORKCENTER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '워크센터명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 				    {
-				        header: '사용여부',
+				        header: '사용여부 *',
 				        name: 'USE_YN',
 				        align: 'center',
 				        formatter: function({value}) {

@@ -111,5 +111,27 @@ public class ManufactureService {
 		
 		return message;
 	}
+
+	public Map<String, Object> selectMember(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectMember 성공";
+		
+		try {
+			List<Map<String, Object>> workcenterList = manufactureMapper.selectMember(requestData);
+			content.put("contents", workcenterList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectMember 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }

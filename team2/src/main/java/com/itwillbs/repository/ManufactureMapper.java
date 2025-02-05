@@ -18,4 +18,6 @@ public interface ManufactureMapper {
 
 	int checkDuplicateWorkcenterCode(Map<String, Object> map);
 
+	List<Map<String, Object>> selectMember(Map<String, Object> requestData);
+
 }

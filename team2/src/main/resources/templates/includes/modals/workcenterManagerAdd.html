@@ -1,0 +1,186 @@
+<!-- 모달창 -->
+<div class="modal fade" id="workcenterManagerAdd" th:fragment="workcenterManagerAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">워크센터 담당자 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<!-- 검색 필터 -->
+				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+					<div class="d-flex">
+						<div class="d-flex">
+							<label class="col-form-label mr-3">부서구분</label> 
+							<select class="appointGubun" id="DEP" name="appointGubun" style="min-width: 120px">
+								<!-- ajax -->
+							</select>
+						</div>
+						<div class="d-flex ml-4">
+							<!-- Date range -->
+							<label for="" class="col-form-label mr-3" style="min-width: 70px;">담당자명</label>
+							<input type="text" class="form-control float-right" id="managerName">
+						</div>
+					</div>
+					<div class="d-flex">
+						<button type="button" class="btn btn-primary" id="btnMemberSearch">조회</button>
+					</div>
+				</div>
+			
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="managerRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="managerColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="ManagerGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveManager" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="workcenterManagerAdd" th:inline="javascript">
+	let managerGrid = null;
+	let managerCurrentSelectedRowKey = null;
+	let selectedManagerId = '';
+	let param = {dept_id: '', member_name: ''};
+	const managerUrl = '/manufacture/workcenterManager';
+	const managerDataSource = {
+		api: {
+		    readData: {url: managerUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const manager_columns = [
+        {header: '사원번호', name: 'MEMBER_ID', align: 'center'},
+        {header: '부서', name: 'DEPT', align: 'left'},
+        {header: '사원명', name: 'NAME', align: 'center'},
+    ];
+
+	$(function() {
+		selectBox("DEP");
+	});
+	
+	$('#workcenterManagerAdd').on('shown.bs.modal', function () {
+		param.dept_id = '';
+		param.member_name = '';
+		$("#DEP").val('');
+		$("#managerName").val('');
+		
+		if (managerGrid == null) {
+	        managerInit();
+	        
+	        return;
+		}
+		
+		managerGrid.readData(1, param, true);
+	});
+	
+	function managerInit() {
+		managerGrid = new tui.Grid({
+	        el: document.getElementById('ManagerGrid'),
+	        data: managerDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: manager_columns,
+	    });
+		
+		managerGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    managerGrid.on('click', (ev) => {
+		    const newRowKey = ev.rowKey;
+
+		    if (managerCurrentSelectedRowKey != null) {
+		    	managerGrid.removeRowClassName(managerCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (managerCurrentSelectedRowKey != newRowKey) {
+		    	managerGrid.addRowClassName(newRowKey, 'selected-row');
+		        managerCurrentSelectedRowKey = newRowKey;
+		        
+		        selectedManagerId = managerGrid.getRow(newRowKey).MEMBER_ID;
+		        $("#saveManager").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        managerCurrentSelectedRowKey = null;
+		        $("#saveManager").attr("disabled", true);
+		        selectedManagerId = '';
+		    }
+		});
+	}
+	
+	$("#saveManager").on('click', function() {
+		const workcenterRow = $("#workcenterRow").val();
+		const workcenterColumn = $("#workcenterColumn").val();
+		const workcenterCode = $("#workcenterCode").val();
+		
+		let managerRow = $("#managerRow").val();
+		let managerColumn = $("#managerColumn").val();
+		workcenterGrid.setValue(managerRow, managerColumn, selectedManagerId);
+		
+		$('#workcenterManagerAdd').modal('hide');
+	});
+	
+	$("#btnMemberSearch").on("click", function() {
+		param.dept_id = $("#DEP").val();
+		param.member_name = $("#managerName").val();
+		selectedManagerId = '';
+		$("#saveManager").attr("disabled", true);
+		
+		managerGrid.readData(1, param, true);
+	});
+
+	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+	function selectBox(type) {
+		$.ajax({
+            type : "POST",
+            url : "/attendance/selectBox",
+            data : {
+            	type : type
+            },
+            success : function(res){
+            	let str = '<option value="" selected="selected">전체</option>';
+            	
+            	res.forEach((el)=>{
+					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+           		})
+           		
+           		$("#" + type).html(str);
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown){
+                console.log("selectBox() ajax 실패");
+            }
+        });
+	}
+</script>

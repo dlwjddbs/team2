@@ -67,4 +67,22 @@
 		  FROM WORKCENTER
 		 WHERE WORKCENTER_ID = #{WORKCENTER_ID}
     </select>
+    
+    <select id="selectMember" resultType="map">
+    	SELECT 
+			   m.MEMBER_ID 	AS MEMBER_ID
+			 , m.NAME 		AS NAME
+			 , cc.CODE_NAME AS DEPT
+		  FROM MEMBER m
+			   INNER JOIN COMMON_CODE cc 
+					   ON m.DEPT_ID = cc.CODE_ID 
+		 WHERE 
+		 	   1 = 1
+		<if test='dept_id != null and dept_id != ""'>
+		   AND m.DEPT_ID = #{dept_id}
+		</if>
+		<if test='member_name != null and member_name != ""'>
+		   AND m.NAME = #{member_name}
+		</if>
+    </select>
 </mapper>
