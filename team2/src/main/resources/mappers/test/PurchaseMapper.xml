@@ -8,7 +8,8 @@
 	
 <!--	발주 리스트-->
 	<select id="getPurchaseList" resultType="map">	
-	SELECT PO_NUM,
+	SELECT PO_ID,
+		   PO_NUM,
 		   PO_COUNT,
 		   PO_PRICE,
 		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
@@ -24,19 +25,19 @@
 <!--	발주 등록-->
 	<insert id="insertPurchase">
 	INSERT INTO PURCHASE_ORDER (
-<!-- 			PO_ID -->
-		    CREATE_DATE
+			PO_ID
+		  , CREATE_DATE
 		  , MEMBER_ID
 		  , CUSTOMER_ID
 		  , PO_STATUS
 		  , PO_NUM		
 		) VALUES (
-<!--         #{PO_ID},  -->
+        'PO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'), 
           CURRENT_DATE, 
         #{INSERT_MEM}, 
-        #{CUSTOMER_ID}, 
+        #{CUSTOMER_ID, jdbcType=VARCHAR}, 
         #{PO_STATUS}, 
-        'PO' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD-HH24MISS')
+        'ORD-' || TO_CHAR(CURRENT_DATE, 'MMDD-HH24MISS')
     )
 	</insert>
 	
@@ -45,42 +46,31 @@
     UPDATE PURCHASE_ORDER
     	SET 
        	 	CREATE_DATE = CURRENT_DATE,
-       	 	CUSTOMER_ID = #{CUSTOMER_ID},
+       	 	CUSTOMER_ID = #{CUSTOMER_ID, jdbcType=VARCHAR},
        	 	UPDATE_DATE = CURRENT_DATE,
        	 	UPDATE_MEMBER = #{UPDATE_MEM},
        	 	PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
-    WHERE PO_NUM = #{PO_NUM, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+    WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
 	</update>
 	
 	<!-- DELETE (데이터 삭제) -->
     <delete id="deletePurchase">
         DELETE FROM PURCHASE_ORDER 
-        	WHERE PO_NUM = #{PO_NUM}
+        	WHERE PO_ID = #{PO_ID}
     </delete>
     
-    
-<!--   발주 상세 유니온 -->
-   <select id="getPurchaseDetail" resultType="map">	
-	SELECT
-  		MATERIAL_ID,
-  		MATERIAL_NM,
-  		<!--  		NULL AS PO_COUNT,  -->
-  		PO_PRICE,
-  		<!--  		NULL AS TOTAL_PRICE,  -->  
-  		CAST(NULL AS VARCHAR2(10)) AS UPDATE_DATE,  
-  		CAST(NULL AS VARCHAR2(100)) AS UPDATE_MEMBER  
-	FROM (
-  		SELECT '1' AS MATERIAL_ID, '유리강판' AS MATERIAL_NM, '2000' AS PO_PRICE, NULL AS UPDATE_DATE, NULL AS UPDATE_MEMBER FROM DUAL
-  		UNION ALL
-  		SELECT '2', '철강', '3000', NULL, NULL FROM DUAL
-  		UNION ALL
-  		SELECT '3', '알루미늄', '4000', NULL, NULL FROM DUAL
-  		UNION ALL
-  		SELECT '4', '철판', '5000', NULL, NULL FROM DUAL
-  		UNION ALL
-  		SELECT '5', '강철발판', '6000', NULL, NULL FROM DUAL
-  	)
-</select>
+    <select id="getPurchaseDetail" resultType="map">
+    SELECT
+        p.MATERIAL_ID,
+        m.MATERIAL_NAME,
+        m.MATERIAL_PRICE
+    FROM PURCHASE_ORDER p
+    JOIN MATERIAL m
+      ON p.MATERIAL_ID = m.MATERIAL_ID
+    WHERE p.MATERIAL_ID = #{MATERIAL_ID, jdbcType=VARCHAR}   	
+    </select>
+
+
     
     <insert id="insertDetail">
 	INSERT INTO PURCHASE_ORDER (
@@ -94,7 +84,9 @@
     )
 	</insert>
     
-    
-    
-    
+    <!-- 모달창 재료 목록 -->
+	<select id="getMaterialList" resultType="map">
+    	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE
+    	FROM MATERIAL
+    </select>
 </mapper>

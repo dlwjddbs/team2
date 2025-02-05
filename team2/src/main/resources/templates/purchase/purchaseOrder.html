@@ -5,7 +5,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>구매발주등록</title>
-
+	
+<!-- 	토스트 페이징 -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css">
+	<!-- Bootstrap & CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Google Font: Source Sans Pro -->
 	<link rel="stylesheet"
 		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -83,7 +87,6 @@
 
 			<section class="content">
 				<div class="container-fluid">
-
 					<!-- 첫 번째 row (구매발주) -->
 					<div class="row">
 						<div class="col-12">
@@ -92,8 +95,7 @@
 									<h5>구매발주</h5>
 									<div class="card-tools">
 										<input type="button" id="btn_add_row" class="btn btn-primary" value="신규"> <input
-											type="button" id="save" class="btn btn-primary" 
-											onclick="saveData(this.id)" value="저장"> <input
+											type="button" id="save" class="btn btn-primary" value="저장"> <input
 											type="button" id="btn_delete" class="btn btn-primary"
 											onclick="deleteRows(this.id)" value="삭제">
 									</div>
@@ -115,9 +117,8 @@
 								<div class="card-header">
 									<h5>구매발주 상세</h5>
 									<div class="card-tools">
-										<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">
-										<input type="button" id="saveDetail" class="btn btn-primary" 
-											onclick="saveData(this.id)" value="저장"> <input
+										<input type="button" id="btn_add_row2" class="btn btn-primary" value="신규">
+										<input type="button" id="saveDetail" class="btn btn-primary" value="저장"> <input
 											type="button" id="btn_delete2" class="btn btn-primary"
 											onclick="deleteRows(this.id)" value="삭제">
 									</div>
@@ -129,17 +130,49 @@
 							</div>
 						</div>
 					</div>
-
 				</div>
+				
+<!-- 납품처 조회 모달 -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width: 150%; margin: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="materialModalLabel">품목 조회</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>품목코드</th>
+                            <th>품목명</th>
+                            <th>단가</th>
+                            <th>선택</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalMaterialList">
+                        <!-- 여기에 동적으로 데이터를 추가 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+				
 			</section>
 			<!-- jQuery -->
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 			<script src="../../plugins/jquery/jquery.min.js"></script>
 			<!-- Bootstrap 4 -->
 			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 			<!-- AdminLTE App -->
 			<script src="../../dist/js/adminlte.min.js"></script>
 			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
-
+<!-- 			토스트 페이징 -->
+			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
+			
 			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 
 			<style>
@@ -178,8 +211,9 @@
 					contentType: 'application/json',
 				};
 				const columns = [
+					{header: 'P/O번호', name: 'PO_ID', align: 'center' },
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
-					{header: 'P/O번호', name: 'PO_NUM', align: 'center'},
+					{header: '주문번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
 					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', 	formatter: function({ row }) {
 						return `
@@ -188,31 +222,50 @@
 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
 						              🔍
 						          </button>
-						      </div>
-						                `;
-					            }
-},
+						      </div> `;
+					            }},
 					{header: '품목(수)', name: 'PO_COUNT', align: 'center'},
 					{header: '금액', name: 'PO_PRICE', align: 'center'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-
-					{
-						header: '상태', name: 'PO_STATUS', align: 'center',
+					{header: '상태', name: 'PO_STATUS', align: 'center',
 						formatter: ({value}) => {
 							const color = {"미결": "red", "마감": "blue"}[value] || "black";
 							return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
 						}
 					}
-					// 					{header: '주문번호', name: 'PO_ID', hidden: true }
 				];
 
 				// grid2 컬럼 설정 (구매 발주 상세)
 				const columns2 = [
-					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', editor: 'text'},
-					{header: '품목명', name: 'MATERIAL_NM', align: 'center', editor: 'text'},
+					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', formatter: function({ value, row }) {
+						console.log("MATERIAL_ID value:", value, "row:", row);
+						return `
+						<div style="display: flex; justify-content: flex-end; align-items: center;">
+						<span class="material-id-display" style="text-align: center; width: 100%; display: inline-block;">
+				          ${value ? value : ''}
+				        </span>
+				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
+						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+						              🔍
+						          </button>
+						      </div> `;
+					            }},
+					{header: '품목명', name: 'MATERIAL_NM', align: 'center', formatter: function({ value, row }) {
+						console.log("MATERIAL_NM value:", value, "row:", row);
+						return `
+						<div style="display: flex; justify-content: flex-end; align-items: center;">
+						<span class="material-nm-display" style="text-align: center; width: 100%; display: inline-block;">
+				          ${value ? value : ''}
+				        </span>	
+				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
+						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+						              🔍
+						          </button>
+						      </div> `;
+					            }},
 					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
-					{header: '단가', name: 'PO_PRICE', align: 'center', editor: 'text'},
+					{header: '단가', name: 'MT_PRICE', align: 'center', editor: 'text'},
 					{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
@@ -230,6 +283,10 @@
 						scrollY: true,
 						rowHeaders: ['checkbox'],
 						editingEvent: 'click',
+						pageOptions: {
+				            useClient: true,  // 서버에서 페이징 처리
+				            perPage: 10        // 페이지당 10개
+				        },
 						columns: columns,
 					});
 
@@ -301,27 +358,79 @@
 							scrollY: true,
 							rowHeaders: ['checkbox'],
 							editingEvent: 'click',
+							pageOptions: {
+					        useClient: true,  // 서버에서 페이징 처리
+					        perPage: 10        // 페이지당 10개
+					        },
 							columns: columns2,
 						});
 						} 
 
 						grid2.resetData(data);
+						
+	
+						// grid2 값 변경 시 자동 계산 (총금액 업데이트)
+					    grid2.on('afterChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName, value }) => {
+					            const newValue = Number(value) || 0;
+					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
 
+					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트
+					            if (newValue !== previousValue) {
+					                if (columnName === "PO_COUNT" || columnName === "MT_PRICE") {
+					                    const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
+					                    const price = Number(grid2.getValue(rowKey, "MT_PRICE")) || 0;
+					                    const totalPrice = count * price; // 총금액 계산
+
+					                    grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice);
+					                }
+					            }
+					        });
+					    });
+						
+						
 						// 체크박스가 활성화된 행의 index를 배열에 저장
 						grid2.on('check', (ev) => {
 							delRows.push(ev.rowKey);
 						});
 						
-						let sum = 0;
-						
-						grid2.on('afterChange', ev => {
-							ev.changes.forEach(change =>  {
-								sum += Number(change.value);
-								grid1.setValue(rowIdx, "PO_COUNT", sum);
-						   })
-				    	});
-					}
+						let totalItemCount = 0;
+					    let totalItemPrice = 0;
+					    const previousCellValues = {}; // 변경 전 셀 값을 저장하는 객체
 
+					    // 변경 전 값 저장 (beforeChange 이벤트)
+					    grid2.on('beforeChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName }) => {
+					            if (!previousCellValues[rowKey]) {
+					                previousCellValues[rowKey] = {};
+					            }
+					            // 변경 전 값을 grid2에서 가져와 저장 (DB에서 불러온 기존 값 포함)
+					            const previousValue = Number(grid2.getValue(rowKey, columnName)) || 0;
+					            previousCellValues[rowKey][columnName] = previousValue;
+					        });
+					    });
+						
+					    
+					    // 값 변경 시 총합 업데이트 (이전 값 반영)
+					    grid2.on('afterChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName, value }) => {
+					            const newValue = Number(value) || 0;
+					            // 이전 값이 존재하지 않는 경우 0으로 처리
+					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
+
+					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트 (중복 방지)
+					            if (newValue !== previousValue) {
+					                if (columnName === "PO_COUNT") {
+					                    totalItemCount = totalItemCount - previousValue + newValue;
+					                    grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
+					                } else if (columnName === "PO_PRICE") {
+					                    totalItemPrice = totalItemPrice - previousValue + newValue;
+					                    grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
+					                }
+					            }
+					        });
+					    });
+					}
 
 				}
 
@@ -472,8 +581,111 @@
 				function showError(message) {
 					Notiflix.Notify.failure('저장 실패!');
 				}
+				
+				
+				
+				
+				
+				
+// 				품목 모달 열기
+				let selectedRowKey = null;
 
+			    $(document).on("click", ".material-modal-btn", function () {
+			        selectedRowKey = $(this).data("row-key"); // 선택한 grid1의 행 key 저장
+			        loadMaterialList(); // 품목 리스트 불러오기
+			        $("#materialModal").modal("show");
+			    });
+			    
+				
+			    let currentPage = 1; // 현재 페이지
+			    const pageSize = 10; // 한 페이지당 표시할 데이터 개수
+			    
+			    function loadMaterialList(page = 1) {
+			    	 fetch(`/getMaterialList?page=${page}&size=${pageSize}`) 
+			            .then(response => response.json())
+			            .then(materials => {
+			            	const materials = data.items; // 서버에서 받아온 데이터 리스트
+			                const totalPages = data.totalPages; // 전체 페이지 수
+			            	
+			                const materialRows = materials.map(mtl => `
+			                    <tr>
+			                        <td>${mtl.MATERIAL_ID}</td>
+			                        <td>${mtl.MATERIAL_NAME}</td>
+			                        <td>${mtl.MATERIAL_PRICE}</td>
+			                        <td>
+			                            <button class="btn btn-success select-material" 
+			                            	data-material-id="${mtl.MATERIAL_ID}" 
+			                            	data-material-name="${mtl.MATERIAL_NAME}" 
+			                            	data-material-price ="${mtl.MATERIAL_PRICE}">
+			                                선택
+			                            </button>
+			                        </td>
+			                    </tr>
+			                `).join("");
+			                
+			                $("#modalMaterialList").html(materialRows);
+			                updatePaginationControls(page, totalPages); // 페이지 네비게이션 업데이트
+			            })
+			            .catch(error => console.error("품목 데이터 로드 실패:", error));
+			    }
+				
+			 // 페이지 네비게이션 UI 생성
+			    function updatePaginationControls(page, totalPages) {
+			        let paginationHtml = `
+			            <button class="btn btn-secondary prev-page" ${page === 1 ? "disabled" : ""}>이전</button>
+			            <span> ${page} / ${totalPages} </span>
+			            <button class="btn btn-secondary next-page" ${page === totalPages ? "disabled" : ""}>다음</button>
+			        `;
+
+			        $("#paginationControls").html(paginationHtml);
+			    }
+
+			    // 페이지 버튼 이벤트 바인딩
+			    $(document).on("click", ".prev-page", function () {
+			        if (currentPage > 1) {
+			            currentPage--;
+			            loadMaterialList(currentPage);
+			        }
+			    });
+
+			    $(document).on("click", ".next-page", function () {
+			        currentPage++;
+			        loadMaterialList(currentPage);
+			    });
+			    
+			    
+			    
+			    
+			    $(document).on("click", ".select-material", function () {
+			        const MATERIAL_ID = $(this).data("material-id");
+			        const MATERIAL_NAME = $(this).data("material-nm");
+			        const MATERIAL_PRICE = $(this).data("material-price");
+			        
+			        if (selectedRowKey !== null) {
+			            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
+			            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
+			            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
+			            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
+			        }else {
+			            console.error("grid2에서 올바른 행을 찾을 수 없음!");
+			        }
+			        
+			        $("#materialModal").modal("hide");
+			    });
+			    
+			 // 페이지 로드시 첫 번째 페이지 로드
+			    $(document).ready(function () {
+			        loadMaterialList(currentPage);
+			    });
+			 
+			    
+			    
+			    
 			</script>
+
+				
+				
+				
 </body>
 
 </html>

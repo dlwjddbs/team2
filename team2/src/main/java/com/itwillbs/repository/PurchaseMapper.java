@@ -23,4 +23,6 @@ public interface PurchaseMapper {
 	int updateDetail(Map<String, Object> data);
 
 	int deleteDetail(Map<String, Object> data);
+
+	List<Map<String, Object>> getMaterialList(Map<String, Object> map);
 }

@@ -9,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.PurchaseService;
@@ -132,7 +134,14 @@ public class PurchaseController {
 		    return ResponseEntity.ok(responseMap);
 		}
 		
-
+		
+		@GetMapping("/getMaterialList")
+		@ResponseBody
+		public List<Map<String, Object>> getMaterialList(@RequestParam Map<String, Object> map, Model model) {
+			System.out.println("리스트" + map);
+			return purchaseService.getMaterialList(map);
+		}
+		
 	
 	
 	

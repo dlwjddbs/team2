@@ -71,7 +71,11 @@ public class PurchaseService {
             count += purchaseMapper.deleteDetail(data);
         }
         return count;
-}	
+}
+
+	public List<Map<String, Object>> getMaterialList(Map<String, Object> map) {
+		return purchaseMapper.getMaterialList(map);
+	}	
 	
 	
 }
