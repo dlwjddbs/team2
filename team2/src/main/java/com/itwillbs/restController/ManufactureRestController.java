@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,6 +31,7 @@ public class ManufactureRestController {
 	
 	private final String workcenter_url = "/manufacture/workcenter";
 	private final String manager_url = "/manufacture/workcenterManager";
+	private final String equipment_url = "/manufacture/equipment";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -53,6 +55,19 @@ public class ManufactureRestController {
 	@GetMapping(manager_url)
 	public Map<String, Object> getMember(@RequestParam Map<String, Object> requestData) {
 		return manufactureService.selectMember(requestData);
+	}	
+	
+	@GetMapping(equipment_url)
+	public Map<String, Object> getEquipment(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectEquipment(requestData);
+	}
+	
+	@PostMapping(equipment_url)
+	public Map<String, Object> addEquipment(@RequestBody Map<String, Object> requestData) {
+	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+		
+//        return manufactureService.addEquipment(createdRows);
+        return null;
 	}	
 	
 }

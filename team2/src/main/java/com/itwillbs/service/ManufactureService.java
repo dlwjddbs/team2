@@ -133,5 +133,46 @@ public class ManufactureService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> selectEquipment(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectEquipment 성공";
+		
+		try {
+			List<Map<String, Object>> workcenterList = manufactureMapper.selectEquipment(requestData);
+			content.put("contents", workcenterList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> addEquipment(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "addEquipment 성공";
+		
+		try {
+			manufactureMapper.addEquipment(createdRows);
+		} catch (Exception e) {
+			result = false;
+			message = "addEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }

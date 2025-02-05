@@ -20,4 +20,8 @@ public interface ManufactureMapper {
 
 	List<Map<String, Object>> selectMember(Map<String, Object> requestData);
 
+	List<Map<String, Object>> selectEquipment(Map<String, Object> requestData);
+
+	int addEquipment(List<Map<String, Object>> createdRows);
+
 }

@@ -36,6 +36,7 @@
 
 		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>
 		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
+		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -83,16 +84,15 @@
 										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터설비</p>
 									</div>
 									<div class="col-6">
-										<div class="card-tools" style="text-align: right;">
-											<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">
-											<input type="button" id="btn_insert2" class="btn btn-primary" value="등록">
-											<input type="button" id="btn_update2" class="btn btn-primary" value="수정">
-											<input type="button" id="btn_delete2" class="btn btn-primary" value="삭제">
+										<div class="card-tools" id="btn_group_equipment" style="text-align: right; display: none;">
+											<input type="button" id="btn_equipment_modal" class="btn btn-primary" value="추가">
+											<input type="button" id="btn_equipment_add" class="btn btn-primary" value="저장">
+											<input type="button" id="btn_equipment_delete" class="btn btn-primary" value="제거">
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="card-body" id="toast_single2">
+							<div class="card-body" id="equipmentGrid">
 								<!-- Toast Grid Ajax -->
 							</div>
 						<!-- /.card-body -->
@@ -129,6 +129,7 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+		// 워크센터
 		let workcenterGrid = null;
 		const workcenterUrl = '/manufacture/workcenter';
 		const workcenterDataSource = {
@@ -140,6 +141,7 @@
 			contentType: 'application/json',
 	    };
 		let workcenterCurrentSelectedRowKey = null;
+		let workcenterCurrentSelectedID = null;
 		let workcenterIsEditModeEnabled = false; 
 		const workcenter_columns = [
             {header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: null},
@@ -156,6 +158,32 @@
             {header: '담당자', name: 'MANAGER_ID', align: 'center', editor: null},
             {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
         ];
+		
+		// TODO
+		// 설비
+		let equipmentGrid = null;
+		const equipmentUrl = '/manufacture/equipment';
+		const equipmentDataSource = {
+			api: {
+				createData: {url: workcenterUrl, method: 'POST'},
+			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '' }},
+			},
+			contentType: 'application/json',
+		};
+		let equipmentCurrentSelectedRowKey = null;
+		const equipment_columns = [
+		    {header: '설비 코드', name: 'EQUIPMENT_ID', align: 'center', editor: null},
+		    {header: '설비명', name: 'EQUIPMENT_NAME', align: 'left', editor: null},
+			{
+			    header: '사용여부', 
+			    name: 'EQUIPMENT_STATUS', 
+			    align: 'center',
+			    formatter: function({value}) {
+			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+			    }
+			},
+		    {header: '비고', name: 'EQUIPMENT_NOTE', align: 'left', editor: null},
+		];
 		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
@@ -283,6 +311,7 @@
 			workcenterInit();
 		});
 		
+		// 워크센터
 		function workcenterInit() {
 			workcenterGrid = new tui.Grid({
 		        el: document.getElementById('workcenterGrid'),
@@ -322,14 +351,25 @@
 			        workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');
 			    }
 
+				if (equipmentGrid) {
+					equipmentGrid.destroy(); // 설비 그리드 제거
+					equipmentGrid = null;
+				}
+				
 			    if (workcenterCurrentSelectedRowKey != newRowKey) {
 			        workcenterGrid.addRowClassName(newRowKey, 'selected-row');
 			        workcenterCurrentSelectedRowKey = newRowKey;
-					// 추가 그리드 생성시 사용할 ID값
-			        //console.log('Selected ID:' + workcenterGrid.getRow(newRowKey).ID);
+					
+					// 설비 그리드 생성
+					const workcenterID = workcenterGrid.getRow(newRowKey).WORKCENTER_ID;
+					equipmentInit(workcenterID);
+					workcenterCurrentSelectedID = workcenterID;
+					$("#btn_group_equipment").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        workcenterCurrentSelectedRowKey = null;
+					workcenterCurrentSelectedID = null;
+					$("#btn_group_equipment").hide();
 			    }
 			});
 		}
@@ -458,6 +498,45 @@
 			
 		    workcenterGrid.request('deleteData');
 			workcenterGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		// TODO
+		// 설비
+		function equipmentInit(workcenter_id) {
+			// 파라미터 설정
+			equipmentDataSource.api.readData.initParams.workcenter_id = workcenter_id;
+			
+			if (equipmentGrid) {
+				equipmentGrid.destroy(); // 기존 그리드 제거
+				equipmentGrid = null;
+			}
+			
+			equipmentGrid = new tui.Grid({
+		        el: document.getElementById('equipmentGrid'),
+		        data: equipmentDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+		        columns: equipment_columns,
+		    });
+			
+			$("#btn_group_equipment").show();
+
+		    equipmentGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+		}
+		
+		$("#btn_equipment_add").on("click", function() {
+			// TODO
+			//equipmentGrid.request('createData');
+			//equipmentGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		$("#btn_equipment_modal").on("click", function() {
+			// TODO
+			$("#workcenterEquipmentAdd").modal();
 		});
 	</script>
 </body>
