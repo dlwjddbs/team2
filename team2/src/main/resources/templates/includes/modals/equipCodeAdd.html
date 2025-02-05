@@ -1,0 +1,129 @@
+<!-- 모달창 -->
+<div class="modal fade" id="equipCodeAdd" th:fragment="equipCodeAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">코드 중복 확인</h4>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="equipRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="equipColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<label>설비코드</label>
+							<div class="input-group">
+								<input type="text" id="equipCode" class="form-control"
+									placeholder="코드를 입력하세요">
+								<div class="input-group-append">
+									<button class="btn btn-primary" id="checkDuplicateCodeBtn"
+										type="button">중복확인</button>
+									<button class="btn btn-primary" id="modifyCodeBtn"
+										type="button" style="display: none;">수정</button>
+								</div>
+							</div>
+							<span id="validationEquipCodeMessage" class="form-text mt-1"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					<button type="submit" class="btn btn-primary" id="saveCode"
+						disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="equipCodeAdd" th:inline="javascript">
+	const dangerText = "form-text text-danger mt-1";
+	
+	$("#checkDuplicateCodeBtn").on("click", function() {
+		const equipCode = $("#equipCode").val().trim();
+		
+		if (equipCode == null || equipCode == '') {
+			validationEquipCodeMessage.textContent = "코드를 입력하세요.";
+			validationEquipCodeMessage.className = dangerText
+			
+			return;
+		}
+		
+		const filteredValues = equipGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row['EQUIPMENT_ID']);
+
+		if (filteredValues.includes(equipCode)) {
+			validationEquipCodeMessage.textContent = '신규 행에서의 중복입니다.';
+			validationEquipCodeMessage.className = dangerText
+			$("#saveCode").attr("disabled", true);
+			
+			return;
+		}
+		
+		$.ajax({
+            type : "POST",
+            url : "/equipment/checkDuplicateEquipCode",
+            data : {
+            	EQUIPMENT_ID : equipCode
+			},
+            success : function(res){
+				if (res.resultCode == 1) {
+					validationEquipCodeMessage.textContent = res.result;
+					validationEquipCodeMessage.className = "form-text text-success mt-1";
+					$("#equipCode").attr("disabled", true);
+					$("#saveCode").attr("disabled", false);
+					
+					$("#checkDuplicateCodeBtn").hide();
+					$("#modifyCodeBtn").show();
+				} else {
+					validationEquipCodeMessage.textContent = res.result;
+					validationEquipCodeMessage.className = dangerText
+					$("#saveCode").attr("disabled", true);
+				}
+            },
+            error : function(e){
+                console.log("checkDuplicateEquipCode() ajax 실패");
+            }
+        });
+	});
+	
+	$("#saveCode").on("click", function() {
+		const equipRow = $("#equipRow").val();
+		const equipColumn = $("#equipColumn").val();
+		const equipCode = $("#equipCode").val();
+		
+		equipCodeGrid.setValue(equipRow, equipColumn, equipCode);
+		$('#equipCodeAdd').modal('hide');
+		
+		validationEquipCodeMessage.textContent = '';
+		$("#saveCode").attr("disabled", true);
+	});
+	
+	$("#modifyCodeBtn").on("click", function() {
+		$("#checkDuplicateCodeBtn").show();
+		$("#modifyCodeBtn").hide();
+		$("#saveCode").attr("disabled", true);
+		$("#equipCode").attr("disabled", false);
+	});
+</script>
