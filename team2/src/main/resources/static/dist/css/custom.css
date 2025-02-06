@@ -28,4 +28,8 @@
 		font-size: 0.8rem;
 		font-weight: bold;
 	}
+	
+	.edit-link{
+		text-decoration: none;
+	}
 }

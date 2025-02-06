@@ -49,6 +49,8 @@
 			<!-- 콘텐츠 헤더 (Page header) -->
 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
 
+			<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
+
 			<!-- 메인 콘텐츠 -->
 			<section class="content contentOrder">
 				<div class="container-fluid">
@@ -103,7 +105,7 @@
 								</div>
 								
 							</div>
-							<div class="card-body" id="toast_single">
+							<div class="card-body" id="ord_grid">
 								<!-- Toast Grid Ajax -->
 							</div>
 							<!-- /.card-body -->
@@ -165,7 +167,7 @@
 
     function grid() {
         grid1 = new tui.Grid({
-            el: document.getElementById('toast_single'),
+            el: document.getElementById('ord_grid'),
             data: dataSource,
             scrollX: true,
             scrollY: true,
@@ -174,7 +176,14 @@
             	resizable: true,
             },
             columns: [
-                { header: '수주번호', name: 'ORDER_ID', align: 'center', editor: 'text' },
+                { header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: 'text' },
+                { header: '수주번호', name: 'ORDER_ID', align: 'center', editor: 'text',
+                	formatter: function(value){
+                        if (value.value != null) {
+                            return `<a href="#" id="${value.value}" class="edit-link"> ${value.value}</a>`;
+                        }
+                        return '';
+                  }},
                 { header: '진행상태', name: 'ORDER_STATUS', align: 'center', editor: 'text',
                 	renderer: {
                     styles: {
@@ -182,9 +191,11 @@
                         color: (props) => props.value == '미결' ? '#ff6464' : '#999'
                       }} },
                 { header: '거래처', name: 'CUSTOMER_ID', align: 'left', editor: 'text' },
-                { header: '품목명', name: 'ITEM_ID', align: 'left', editor: 'text' },
-                { header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: 'text' },
-                { header: '수주금액', name: 'ORDER_PR', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
+                { header: '담당자', name: 'SALES_REP_ID', align: 'center', editor: 'text' },
+                { header: '품목명', name: 'ITEM_ID', align: 'left', editor: 'text' },                
+              { header: '단위', name: 'UNIT', align: 'center', editor: 'text' },
+              { header: '규격', name: 'STANDARD', align: 'center', editor: 'text' },
+               /*  { header: '공급가', name: 'ORDER_PR', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
                     if (value.value != null) {
                         // value.value가 숫자가 아니라면 숫자로 변환
                         const numericValue = Number(value.value);
@@ -192,10 +203,23 @@
                     }
                     return '';
               } },
-                { header: '납품예정일', name: 'DELIVERY_DATE', align: 'center', editor: 'text' },
-                { header: '단위', name: 'UNIT', align: 'center', editor: 'text' },
-                { header: '규격', name: 'STANDARD', align: 'center', editor: 'text' },
-                { header: '담당자', name: 'SALES_REP_ID', align: 'center', editor: 'text' },
+              { header: '부가세', name: 'TAX', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
+                  if (value.value != null) {
+                      // value.value가 숫자가 아니라면 숫자로 변환
+                      const numericValue = Number(value.value);
+                      return `${numericValue.toLocaleString('kr-KR')}원`;
+                  }
+                  return '';
+            } }, 
+            { header: '합계', name: 'ORDER_SUM', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
+                if (value.value != null) {
+                    // value.value가 숫자가 아니라면 숫자로 변환
+                    const numericValue = Number(value.value);
+                    return `${numericValue.toLocaleString('kr-KR')}원`;
+                }
+                return '';
+          } },*/
+                { header: '납품예정일', name: 'DELIVERY_DATE', align: 'center', editor: 'text' },     
                 { header: '수주수량', name: 'ORDER_QTY', align: 'right', editor: 'text', formatter: function(value){
                     if (value.value != null) {
                         const numericValue = Number(value.value);
@@ -219,7 +243,6 @@
               } },
                 { header: '등록자', name: 'REGIST_BY', align: 'center', editor: 'text' },
                 { header: '수정일자', name: 'UPDATE_DATE', align: 'center', editor: 'text' },
-                { header: '등록일자', name: 'CREATE_DATE', align: 'center', editor: 'text' },
                 { header: '비고', name: 'REMARKS', align: 'left', editor: 'text' }
             ],
         });
@@ -236,9 +259,23 @@
             if (columnName == 'ID' && !rowData.isNew) {
                 ev.stop();
             }
-        });
+        });      
     }
 
+    document.getElementById('ord_grid').addEventListener('click', function(event) {
+        if (event.target && event.target.matches('a.edit-link')) {
+            event.preventDefault();
+            var id = event.target.id;
+            console.log("클릭된 수주번호", id);
+            loadModalContent(id);
+        }
+    });
+    
+    function loadModalContent(id) {
+    	$('#modal-lg').modal('show');
+	  }
+
+    
     // Select Box
     const customers = document.getElementById('cusInput');
     const selectBox = new tui.SelectBox(customers, {
