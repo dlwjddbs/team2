@@ -31,6 +31,19 @@
 		crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<meta name="_csrf" th:content="${_csrf.token}" />
 	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	
+				<!-- jQuery -->
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+			<!-- Bootstrap 4 -->
+			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+			<!-- AdminLTE App -->
+			<script src="../../dist/js/adminlte.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
+<!-- 			토스트 페이징 -->
+			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
+			
+			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 
 
 	<style>
@@ -151,33 +164,20 @@
                         </tr>
                     </thead>
                     <tbody id="modalMaterialList">
-                        <!-- 여기에 동적으로 데이터를 추가 -->
+<!--                         여기에 동적으로 데이터를 추가 -->
                     </tbody>
                 </table>
 				
-				<!-- 페이징 버튼을 표시할 영역 -->
+<!-- 				페이징 버튼을 표시할 영역 -->
 				        <div id="paginationContainer" class="mt-3 d-flex justify-content-center">
-				          <!-- 여기에 이전, 페이지번호, 다음 버튼 생성 -->
-						  
+<!-- 				          여기에 이전, 페이지번호, 다음 버튼 생성 -->		  
             </div>
         </div>
     </div>
 </div>
-
 				
 			</section>
-			<!-- jQuery -->
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-			<!-- Bootstrap 4 -->
-			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-			<!-- AdminLTE App -->
-			<script src="../../dist/js/adminlte.min.js"></script>
-			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
-<!-- 			토스트 페이징 -->
-			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
-			
-			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+
 
 			<style>
 				.selected-row {
@@ -193,7 +193,6 @@
 				const token = $("meta[name='_csrf']").attr("content")
 				const header = $("meta[name='_csrf_header']").attr("content");
 				const name = $("#userName").val();
-				
 
 				$(function () {
 					initGrids();
@@ -242,6 +241,7 @@
 
 				// grid2 컬럼 설정 (구매 발주 상세)
 				const columns2 = [
+				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
 					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', formatter: function({ value, row }) {
 						console.log("MATERIAL_ID value:", value, "row:", row);
 						return `
@@ -319,7 +319,8 @@
 						if (ev.rowKey === null)
 							return;
 						const selectedRow = grid1.getRow(ev.rowKey);
-						
+						console.log("선택한 행 데이터:", selectedRow); // 이 줄 추가
+						console.log("선택한 행의 PO_ID:", selectedRow.PO_ID);
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
 
@@ -327,14 +328,14 @@
 						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
 						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
 
-						// 선택한 발주번호(PO_NUM)로 상세 데이터 요청
+						// 선택한 발주번호(PO_ID)로 상세 데이터 요청
 						fetch('/getPurchaseDetail', {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
 								[header]: token
 							},
-							body: JSON.stringify({PO_NUM: selectedRow.PO_NUM})
+							body: JSON.stringify({PO_ID: selectedRow.PO_ID})
 						})
 							.then(response => response.json())
 							.then(data => {
@@ -353,7 +354,7 @@
 
 					// -----------------
 					function dtlGrid(data) {
-						
+						console.log("grid2에 넣을 데이터:", data);
 						if (!grid2) {
 							grid2 = new tui.Grid({
 							el: document.getElementById('toast_single2'),
@@ -381,9 +382,9 @@
 
 					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트
 					            if (newValue !== previousValue) {
-					                if (columnName === "PO_COUNT" || columnName === "MT_PRICE") {
+					                if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
 					                    const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
-					                    const price = Number(grid2.getValue(rowKey, "MT_PRICE")) || 0;
+					                    const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
 					                    const totalPrice = count * price; // 총금액 계산
 
 					                    grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice);
@@ -459,6 +460,7 @@
 					let date = String(today.getDate()).padStart(2, "0");  // 날짜
 					const newRowKey = grid2.appendRow(
 						{
+							"PO_ID": selectedRow.PO_ID,
 							"PO_DATE": year + '-' + month + '-' + date,
 
 						},

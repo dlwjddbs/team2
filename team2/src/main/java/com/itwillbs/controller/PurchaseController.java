@@ -88,7 +88,7 @@ public class PurchaseController {
 		
 		@PostMapping("getPurchaseDetail")
 		@ResponseBody
-		public List<Map<String, Object>> getPurchaseDetail(@RequestBody Map<String, Object> map) {
+		public List<Map<String, Object>> getPurchaseDetail(@RequestBody Map<String, Object> map  ) {
 			List<Map<String, Object>> purchaseDetail = purchaseService.getPurchaseDetail(map);
 			System.out.println("받은 리스트 :" + map.toString());
 			System.out.println("purchaseList: " + purchaseDetail);

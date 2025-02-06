@@ -60,29 +60,45 @@
     </delete>
     
     <select id="getPurchaseDetail" resultType="map">
-    SELECT
-        p.MATERIAL_ID,
-        m.MATERIAL_NAME,
-        m.MATERIAL_PRICE
-    FROM PURCHASE_ORDER p
-    JOIN MATERIAL m
-      ON p.MATERIAL_ID = m.MATERIAL_ID
-    WHERE p.MATERIAL_ID = #{MATERIAL_ID, jdbcType=VARCHAR}   	
-    </select>
+    SELECT 
+    pd.PODETAIL_ID,
+    pd.MATERIAL_ID,
+    pd.PO_COUNT,
+    pd.TOTAL_PRICE,
+    pd.UPDATE_DATE,
+    pd.UPDATE_MEMBER,
+    m.MATERIAL_NAME,
+    m.MATERIAL_PRICE
+FROM PO_DETAIL pd
+JOIN PURCHASE_ORDER p 
+    ON pd.PO_ID = p.PO_ID
+JOIN MATERIAL m
+    ON pd.MATERIAL_ID = m.MATERIAL_ID
+WHERE pd.PO_ID = #{PO_ID}   
+ </select>
 
-
-    
+<!-- 발주 상세 등록    -->
     <insert id="insertDetail">
-	INSERT INTO PURCHASE_ORDER (
-		    MATERIAL_ID
-		  , PO_COUNT
-		  , PO_PRICE
-		) VALUES (
-        #{MATERIAL_ID}, 
-        #{PO_COUNT}, 
-        #{PO_PRICE} 
+    INSERT INTO PO_DETAIL (
+        PODETAIL_ID,
+        PO_ID,
+        MATERIAL_ID,
+        PO_COUNT,
+        PO_PRICE,
+        TOTAL_PRICE,
+        CREATE_DATE
     )
-	</insert>
+    SELECT 
+        SEQ_PODETAIL.NEXTVAL,
+        po.PO_ID,
+        #{MATERIAL_ID},
+        #{PO_COUNT},
+        #{PO_PRICE}, 
+        (#{PO_COUNT} * #{PO_PRICE}),
+        CURRENT_DATE
+    FROM PURCHASE_ORDER po
+    WHERE po.PO_ID = #{PO_ID}
+</insert>
     
     <!-- 모달창 재료 목록 -->
 	<select id="getMaterialList" resultType="map">
