@@ -125,6 +125,9 @@
 	    .deselected-row {
 	        background-color: #ffd1d1;
 	    }
+		.modal-custom-size {
+			max-width: 1300px;
+		}
 	</style>
 	
 	<!-- Page specific script -->
@@ -347,6 +350,11 @@
 				}
 
 			    const newRowKey = ev.rowKey;
+				
+				// 새로 추가된 행은 클릭 안되도록.
+				if (workcenterGrid.getRow(newRowKey).isNew) {
+					return;
+				}
 
 			    if (workcenterCurrentSelectedRowKey != null) {
 			        workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');

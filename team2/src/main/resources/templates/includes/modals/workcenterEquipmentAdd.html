@@ -1,6 +1,6 @@
 <!-- 모달창 -->
 <div class="modal fade" id="workcenterEquipmentAdd" th:fragment="workcenterEquipmentAdd">
-	<div class="modal-dialog modal-lg">
+	<div class="modal-dialog modal-custom-size">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
 			<div class="modal-header">
@@ -25,8 +25,39 @@
 						</div>
 						<div class="row">
 							<div class="col-md-12">
-								<div class="card-body" id="equipmentModalGrid">
+								<!-- 검색 필터 -->
+								<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+									<div class="d-flex">
+										<div class="d-flex">
+											<label class="col-form-label mr-3">사용여부</label> 
+											<select class="appointGubun" id="use_yn" name="appointGubun" style="min-width: 120px">
+												<option value="" selected>전체</option>
+												<option value="Y">사용</option>
+												<option value="N">미사용</option>
+											</select>
+										</div>
+										<div class="d-flex ml-4">
+											<label for="" class="col-form-label mr-3" style="min-width: 120px;">설비코드/설비명</label>
+											<input type="text" class="form-control float-right" id="equipmentSearchKeyword">
+										</div>
+									</div>
+									<div class="d-flex">
+										<button type="button" class="btn btn-primary" id="btnEquipmentSearch">조회</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-8">
+								<span style="padding-left: 20px;">워크센터 설비 목록</span>
+								<div class="card-body" id="equipmentModalGrid" style="padding-top: 10px;">
 									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+							<div class="col-md-4">
+								<span style="padding-left: 20px;">선택 목록</span>
+								<div class="card-body" id="equipmentModalSelectedGrid" style="padding-top: 10px;">
+									 <!-- Toast Grid Ajax -->
 								</div>
 							</div>
 						</div>
@@ -38,7 +69,6 @@
 			<div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-<!-- 					<button type="submit" class="btn btn-primary" id="saveEquipment" disabled>추가</button> -->
 					<button type="submit" class="btn btn-primary" id="saveEquipment">적용</button>
 				</div>
 			</div>
@@ -51,10 +81,18 @@
 <script th:fragment="workcenterEquipmentAdd" th:inline="javascript">
 	let equipmentModalGrid = null;
 	let selectedEquipmentList = [];
+	let equipmentModalSelectedGrid = null;
+	const equipmentSelected_columns = [
+	    {header: '설비 코드', name: 'EQUIPMENT_ID', align: 'center', editor: null},
+	    {header: '설비명', name: 'EQUIPMENT_NAME', align: 'left', editor: null},
+	];
+	let equipmentParam = {use_yn: '', searchKeyword: ''};
 	
 	$('#workcenterEquipmentAdd').on('shown.bs.modal', function () {
 		selectedEquipmentList.length = 0;
-// 		$("#saveEquipment").attr('disabled', true);
+		$("#use_yn").val("").attr("selected", "selected");
+		equipmentParam.use_yn = '';
+		equipmentParam.searchKeyword = '';
         
 		equipmentModalInit();
 	});
@@ -110,10 +148,9 @@
 		    		    	
 		    		    	selectedEquipmentList.push(mapRowData);
 		    		    });
-		    		    
-// 		    		    if (deleteRowKeys.length > 0) {
-// 		    		    	$("#saveEquipment").attr('disabled', false);
-// 		    		    }
+						
+						// selectedEquipmentList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
+						equipmentModalSelectedInit();
 		            } else {
 		                checkGridRendered(); // 데이터가 없으면 다시 체크
 		            }
@@ -149,12 +186,26 @@
 		    	selectedEquipmentList.push(mapRowData);
 		    	equipmentModalGrid.addRowClassName(newRowKey, 'selected-row');
 		    }
-		    
-// 		    if (selectedEquipmentList.length == 0) {
-// 		    	$("#saveEquipment").attr('disabled', true);
-// 		    } else {
-// 		    	$("#saveEquipment").attr('disabled', false);
-// 		    }
+			
+			// TODO resetData 말고 수동으로 업데이트
+			/*
+			workcenter:727 Uncaught TypeError: Cannot read properties of null (reading 'EQUIPMENT_ID')
+
+			선택목록 클릭시 null오류
+			선택목록 클릭시 여러개 한번에 삭제되는 경우
+			선택목록 클릭시 삭제가 안되는 경우
+
+			- 설비목록 클릭 시 선택목록 중복생성 되는 경우
+			equipmentModalSelectedGrid.resetData(selectedEquipmentList);
+			resetData가 뻑나고 있음, selectedEquipmentList는 제대로 값이들어가 있는데
+			기존의 그리드가 초기화가 제대로 안되서 중복나는거 같음
+			이 상태에서 선택목록 클릭하면 위의 세가지 오류가 모두 생김
+			*/
+			console.log('설비목록클릭', equipment_id, selectedEquipmentList);
+			
+			// 워크센터 설비 목록 클릭시 마다 선택 목록 갱신
+			equipmentModalSelectedGrid.resetData(selectedEquipmentList);
+			//setEquipmentModalSelectedGridColor();
 		});
 	}
 	
@@ -176,49 +227,68 @@
 		$("#workcenterEquipmentAdd").modal('hide');
 	});
 	
-	
-// 	$("#saveManager").on('click', function() {
-// 		const workcenterRow = $("#workcenterRow").val();
-// 		const workcenterColumn = $("#workcenterColumn").val();
-// 		const workcenterCode = $("#workcenterCode").val();
+	function equipmentModalSelectedInit() {
+		if (equipmentModalSelectedGrid) {
+			equipmentModalSelectedGrid.destroy(); // 기존 그리드 제거
+			equipmentModalSelectedGrid = null;
+		}
 		
-// 		let managerRow = $("#managerRow").val();
-// 		let managerColumn = $("#managerColumn").val();
-// 		workcenterGrid.setValue(managerRow, managerColumn, selectedManagerId);
+		equipmentModalSelectedGrid = new tui.Grid({
+	        el: document.getElementById('equipmentModalSelectedGrid'),
+			data: selectedEquipmentList,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: equipmentSelected_columns,
+	    });
+		//setEquipmentModalSelectedGridColor();
 		
-// 		$('#workcenterManagerAdd').modal('hide');
-// 	});
-	
-// 	$("#btnMemberSearch").on("click", function() {
-// 		param.dept_id = $("#DEP").val();
-// 		param.member_name = $("#managerName").val();
-// 		selectedManagerId = '';
-// 		$("#saveManager").attr("disabled", true);
-		
-// 		managerGrid.readData(1, param, true);
-// 	});
+		equipmentModalSelectedGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
 
-// 	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
-// 	function selectBox(type) {
-// 		$.ajax({
-//             type : "POST",
-//             url : "/attendance/selectBox",
-//             data : {
-//             	type : type
-//             },
-//             success : function(res){
-//             	let str = '<option value="" selected="selected">전체</option>';
-            	
-//             	res.forEach((el)=>{
-// 					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
-//            		})
-           		
-//            		$("#" + type).html(str);
-//             },
-//             error : function(XMLHttpRequest, textStatus, errorThrown){
-//                 console.log("selectBox() ajax 실패");
-//             }
-//         });
-// 	}
+			const newRowKey = ev.rowKey;
+			const rowData = equipmentModalSelectedGrid.getRow(newRowKey);
+			const equipment_id = rowData.EQUIPMENT_ID;
+			
+			selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
+			
+			equipmentModalSelectedGrid.removeRow(newRowKey);
+			
+			console.log('선택목록클릭', equipment_id, selectedEquipmentList);
+			
+			equipmentModalGrid.getData().forEach(row => {
+			    if (equipment_id == row.EQUIPMENT_ID) {
+			        equipmentModalGrid.removeRowClassName(row.rowKey, 'selected-row');
+			    }
+			});
+		});
+    };
 	
+	$("#btnEquipmentSearch").on("click", function() {
+		equipmentParam.use_yn = $("#use_yn").val();
+		equipmentParam.searchKeyword = $("#equipmentSearchKeyword").val();
+		
+		const selectedEquipmentIds = selectedEquipmentList.map(row => row.EQUIPMENT_ID);
+		equipmentModalGrid.readData(1, equipmentParam, true);
+
+		equipmentModalGrid.off('onGridUpdated');
+		equipmentModalGrid.on('onGridUpdated', () => {
+		    const updatedRows = equipmentModalGrid.getData();
+			
+		    // 기존 선택된 설비 ID가 있는 행에 'selected-row' 클래스 추가
+		    updatedRows.forEach(row => {
+		        if (selectedEquipmentIds.includes(row.EQUIPMENT_ID)) {
+		            equipmentModalGrid.addRowClassName(row.rowKey, 'selected-row');
+		        }
+		    });
+		});
+	});
+	
+	function setEquipmentModalSelectedGridColor() {
+		equipmentModalSelectedGrid.getData().forEach((row, index) => {
+		    equipmentModalSelectedGrid.addRowClassName(index, 'selected-row');
+		});
+	}
 </script>

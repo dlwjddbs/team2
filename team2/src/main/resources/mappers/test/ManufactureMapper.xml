@@ -89,7 +89,7 @@
     <select id="selectEquipment" resultType="map">
 		SELECT 
 			   EQUIPMENT_ID 	AS EQUIPMENT_ID
-			 , EQUIPMENT_NAME 	AS	EQUIPMENT_NAME
+			 , EQUIPMENT_NAME 	AS EQUIPMENT_NAME
 			 , EQUIPMENT_STATUS AS EQUIPMENT_STATUS
 			 , EQUIPMENT_NOTE 	AS EQUIPMENT_NOTE
 			 , WORKCENTER_ID	AS WORKCENTER_ID
@@ -104,6 +104,13 @@
 				AND WORKCENTER_ID IS NULL
 			</otherwise>
 		</choose>
+		<if test='use_yn != null and use_yn != ""'>
+			AND EQUIPMENT_STATUS = #{use_yn}
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (EQUIPMENT_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
+					OR EQUIPMENT_NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+		</if>
     </select>
     
     <update id="addEquipment">
