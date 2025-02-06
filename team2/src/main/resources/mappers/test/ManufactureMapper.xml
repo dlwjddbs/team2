@@ -95,9 +95,14 @@
 		  FROM EQUIPMENT
 		 WHERE
 		 	   1 = 1
-  		<if test='workcenter_id != null and workcenter_id != ""'>
-		   AND WORKCENTER_ID = #{workcenter_id}
-		</if>
+		<choose>
+			<when test='workcenter_id != null and workcenter_id != ""'>
+				AND WORKCENTER_ID = #{workcenter_id}
+			</when>
+			<otherwise>
+				AND WORKCENTER_ID IS NULL
+			</otherwise>
+		</choose>
     </select>
     
     <update id="addEquipment">

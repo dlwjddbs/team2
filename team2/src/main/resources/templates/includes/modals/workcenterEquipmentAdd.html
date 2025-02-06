@@ -25,7 +25,7 @@
 						</div>
 						<div class="row">
 							<div class="col-md-12">
-								<div class="card-body" id="EquipmentModalGrid">
+								<div class="card-body" id="equipmentModalGrid">
 									<!-- Toast Grid Ajax -->
 								</div>
 							</div>
@@ -38,7 +38,8 @@
 			<div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-primary" id="saveEquipment" disabled>추가</button>
+<!-- 					<button type="submit" class="btn btn-primary" id="saveEquipment" disabled>추가</button> -->
+					<button type="submit" class="btn btn-primary" id="saveEquipment">적용</button>
 				</div>
 			</div>
 			<!-- /.모달창 푸터-->
@@ -48,123 +49,173 @@
 <!-- /.모달창 -->
 
 <script th:fragment="workcenterEquipmentAdd" th:inline="javascript">
-	/*
-	let managerGrid = null;
-	let managerCurrentSelectedRowKey = null;
-	let selectedManagerId = '';
-	let param = {dept_id: '', member_name: ''};
-	const managerUrl = '/manufacture/workcenterManager';
-	const managerDataSource = {
-		api: {
-		    readData: {url: managerUrl, method: 'GET'},
-		},
-		contentType: 'application/json',
-	};
-	const manager_columns = [
-        {header: '사원번호', name: 'MEMBER_ID', align: 'center'},
-        {header: '부서', name: 'DEPT', align: 'left'},
-        {header: '사원명', name: 'NAME', align: 'center'},
-    ];
-
-	$(function() {
-		selectBox("DEP");
+	let equipmentModalGrid = null;
+	let selectedEquipmentList = [];
+	
+	$('#workcenterEquipmentAdd').on('shown.bs.modal', function () {
+		selectedEquipmentList.length = 0;
+// 		$("#saveEquipment").attr('disabled', true);
+        
+		equipmentModalInit();
 	});
 	
-	$('#workcenterManagerAdd').on('shown.bs.modal', function () {
-		param.dept_id = '';
-		param.member_name = '';
-		selectedManagerId = '';
-		$("#DEP").val('');
-		$("#managerName").val('');
-		$("#saveManager").attr("disabled", true);
+	function equipmentModalInit() {
+		// 파라미터 설정
+		equipmentDataSource.api.readData.initParams.workcenter_id = '';
 		
-		if (managerGrid == null) {
-	        managerInit();
-	        
-	        return;
+		if (equipmentModalGrid) {
+			equipmentModalGrid.destroy(); // 기존 그리드 제거
+			equipmentModalGrid = null;
 		}
 		
-		managerGrid.readData(1, param, true);
-	});
-	
-	function managerInit() {
-		managerGrid = new tui.Grid({
-	        el: document.getElementById('ManagerGrid'),
-	        data: managerDataSource,
+		equipmentModalGrid = new tui.Grid({
+	        el: document.getElementById('equipmentModalGrid'),
+	        data: equipmentDataSource,
 	        scrollX: true,
 	        scrollY: true,
 	        bodyHeight: 250,
-	        columns: manager_columns,
+	        columns: equipment_columns,
 	    });
 		
-		managerGrid.on('failResponse', function(ev) {
+	    equipmentModalGrid.on('failResponse', function(ev) {
 	        alert(JSON.parse(ev.xhr.responseText).message);
 	    });
-		
-	    managerGrid.on('click', (ev) => {
-		    const newRowKey = ev.rowKey;
+	    
+	    equipmentModalGrid.on('onGridMounted', () => {  // 테이블 데이터 렌더링 완료후에 실행
+		    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+		    const checkGridRendered = () => {
+		        setTimeout(() => {
+		            if (equipmentModalGrid.getData().length > 0) {
+		    	    	const equipmentGridNewRows = equipmentGrid.getData().filter(row => row.isNew);
+		    		    const selectedRowKeys = equipmentModalGrid.getData()
+		    			    .filter(row => equipmentGridNewRows.some(newRow => newRow.EQUIPMENT_ID == row.EQUIPMENT_ID))
+		    			    .map(row => row.rowKey);
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 가져와서 설비모달에 선택값 그대로 적용함.
+		    		    selectedRowKeys.forEach(function(key) {
+			    		    equipmentModalGrid.addRowClassName(key, 'selected-row');
+		    		    });
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 selectedEquipmentList 초기값 설정
+		    		    equipmentGridNewRows.forEach(function(row) {
+		    		    	const mapRowData = {
+		    		        	"EQUIPMENT_ID": row.EQUIPMENT_ID,
+		    		        	"EQUIPMENT_NAME": row.EQUIPMENT_NAME,
+		    		        	"EQUIPMENT_STATUS": row.EQUIPMENT_STATUS,
+		    		        	"EQUIPMENT_NOTE": row.EQUIPMENT_NOTE,
+		    		            isNew: true
+		    			    };
+		    		    	
+		    		    	selectedEquipmentList.push(mapRowData);
+		    		    });
+		    		    
+// 		    		    if (deleteRowKeys.length > 0) {
+// 		    		    	$("#saveEquipment").attr('disabled', false);
+// 		    		    }
+		            } else {
+		                checkGridRendered(); // 데이터가 없으면 다시 체크
+		            }
+		        }, 100);
+		    };
 
-		    if (managerCurrentSelectedRowKey != null) {
-		    	managerGrid.removeRowClassName(managerCurrentSelectedRowKey, 'selected-row');
+		    checkGridRendered(); // 실행
+	    });
+	    
+	    equipmentModalGrid.on('click', (ev) => {
+		    if (ev.targetType != "cell") {
+				return;
+			}
+	    	
+		    const newRowKey = ev.rowKey;
+		    const isSelectedRow = equipmentModalGrid.getRowClassName(newRowKey).includes('selected-row');
+		    const rowData = equipmentModalGrid.getRow(newRowKey);
+		    const equipment_id = rowData.EQUIPMENT_ID;
+		    
+		    if (isSelectedRow) {
+		    	equipmentModalGrid.removeRowClassName(newRowKey, 'selected-row');
+		    	selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
+		    } else {
+		    	const mapRowData = {
+		        	"EQUIPMENT_ID": equipment_id,
+		        	"EQUIPMENT_NAME": rowData.EQUIPMENT_NAME,
+		        	"EQUIPMENT_STATUS": rowData.EQUIPMENT_STATUS,
+		        	"EQUIPMENT_NOTE": rowData.EQUIPMENT_NOTE,
+		            isNew: true
+			    };
+		    	
+		    	selectedEquipmentList.push(mapRowData);
+		    	equipmentModalGrid.addRowClassName(newRowKey, 'selected-row');
 		    }
 		    
-		    if (managerCurrentSelectedRowKey != newRowKey) {
-		    	managerGrid.addRowClassName(newRowKey, 'selected-row');
-		        managerCurrentSelectedRowKey = newRowKey;
-		        
-		        selectedManagerId = managerGrid.getRow(newRowKey).MEMBER_ID;
-		        $("#saveManager").attr("disabled", false);
-		    } else {
-		        // 같은 행을 클릭한 경우 선택 해제
-		        managerCurrentSelectedRowKey = null;
-		        $("#saveManager").attr("disabled", true);
-		        selectedManagerId = '';
-		    }
+// 		    if (selectedEquipmentList.length == 0) {
+// 		    	$("#saveEquipment").attr('disabled', true);
+// 		    } else {
+// 		    	$("#saveEquipment").attr('disabled', false);
+// 		    }
 		});
 	}
 	
-	$("#saveManager").on('click', function() {
-		const workcenterRow = $("#workcenterRow").val();
-		const workcenterColumn = $("#workcenterColumn").val();
-		const workcenterCode = $("#workcenterCode").val();
+	$("#saveEquipment").on('click', function() {
+		const rowKeysToDelete = equipmentGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row.rowKey);
 		
-		let managerRow = $("#managerRow").val();
-		let managerColumn = $("#managerColumn").val();
-		workcenterGrid.setValue(managerRow, managerColumn, selectedManagerId);
+		// 워크센터설비 그리드 기존의 새로 추가된 행 삭제
+		rowKeysToDelete.forEach(function(key) {
+			equipmentGrid.removeRow(key);
+		});
 		
-		$('#workcenterManagerAdd').modal('hide');
+		// 새로 선택된 값 워크센터설비 그리드 행 추가
+		selectedEquipmentList.forEach(function(data) {
+			equipmentGrid.appendRow(data);
+		});
+		
+		$("#workcenterEquipmentAdd").modal('hide');
 	});
 	
-	$("#btnMemberSearch").on("click", function() {
-		param.dept_id = $("#DEP").val();
-		param.member_name = $("#managerName").val();
-		selectedManagerId = '';
-		$("#saveManager").attr("disabled", true);
+	
+// 	$("#saveManager").on('click', function() {
+// 		const workcenterRow = $("#workcenterRow").val();
+// 		const workcenterColumn = $("#workcenterColumn").val();
+// 		const workcenterCode = $("#workcenterCode").val();
 		
-		managerGrid.readData(1, param, true);
-	});
+// 		let managerRow = $("#managerRow").val();
+// 		let managerColumn = $("#managerColumn").val();
+// 		workcenterGrid.setValue(managerRow, managerColumn, selectedManagerId);
+		
+// 		$('#workcenterManagerAdd').modal('hide');
+// 	});
+	
+// 	$("#btnMemberSearch").on("click", function() {
+// 		param.dept_id = $("#DEP").val();
+// 		param.member_name = $("#managerName").val();
+// 		selectedManagerId = '';
+// 		$("#saveManager").attr("disabled", true);
+		
+// 		managerGrid.readData(1, param, true);
+// 	});
 
-	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
-	function selectBox(type) {
-		$.ajax({
-            type : "POST",
-            url : "/attendance/selectBox",
-            data : {
-            	type : type
-            },
-            success : function(res){
-            	let str = '<option value="" selected="selected">전체</option>';
+// 	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+// 	function selectBox(type) {
+// 		$.ajax({
+//             type : "POST",
+//             url : "/attendance/selectBox",
+//             data : {
+//             	type : type
+//             },
+//             success : function(res){
+//             	let str = '<option value="" selected="selected">전체</option>';
             	
-            	res.forEach((el)=>{
-					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
-           		})
+//             	res.forEach((el)=>{
+// 					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+//            		})
            		
-           		$("#" + type).html(str);
-            },
-            error : function(XMLHttpRequest, textStatus, errorThrown){
-                console.log("selectBox() ajax 실패");
-            }
-        });
-	}
-	*/
+//            		$("#" + type).html(str);
+//             },
+//             error : function(XMLHttpRequest, textStatus, errorThrown){
+//                 console.log("selectBox() ajax 실패");
+//             }
+//         });
+// 	}
+	
 </script>
