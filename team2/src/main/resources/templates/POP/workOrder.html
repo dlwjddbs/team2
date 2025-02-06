@@ -23,19 +23,24 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css" integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	
 	<style>
+		#keyboard {
+			display: grid;
+		    grid-template-columns: repeat(3, 1fr);
+		    gap: 3px;
+		    width: 100%;
+		    max-width: 100%;
+			margin-top: 5px;
+		}
+		
 		#keyboard .btn {
 			flex: 1;
 			aspect-ratio: 1 / 1;
-		    margin: 1px; 
 		    display: flex; 
 		    align-items: center; 
 		    justify-content: center;
-		}
-		
-		#keyboard i {
 			font-size: 1.5rem;
 		}
-
+		
 		.tui-grid-cell-has-input  {
 		    background-color: white !important;
 		}
@@ -62,13 +67,16 @@
 									<button type="button" class="btn btn-default" data-toggle="modal" data-target="#materialInput">
 										materialInput.html
 									</button>
+									<button type="button" class="btn btn-default" data-toggle="modal" data-target="#inboundInspection">
+										inboundInspection.html
+									</button>
 									
 								</div>
 								<div class="col-6 ">
 									<button type="button" class="btn btn-secondary btn-lg"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 비가동</button>
 									<button type="button" class="btn btn-secondary btn-lg"><i class="fa-solid fa-code-fork mr-1"></i> 자재투입/불량</button>
 									<button type="button" class="btn btn-success btn-lg"><i class="fa-solid fa-circle-plus mr-1"></i> 양품등록</button>
-									<button type="button" class="btn btn-warning btn-lg"><i class="fa-solid fa-circle-minus mr-1"></i> 불량등록</button>
+									<button type="button" class="btn btn-warning btn-lg" data-toggle="defectRegist" data-target="#modal-xl"><i class="fa-solid fa-circle-minus mr-1"></i> 불량등록</button>
 									<button type="button" class="btn btn-primary btn-lg"><i class="fa-solid fa-play mr-1"></i> 작업시작</button>
 								</div>
 							</div>
@@ -96,7 +104,8 @@
 						</div>
 						<div th:insert="~{POP/orderDetail :: orderDetail}"></div>
 						<div th:insert="~{POP/materialInput :: materialInput}"></div>
-						
+						<div th:insert="~{POP/defectRegist :: defectRegist}"></div>
+						<div th:insert="~{POP/inboundInspection :: inboundInspection}"></div>
 					</div>
 				</div>
 			</section>
@@ -216,9 +225,38 @@
 		} //function grid() 끝
 		
 		
+	/*
+	//	---------------- Modal Number Pad ----------------
+		$(document).on("shown.bs.modal", function(event) {
+			let modal = $(event.target);
 
+			if (modal.data("keyboard") !== true) {
+				return;
+			}
+
+
+			modal.find("#keyboard").off("click", ".key").on("click", ".key", function() {
+				let value = $(this).data("value");
+				modal.find("#input").val(function(index, currentVal) {
+					return currentVal + value;
+				});
+			});
+
+			modal.find("#delete").off("click").on("click", function() {
+				modal.find("#input").val(function(index, currentVal) {
+					return currentVal.slice(0, -1);
+				});
+			});
+
+			modal.find("#clear").off("click").on("click", function() {
+			modal.find("#input").val("");
+			});
+		});
+	//  --------------------------------------------------
+	*/
 	</script>
 	<script th:src="@{/js/orderDetail.js}"></script>
 	<script th:src="@{/js/materialInput.js}"></script>
+	<script th:src="@{/js/inboundInspection.js}"></script>
 </body>
 </html>
