@@ -87,7 +87,7 @@
 										<div class="card-tools" id="btn_group_equipment" style="text-align: right; display: none;">
 											<input type="button" id="btn_equipment_modal" class="btn btn-primary" value="추가">
 											<input type="button" id="btn_equipment_add" class="btn btn-primary" value="저장">
-											<input type="button" id="btn_equipment_delete" class="btn btn-primary" value="삭제">
+											<input type="button" id="btn_equipment_delete" class="btn btn-primary" value="제거">
 										</div>
 									</div>
 								</div>
@@ -159,7 +159,6 @@
             {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
         ];
 		
-		// TODO
 		// 설비
 		let equipmentGrid = null;
 		const equipmentUrl = '/manufacture/equipment';
@@ -167,6 +166,7 @@
 			api: {
 				createData: {url: equipmentUrl, method: 'POST'},
 			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '' }},
+			    deleteData: {url: equipmentUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 		};
@@ -183,6 +183,7 @@
 			    }
 			},
 		    {header: '비고', name: 'EQUIPMENT_NOTE', align: 'left', editor: null},
+		    {header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: null, hidden: true},
 		];
 		
 		const TextInputRenderer = function(props) {
@@ -500,7 +501,6 @@
 			workcenterGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
-		// TODO
 		// 설비
 		function equipmentInit(workcenter_id) {
 			// 파라미터 설정
@@ -529,14 +529,26 @@
 		}
 		
 		$("#btn_equipment_add").on("click", function() {
-			// TODO
 			equipmentGrid.request('createData');
 			equipmentGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
 		$("#btn_equipment_modal").on("click", function() {
-			// TODO
 			$("#workcenterEquipmentAdd").modal();
+		});
+		
+		$("#btn_equipment_delete").on("click", function() {
+			equipmentGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = equipmentGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.EQUIPMENT_ID))  // 한글 변환
+				.join(',');
+			equipmentDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+			equipmentGrid.request('deleteData');
+			equipmentGrid.reloadData();  // 실패시 테이블 리로드
 		});
 	</script>
 </body>

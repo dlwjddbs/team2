@@ -24,4 +24,6 @@ public interface ManufactureMapper {
 
 	int addEquipment(List<Map<String, Object>> createdRows);
 
+	int deleteEquipment(List<String> equipmentIds);
+
 }

@@ -92,6 +92,7 @@
 			 , EQUIPMENT_NAME 	AS	EQUIPMENT_NAME
 			 , EQUIPMENT_STATUS AS EQUIPMENT_STATUS
 			 , EQUIPMENT_NOTE 	AS EQUIPMENT_NOTE
+			 , WORKCENTER_ID	AS WORKCENTER_ID
 		  FROM EQUIPMENT
 		 WHERE
 		 	   1 = 1
@@ -110,6 +111,14 @@
 		    UPDATE EQUIPMENT 
 			   SET WORKCENTER_ID = #{item.WORKCENTER_ID}
 			 WHERE EQUIPMENT_ID = #{item.EQUIPMENT_ID}
+		</foreach>
+    </update>
+    
+	<update id="deleteEquipment">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE EQUIPMENT 
+			   SET WORKCENTER_ID = NULL
+			 WHERE EQUIPMENT_ID = #{item}
 		</foreach>
     </update>
 </mapper>

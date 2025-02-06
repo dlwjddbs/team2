@@ -50,7 +50,7 @@ public class ManufactureRestController {
 	    List<String> workcenterIds = Arrays.asList(decodedIds.split(","));
         
         return manufactureService.deleteWorkcenter(workcenterIds);
-	}	
+	}
 	
 	@GetMapping(manager_url)
 	public Map<String, Object> getMember(@RequestParam Map<String, Object> requestData) {
@@ -67,7 +67,16 @@ public class ManufactureRestController {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
         return manufactureService.addEquipment(createdRows);
-	}	
+	}
+	
+	@DeleteMapping(equipment_url)
+	public Map<String, Object> deletEquipment(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
+	    
+        return manufactureService.deleteEquipment(equipmentIds);
+	}
 	
 }
 

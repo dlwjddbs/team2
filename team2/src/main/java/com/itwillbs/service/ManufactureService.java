@@ -173,5 +173,26 @@ public class ManufactureService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> deleteEquipment(List<String> equipmentIds) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteEquipment 성공";
+		
+		try {
+			if (equipmentIds.size() > 0) {
+				manufactureMapper.deleteEquipment(equipmentIds);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }
