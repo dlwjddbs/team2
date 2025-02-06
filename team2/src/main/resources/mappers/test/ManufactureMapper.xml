@@ -106,6 +106,10 @@
     </select>
     
     <update id="addEquipment">
-    
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE EQUIPMENT 
+			   SET WORKCENTER_ID = #{item.WORKCENTER_ID}
+			 WHERE EQUIPMENT_ID = #{item.EQUIPMENT_ID}
+		</foreach>
     </update>
 </mapper>

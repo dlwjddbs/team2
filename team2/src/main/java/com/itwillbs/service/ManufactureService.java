@@ -158,7 +158,6 @@ public class ManufactureService {
 
 	public Map<String, Object> addEquipment(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
-		
 		Boolean result = true;
 		String message = "addEquipment 성공";
 		

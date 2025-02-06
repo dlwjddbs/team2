@@ -165,7 +165,7 @@
 		const equipmentUrl = '/manufacture/equipment';
 		const equipmentDataSource = {
 			api: {
-				createData: {url: workcenterUrl, method: 'POST'},
+				createData: {url: equipmentUrl, method: 'POST'},
 			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '' }},
 			},
 			contentType: 'application/json',
@@ -530,8 +530,8 @@
 		
 		$("#btn_equipment_add").on("click", function() {
 			// TODO
-			//equipmentGrid.request('createData');
-			//equipmentGrid.reloadData();  // 실패시 테이블 리로드
+			equipmentGrid.request('createData');
+			equipmentGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
 		$("#btn_equipment_modal").on("click", function() {

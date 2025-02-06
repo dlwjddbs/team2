@@ -66,8 +66,7 @@ public class ManufactureRestController {
 	public Map<String, Object> addEquipment(@RequestBody Map<String, Object> requestData) {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
-//        return manufactureService.addEquipment(createdRows);
-        return null;
+        return manufactureService.addEquipment(createdRows);
 	}	
 	
 }
