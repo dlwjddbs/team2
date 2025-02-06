@@ -14,7 +14,7 @@
 		   PO_PRICE,
 		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
 		   (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = PO.MEMBER_ID) AS MEMBER_NAME,
-		   CUSTOMER_ID,
+		   CLIENT_ID,
 		   PO_STATUS,
 		   TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
 		   (SELECT NAME FROM MEMBER M2 WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
@@ -78,7 +78,7 @@ WHERE pd.PO_ID = #{PO_ID}
  </select>
 
 <!-- 발주 상세 등록    -->
-    <insert id="insertDetail">
+    <insert id="insertDetail" parameterType="map">
     INSERT INTO PO_DETAIL (
         PODETAIL_ID,
         PO_ID,
@@ -93,11 +93,12 @@ WHERE pd.PO_ID = #{PO_ID}
         po.PO_ID,
         #{MATERIAL_ID},
         #{PO_COUNT},
-        #{PO_PRICE}, 
-        (#{PO_COUNT} * #{PO_PRICE}),
+        m.MATERIAL_PRICE, 
+        (#{PO_COUNT} * m.MATERIAL_PRICE),
         CURRENT_DATE
     FROM PURCHASE_ORDER po
-    WHERE po.PO_ID = #{PO_ID}
+    JOIN MATERIAL m ON m.MATERIAL_ID = #{MATERIAL_ID}
+    WHERE po.PO_ID = #{poId}
 </insert>
     
     <!-- 모달창 재료 목록 -->
@@ -105,4 +106,20 @@ WHERE pd.PO_ID = #{PO_ID}
     	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE
     	FROM MATERIAL
     </select>
+    
+<!--    거래처 목록-->
+    <select id="getClientList" resultType="map">
+    	SELECT CLIENT_ID, CLIENT_NAME
+    	FROM CLIENT
+    	 WHERE 
+		 	   1 = 1
+		<if test='client_id != null and client_id != ""'>
+		   AND CLIENT_ID = #{client_id}
+		</if>
+		<if test='client_name != null and client_name != ""'>
+		   AND CLIENT_NAME = #{client_name}
+		</if>
+    </select>
+    
 </mapper>
+

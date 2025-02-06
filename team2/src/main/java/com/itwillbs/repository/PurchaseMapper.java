@@ -25,4 +25,6 @@ public interface PurchaseMapper {
 	int deleteDetail(Map<String, Object> data);
 
 	List<Map<String, Object>> getMaterialList(Map<String, Object> map);
+
+	List<Map<String, Object>> getClientList(Map<String, Object> requestData);
 }

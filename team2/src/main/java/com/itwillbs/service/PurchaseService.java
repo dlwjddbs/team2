@@ -1,5 +1,6 @@
 package com.itwillbs.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +76,28 @@ public class PurchaseService {
 
 	public List<Map<String, Object>> getMaterialList(Map<String, Object> map) {
 		return purchaseMapper.getMaterialList(map);
+	}
+
+	public Map<String, Object> getClientList(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectMember 성공";
+		
+		try {
+			List<Map<String, Object>> purchaseList = purchaseMapper.getClientList(requestData);
+			content.put("contents", purchaseList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "getClientList 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
 	}	
 	
 	

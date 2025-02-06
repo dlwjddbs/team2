@@ -1,0 +1,184 @@
+<!-- 모달창 -->
+<div class="modal fade" id="purchaseClt" th:fragment="purchaseClt">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">거래처 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<!-- 검색 필터 -->				
+						<div class="d-flex ml-4">
+							<!-- Date range -->
+							<label for="" class="col-form-label mr-3" style="min-width: 70px;">거래처명</label>
+							<input type="text" class="form-control float-center" id="clientName">
+					<div class="d-flex">
+						<button type="button" class="btn btn-primary" id="btnClientSearch">조회</button>
+					</div>
+						</div>
+					</div>
+			
+			
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="clientRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="clientColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="ClientGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+						</div>
+					</div>
+				
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveClient" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+			</div>
+						</div>
+		</div>
+
+<!-- /.모달창 -->
+
+<script th:fragment="purchaseClt" th:inline="javascript">
+	let clientGrid = null;
+	let clientCurrentSelectedRowKey = null;
+	let selectedClientId = '';
+	let param = {client_name: ''};
+	const clientUrl = '/purchase/purchaseClt';
+	const clientDataSource = {
+		api: {
+		    readData: {url: clientUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const client_columns = [
+        {header: '거래처코드', name: 'CLIENT_ID', align: 'center'},
+        {header: '거래처명', name: 'CLIENT_NAME', align: 'center'},
+    ];
+
+	/*$(function() {
+		selectBox("CLT");
+	});*/
+	
+	$('#purchaseClt').on('shown.bs.modal', function () {
+		param.client_id = '';
+		param.client_name = '';
+		selectedClientId = '';
+		$("#CLT").val('');
+		$("#clientName").val('');
+		$("#saveClient").attr("disabled", true);
+		
+		if (clientGrid == null) {
+	        clientInit();
+	        
+	        return;
+		}
+		
+		clientGrid.readData(1, param, true);
+	});
+	
+	function clientInit() {
+		clientGrid = new tui.Grid({
+	        el: document.getElementById('ClientGrid'),
+	        data: clientDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: client_columns,
+	    });
+		
+		clientGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    clientGrid.on('click', (ev) => {
+		    const newRowKey = ev.rowKey;
+
+		    if (clientCurrentSelectedRowKey != null) {
+		    	clientGrid.removeRowClassName(clientCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (clientCurrentSelectedRowKey != newRowKey) {
+		    	clientGrid.addRowClassName(newRowKey, 'selected-row');
+		        clientCurrentSelectedRowKey = newRowKey;
+		        
+		        selectedClientId = clientGrid.getRow(newRowKey).CLIENT_ID;
+		        $("#saveClient").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        clientCurrentSelectedRowKey = null;
+		        $("#saveClient").attr("disabled", true);
+		        selectedClientId = '';
+		    }
+		});
+	}
+	
+	$("#saveClient").on('click', function() {
+		const purchaseRow = $("#purchaseRow").val();
+		const purchaseColumn = $("#purchaseColumn").val();
+		const purchaseCode = $("#purchaseCode").val();
+		
+		let clientRow = $("#clientRow").val();
+		let clientColumn = $("#clientColumn").val();
+		grid1.setValue(clientRow, clientColumn, selectedClientId);
+		
+		$('#purchaseClt').modal('hide');
+	});
+	
+	$("#btnClientSearch").on("click", function() {
+		param.client_id = $("#CLT").val();
+		param.client_name = $("#clientName").val();
+		selectedClientId = '';
+		$("#saveClient").attr("disabled", true);
+		
+		clientGrid.readData(1, param, true);
+	});
+
+	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+	/*function selectBox(type) {
+		$.ajax({
+            type : "POST",
+            url : "/purchase/selectBox",
+            data : {
+            	type : type
+            },
+            success : function(res){
+            	let str = '<option value="" selected="selected">전체</option>';
+            	
+            	res.forEach((el)=>{
+					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+           		})
+           		
+           		$("#" + type).html(str);
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown){
+                console.log("selectBox() ajax 실패");
+            }
+        });
+	}*/
+	
+	
+	
+	
+</script>

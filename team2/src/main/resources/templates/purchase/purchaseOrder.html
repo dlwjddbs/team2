@@ -44,7 +44,7 @@
 			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
 			
 			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
-
+			
 
 	<style>
 		.table-container {
@@ -79,7 +79,9 @@
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
 			<nav th:replace="~{includes/modals/purchaseMtl :: materialModal}"></nav>
-
+			<nav th:replace="~{includes/modals/purchaseClt :: purchaseClt}"></nav>
+			
+			
 			 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> 
 			<section class="content-header">
 				<div class="container-fluid">
@@ -145,7 +147,7 @@
 					</div>
 				</div>
 				
-<!-- 납품처 조회 모달 -->
+<!-- 품목 조회 모달 -->
 <div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" style="width: 150%; margin: auto;">
@@ -176,6 +178,9 @@
     </div>
 </div>
 				
+
+
+
 			</section>
 
 
@@ -218,10 +223,10 @@
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
 					{header: '주문번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
-					{header: '거래처', name: 'CUSTOMER_ID', align: 'center', 	formatter: function({ row }) {
+					{header: '거래처', name: 'CLIENT_ID', align: 'center', 	formatter: function({ row }) {
 						return `
 						<div style="display: flex; justify-content: flex-end; align-items: center;">
-						          <button class="open-modal-btn" data-row-key="${row.rowKey}" 
+						          <button class="client-modal-btn" data-row-key="${row.rowKey}" 
 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
 						              🔍
 						          </button>
@@ -238,7 +243,9 @@
 						}
 					}
 				];
-
+				
+				let poId = "";
+				
 				// grid2 컬럼 설정 (구매 발주 상세)
 				const columns2 = [
 				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
@@ -321,6 +328,7 @@
 						const selectedRow = grid1.getRow(ev.rowKey);
 						console.log("선택한 행 데이터:", selectedRow); // 이 줄 추가
 						console.log("선택한 행의 PO_ID:", selectedRow.PO_ID);
+						poId = selectedRow.PO_ID;
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
 
@@ -339,7 +347,6 @@
 						})
 							.then(response => response.json())
 							.then(data => {
-								console.log("[grid2] 서버 응답 데이터:", data);
 								dtlGrid(data);
 							})
 							.catch(error => console.error("grid2 데이터 불러오기 실패:", error));
@@ -354,7 +361,6 @@
 
 					// -----------------
 					function dtlGrid(data) {
-						console.log("grid2에 넣을 데이터:", data);
 						if (!grid2) {
 							grid2 = new tui.Grid({
 							el: document.getElementById('toast_single2'),
@@ -460,7 +466,6 @@
 					let date = String(today.getDate()).padStart(2, "0");  // 날짜
 					const newRowKey = grid2.appendRow(
 						{
-							"PO_ID": selectedRow.PO_ID,
 							"PO_DATE": year + '-' + month + '-' + date,
 
 						},
@@ -543,14 +548,15 @@
 				// 저장 함수
 				function detailSave() {
 					grid2.blur(); // 포커스 해제
+					console.info(poId);
 
 					const modifiedRows2 = grid2.getModifiedRows();
-					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert"}));
-					const updatedRows2 = modifiedRows2.updatedRows.map(row => ({...row, rowType: "update"}));
-					const deletedRows2 = modifiedRows2.deletedRows.map(row => ({...row, rowType: "delete"}));
+					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert", poId:poId}));
+					const updatedRows2 = modifiedRows2.updatedRows.map(row => ({...row, rowType: "update", poId:poId}));
+					const deletedRows2 = modifiedRows2.deletedRows.map(row => ({...row, rowType: "delete", poId:poId}));
 
 					const allData = [...createdRows2, ...updatedRows2, ...deletedRows2];
-
+					
 					if (allData.length === 0) {
 						alert("변경된 데이터가 없습니다.");
 						return;
@@ -592,7 +598,7 @@
 				let selectedRowKey = null;
 
 			    $(document).on("click", ".material-modal-btn", function () {
-			        selectedRowKey = $(this).data("row-key"); // 선택한 grid1의 행 key 저장
+			        selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
 			        loadMaterialList(); // 품목 리스트 불러오기
 			        $("#materialModal").modal("show");
 			    });
@@ -614,10 +620,15 @@
 							        $("#materialModal").modal("hide");
 							    });
 								
-												
-												
-												
-												
+				
+																
+	
+					$(document).on("click", ".client-modal-btn", function (props) {
+						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
+								    $("#purchaseClt").modal("show");
+							       // loadClientList(); // 거래처 리스트 불러오기
+							    });							
+									
 			    
 			</script>
 

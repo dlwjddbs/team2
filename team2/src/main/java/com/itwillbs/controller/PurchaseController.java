@@ -27,13 +27,15 @@ import lombok.extern.java.Log;
 public class PurchaseController {
 	
 	private final PurchaseService purchaseService;
-
+	
+	private final String purchaseClt = "/purchase/purchaseClt";
+	
 	@GetMapping("/purchase")
 	public String purchase(@AuthenticationPrincipal User user) {
 //		if (session.getAttribute("id") == null) {
 //      return "redirect:/login"; 
 //  }
-		return "/purchase/purchaseOrder";
+		return "purchase/purchaseOrder";
 	}
 	
 		@PostMapping("getPurchase")
@@ -142,7 +144,13 @@ public class PurchaseController {
 			return purchaseService.getMaterialList(map);
 		}
 		
-	
+		
+		@GetMapping(purchaseClt)
+		@ResponseBody
+		public Map<String, Object> getClientList(@RequestParam Map<String, Object> requestData) {
+			System.out.println("거래처 리스트" + requestData);
+			return purchaseService.getClientList(requestData);
+		}
 	
 	
 }

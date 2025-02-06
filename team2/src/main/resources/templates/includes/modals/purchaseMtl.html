@@ -150,20 +150,5 @@
 				    </button>
 				  `;
 				}
-$(document).on("click", ".select-material", function () {
-			        const MATERIAL_ID = $(this).data("material-id");
-			        const MATERIAL_NAME = $(this).data("material-name");
-			        const MATERIAL_PRICE = $(this).data("material-price");
-			        
-			        if (selectedRowKey !== null) {
-			            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
-			            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
-			            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
-			            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
-			        }else {
-			            console.error("grid2에서 올바른 행을 찾을 수 없음!");
-			        }
-			        
-			        $("#materialModal").modal("hide");
-			    });
+
 	</script>
