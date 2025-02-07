@@ -2,69 +2,82 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>구매발주등록</title>
-	
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구매발주등록</title>
+
 <!-- 	토스트 페이징 -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css">
-	<!-- Bootstrap & CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<!-- Google Font: Source Sans Pro -->
-	<link rel="stylesheet"
-		href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
-	<!-- Toast Grid -->
-	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<!-- jQuery OrgChart CSS CDN -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
-		integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
-		crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<meta name="_csrf" th:content="${_csrf.token}" />
-	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
-	
-				<!-- jQuery -->
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-			<!-- Bootstrap 4 -->
-			<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-			<!-- AdminLTE App -->
-			<script src="../../dist/js/adminlte.min.js"></script>
-			<script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css">
+<!-- Bootstrap & CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+<!-- DataTables -->
+<link rel="stylesheet"
+	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="../../plugins/daterangepicker/daterangepicker.css">
+<!-- Toast Grid -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<!-- jQuery OrgChart CSS CDN -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
+	integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
 <!-- 			토스트 페이징 -->
-			<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
-			
-			<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
-			
+<script
+	src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
 
-	<style>
-		.table-container {
-			margin-top: 20px;
-		}
+<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 
-		.divider {
-			border-top: 4px solid #000;
-			margin: 30px 0;
-		}
 
-		.btn-actions {
-			display: flex;
-			gap: 10px;
-		}
+<style>
+.table-container {
+	margin-top: 20px;
+}
 
-		.hidden {
-			display: none;
-		}
-	</style>
+.divider {
+	border-top: 4px solid #000;
+	margin: 30px 0;
+}
+
+.btn-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.hidden {
+	display: none;
+}
+</style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -78,11 +91,11 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-			<nav th:replace="~{includes/modals/purchaseMtl :: materialModal}"></nav>
+			<nav th:replace="~{includes/modals/purchaseMtl :: purchaseMtl}"></nav>
 			<nav th:replace="~{includes/modals/purchaseClt :: purchaseClt}"></nav>
-			
-			
-			 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> 
+
+
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
 
 			<section class="content">
 				<div class="container-fluid">
@@ -93,8 +106,9 @@
 								<div class="card-header">
 									<h5>구매발주</h5>
 									<div class="card-tools">
-										<input type="button" id="btn_add_row" class="btn btn-primary" value="신규"> <input
-											type="button" id="save" class="btn btn-primary" value="저장"> <input
+										<input type="button" id="btn_add_row" class="btn btn-primary"
+											value="신규"> <input type="button" id="save"
+											class="btn btn-primary" value="저장"> <input
 											type="button" id="btn_delete" class="btn btn-primary"
 											onclick="deleteRows(this.id)" value="삭제">
 									</div>
@@ -115,11 +129,14 @@
 							<div class="card">
 								<div class="card-header">
 									<h5>구매발주 상세</h5>
-									<div class="card-tools">
-										<input type="button" id="btn_add_row2" class="btn btn-primary" value="신규">
-										<input type="button" id="saveDetail" class="btn btn-primary" value="저장"> <input
-											type="button" id="btn_delete2" class="btn btn-primary"
-											onclick="deleteRows(this.id)" value="삭제">
+									<div class="card-tools" id="btn_purchase_detail"
+										style="text-align: right;">
+										<input type="button" id="material-modal-btn"
+											class="btn btn-primary" value="신규"> <input
+											type="button" id="saveDetail" class="btn btn-primary"
+											value="저장"> <input type="button" id="btn_delete2"
+											class="btn btn-primary" onclick="deleteRows(this.id)"
+											value="삭제">
 									</div>
 								</div>
 								<div class="card-body">
@@ -130,53 +147,52 @@
 						</div>
 					</div>
 				</div>
-				
-<!-- 품목 조회 모달 -->
-<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="width: 150%; margin: auto;">
-            <div class="modal-header">
-                <h5 class="modal-title" id="materialModalLabel">품목 조회</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>품목코드</th>
-                            <th>품목명</th>
-                            <th>단가</th>
-                            <th>선택</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modalMaterialList">
-<!--                         여기에 동적으로 데이터를 추가 -->
-                    </tbody>
-                </table>
-				
-<!-- 				페이징 버튼을 표시할 영역 -->
-				        <div id="paginationContainer" class="mt-3 d-flex justify-content-center">
-<!-- 				          여기에 이전, 페이지번호, 다음 버튼 생성 -->		  
-            </div>
-        </div>
-    </div>
-</div>
-				
 
+				<!-- 품목 조회 모달 -->
+				<div class="modal fade" id="materialModal" tabindex="-1"
+					aria-labelledby="materialModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content" style="width: 150%; margin: auto;">
+							<div class="modal-header">
+								<h5 class="modal-title" id="materialModalLabel">품목 조회</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th>품목코드</th>
+											<th>품목명</th>
+											<th>단가</th>
+											<th>선택</th>
+										</tr>
+									</thead>
+									<tbody id="modalMaterialList">
+										<!--                         여기에 동적으로 데이터를 추가 -->
+									</tbody>
+								</table>
 
-
+								<!-- 				페이징 버튼을 표시할 영역 -->
+								<div id="paginationContainer"
+									class="mt-3 d-flex justify-content-center">
+									<!-- 				          여기에 이전, 페이지번호, 다음 버튼 생성 -->
+								</div>
+							</div>
+						</div>
+					</div>
 			</section>
 
 
 			<style>
-				.selected-row {
-					background-color: #d1ffd6;
-				}
+.selected-row {
+	background-color: #d1ffd6;
+}
 
-				.deselected-row {
-					background-color: #ffd1d1;
-				}
-			</style>
+.deselected-row {
+	background-color: #ffd1d1;
+}
+</style>
 			<!-- Page specific script -->
 			<script>
 				const token = $("meta[name='_csrf']").attr("content")
@@ -238,29 +254,28 @@
 				const columns2 = [
 				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
 					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', formatter: function({ value, row }) {
-						return `
-						<div style="display: flex; justify-content: flex-end; align-items: center;">
-						<span class="material-id-display" style="text-align: center; width: 100%; display: inline-block;">
-				          ${value ? value : ''}
-				        </span>
-				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
-						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
-						              🔍
-						          </button>
-						      </div> `;
+// 						return `
+// 						<div style="display: flex; justify-content: flex-end; align-items: center;">
+// 						<span class="material-id-display" style="text-align: center; width: 100%; display: inline-block;">
+// 				          ${value ? value : ''}
+// 				        </span>
+// 				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
+// 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+// 						              🔍
+// 						          </button>
+// 						      </div> `;
 					            }},
 					{header: '품목명', name: 'MATERIAL_NAME', align: 'center', formatter: function({ value, row }) {
-						console.log("MATERIAL_NM value:", value, "row:", row);
-						return `
-						<div style="display: flex; justify-content: flex-end; align-items: center;">
-						<span class="material-nm-display" style="text-align: center; width: 100%; display: inline-block;">
-				          ${value ? value : ''}
-				        </span>	
-				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
-						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
-						              🔍
-						          </button>
-						      </div> `;
+// 						return `
+// 						<div style="display: flex; justify-content: flex-end; align-items: center;">
+// 						<span class="material-nm-display" style="text-align: center; width: 100%; display: inline-block;">
+// 				          ${value ? value : ''}
+// 				        </span>	
+// 				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
+// 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+// 						              🔍
+// 						          </button>
+// 						      </div> `;
 					            }},
 					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
 					{header: '단가', name: 'MATERIAL_PRICE', align: 'center', editor: 'text'},
@@ -299,7 +314,6 @@
 					})
 						.then(response => response.json())
 						.then(data => {
-							console.log("서버 응답 데이터:", data);
 							grid1.resetData(data);
  							
 						})
@@ -314,14 +328,10 @@
 						if (ev.rowKey === null)
 							return;
 						const selectedRow = grid1.getRow(ev.rowKey);
-						console.log("선택한 행 데이터:", selectedRow); // 이 줄 추가
-						console.log("선택한 행의 PO_ID:", selectedRow.PO_ID);
 						poId = selectedRow.PO_ID;
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
 						
-						console.info(cltId);
-
 						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
 						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
 
@@ -350,25 +360,76 @@
 						grid2.resetData([]);
 					});
 
-					// -----------------
+// 					-----------------
+// 					function dtlGrid(data) {
+// 						if (!grid2) {
+// 							grid2 = new tui.Grid({
+// 							el: document.getElementById('toast_single2'),
+// 							data: [],
+// 							scrollX: true,
+// 							scrollY: true,
+// 							rowHeaders: ['checkbox'],
+// 							editingEvent: 'click',
+// 							pageOptions: {
+// 					        useClient: true,  // 서버에서 페이징 처리
+// 					        perPage: 10        // 페이지당 10개
+// 					        },
+// 							columns: columns2,
+// 						});
+// 						} 
+						
 					function dtlGrid(data) {
-						if (!grid2) {
-							grid2 = new tui.Grid({
-							el: document.getElementById('toast_single2'),
-							data: [],
-							scrollX: true,
-							scrollY: true,
-							rowHeaders: ['checkbox'],
-							editingEvent: 'click',
-							pageOptions: {
-					        useClient: true,  // 서버에서 페이징 처리
-					        perPage: 10        // 페이지당 10개
-					        },
-							columns: columns2,
-						});
-						} 
+				    // API 요청을 위한 파라미터 설정
+// 				   dataSource.api.readData.initParams.po_id = po_id;
+				
+				
+				    // 기존 그리드가 없을 때만 새로 생성
+				   if (!grid2) {
+					   grid2 = new tui.Grid({
+				        el: document.getElementById('toast_single2'),
+				        data: [],  // API 데이터 사용
+				        scrollX: true,
+				        scrollY: true,
+				        bodyHeight: 250,
+				        rowHeaders: ['checkbox'],
+				        pageOptions: {
+				            useClient: true,  // 클라이언트에서 페이징 처리
+				            perPage: 10        // 페이지당 10개
+				        },
+				        columns: columns2,
+				    });
 
-						grid2.resetData(data);
+   } 			
+						
+   grid2.resetData(data);					
+		
+						
+// function dtlGrid(po_id) {
+// 			// 파라미터 설정
+// 			materialDataSource.api.readData.initParams.po_id = po_id;
+			
+// 			if (materialGrid) {
+// 				materialGrid.destroy(); // 기존 그리드 제거
+// 				materialGrid = null;
+// 			}
+			
+// 			materialGrid = new tui.Grid({
+// 		        el: document.getElementById('toast_single2'),
+// 		        data: materialDataSource,
+// 		        scrollX: true,
+// 		        scrollY: true,
+// 		        bodyHeight: 250,
+// 		        rowHeaders: ['checkbox'],
+// 		        pageOptions: {
+// 			        useClient: true,  // 서버에서 페이징 처리
+// 			        perPage: 10        // 페이지당 10개
+// 			        },
+// 		        columns: material_columns,
+// 		    });
+
+
+
+// 						grid2.resetData(data);
 						
 	
 						// grid2 값 변경 시 자동 계산 (총금액 업데이트)
@@ -450,19 +511,19 @@
 					);
 				});
 
-				$("#btn_add_row2").on("click", function () {
-					let today = new Date();
-					let year = today.getFullYear(); // 년도
-					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
-					let date = String(today.getDate()).padStart(2, "0");  // 날짜
-					const newRowKey = grid2.appendRow(
-						{
-							"PO_DATE": year + '-' + month + '-' + date,
+// 				$("#btn_add_row2").on("click", function () {
+// 					let today = new Date();
+// 					let year = today.getFullYear(); // 년도
+// 					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
+// 					let date = String(today.getDate()).padStart(2, "0");  // 날짜
+// 					const newRowKey = grid2.appendRow(
+// 						{
+// 							"PO_DATE": year + '-' + month + '-' + date,
 
-						},
-						{focus: true}
-					);
-				});
+// 						},
+// 						{focus: true}
+// 					);
+// 				});
 
 				// 저장 버튼 이벤트
 				save.addEventListener('mousedown', handleSave);
@@ -494,7 +555,6 @@
 						gridNm.removeRow(row.rowKey); // 화면에서 행 삭제
 					});
 
-					console.info("삭제할 데이터 목록:", delRows);
 				}
 
 
@@ -515,7 +575,6 @@
 						return;
 					}
 
-					console.log("서버로 전송할 데이터:", allData);
 
 					$.ajax({
 						url: "/savePurchase",
@@ -524,7 +583,6 @@
 						data: JSON.stringify(allData),
 						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
 						success: (res) => {
-							console.log("서버 응답:", res); // 응답 값 확인
 							if (res.status == "success") {
 								showSuccess("저장 성공!", true);
 								delRows = []; // 삭제 목록 초기화 (성공 시)
@@ -539,7 +597,6 @@
 				// 저장 함수
 				function detailSave() {
 					grid2.blur(); // 포커스 해제
-					console.info(poId);
 
 					const modifiedRows2 = grid2.getModifiedRows();
 					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert", poId:poId}));
@@ -553,7 +610,6 @@
 						return;
 					}
 
-					console.log("서버로 전송할 데이터:", allData);
 
 					$.ajax({
 						url: "/saveDetail",
@@ -562,7 +618,6 @@
 						data: JSON.stringify(allData),
 						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
 						success: (res) => {
-							console.log("상세 서버 응답:", res); // 응답 값 확인
 							if (res.status == "success") {
 								showSuccess("상세 저장 성공!", true);
 								delRows = []; // 삭제 목록 초기화 (성공 시)
@@ -585,32 +640,47 @@
 					Notiflix.Notify.failure('저장 실패!');
 				}
 
-// 				품목 모달 열기
-				let selectedRowKey = null;
+// // 				품목 모달 열기
+// 				let selectedRowKey = null;
 
-			    $(document).on("click", ".material-modal-btn", function () {
-			        selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
-			        loadMaterialList(); // 품목 리스트 불러오기
-			        $("#materialModal").modal("show");
-			    });
+// 			    $(document).on("click", ".material-modal-btn", function () {
+// 			        selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
+// 			        loadMaterialList(); // 품목 리스트 불러오기
+// 			        $("#materialModal").modal("show");
+// 			    });
 
-				$(document).on("click", ".select-material", function () {
-							        const MATERIAL_ID = $(this).data("material-id");
-							        const MATERIAL_NAME = $(this).data("material-name");
-							        const MATERIAL_PRICE = $(this).data("material-price");
+// 				$(document).on("click", ".select-material", function () {
+// 							        const MATERIAL_ID = $(this).data("material-id");
+// 							        const MATERIAL_NAME = $(this).data("material-name");
+// 							        const MATERIAL_PRICE = $(this).data("material-price");
 							        
-							        if (selectedRowKey !== null) {
-							            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
-							            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
-							            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
-							            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
-							        }else {
-							            console.error("grid2에서 올바른 행을 찾을 수 없음!");
-							        }
+// 							        if (selectedRowKey !== null) {
+// 							            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
+// 							            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
+// 							            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
+// 							            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
+// 							        }else {
+// 							            console.error("grid2에서 올바른 행을 찾을 수 없음!");
+// 							        }
 							        
-							        $("#materialModal").modal("hide");
-							    });
+// 							        $("#materialModal").modal("hide");
+// 							    });
 								
+				
+			
+
+			
+		
+// 		$("#btn_equipment_add").on("click", function() {
+// 			equipmentGrid.request('createData');
+// 			equipmentGrid.reloadData();  // 실패시 테이블 리로드
+// 		});
+		
+		$("#material-modal-btn").on("click", function() {
+			$("#purchaseMtl").modal("show");
+		});
+				
+				
 				
 																
 	
@@ -623,12 +693,19 @@
 						$("#purchaseClt").modal("show");
 							       // loadClientList(); // 거래처 리스트 불러오기
 							    });							
-									
+					
+					
+				$(document).on("click", ".material-modal-btn", function (props) {
+					// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
+					 const rowKey = $(this).data("row-key");
+			    // 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
+			    $("#materialRow").val(rowKey);
+					
+					$("#purchaseMtl").modal("show");
+						       // loadClientList(); // 거래처 리스트 불러오기
+						    });
+				
 			</script>
-
-				
-				
-				
 </body>
 
 </html>

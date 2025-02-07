@@ -1,154 +1,282 @@
-<!-- Bootstrap & CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- 모달창 -->
+<div class="modal fade" id="purchaseMtl" th:fragment="purchaseMtl">
+	<div class="modal-dialog modal-custom-size">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">발주 상세 추가</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="materialRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="materialColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<!-- 검색 필터 -->
+									<div class="d-flex mt-3">
+										
+										<div class="d-flex ml-4">
+											<label for="" class="col-form-label mr-2" style="min-width: 70px;">자재명</label>
+											<input type="text" class="form-control float-right" id="materialSearchKeyword">
+										</div>
+									</div>
+									<div class="d-flex">
+										<button type="button" class="btn btn-primary ml-2" id="btnMaterialSearch">조회</button>
+									</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-8">
+								<span style="padding-left: 20px;">자재 목록</span>
+								<div class="card-body" id="materialModalGrid" style="padding-top: 10px;">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+							<div class="col-md-4">
+								<span style="padding-left: 20px;">선택 목록</span>
+								<div class="card-body" id="materialModalSelectedGrid" style="padding-top: 10px;">
+									 <!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveMaterial">적용</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+<script th:fragment="purchaseMtl" th:inline="javascript">
+	let materialModalGrid = null;
+	let selectedMaterialList = [];
+	let materialModalSelectedGrid = null;
+	const materialSelected_columns = [
+	    {header: '품목코드', name: 'MATERIAL_ID', align: 'center', editor: null},
+	    {header: '품목명', name: 'MATERIAL_NAME', align: 'left', editor: null}, 
+	];
+	let materialParam = {use_yn: '', searchKeyword: ''};
+	
+	$('#purchaseMtl').on('shown.bs.modal', function () {
+		selectedMaterialList.length = 0;
+		$("#use_yn").val("").attr("selected", "selected");
+		materialParam.use_yn = '';
+		materialParam.searchKeyword = '';
+        
+		materialModalInit();
+	});
+	
+	function materialModalInit() {
+		// 파라미터 설정
+// 		materialDataSource.api.readData.initParams.po_id = '';
+		
+		if (materialModalGrid) {
+			materialModalGrid.destroy(); // 기존 그리드 제거
+			materialModalGrid = null;
+		}
+		
+		materialModalGrid = new tui.Grid({
+	        el: document.getElementById('materialModalGrid'),
+	        data: [],
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: materialSelected_columns,
+	    });
+		
+		materialModalGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+	    
+	    // 테이블 데이터 렌더링 완료후에 실행 (테이블 출력이 끝나는 정확한 타이밍을 못잡아서 onGridMounted로 잡고 후처리)
+	    materialModalGrid.on('onGridMounted', () => {
+		    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+		    const checkGridRendered = () => {
+		        setTimeout(() => {
+		            if (materialModalGrid.getData().length > 0) {
+		    	    	const materialGridNewRows = materialGrid.getData().filter(row => row.isNew);
+		    		    const selectedRowKeys = materialModalGrid.getData()
+		    			    .filter(row => materialGridNewRows.some(newRow => newRow.MATERIAL_ID == row.MATERIAL_ID))
+		    			    .map(row => row.rowKey);
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 가져와서 설비모달에 선택값 그대로 적용함.
+		    		    selectedRowKeys.forEach(function(key) {
+		    		    	materialModalGrid.addRowClassName(key, 'selected-row');
+		    		    });
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 selectedMaterialList 초기값 설정
+		    		    materialGridNewRows.forEach(function(row) {
+		    		    	const mapRowData = {
+		    		        	"MATERIAL_ID": row.MATERIAL_ID,
+		    		        	"MATERIAL_NAME": row.MATERIAL_NAME,
+		    		        	"MATERIAL_PRICE": row.MATERIAL_PRICE,
+		    		        	"PO_ID": purchaseCurrentSelectedID,
+		    		            isNew: true
+		    			    };
+		    		    	
+		    		    	selectedMaterialList.push(mapRowData);
+		    		    });
+						
+						// selectedMaterialList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
+						materialtModalSelectedInit();
+		            } else {
+		                checkGridRendered(); // 데이터가 없으면 다시 체크
+		            }
+		        }, 100);
+		    };
 
+		    checkGridRendered(); // 실행
+	    });
+	    
+	    materialModalGrid.on('click', (ev) => {
+		    if (ev.targetType != "cell") {
+				return;
+			}
+	    	
+		    const newRowKey = ev.rowKey;
+		    const isSelectedRow = materialModalGrid.getRowClassName(newRowKey).includes('selected-row');
+		    const rowData = materialModalGrid.getRow(newRowKey);
+		    const material_id = rowData.MATERIAL_ID;
+		    
+		    if (isSelectedRow) {
+		    	materialModalGrid.removeRowClassName(newRowKey, 'selected-row');
+		    	selectedMaterialList = selectedMaterialList.filter(item => item.MATERIAL_ID != material_id);
+		    } else {
+		    	const mapRowData = {
+		        	"MATERIAL_ID": material_id,
+		        	"MATERIAL_NAME": rowData.MATERIAL_NAME,
+		        	"MATERIAL_PRICE": rowData.MATERIAL_PRICE,
+		        	"PO_ID": purchaseCurrentSelectedID,
+		            isNew: true
+			    };
+		    	
+		    	selectedMaterialList.push(mapRowData);
+		    	materialModalGrid.addRowClassName(newRowKey, 'selected-row');
+		    }
+			
+			// TODO resetData 말고 수동으로 업데이트
+			/*
+			workcenter:727 Uncaught TypeError: Cannot read properties of null (reading 'EQUIPMENT_ID')
 
+			선택목록 클릭시 null오류
+			선택목록 클릭시 여러개 한번에 삭제되는 경우
+			선택목록 클릭시 삭제가 안되는 경우
 
-<!--	 Bootstrap 4 -->
-	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script th:fragment="materialModal" th:inline="javascript">
+			- 설비목록 클릭 시 선택목록 중복생성 되는 경우
+			materialModalSelectedGrid.resetData(selectedMaterialList);
+			resetData가 뻑나고 있음, selectedMaterialList는 제대로 값이들어가 있는데
+			기존의 그리드가 초기화가 제대로 안되서 중복나는거 같음
+			이 상태에서 선택목록 클릭하면 위의 세가지 오류가 모두 생김
+			*/
+			console.log('설비목록클릭', material_id, selectedMaterialList);
+			
+			// 워크센터 설비 목록 클릭시 마다 선택 목록 갱신
+			materialModalSelectedGrid.resetData(selectedMaterialList);
+			//setMaterialModalSelectedGridColor();
+		});
+	}
+	
+	$("#saveMaterial").on('click', function() {
+		const rowKeysToDelete = materialGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row.rowKey);
+		
+		// 워크센터설비 그리드 기존의 새로 추가된 행 삭제
+		rowKeysToDelete.forEach(function(key) {
+			materialGrid.removeRow(key);
+		});
+		
+		// 새로 선택된 값 워크센터설비 그리드 행 추가
+		selectedMaterialList.forEach(function(data) {
+			materialGrid.appendRow(data);
+		});
+		
+		$("#purchaseMtl").modal('hide');
+	});
+	
+	function materialModalSelectedInit() {
+		if (materialModalSelectedGrid) {
+			materialModalSelectedGrid.destroy(); // 기존 그리드 제거
+			materialModalSelectedGrid = null;
+		}
+		
+		materialModalSelectedGrid = new tui.Grid({
+	        el: document.getElementById('materialModalSelectedGrid'),
+			data: selectedMaterialList,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: materialSelected_columns,
+	    });
+		//setMaterialModalSelectedGridColor();
+		
+		materialModalSelectedGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
 
-		// 전역 변수
-				let materialsData = [];   // 전체 품목 리스트
-				let currentPage = 1;      // 현재 페이지
-				const itemsPerPage = 5;   // 페이지당 표시할 품목 수
-				const maxPagesToShow = 5; // 한 번에 보여줄 페이지 번호 개수 (필요에 맞게 조절)
+			const newRowKey = ev.rowKey;
+			const rowData = materialModalSelectedGrid.getRow(newRowKey);
+			const material_id = rowData.MATERIAL_ID;
+			
+			selectedMaterialList = selectedMaterialList.filter(item => item.MATERIAL_ID != material_id);
+			
+			materialModalSelectedGrid.removeRow(newRowKey);
+			
+			console.log('선택목록클릭', material_id, selectedMaterialList);
+			
+			materialModalGrid.getData().forEach(row => {
+			    if (material_id == row.MATERIAL_ID) {
+			    	materialModalGrid.removeRowClassName(row.rowKey, 'selected-row');
+			    }
+			});
+		});
+    };
+	
+	$("#btnMaterialSearch").on("click", function() {
+		materialParam.use_yn = $("#use_yn").val();
+		materialParam.searchKeyword = $("#materialSearchKeyword").val();
+		
+		const selectedMaterialIds = selectedMaterialList.map(row => row.MATERIAL_ID);
+		materialModalGrid.readData(1, materialParam, true);
 
-				function loadMaterialList() {
-				  fetch('/getMaterialList')
-				    .then(response => response.json())
-				    .then(materials => {
-				      materialsData = materials;
-				      renderPage(1); // 첫 페이지 표시
-				    })
-				    .catch(error => console.error("품목 데이터 로드 실패:", error));
-				}
-
-				// 특정 페이지 렌더링
-				function renderPage(pageNumber) {
-				  currentPage = pageNumber;
-
-				  const startIndex = (pageNumber - 1) * itemsPerPage;
-				  const endIndex = startIndex + itemsPerPage;
-				  
-				  // 현재 페이지에 보여줄 데이터 추출
-				  const pageMaterials = materialsData.slice(startIndex, endIndex);
-				  
-				  // "materials" 대신 "pageMaterials"를 사용해야 합니다.
-				  const materialRows = pageMaterials.map(mtl => `
-				    <tr>
-				      <td>${mtl.MATERIAL_ID}</td>
-				      <td>${mtl.MATERIAL_NAME}</td>
-				      <td>${mtl.MATERIAL_PRICE}</td>
-				      <td>
-				        <button class="btn btn-success select-material" 
-				          data-material-id="${mtl.MATERIAL_ID}" 
-				          data-material-name="${mtl.MATERIAL_NAME}" 
-				          data-material-price="${mtl.MATERIAL_PRICE}">
-				          선택				    
-				        </button>
-				      </td>
-				    </tr>
-				  `).join("");
-
-				  // jQuery 또는 순수 JavaScript 중 하나만 사용하세요.
-			$("#modalMaterialList").html(materialRows);												  // 또는
-				  // $("#modalMaterialList").html(materialRows);
-
-				  // 페이징 갱신
-				  renderPagination();
-				}
-
-				// 페이징 버튼 렌더링
-				function renderPagination() {
-				  const totalItems = materialsData.length;
-				  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-				  // 페이징 요소를 담을 변수
-				  let paginationHtml = "";
-
-				  // 이전 버튼 (맨 앞으로, 한 페이지 앞으로)
-				  paginationHtml += `
-				    <button class="btn btn-secondary me-2" 
-				      onclick="renderPage(1)" 
-				      ${currentPage === 1 ? "disabled" : ""}>
-				      << 
-				    </button>
-				  `;
-				  paginationHtml += `
-				    <button class="btn btn-secondary me-2" 
-				      onclick="renderPage(${currentPage - 1})" 
-				      ${currentPage === 1 ? "disabled" : ""}>
-				      <
-				    </button>
-				  `;
-
-				  // 중앙 페이지 번호들
-				  if (totalPages <= maxPagesToShow) {
-				    for (let i = 1; i <= totalPages; i++) {
-				      paginationHtml += createPageButton(i);
-				    }
-				  } else {
-				    const half = Math.floor(maxPagesToShow / 2);
-				    let startPage = currentPage - half;
-				    let endPage = currentPage + half;
-
-				    if (maxPagesToShow % 2 === 0) {
-				      endPage = currentPage + half - 1;
-				    }
-
-				    if (startPage < 1) {
-				      startPage = 1;
-				      endPage = maxPagesToShow;
-				    }
-				    if (endPage > totalPages) {
-				      endPage = totalPages;
-				      startPage = totalPages - (maxPagesToShow - 1);
-				    }
-
-				    if (startPage > 1) {
-				      paginationHtml += createPageButton(1);
-				      paginationHtml += `<span class="mx-2">...</span>`;
-				    }
-
-				    for (let i = startPage; i <= endPage; i++) {
-				      paginationHtml += createPageButton(i);
-				    }
-
-				    if (endPage < totalPages) {
-				      paginationHtml += `<span class="mx-2">...</span>`;
-				      paginationHtml += createPageButton(totalPages);
-				    }
-				  }
-
-				  // 다음 버튼 (한 페이지 뒤로, 맨 뒤로)
-				  paginationHtml += `
-				    <button class="btn btn-secondary ms-2" 
-				      onclick="renderPage(${currentPage + 1})" 
-				      ${currentPage === totalPages ? "disabled" : ""}>
-				      >
-				    </button>
-				  `;
-				  paginationHtml += `
-				    <button class="btn btn-secondary ms-2" 
-				      onclick="renderPage(${totalPages})" 
-				      ${currentPage === totalPages ? "disabled" : ""}>
-				      >>
-				    </button>
-				  `;
-
-				  document.getElementById("paginationContainer").innerHTML = paginationHtml;
-				}
-
-				// 페이지 번호 버튼 생성 함수
-				function createPageButton(pageNumber) {
-				  return `
-				    <button 
-				      class="btn ${pageNumber === currentPage ? 'btn-primary' : 'btn-outline-primary'} me-2" 
-				      onclick="renderPage(${pageNumber})">
-				      ${pageNumber}
-				    </button>
-				  `;
-				}
-
-	</script>
+		materialModalGrid.off('onGridUpdated');
+		materialModalGrid.on('onGridUpdated', () => {
+		    const updatedRows = materialModalGrid.getData();
+			
+		    // 기존 선택된 설비 ID가 있는 행에 'selected-row' 클래스 추가
+		    updatedRows.forEach(row => {
+		        if (selectedMaterialIds.includes(row.MATERIAL_ID)) {
+		        	materialModalGrid.addRowClassName(row.rowKey, 'selected-row');
+		        }
+		    });
+		});
+	});
+	
+	function setMaterialModalSelectedGridColor() {
+		materialModalSelectedGrid.getData().forEach((row, index) => {
+			materialModalSelectedGrid.addRowClassName(index, 'selected-row');
+		});
+	}
+</script>
