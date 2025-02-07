@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import com.itwillbs.repository.MesCommonCodeMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 @Service
 @RequiredArgsConstructor
+@Log
 public class MesCommonCodeService {
 
 	private final MesCommonCodeMapper mesCommonCodeMapper;
@@ -82,6 +84,8 @@ public class MesCommonCodeService {
 
 
 	public Map<String, Object> updateMesCommonCodeGroup(Map<String, Object> map) {
+		
+		
 	    Map<String, Object> message = new HashMap<>();
 
 	    String result = "수정 실패.";
@@ -181,6 +185,7 @@ public class MesCommonCodeService {
 	    try {
 	        // 중복된 순서 체크
 	        int duplicateCnt = mesCommonCodeMapper.isDuplicateSubOrder(map);
+	        log.info(String.valueOf(duplicateCnt));
 	        if (duplicateCnt > 0) {
 	            result = "중복된 순서입니다.";
 	        } else {

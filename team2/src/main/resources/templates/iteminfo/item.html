@@ -34,7 +34,7 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
-		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>
+		<nav th:replace="~{includes/modals/itemAdd :: itemAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -100,24 +100,26 @@
 								        </div>
 								
 								        <!-- 조회 버튼 -->
-								        <input type="button" id="btn_equip_insert" class="btn btn-primary" value="조회">
+								        <input type="button" id="btn_item_insert" class="btn btn-primary" value="조회">
 								    </div>
 								</div>
+								<div class="card-header">
 									<div class="row">
 										<div class="col-6">
 											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">품목 목록</p>
 										</div>
 										<div class="col-6">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_workcenter_add_row" class="btn btn-primary" value="행추가" style="display : none;">
-												<input type="button" id="btn_workcenter_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
-												<input type="button" id="btn_workcenter_toggleEditMode" class="btn btn-primary" value="편집">
-												<input type="button" id="btn_workcenter_modify" class="btn btn-primary" value="저장">
-												<input type="button" id="btn_workcenter_delete" class="btn btn-primary" value="삭제">
+												<input type="button" id="btn_item_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_item_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_item_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_item_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_item_delete" class="btn btn-primary" value="삭제">
 											</div>
 										</div>
 									</div>
-								<div class="card-body" id="workcenterGrid">
+								</div>
+								<div class="card-body" id="itemGrid">
 									<!-- Toast Grid Ajax -->
 								</div>
 							<!-- /.card-body -->
@@ -178,23 +180,27 @@
 	    .deselected-row {
 	        background-color: #ffd1d1;
 	    }
+		.modal-custom-size {
+			max-width: 1300px;
+		}
 	</style>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let itemGrid = null;
-		const itemUrl = '/manufacture/workcenter';
+		const itemUrl = '/iteminfo/item';
 		const itemDataSource = {
 			api: {
+				//createData: {url: itemUrl, method: 'POST'},
 			    readData: {url: itemUrl, method: 'GET'},
 				modifyData: { url: itemUrl, method: 'PUT' },
 				deleteData: {url: itemUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
-		let workcenterCurrentSelectedRowKey = null;
-		let workcenterIsEditModeEnabled = false; 
-		const workcenter_columns = [
+		let itemCurrentSelectedRowKey = null;
+		let itemIsEditModeEnabled = false; 
+		const item_columns = [
             {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
             {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
             {header: '품목 유형', name: 'ITEM_TYPE', align: 'left', editor: null},
@@ -208,10 +214,10 @@
 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
 			    }
 			},
-            {header: '기준단위', name: 'ITEM_NAME', align: 'center', editor: null},
+            {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
             {header: '회사명', name: 'CLIENT_NAME', align: 'center', editor: null},
             {header: '단가', name: 'ITEM_COST', align: 'center', editor: null},
-            {header: '입고검사', name: 'ITEM_COST', align: 'center', editor: null},
+            {header: '입고검사', name: 'INB_INSP', align: 'center', editor: null},
             {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', editor: null},
             {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', editor: null},
         ];
@@ -253,9 +259,9 @@
 			
 			container.appendChild(el);
 			
-			// WORKCENTER_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'WORKCENTER_ID'
-				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
+			// ITEM_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'ITEM_ID'
+				&& itemGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
 			    button.style.border = 'solid 1px #007BFF';
@@ -272,24 +278,22 @@
 					const row = props.rowKey;
 					const column = props.columnInfo.name;
 					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = workcenterGrid.getValue(row, column);
+					const value = itemGrid.getValue(row, column);
 					
 					switch (column) {
-						case 'WORKCENTER_ID':
-							$("#workcenterCode").val(value);
-							$("#workcenterRow").val(row);
-							$("#workcenterColumn").val(column);
+						case 'ITEM_ID':
+							$("#itemCode").val(value);
+							$("#itemRow").val(row);
+							$("#itemColumn").val(column);
 							
 							$("#checkDuplicateCodeBtn").show();
 							$("#modifyCodeBtn").hide();
 							$("#saveCode").attr("disabled", true);
-							$("#workcenterCode").attr("disabled", false);
-							$("#validationWorkcenterCodeMessage").text('');
+							$("#itemCode").attr("disabled", false);
+							$("#validationItemCodeMessage").text('');
 							
-							$('#workcenterCodeAdd').modal();
+							$('#itemCodeAdd').modal();
 						break;
-	//					case 'MANAGER_ID': $('#categoryAdd').modal(); break;
-	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
 					}
 			    });
 			}
@@ -332,74 +336,71 @@
 		};
 
 		$(function () {
-			workcenterInit();
+			itemInit();
 		});
 		
-		function workcenterInit() {
-			workcenterGrid = new tui.Grid({
-		        el: document.getElementById('workcenterGrid'),
-		        data: workcenterDataSource,
+		function itemInit() {
+			itemGrid = new tui.Grid({
+		        el: document.getElementById('itemGrid'),
+		        data: itemDataSource,
 		        scrollX: true,
 		        scrollY: true,
 		        bodyHeight: 250,
 		        rowHeaders: ['checkbox'],
 				editingEvent: 'click',
-		        columns: workcenter_columns,
+		        columns: item_columns,
 		    });
 
-		    workcenterGrid.on('failResponse', function(ev) {
+		    itemGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
+				alert("Response 실패");
 		    });
 			
-			workcenterGrid.on('editingStart', function(ev) {
+			itemGrid.on('editingStart', function(ev) {
 			    const {rowKey, columnName, value} = ev;
-			    const rowData = workcenterGrid.getRow(rowKey);
+			    const rowData = itemGrid.getRow(rowKey);
 				
 				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-// 				if (columnName == 'WORKCENTER_ID' && !rowData.isNew) {
-// 				if (columnName == 'MANAGER_ID') {
-// 					$('#categoryAdd').modal();
+// 				if (columnName == 'ITEM_ID' && !rowData.isNew) {
 // 					ev.stop();
 // 				}
 			});
 			
-			workcenterGrid.on('click', (ev) => {
-			    if (ev.targetType != "cell" || workcenterIsEditModeEnabled) {
+			itemGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || itemIsEditModeEnabled) {
 					return;
 				}
 
 			    const newRowKey = ev.rowKey;
 
-			    if (workcenterCurrentSelectedRowKey != null) {
-			        workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');
+			    if (itemCurrentSelectedRowKey != null) {
+			        itemGrid.removeRowClassName(itemCurrentSelectedRowKey, 'selected-row');
 			    }
 
-			    if (workcenterCurrentSelectedRowKey != newRowKey) {
-			        workcenterGrid.addRowClassName(newRowKey, 'selected-row');
-			        workcenterCurrentSelectedRowKey = newRowKey;
-					// 추가 그리드 생성시 사용할 ID값
-			        //console.log('Selected ID:' + workcenterGrid.getRow(newRowKey).ID);
+			    if (itemCurrentSelectedRowKey != newRowKey) {
+			        itemGrid.addRowClassName(newRowKey, 'selected-row');
+			        itemCurrentSelectedRowKey = newRowKey;
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
-			        workcenterCurrentSelectedRowKey = null;
+			        itemCurrentSelectedRowKey = null;
 			    }
 			});
 		}
 		
 		// 수정 모드 토글 버튼 이벤트
-		$("#btn_workcenter_toggleEditMode").on("click", function () {
-		    workcenterIsEditModeEnabled = !workcenterIsEditModeEnabled; // 수정 모드 상태 토글
+		$("#btn_item_toggleEditMode").on("click", function () {
+		    itemIsEditModeEnabled = !itemIsEditModeEnabled; // 수정 모드 상태 토글
 		    
-		    if (workcenterIsEditModeEnabled) {
-				$("#btn_workcenter_add_row").show();
-				$("#btn_workcenter_remove_row").show();
+		    if (itemIsEditModeEnabled) {
+				$("#btn_item_add_row").show();
+				$("#btn_item_remove_row").show();
 		    } else {
-		    	$("#btn_workcenter_add_row").hide();
-				$("#btn_workcenter_remove_row").hide();
+		    	$("#btn_item_add_row").hide();
+				$("#btn_item_remove_row").hide();
 		    }
 		    
-		    if (workcenterIsEditModeEnabled) {
-		        workcenterGrid.setColumns([
+		    if (itemIsEditModeEnabled) {
+		        itemGrid.setColumns([
 		        	{header: '품목 코드', name: 'ITEM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '품목 유형', name: 'ITEM_TYPE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
@@ -414,38 +415,44 @@
 				        },
 				        renderer: { type: CheckboxRenderer }
 				    },
-		            {header: '기준단위', name: 'ITEM_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '기준단위', name: 'ITEM_UNIT', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '회사명', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '단가', name: 'ITEM_COST', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '입고검사', name: '', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '입고검사', name: 'INB_INSP', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		        ]);
 		    } else {
-		        workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
-		        workcenterGrid.setColumns(workcenter_columns);
+		        itemGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        itemGrid.setColumns(item_columns);
 		    }
 		});
 
-		$("#btn_workcenter_add_row").on("click", function () {
-		    const newRowKey = workcenterGrid.appendRow(
+		$("#btn_item_add_row").on("click", function () {
+		    const newRowKey = itemGrid.appendRow(
 		        {
-		        	"WORKCENTER_ID": '',
-		        	"NAME": '',
+		        	"ITEM_ID": '',
+		        	"ITEM_NAME": '',
+		        	"ITEM_TYPE": '',
+		        	"MAIN_NAME": '',
+		        	"SUB_NAME": '',
 		        	"USE_YN": 'N',
-		        	"NOTE": '',
-		        	"MANAGER_ID": '',
-		        	"ROUTING_ID": '',
+		        	"ITEM_UNIT": '',
+		        	"CLIENT_NAME": '',
+		        	"ITEM_COAST": '',
+		        	"INB_INSP": '',
+		        	"WAREHOUSE_NAME": '',
+		        	"SAFETY_INVENTORY": '',
 		            isNew: true
 		        },
 		        {focus: true}
 		    );
 		});
 		
-		$("#btn_workcenter_remove_row").on("click", function () {
-		    const rowCount = workcenterGrid.getRowCount(); // 현재 행 개수 가져오기
+		$("#btn_item_remove_row").on("click", function () {
+		    const rowCount = itemrGrid.getRowCount(); // 현재 행 개수 가져오기
 		    
-		    const allRows = workcenterGrid.getData(); // 전체 데이터 가져오기
+		    const allRows = itemGrid.getData(); // 전체 데이터 가져오기
 		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
 		    
 		    if (newRows.length === 0) {
@@ -453,18 +460,18 @@
 		        return;
 		    }
 
-		    const lastRowKey = workcenterGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
-		    workcenterGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		    const lastRowKey = itemGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    itemGrid.removeRow(lastRowKey); // 마지막 행 삭제
 		});
 
-		$("#btn_workcenter_modify").on("click", function() {
-			workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+		$("#btn_item_modify").on("click", function() {
+			itemGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
 			
-		    let createdRows = workcenterGrid.getModifiedRows().createdRows;
-		    let updatedRows = workcenterGrid.getModifiedRows().updatedRows;
+		    let createdRows = itemGrid.getModifiedRows().createdRows;
+		    let updatedRows = itemGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["WORKCENTER_ID", "NAME", "USE_YN"];
+		    const requiredFields = ["ITEM_ID", "ITEM_NAME", "ITEM_TYPE", "MAIN_NAME", "SUB_NAME"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
@@ -496,26 +503,26 @@
 		        return;
 			}
 			
-			workcenterGrid.request('modifyData');
-			workcenterGrid.setColumns(workcenter_columns);
+			itemGrid.request('modifyData');
+			itemGrid.setColumns(item_columns);
 			
-			workcenterIsEditModeEnabled = false;
-	    	$("#btn_workcenter_add_row").hide();
-			$("#btn_workcenter_remove_row").hide();
+			itemIsEditModeEnabled = false;
+	    	$("#btn_item_add_row").hide();
+			$("#btn_item_remove_row").hide();
 		});
 		
-        $("#btn_workcenter_delete").on("click", function() {
-			workcenterGrid.removeCheckedRows();
+        $("#btn_item_delete").on("click", function() {
+			itemGrid.removeCheckedRows();
 			
 			// 반드시 removeCheckedRows()후에 실행 순서
 			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = workcenterGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.WORKCENTER_ID))  // 한글 변환
+			const ids = itemGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.ITEM_ID))  // 한글 변환
 				.join(',');
-			workcenterDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			itemDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
-		    workcenterGrid.request('deleteData');
-			workcenterGrid.reloadData();  // 실패시 테이블 리로드
+		    itemGrid.request('deleteData');
+			itemGrid.reloadData();  // 실패시 테이블 리로드
 		});
 	</script>
 </body>

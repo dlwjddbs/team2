@@ -84,7 +84,8 @@
 			   SUB_ID 
 			 , MAIN_ID 
 			 , SUB_NAME
-			 , CONCAT(MAIN_ID, SUB_ID) AS CLASSIFICATION_ID
+<!--			 , CONCAT(MAIN_ID, SUB_ID) AS CLASSIFICATION_ID-->
+			 , CLASSIFICATION_ID
 			 , SUB_ORDER
 			 , DESCRIPTION 
 			 , USE_STATUS
@@ -123,7 +124,7 @@
 		) VALUES (
 			  #{SUB_ID}
 			, #{MAIN_ID}
-			, #{MAIN_ID} || #{SUB_ID}
+			, #{MAIN_ID} || '-' || #{SUB_ID}
 			, #{SUB_NAME}
 			, #{SUB_ORDER}
 			, #{DESCRIPTION}
@@ -136,7 +137,8 @@
     <!-- isDuplicateSubOrder 공통코드 순서 중복 확인 -->
     	SELECT COUNT(*) AS COUNT
 		  FROM MES_COMMON
-		WHERE SUB_ORDER = #{SUB_ORDER}
+		WHERE 1 = 1
+		  AND SUB_ORDER = #{SUB_ORDER}
 		  AND MAIN_ID = #{MAIN_ID}
 		  <if test="SUB_ORDER != null and SUB_ORDER != ''">
 		  	   AND SUB_ORDER != #{SUB_ORDER}
@@ -155,11 +157,10 @@
 		UPDATE MES_COMMON 
 		   SET 
 			   SUB_NAME = #{SUB_NAME}
-			 , CLASSIFICATION_ID = #{MAIN_ID} || #{SUB_ID}
-			 , DESCRIPTION = #{DESCRIPTION}
-			 , SUB_ORDER = #{SUB_ORDER}
 			 , USE_STATUS = #{USE_STATUS}
+			 , SUB_ORDER = #{SUB_ORDER}
+			 , DESCRIPTION = #{DESCRIPTION}
 			 , UPDATE_DATE = CURRENT_DATE
-		 WHERE SUB_ID = #{SUB_ID}
+		 WHERE CLASSIFICATION_ID = CONCAT(CONCAT(#{MAIN_ID}, '-'), #{SUB_ID})
 	</update>
 </mapper>
