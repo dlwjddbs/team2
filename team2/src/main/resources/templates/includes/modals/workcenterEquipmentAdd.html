@@ -201,11 +201,18 @@
 			기존의 그리드가 초기화가 제대로 안되서 중복나는거 같음
 			이 상태에서 선택목록 클릭하면 위의 세가지 오류가 모두 생김
 			*/
-			console.log('설비목록클릭', equipment_id, selectedEquipmentList);
+// 			console.log('설비목록클릭', equipment_id, selectedEquipmentList);
 			
 			// 워크센터 설비 목록 클릭시 마다 선택 목록 갱신
-			equipmentModalSelectedGrid.resetData(selectedEquipmentList);
+			//equipmentModalSelectedGrid.resetData(selectedEquipmentList);
 			//setEquipmentModalSelectedGridColor();
+			
+			// TODO 여기서 초기화말고 수동으로 그리드에 add remove 해주면? 그리드 객체가 뻑날일이 없지 않을까?
+			// 반대로 선택목록에서 클릭했을 때 설비 목록 테이블에 remove해주면? 두 그리드 싱크만 잘 맞춰주면 될거같은데?
+			equipmentModalSelectedGrid.resetData([]); // 초기화
+			setTimeout(() => {
+				equipmentModalSelectedGrid.resetData(selectedEquipmentList);
+			}, 50)
 		});
 	}
 	
@@ -247,16 +254,34 @@
 			if (ev.targetType != "cell") {
 				return;
 			}
-
+			
+			console.log(" =========== event =========== ");
+			console.log(ev);
+			
 			const newRowKey = ev.rowKey;
 			const rowData = equipmentModalSelectedGrid.getRow(newRowKey);
-			const equipment_id = rowData.EQUIPMENT_ID;
+			const allData = equipmentModalSelectedGrid.getData();
 			
+			console.log("rowKey : ", ev.rowKey);
+			console.log("allData : ", allData);
+			console.log("rowData : ", rowData);
+			
+			
+			//data-row-key="" 가 중복되는 경우있음.
+			
+			if (!rowData) {
+				// 여기서 키를 찾아내야됨.
+			}
+			
+			const equipment_id = rowData.EQUIPMENT_ID;
 			selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
 			
 			equipmentModalSelectedGrid.removeRow(newRowKey);
 			
-			console.log('선택목록클릭', equipment_id, selectedEquipmentList);
+// 			equipmentModalSelectedGrid.resetData([])
+// 			setTimeout(() => {
+// 				equipmentModalSelectedGrid.resetData(selectedEquipmentList);
+// 			}, 50)
 			
 			equipmentModalGrid.getData().forEach(row => {
 			    if (equipment_id == row.EQUIPMENT_ID) {
