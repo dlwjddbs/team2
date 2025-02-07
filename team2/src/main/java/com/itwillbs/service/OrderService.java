@@ -9,33 +9,25 @@ import org.springframework.stereotype.Service;
 import com.itwillbs.repository.OrderMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
-	
-	private final OrderMapper orderMapper;
-	
-	public Map<String, Object> getOrder() {
-		
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "data get 성공";
-		
-		try {
-			List<Map<String, Object>> orderList = orderMapper.getOrder();
-			content.put("contents", orderList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			System.err.println("데이터 조회 실패" + e);
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
+
+    private final OrderMapper orderMapper;
+
+    // 수주 조회 (orderId가 있으면 상세 조회, 없으면 전체 조회)
+    public Map<String, Object> getOrder(String orderId) {
+        List<Map<String, Object>> orderData = orderMapper.getOrder(orderId);  // orderId가 있으면 상세 조회, 없으면 전체 조회
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("orders", orderData);
+        return response;
+    }
+
+    public void deleteOrder(List<String> orderIds) {
+        orderMapper.deleteOrder(orderIds);
+    }
 }

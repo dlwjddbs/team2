@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-lg" th:fragment="salarywrite">
+<div class="modal fade" id="modal-lg" th:fragment="orderDetail">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
@@ -12,123 +12,53 @@
 			<!-- /.모달창 헤더 -->
 
 			<!-- form -->
-			<form th:action="@{/writeSalary}" method="post" id="writeSalaryForm">
+			<form th:action="@{/orderDetail}" method="post" id="orderDetailTable">
 				<!-- 모달창 바디 -->
 				<div class="modal-body">
 					<div class="card-body">
-
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-									<label>수주 일자</label>
-									<div class="input-group date" id="reservationdate"
-										data-target-input="nearest">
-										<input type="text" autocomplete='off'
-											class="form-control datetimepicker-input" id="daterange"
-											name="PAYDAY" placeholder="년-월 선택" />
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-5">
-								<div class="form-group">
-									<label>수주 번호</label> <input type="text" class="form-control"
-										id="member" name="MEMBER_ID" data-target="#reservationdate"
-										readonly />
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="form-group">
-									<label>거래처</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>담당자</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>단위</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>품목명</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>수량</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>공급가</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>부가세</label> <input type="text" class="form-control"
-										id="name" name="NAME" placeholder="사원명을 입력하세요.">
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>합계</label> <input type="text" class="form-control"
-											id="name" name="NAME" placeholder="사원명을 입력하세요.">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>비고</label> <input type="text" class="form-control"
-											id="name" name="NAME" placeholder="사원명을 입력하세요.">
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>수정일</label> <input type="text" class="form-control"
-											id="name" name="NAME" placeholder="사원명을 입력하세요.">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>등록자</label> <input type="text" class="form-control"
-											id="name" name="NAME" placeholder="사원명을 입력하세요.">
-									</div>
-								</div>
-							</div>
-						</div>
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>수주일자</th>
+									<td id="orderDate"></td>
+									<th>수주번호</th>
+									<td id="orderId"></td>
+									<th>등록자</th>
+									<td id="registBy"></td>
+								</tr>							
+								<tr>
+									<th>거래처</th>
+									<td id="customerId"></td>
+									<th>담당자</th>
+									<td id="salesRepId"></td>
+									<th>납품예정일</th>
+									<td id="deliveryDate"></td>
+								</tr>
+								<tr>									
+									<th>품목명</th>
+									<td id="itemId"></td>
+									<th>단위</th>
+									<td id="unit"></td>
+									<th>단가</th>
+									<td id="itemPrice" class="text-right"></td>
+								</tr>
+								<tr>
+									<th>공급가</th>
+									<td id="orderPrice" class="text-right"></td>
+									<th>부가세</th>
+									<td id="tax" class="text-right"></td>
+									<th>합계</th>
+									<td id="orderSum" class="text-right"></td>
+								</tr>
+								<tr>									
+									<th>비고</th>
+									<td colspan="5" id="remarks"></td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 				<!-- /.모달창 바디 -->
-				<!-- 모달창 푸터-->
-				<div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" id="closeBtn" class="btn btn-default"
-							data-dismiss="modal">닫기</button>
-						<!-- 						<button type="submit" id="submitBtn" class="btn btn-primary">급여 등록</button> -->
-						<button type="button" id="submitBtn2" class="btn btn-primary">급여
-							등록</button>
-					</div>
-				</div>
-				<!-- /.모달창 푸터-->
 			</form>
 			<!-- /.form -->
 		</div>

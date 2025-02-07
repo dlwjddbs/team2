@@ -5,49 +5,61 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.OrderMapper">
-
+	<!-- SEARCH -->
     <select id="getOrder" resultType="map">
-		WITH OrderDetails AS (
-		    SELECT
-		        ORDER_ID,
-		        ORDER_STATUS,
-		        (SELECT CLIENT_NAME FROM CLIENT C WHERE C.CLIENT_ID = ORDR.CUSTOMER_ID) AS CUSTOMER_ID,
-		        (SELECT MATERIAL_NAME FROM MATERIAL M2 WHERE M2.MATERIAL_ID = ORDR.ITEM_ID) AS ITEM_ID,
-		        TO_CHAR(ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
-		        (SELECT MATERIAL_PRICE FROM MATERIAL M1 WHERE M1.MATERIAL_ID = ORDR.ITEM_ID) AS MATERIAL_PRICE,
-		        ORDER_QTY,
-		        TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
-		        ITEM_ID AS UNIT,
-		        ITEM_ID AS STANDARD,
-		        (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.SALES_REP_ID) AS SALES_REP_ID,
-		        (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.REGIST_BY) AS REGIST_BY,
-		        TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
-		        REMARKS,
-		        TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
-		    FROM ORDERS ORDR
-		)
-		SELECT
-		    ORDER_ID,
-		    ORDER_STATUS,
-		    CUSTOMER_ID,
-		    ITEM_ID,
-		    ORDER_DATE,
-		    MATERIAL_PRICE * ORDER_QTY AS ORDER_PR,  -- 공급가 * 수량
-		    (MATERIAL_PRICE * ORDER_QTY) * 0.1 AS TAX,  -- 부가세(10%)
-		    (MATERIAL_PRICE * ORDER_QTY) + ((MATERIAL_PRICE * ORDER_QTY) * 0.1) AS ORDER_SUM,  -- 공급가 + 부가세(합계금액)
-		    DELIVERY_DATE,
-		    UNIT,
-		    STANDARD,
-		    SALES_REP_ID,
-		    ORDER_QTY,
-		    ORDER_QTY AS SHIPPED_QTY,
-		    ORDER_QTY AS BACKLOG,
-		    REGIST_BY,
-		    UPDATE_DATE,
-		    REMARKS,
-		    CREATE_DATE
-		FROM OrderDetails
-		ORDER BY ORDER_ID DESC
+        WITH OrderDetails AS (
+            SELECT
+                ORDER_ID,
+                ORDER_STATUS,
+                (SELECT CLIENT_NAME FROM CLIENT C WHERE C.CLIENT_ID = ORDR.CUSTOMER_ID) AS CUSTOMER_ID,
+                (SELECT MATERIAL_NAME FROM MATERIAL M2 WHERE M2.MATERIAL_ID = ORDR.ITEM_ID) AS ITEM_ID,
+                (SELECT MATERIAL_PRICE FROM MATERIAL M2 WHERE M2.MATERIAL_ID = ORDR.ITEM_ID) AS ITEM_PR,
+                TO_CHAR(ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+                (SELECT MATERIAL_PRICE FROM MATERIAL M1 WHERE M1.MATERIAL_ID = ORDR.ITEM_ID) AS MATERIAL_PRICE,
+                ORDER_QTY,
+                TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
+                ITEM_ID AS UNIT,
+                ITEM_ID AS STANDARD,
+                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.SALES_REP_ID) AS SALES_REP_ID,
+                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.REGIST_BY) AS REGIST_BY,
+                TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+                REMARKS,
+                TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
+            FROM ORDERS ORDR
+            WHERE #{orderId, jdbcType=VARCHAR} IS NULL OR ORDER_ID = #{orderId, jdbcType=VARCHAR}
+        )
+        SELECT
+            ORDER_ID,
+            ORDER_STATUS,
+            CUSTOMER_ID,
+            ITEM_ID,
+            ITEM_PR,
+            ORDER_DATE,
+            MATERIAL_PRICE * ORDER_QTY AS ORDER_PR,
+            (MATERIAL_PRICE * ORDER_QTY) * 0.1 AS TAX,
+            (MATERIAL_PRICE * ORDER_QTY) + ((MATERIAL_PRICE * ORDER_QTY) * 0.1) AS ORDER_SUM,
+            DELIVERY_DATE,
+            UNIT,
+            STANDARD,
+            SALES_REP_ID,
+            ORDER_QTY,
+            ORDER_QTY AS SHIPPED_QTY,
+            ORDER_QTY AS BACKLOG,
+            REGIST_BY,
+            UPDATE_DATE,
+            REMARKS,
+            CREATE_DATE
+        FROM OrderDetails
+        ORDER BY ORDER_ID DESC
     </select>
-	
+    
+   	<!-- DELETE -->
+      <delete id="deleteOrder">
+        DELETE FROM ORDERS
+        WHERE ORDER_ID IN
+        <foreach item="orderId" collection="list" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+    
 </mapper>

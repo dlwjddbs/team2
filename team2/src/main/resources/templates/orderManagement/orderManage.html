@@ -26,12 +26,17 @@
 
 <link rel="stylesheet"
 	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
 <link rel="stylesheet"
 	href="https://uicdn.toast.com/select-box/latest/toastui-select-box.css" />
 <link rel="stylesheet"
-	href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+	href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
 <link rel="stylesheet"
-	href="https://uicdn.toast.com/autocomplete/latest/toastui-autocomplete.min.css">
+	href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.1/dist/css/bootstrap-select.min.css"
+	rel="stylesheet">
+
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -49,7 +54,7 @@
 			<!-- 콘텐츠 헤더 (Page header) -->
 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
 
-			<nav th:replace="~{includes/modals/salarywrite :: salarywrite}"></nav>
+			<nav th:replace="~{includes/modals/orderDetail :: orderDetail}"></nav>
 
 			<!-- 메인 콘텐츠 -->
 			<section class="content contentOrder">
@@ -77,11 +82,13 @@
 										</div>
 										<div class="d-flex ml-4">
 											<div class="custom-label">거래처 :</div>
-											<div id="cusInput"></div>
+											<select id="cusInput" class="selectpicker"
+												data-live-search="true"></select>
 										</div>
 										<div class="d-flex ml-4">
 											<div class="custom-label">품목 :</div>
-											<input type="text" class="form-control" id="itemInput">
+											<select id="itemInput" class="selectpicker"
+												data-live-search="true"></select>
 										</div>
 										<div class="d-flex ml-4">
 											<div class="custom-label">수주번호 :</div>
@@ -97,13 +104,16 @@
 									</div>
 									<div class="card-tools">
 										<!-- <input type="button" id="btn_add_row" class="btn btn-primary" value="행추가"> -->
-										<input type="button" id="btn_search" class="btn btn-primary btn-sm" value="조회"> 
-										<input type="button" id="btn_insert" class="btn btn-primary btn-sm" value="등록"> 
-										<input type="button" id="btn_update" class="btn btn-primary btn-sm" value="수정"> 
-										<input type="button" id="btn_delete" class="btn btn-primary btn-sm" value="삭제">
+										<input type="button" id="btn_search"
+											class="btn btn-primary btn-sm" value="조회"> <input
+											type="button" id="btn_insert" class="btn btn-primary btn-sm"
+											value="등록"> <input type="button" id="btn_update"
+											class="btn btn-primary btn-sm" value="수정"> <input
+											type="button" id="btn_delete" class="btn btn-primary btn-sm"
+											value="삭제">
 									</div>
 								</div>
-								
+
 							</div>
 							<div class="card-body" id="ord_grid">
 								<!-- Toast Grid Ajax -->
@@ -147,121 +157,83 @@
 	<script
 		src="https://uicdn.toast.com/autocomplete/latest/toastui-autocomplete.min.js"></script>
 
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.1/dist/js/bootstrap-select.min.js"></script>
+
+
 	<!-- Page specific script -->
 	<script th:inline="javascript">
     
-    var grid1;
+    var grid;
     
-    const url = '/ajax/order';
-    const dataSource = {
-        api: {
-            readData: { url: url, method: 'GET' },
-        },
-        contentType: 'application/json',
-    };
-
+    const url = '/ajax/order';  // API URL
+    
+    // 페이지 로딩 후 데이터 로드
     document.addEventListener("DOMContentLoaded", function () {
-        grid();
-        console.log("dataSource", dataSource);
+        loadGridData();
+        loadClientList();    
+        loadItemList();
     });
 
-    function grid() {
-        grid1 = new tui.Grid({
-            el: document.getElementById('ord_grid'),
-            data: dataSource,
-            scrollX: true,
-            scrollY: true,
-            rowHeaders: ['checkbox'],
-            columnOptions: {
-            	resizable: true,
-            },
-            columns: [
-                { header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: 'text' },
-                { header: '수주번호', name: 'ORDER_ID', align: 'center', editor: 'text',
-                	formatter: function(value){
-                        if (value.value != null) {
-                            return `<a href="#" id="${value.value}" class="edit-link"> ${value.value}</a>`;
-                        }
-                        return '';
-                  }},
-                { header: '진행상태', name: 'ORDER_STATUS', align: 'center', editor: 'text',
-                	renderer: {
-                    styles: {
-                        fontWeight: 'bold',
-                        color: (props) => props.value == '미결' ? '#ff6464' : '#999'
-                      }} },
-                { header: '거래처', name: 'CUSTOMER_ID', align: 'left', editor: 'text' },
-                { header: '담당자', name: 'SALES_REP_ID', align: 'center', editor: 'text' },
-                { header: '품목명', name: 'ITEM_ID', align: 'left', editor: 'text' },                
-              { header: '단위', name: 'UNIT', align: 'center', editor: 'text' },
-              { header: '규격', name: 'STANDARD', align: 'center', editor: 'text' },
-               /*  { header: '공급가', name: 'ORDER_PR', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
-                    if (value.value != null) {
-                        // value.value가 숫자가 아니라면 숫자로 변환
-                        const numericValue = Number(value.value);
-                        return `${numericValue.toLocaleString('kr-KR')}원`;
-                    }
-                    return '';
-              } },
-              { header: '부가세', name: 'TAX', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
-                  if (value.value != null) {
-                      // value.value가 숫자가 아니라면 숫자로 변환
-                      const numericValue = Number(value.value);
-                      return `${numericValue.toLocaleString('kr-KR')}원`;
-                  }
-                  return '';
-            } }, 
-            { header: '합계', name: 'ORDER_SUM', align: 'right', editor: 'text', whiteSpace: 'pre-wrap', formatter: function(value){
-                if (value.value != null) {
-                    // value.value가 숫자가 아니라면 숫자로 변환
-                    const numericValue = Number(value.value);
-                    return `${numericValue.toLocaleString('kr-KR')}원`;
-                }
-                return '';
-          } },*/
-                { header: '납품예정일', name: 'DELIVERY_DATE', align: 'center', editor: 'text' },     
-                { header: '수주수량', name: 'ORDER_QTY', align: 'right', editor: 'text', formatter: function(value){
-                    if (value.value != null) {
-                        const numericValue = Number(value.value);
-                        return numericValue.toLocaleString();
-                    }
-                    return '';
-              } },
-                { header: '출하수량', name: 'SHIPPED_QTY', align: 'right', editor: 'text', formatter: function(value){
-                    if (value.value != null) {
-                        const numericValue = Number(value.value);
-                        return numericValue.toLocaleString();
-                    }
-                    return '';
-              } },
-                { header: '수주잔량', name: 'BACKLOG', align: 'right', editor: 'text', formatter: function(value){
-                    if (value.value != null) {
-                        const numericValue = Number(value.value);
-                        return numericValue.toLocaleString();
-                    }
-                    return '';
-              } },
-                { header: '등록자', name: 'REGIST_BY', align: 'center', editor: 'text' },
-                { header: '수정일자', name: 'UPDATE_DATE', align: 'center', editor: 'text' },
-                { header: '비고', name: 'REMARKS', align: 'left', editor: 'text' }
-            ],
-        });
+    function loadGridData() {
+        fetch(url) 
+            .then(response => response.json()) 
+            .then(data => {
+                console.log("수주 데이터 로드 성공", data);
 
-        grid1.on('failResponse', function (ev) {
-            alert(JSON.parse(ev.xhr.responseText).message);
-        });
+                // 그리드 설정
+                grid = new tui.Grid({
+                    el: document.getElementById('ord_grid'),
+                    data: data.orders, 
+                    scrollX: true,
+                    scrollY: true,
+                    rowHeaders: ['checkbox'],
+                    columnOptions: {
+                        resizable: true,
+                    },
+                    columns: [
+                        { header: '수주일자', name: 'ORDER_DATE', align: 'center', width: 110 },
+                        { header: '수주번호', name: 'ORDER_ID', align: 'center', formatter: function(value) { 
+                            return `<a href="#" id="${value.value}" class="edit-link"> ${value.value}</a>`; 
+                        }},
+                        { header: '진행상태', name: 'ORDER_STATUS', align: 'center', width: 80, 
+                          renderer: {
+                              styles: {
+                                  fontWeight: 'bold',
+                                  color: (props) => props.value == '미결' ? '#ff6464' : '#999'
+                              }
+                          }
+                        },
+                        { header: '거래처', name: 'CUSTOMER_ID', align: 'left' },
+                        { header: '담당자', name: 'SALES_REP_ID', align: 'center', width: 100 },
+                        { header: '품목명', name: 'ITEM_ID', align: 'left' },
+                        { header: '납품예정일', name: 'DELIVERY_DATE', align: 'center', width: 95 }, 
+                        { header: '수주수량', name: 'ORDER_QTY', align: 'right', width: 80, 
+                          formatter: function(value) { return Number(value.value).toLocaleString(); }
+                        },
+                        { header: '출하수량', name: 'SHIPPED_QTY', align: 'right', width: 80, 
+                          formatter: function(value) { return Number(value.value).toLocaleString(); }
+                        },
+                        { header: '수주잔량', name: 'BACKLOG', align: 'right', width: 80, 
+                          formatter: function(value) { return Number(value.value).toLocaleString(); }
+                        },
+                        { header: '등록자', name: 'REGIST_BY', align: 'center', width: 100 },
+                        { header: '수정일자', name: 'UPDATE_DATE', align: 'center', width: 110 },
+                        { header: '비고', name: 'REMARKS', align: 'left' }
+                    ],
+                });
 
-        grid1.on('editingStart', function (ev) {
-            const { rowKey, columnName, value } = ev;
-            const rowData = grid1.getRow(rowKey);
-
-            // PK 수정 불가 && 새로 추가된 행은 작성 가능
-            if (columnName == 'ID' && !rowData.isNew) {
-                ev.stop();
-            }
-        });      
+                // 오류 응답 처리
+                grid.on('failResponse', function (ev) {
+                    alert(JSON.parse(ev.xhr.responseText).message);
+                });
+            })
+            .catch(error => {
+                console.error("데이터 로딩 실패", error);
+            });
     }
 
+    // 수주번호 클릭 시 모달로 상세 내용 로드
     document.getElementById('ord_grid').addEventListener('click', function(event) {
         if (event.target && event.target.matches('a.edit-link')) {
             event.preventDefault();
@@ -270,44 +242,114 @@
             loadModalContent(id);
         }
     });
-    
+
+    // 수주 상세 정보 로드
     function loadModalContent(id) {
-    	$('#modal-lg').modal('show');
-	  }
+        fetch(`${url}?orderId=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('수주 상세 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("data :" + data.orders[0]);
+                
+                const order = data.orders[0];
+                
+                if (data) {
+                    console.log("수주 상세 정보:", data);
+                    document.getElementById('orderDate').innerText = order.ORDER_DATE;
+                    document.getElementById('orderId').innerText = order.ORDER_ID;
+                    document.getElementById('registBy').innerText = order.REGIST_BY;
+                    document.getElementById('customerId').innerText = order.CUSTOMER_ID;
+                    document.getElementById('salesRepId').innerText = order.SALES_REP_ID;
+                    document.getElementById('deliveryDate').innerText = order.DELIVERY_DATE;
+                    document.getElementById('itemId').innerText = order.ITEM_ID;
+                    document.getElementById('unit').innerText = order.UNIT;
+                    document.getElementById('itemPrice').innerText = order.ITEM_PR.toLocaleString() + ' 원';;
+                    document.getElementById('orderPrice').innerText = order.ORDER_PR.toLocaleString() + ' 원';;
+                    document.getElementById('tax').innerText = order.TAX.toLocaleString() + ' 원';;
+                    document.getElementById('orderSum').innerText = order.ORDER_SUM.toLocaleString() + ' 원';;
+                    document.getElementById('remarks').innerText = order.REMARKS ? order.REMARKS : ' ';
+
+                    $('#modal-lg').modal('show');
+                } else {
+                    alert('수주 상세 정보를 불러오는 데 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
 
     
-    // Select Box
-    const customers = document.getElementById('cusInput');
-    const selectBox = new tui.SelectBox(customers, {
-        data: [
-                 { label: 'CUST01', value: 'CUST01', selected: true },
-                 { label: 'CUST02', value: 'CUST02' }              
-           
-        ],
-    });
+ 	// 거래처 Select Box
+    function loadClientList() {
+        fetch('/purchase/purchaseClt') 
+            .then(response => response.json()) 
+            .then(data => {
+                console.log("거래처 리스트 데이터:", data);
+                updateSelectBox(data.data.contents, 'cusInput');  // 'cusInput' SelectBox 업데이트
+            })
+            .catch(error => {
+                console.error("거래처 리스트를 불러오는 데 실패했습니다.", error);
+            });
+    }
+
+    // 품목 Select Box
+    function loadItemList() {
+        fetch('/getMaterialList') 
+            .then(response => response.json()) 
+            .then(data => {
+                console.log("품목 리스트 데이터:", data);
+                updateSelectBox(data, 'itemInput');  // 'itemInput' SelectBox 업데이트
+            })
+            .catch(error => {
+                console.error("품목 리스트를 불러오는 데 실패했습니다.", error);
+            });
+    }
+
+    // selectBox의 옵션을 업데이트하는 함수
+    function updateSelectBox(data, elementId) {
+        const selectElement = document.getElementById(elementId);  // SelectBox를 삽입할 HTML 요소
+
+        // 옵션 생성
+        const options = [
+            `<option value="all">전체</option>`,  // "전체" 옵션 추가
+            ...data.map(item => {
+                return `<option value="${item.CLIENT_ID || item.MATERIAL_ID}">${item.CLIENT_NAME || item.MATERIAL_NAME}</option>`;
+            })
+        ].join("");
+
+        selectElement.innerHTML = options;  // 옵션을 SelectBox에 삽입
+
+        $(selectElement).selectpicker('refresh');  // selectpicker 새로고침
+    }
     
     //dateRange
-  var today = new Date();
+ 	const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
     const DatePicker = tui.DatePicker;
 
-    // startpicker와 endpicker의 초기 상태에서 캘린더를 숨깁니다.
+    // startpicker와 endpicker의 초기 상태에서 캘린더를 숨김
     const rangePicker = DatePicker.createRangePicker({
         startpicker: {
-            date: today,
+            date: startOfYear,
             input: '#startpicker-input',
             container: '#startpicker-container',
             // 클릭하기 전에는 캘린더를 숨기도록 설정
-            isVisible: false  // 초기에는 캘린더가 보이지 않게
+            isVisible: false
         },
         endpicker: {
             date: today,
             input: '#endpicker-input',
             container: '#endpicker-container',
             // 클릭하기 전에는 캘린더를 숨기도록 설정
-            isVisible: false  // 초기에는 캘린더가 보이지 않게
+            isVisible: false
         },
         selectableRanges: [
-            [today, new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())]
+            [startOfYear, today]
         ],
         type: 'date',
         format: 'YYYY-MM-dd'
@@ -322,6 +364,47 @@
     document.getElementById('endpicker-input').addEventListener('click', function () {
         rangePicker.open('end');  // endpicker가 클릭되면 끝 날짜 캘린더 열기
     });
+    
+ 	// delete btn
+	document.getElementById('btn_delete').addEventListener('click', () => {
+	    const selectedRowKeys = grid.getCheckedRowKeys();
+	
+	    if (selectedRowKeys.length === 0) {
+	        alert('삭제할 행을 선택해주세요.');
+	        return;
+	    }
+	
+	    // 선택된 행의 orderId 값 가져오기
+	    const orderIds = selectedRowKeys.map(rowKey => {
+	        const rowData = grid.getRow(rowKey);
+	        return rowData.ORDER_ID;  // 실제 필드명에 맞게 수정
+	    });
+	
+	    // 서버로 삭제 요청 보내기
+	    fetch(`${url}/delete`, {
+	        method: 'DELETE',  // DELETE 메서드 사용
+	        headers: {
+	            'Content-Type': 'application/json',
+	        },
+	        body: JSON.stringify(orderIds),  // JSON 배열로 보내기
+	    })
+	    .then(response => response.json())  // 응답을 JSON으로 파싱
+	    .then(data => {
+	        if (data.success) {
+	            // 삭제 성공 시 그리드에서 행 제거
+	            grid.removeRows(selectedRowKeys);
+	            alert('선택한 주문이 삭제되었습니다.');
+	        } else {
+	            alert(data.message);  // 오류 메시지 출력
+	        }
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	        alert('서버와의 통신에 실패했습니다.');
+	    });
+	});
+
+
     
 </script>
 
