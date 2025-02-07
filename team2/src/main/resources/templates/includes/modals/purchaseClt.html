@@ -13,17 +13,18 @@
 			
 			<!-- 모달창 바디 -->
 			<div class="modal-body">
-				<!-- 검색 필터 -->				
+				<!-- 검색 필터 -->	
+				<div class="d-flex mt-3">
 						<div class="d-flex ml-4">
 							<!-- Date range -->
-							<label for="" class="col-form-label mr-3" style="min-width: 70px;">거래처명</label>
+							<label for="" class="col-form-label mr-2" style="min-width: 70px;">거래처명</label>
 							<input type="text" class="form-control float-center" id="clientName">
-					<div class="d-flex">
-						<button type="button" class="btn btn-primary" id="btnClientSearch">조회</button>
-					</div>
 						</div>
+					<div class="d-flex">
+						<button type="button" class="btn btn-primary ml-2" id="btnClientSearch">조회</button>
 					</div>
-			
+					</div>
+			</div>
 			
 				<div class="card-body">
 					<div class="form-group">
@@ -44,6 +45,9 @@
 						</div>
 						</div>
 					</div>
+					
+					<input type="hidden" id="clientRow" class="form-control">
+					<input type="hidden" id="clientColumn" class="form-control">
 				
 			<!-- /.모달창 바디 -->
 			<!-- 모달창 푸터-->
@@ -77,9 +81,6 @@
         {header: '거래처명', name: 'CLIENT_NAME', align: 'center'},
     ];
 
-	/*$(function() {
-		selectBox("CLT");
-	});*/
 	
 	$('#purchaseClt').on('shown.bs.modal', function () {
 		param.client_id = '';
@@ -124,14 +125,17 @@
 		        clientCurrentSelectedRowKey = newRowKey;
 		        
 		        selectedClientId = clientGrid.getRow(newRowKey).CLIENT_ID;
+		        selectedClientName = clientGrid.getRow(newRowKey).CLIENT_NAME;
 		        $("#saveClient").attr("disabled", false);
 		    } else {
 		        // 같은 행을 클릭한 경우 선택 해제
 		        clientCurrentSelectedRowKey = null;
 		        $("#saveClient").attr("disabled", true);
 		        selectedClientId = '';
+		        selectedClientName = '';
 		    }
-		});
+		    
+		    console.info("선택한 거래처코드:", selectedClientId, "선택한 거래처명:", selectedClientName);});
 	}
 	
 	$("#saveClient").on('click', function() {
@@ -139,9 +143,12 @@
 		const purchaseColumn = $("#purchaseColumn").val();
 		const purchaseCode = $("#purchaseCode").val();
 		
-		let clientRow = $("#clientRow").val();
-		let clientColumn = $("#clientColumn").val();
-		grid1.setValue(clientRow, clientColumn, selectedClientId);
+		
+		let clientRow = $("#clientRow").val(); // 부모창에서 선택한 행 위치
+		console.info("로우 / " + clientRow + " // 컬럼 / " + clientColumn + " // 값 / " + selectedClientId);
+		grid1.setValue(clientRow, "CLIENT_ID", selectedClientId);
+		grid1.setValue(clientRow, "CLIENT_NAME", selectedClientName);
+		cltId = selectedClientId;
 		
 		$('#purchaseClt').modal('hide');
 	});
@@ -154,31 +161,11 @@
 		
 		clientGrid.readData(1, param, true);
 	});
-
-	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
-	/*function selectBox(type) {
-		$.ajax({
-            type : "POST",
-            url : "/purchase/selectBox",
-            data : {
-            	type : type
-            },
-            success : function(res){
-            	let str = '<option value="" selected="selected">전체</option>';
-            	
-            	res.forEach((el)=>{
-					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
-           		})
-           		
-           		$("#" + type).html(str);
-            },
-            error : function(XMLHttpRequest, textStatus, errorThrown){
-                console.log("selectBox() ajax 실패");
-            }
-        });
-	}*/
 	
-	
+	$(".close, .btn-default").on("click", function (event) {
+	    event.stopPropagation(); // 다른 이벤트와 충돌 방지
+	    $("#purchaseClt").modal("hide");
+	});
 	
 	
 </script>

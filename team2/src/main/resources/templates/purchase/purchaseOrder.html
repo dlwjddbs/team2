@@ -83,22 +83,6 @@
 			
 			
 			 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> 
-			<section class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1>발주관리</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a href="#">설정</a></li>
-								<li class="breadcrumb-item active">발주관리</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
-			<!-- /.콘텐츠 헤더 (Page header) -->
 
 			<section class="content">
 				<div class="container-fluid">
@@ -204,7 +188,7 @@
 				});
 
 				// Toast Grid 설정
-
+				let cltId = "";
 				let grid1;
 				let grid2;
 
@@ -223,9 +207,13 @@
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
 					{header: '주문번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
-					{header: '거래처', name: 'CLIENT_ID', align: 'center', 	formatter: function({ row }) {
+					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
+					{header: '거래처', name: 'CLIENT_NAME', align: 'center', 	formatter: function({ value, row }) {
 						return `
 						<div style="display: flex; justify-content: flex-end; align-items: center;">
+						<span class="client-id-display" style="text-align: center; width: 100%; display: inline-block;">
+				          ${value ? value : ''}
+				        </span>
 						          <button class="client-modal-btn" data-row-key="${row.rowKey}" 
 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
 						              🔍
@@ -250,7 +238,6 @@
 				const columns2 = [
 				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
 					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', formatter: function({ value, row }) {
-						console.log("MATERIAL_ID value:", value, "row:", row);
 						return `
 						<div style="display: flex; justify-content: flex-end; align-items: center;">
 						<span class="material-id-display" style="text-align: center; width: 100%; display: inline-block;">
@@ -314,6 +301,7 @@
 						.then(data => {
 							console.log("서버 응답 데이터:", data);
 							grid1.resetData(data);
+ 							
 						})
 						.catch(error => console.error("데이터 불러오기 실패:", error));
 
@@ -331,25 +319,28 @@
 						poId = selectedRow.PO_ID;
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
-
+						
+						console.info(cltId);
 
 						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
 						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
 
 						// 선택한 발주번호(PO_ID)로 상세 데이터 요청
-						fetch('/getPurchaseDetail', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								[header]: token
-							},
-							body: JSON.stringify({PO_ID: selectedRow.PO_ID})
-						})
-							.then(response => response.json())
-							.then(data => {
-								dtlGrid(data);
+						if(selectedRow.PO_ID != null){
+							fetch('/getPurchaseDetail', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+									[header]: token
+								},
+								body: JSON.stringify({PO_ID: selectedRow.PO_ID})
 							})
-							.catch(error => console.error("grid2 데이터 불러오기 실패:", error));
+								.then(response => response.json())
+								.then(data => {
+									dtlGrid(data);
+								})
+								.catch(error => console.error("grid2 데이터 불러오기 실패:", error));
+						}
 					});
 
 					// 더블 클릭하면 상세 리스트 숨기기
@@ -513,9 +504,9 @@
 					grid1.blur(); // 포커스 해제
 
 					const modifiedRows = grid1.getModifiedRows();
-					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert"}));
-					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update"}));
-					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete"}));
+					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert", cltId:cltId}));
+					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update", cltId:cltId}));
+					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete", cltId:cltId}));
 
 					const allData = [...createdRows, ...updatedRows, ...deletedRows];
 
@@ -625,11 +616,14 @@
 	
 					$(document).on("click", ".client-modal-btn", function (props) {
 						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
-								    $("#purchaseClt").modal("show");
+						 const rowKey = $(this).data("row-key");
+				    // 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
+				    $("#clientRow").val(rowKey);
+						
+						$("#purchaseClt").modal("show");
 							       // loadClientList(); // 거래처 리스트 불러오기
 							    });							
 									
-			    
 			</script>
 
 				

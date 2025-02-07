@@ -15,6 +15,7 @@
 		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
 		   (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = PO.MEMBER_ID) AS MEMBER_NAME,
 		   CLIENT_ID,
+		   (SELECT CLIENT_NAME FROM CLIENT WHERE CLIENT_ID = PO.CLIENT_ID) AS CLIENT_NAME,
 		   PO_STATUS,
 		   TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
 		   (SELECT NAME FROM MEMBER M2 WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
@@ -23,30 +24,32 @@
 	</select>
 	
 <!--	발주 등록-->
-	<insert id="insertPurchase">
+	<insert id="insertPurchase" parameterType="map">
 	INSERT INTO PURCHASE_ORDER (
-			PO_ID
-		  , CREATE_DATE
-		  , MEMBER_ID
-		  , CUSTOMER_ID
-		  , PO_STATUS
-		  , PO_NUM		
-		) VALUES (
-        'PO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'), 
-          CURRENT_DATE, 
-        #{INSERT_MEM}, 
-        #{CUSTOMER_ID, jdbcType=VARCHAR}, 
-        #{PO_STATUS}, 
-        'ORD-' || TO_CHAR(CURRENT_DATE, 'MMDD-HH24MISS')
-    )
+    PO_ID,
+    CREATE_DATE,
+    MEMBER_ID,
+    CLIENT_ID,
+    PO_STATUS,
+    PO_NUM
+)
+SELECT
+    'PO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
+    CURRENT_DATE, 
+    #{INSERT_MEM},
+    CLIENT_ID,
+    #{PO_STATUS},
+    'ORD-' || TO_CHAR(SYSDATE, 'MMDD-HH24MISS')
+FROM CLIENT
+WHERE CLIENT_ID = #{cltId}
 	</insert>
 	
 <!--	발주 수정-->
-	<update id="updatePurchase">
+	<update id="updatePurchase" parameterType="map">
     UPDATE PURCHASE_ORDER
     	SET 
        	 	CREATE_DATE = CURRENT_DATE,
-       	 	CUSTOMER_ID = #{CUSTOMER_ID, jdbcType=VARCHAR},
+       	 	CLIENT_ID = #{CLIENT_ID, jdbcType=VARCHAR},
        	 	UPDATE_DATE = CURRENT_DATE,
        	 	UPDATE_MEMBER = #{UPDATE_MEM},
        	 	PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
@@ -59,7 +62,7 @@
         	WHERE PO_ID = #{PO_ID}
     </delete>
     
-    <select id="getPurchaseDetail" resultType="map">
+    <select id="getPurchaseDetail" resultType="map" parameterType="map">
     SELECT 
     pd.PODETAIL_ID,
     pd.MATERIAL_ID,
