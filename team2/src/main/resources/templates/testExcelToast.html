@@ -236,6 +236,8 @@
 		    // Grid 데이터 가져오기
 		    const jsonData = grid1.getData(); // getData() 사용
 		    const headers = grid1.getColumns().map(col => col.name);
+		    //const headers = grid1.getColumns().map(col => col.header);
+		  	//const headers = equipGrid.getColumns().map(col => `${col.header}(${col.name})`);
 		    const data = jsonData.map(row => grid1.getColumns().map(col => row[col.name] || ""));
 		    
 		    // 엑셀 시트 생성
@@ -253,7 +255,7 @@
 		    XLSX.writeFile(workbook, fileName);
 		}
 		
-		// 엑셀 양식 다운로드 (test)
+		// 엑셀 양식 다운로드
 		function downloadExcelTemplate() {
 			// 급여 테이블로 테스트
 		    const tableName = prompt("다운로드할 테이블(양식)명을 입력하세요.", "TEST");

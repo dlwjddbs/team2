@@ -12,6 +12,7 @@
 			 , EQUIPMENT_STATUS
 			 , EQUIPMENT_NOTE
           FROM EQUIPMENT
+      ORDER BY EQUIPMENT_ID
     </select>
     
     <insert id="insertEquipment">

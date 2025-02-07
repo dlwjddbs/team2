@@ -68,14 +68,14 @@
 									<div class="d-flex justify-content-between align-items-center">
 								        <div class="d-flex align-items-center">
 								            <label class="col-form-label" style="min-width: 70px">설비코드</label>
-								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="미구현">
+								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="(미구현)">
 								            
 								            <label class="col-form-label" style="min-width: 70px">설비명</label>
-								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="미구현">
+								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="(미구현)">
 	
 								            <label class="col-form-label" style="min-width: 70px">사용여부</label>
 								            <select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
-								                <option selected="selected" disabled>사용여부(미구현)</option>
+								                <option selected="selected" disabled>(미구현)</option>
 								                <option>사용</option>
 								                <option>미사용</option>
 								            </select>
@@ -155,18 +155,19 @@
 		};
 		
 		const equip_columns =  [
-			{header: '설비코드', name: 'EQUIPMENT_ID', width: 150},
-			{header: '설비명', name: 'EQUIPMENT_NAME', width: 200},
+			{header: '설비코드', name: 'EQUIPMENT_ID', width: 150, sortable: true},
+			{header: '설비명', name: 'EQUIPMENT_NAME', width: 200, sortable: true},
 			{
 				header: '사용여부', 
 				name: 'EQUIPMENT_STATUS', 
 				width: 100,
+				sortable: true,
 			    align: 'center',
 			    formatter: function({value}) {
 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
 			    },
 			},
-			{header: '비고', name: 'EQUIPMENT_NOTE', width: 300}
+			{header: '비고', name: 'EQUIPMENT_NOTE', width: 300, sortable: true}
 		];
 
 		const TextInputRenderer = function(props) {
@@ -297,7 +298,7 @@
 				data: equipDataSource,
 				scrollX: true,
 				scrollY: true,
-				bodyHeight: 250,
+				bodyHeight: 500,
 				rowHeaders: ['checkbox'],
 				editingEvent: 'click',
 				columns: equip_columns
@@ -469,20 +470,33 @@
 		
 		$("#btn_excel_download").on("click", function() {      
 			// test용 엑셀 파일
-			const sheetName = "테스트 데이터";
-			const fileName = "테스트 데이터.xlsx";
+			const sheetName = "설비정보_테스트";
+			const fileName = "설비정보_엑셀_테스트.xlsx";
+			
+			// 페이지 제목 가져오기
+			const pageTitle = document.getElementById("pageHeaderTitle").innerText || "제목 없음";
 		
 			// Grid 데이터 가져오기
 			const jsonData = equipGrid.getData(); // getData() 사용
-			const headers = equipGrid.getColumns().map(col => col.name);
+			const headers = equipGrid.getColumns().map(col => col.header);
 			const data = jsonData.map(row => equipGrid.getColumns().map(col => row[col.name] || ""));
 		
-			// 엑셀 시트 생성
-			const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
-		
+			// 엑셀 시트 생성 (1행: 제목, 2행부터 데이터)
+		    const worksheet = XLSX.utils.aoa_to_sheet([
+		        [pageTitle],	// 1행: 제목
+		        headers,		// 2행: 컬럼명
+		        ...data			// 3행부터 데이터
+		    ]);
+			
+		    // 제목 열 병합 설정 (A1 ~ 마지막 컬럼 병합)
+		    // 가운데 정렬 미구현
+		    worksheet['!merges'] = [
+		        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } } // 1행 전체 병합
+		    ];
+		    
 			// 컬럼 자동 너비 조정
-			const colWidths = headers.map(header => ({wch: header.length + 5}));
-			worksheet['!cols'] = colWidths;
+		    const colWidths = headers.map(header => ({ wch: header.length + 5 }));
+		    worksheet['!cols'] = colWidths;
 		
 			// 워크북 생성
 			const workbook = XLSX.utils.book_new();
@@ -491,30 +505,6 @@
 			// 파일 다운로드
 			XLSX.writeFile(workbook, fileName);
 		});
-		
-		/*
-		$("#btn_equip_insert").on("click", function () {
-			equipGrid.request('createData');
-			equipGrid.reloadData();  // 실패시 테이블 리로드
-			// GET 요청시 데이터 보낼려면 header 설정
-		});
-
-		$("#btn_equip_update").on("click", function () {
-			equipGrid.request('updateData');
-		});
-
-		$("#btn_equip_delete").on("click", function () {
-			equipGrid.removeCheckedRows();
-
-			// 반드시 removeCheckedRows()후에 실행 순서
-			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = equipGrid.getModifiedRows().deletedRows.map(row => row.ID).join(',');
-			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
-
-			equipGrid.request('deleteData');
-			equipGrid.reloadData();  // 실패시 테이블 리로드
-		});
-		*/
 	</script>
 </body>
 

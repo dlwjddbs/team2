@@ -47,6 +47,41 @@
 <!-- /.모달창 -->
 
 <script th:fragment="excelModal" th:inline="javascript">
+
+	// 엑셀 데이터를 Grid의 name과 자동 매핑
+	function autoMapExcelData(excelData, gridInstance) {
+	    if (excelData.length === 0) return [];
+	
+	    // Toast UI Grid 컬럼 정보 가져오기
+	    // [{name, header}, ...]
+	    const gridColumns = gridInstance.getColumns();
+	
+	    // 첫 번째 행 (엑셀 header) 추출
+	    const excelHeaders = Object.keys(excelData[0]);
+	
+	    // 엑셀 header와 Grid의 name을 자동 매핑
+	    const headerMap = {};
+	    gridColumns.forEach(column => {
+	        let matchedHeader = excelHeaders.find(header => header === column.header); // header 값이 일치하는지 확인
+	        if (matchedHeader) {
+	            headerMap[matchedHeader] = column.name; // '설비코드' → 'EQUIPMENT_ID'
+	        }
+	    });
+	
+	    console.log("자동 매핑 결과 :", headerMap);
+	
+	    // 엑셀 데이터를 Grid의 name 기준으로 변환
+	    return excelData.map(row => {
+	        let newRow = {};
+	        Object.keys(row).forEach(header => {
+	            if (headerMap[header]) {
+	                newRow[headerMap[header]] = row[header]; // 매칭된 키로 변경
+	            }
+	        });
+	        return newRow;
+	    });
+	}
+
 	// 엑셀 업로드 버튼 클릭 이벤트
 	$('#btn_excel_upload').on('click', function () {
 		
@@ -85,10 +120,16 @@
 	            }
 
 	            if (activeGrid) {
-	            	alert("엑셀 불러오기 성공!");
-	                activeGrid.resetData(res); // Toast UI Grid에 데이터 바인딩
+	                // 엑셀 데이터를 Grid의 name에 맞게 자동 변환
+	                let transformedData = autoMapExcelData(res, activeGrid);
+	                console.log("엑셀 데이터 (매핑 전) :", res);
+	                console.log("엑셀 데이터 (매핑 후) :", transformedData);
+
+	                // alert("엑셀 불러오기 성공!");
+	                activeGrid.resetData(transformedData); // 변환된 데이터 적용
 	            } else {
 	                alert("보이는 그리드를 찾을 수 없습니다.");
+	                alert("엑셀 불러오기 실패!");
 	            }
 			},
 			error: function (err) {
@@ -98,7 +139,7 @@
 		});
 	});
 	
-	// 엑셀 업로드시 수정된 행(row)만 db에 업데이트 이벤트 (동작안함)
+	// 엑셀 업로드시 수정된 행(row)만 db에 업데이트 이벤트 (수정 중)
 	$('#btn_db_update').on('click', function () {
 		
 		// 엑셀 파일 업로드시 수정된 행(row)만 db에 업데이트
@@ -130,7 +171,7 @@
 		});
 	});
 	
-	// 엑셀 양식 다운로드 버튼 클릭 이벤트 (동작함)
+	// 엑셀 양식 다운로드 버튼 클릭 이벤트
 	$('#btn_excel_template').on('click', function () {
 		const tableName = prompt("다운로드할 테이블(양식)명을 입력하세요.", "TEST");
 	
@@ -140,7 +181,6 @@
 		}
 	
 		$.ajax({
-			//url: `/ajax/downloadTemplate?tableName=${tableName}`,
 			url: "/ajax/downloadTemplate?tableName=" + tableName,
 			method: "GET",
 			xhrFields: {
@@ -154,7 +194,6 @@
 				// 다운로드 속성 설정
 				a.href = url;
 				a.download = tableName + "_template.xlsx";
-				//a.download = `${tableName}_template.xlsx`;
 	
 				// 링크를 클릭하여 다운로드 시작
 				document.body.appendChild(a);

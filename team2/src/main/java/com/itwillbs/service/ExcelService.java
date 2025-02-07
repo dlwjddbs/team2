@@ -241,7 +241,7 @@ public class ExcelService {
 			int rowCount = sheet.getPhysicalNumberOfRows();
 
 			// header 읽기 (2번째 행부터 시작)
-			Row headerRow = sheet.getRow(0);
+			Row headerRow = sheet.getRow(1);
 			List<String> headers = new ArrayList<>();
 
 			// 2번째 행의 모든 셀을 읽어서 headers 리스트에 저장
@@ -250,7 +250,7 @@ public class ExcelService {
 			}
 
 			// 데이터 읽기 (3번째 행부터)
-			for (int i = 1; i < rowCount; i++) {
+			for (int i = 2; i < rowCount; i++) {
 				Row row = sheet.getRow(i);
 
 				if (row == null)
