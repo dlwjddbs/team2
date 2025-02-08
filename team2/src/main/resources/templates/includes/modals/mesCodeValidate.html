@@ -60,16 +60,17 @@
 	button.addEventListener('click', function() {
 		const row = props.rowKey;
 		const column = props.columnInfo.name;
-		const value = processGrid.getValue(row, column);  // 값을 가져올 그리드로 바꿔야함.
+		const value = processGrid.getValue(row, column);  // 사용할 그리드 - 변경필요.
 		
 		$("#inputCodeText").val(value);  // 그리드에 출력되어있는 기존의 값
 		$("#gridCheckedRow").val(row);  // 선택한 행
 		$("#gridCheckedColumn").val(column);  // 선택한 열
 		
-		tableName = "PROCESS";  // DB테이블명
-		tableCodeId = "PROCESS_ID";  // 중복체크할 컬럼 ID
-		copyGrid = processGrid;  // 선택한값 집어넣을 그리드 객체
+		tableName = "PROCESS";  // DB테이블명 - 변경필요.
+		tableCodeId = "PROCESS_ID";  // 중복체크할 컬럼 ID - 변경필요.
+		copyGrid = processGrid;  // 선택한값 집어넣을 그리드 객체 - 변경필요.
 		
+		// 위에서 변경필요한 값들 수정한 다음 모달 띄움.
 		$('#mesCodeValidate').modal();
 	}
 	*/
