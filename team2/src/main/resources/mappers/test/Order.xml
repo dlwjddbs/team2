@@ -53,6 +53,82 @@
         ORDER BY ORDER_ID DESC
     </select>
     
+    <!-- 필터링 수주 조회 -->
+    <select id="selectFilteredOrders" resultType="map">
+        WITH OrderDetails AS (
+            SELECT
+                ORDER_ID,
+                ORDER_STATUS,
+                (SELECT CLIENT_NAME FROM CLIENT C WHERE C.CLIENT_ID = ORDR.CUSTOMER_ID) AS CUSTOMER_ID,
+                (SELECT MATERIAL_NAME FROM MATERIAL M2 WHERE M2.MATERIAL_ID = ORDR.ITEM_ID) AS ITEM_ID,
+                (SELECT MATERIAL_PRICE FROM MATERIAL M2 WHERE M2.MATERIAL_ID = ORDR.ITEM_ID) AS ITEM_PR,
+                TO_CHAR(ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+                (SELECT MATERIAL_PRICE FROM MATERIAL M1 WHERE M1.MATERIAL_ID = ORDR.ITEM_ID) AS MATERIAL_PRICE,
+                ORDER_QTY,
+                TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
+                ITEM_ID AS UNIT,
+                ITEM_ID AS STANDARD,
+                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.SALES_REP_ID) AS SALES_REP_ID,
+                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.REGIST_BY) AS REGIST_BY,
+                TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+                REMARKS,
+                TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
+            FROM ORDERS ORDR
+            <where>
+                <!-- 주문 날짜 범위 필터링 -->
+                <if test="startDate != null">
+                    AND ORDER_DATE &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    AND TRUNC(ORDER_DATE) &lt;= #{endDate}
+                </if>
+
+                <!-- 거래처 필터링 -->
+                <if test="customerId != null and customerId != 'all'">
+                    AND CUSTOMER_ID = #{customerId}
+                </if>
+
+                <!-- 품목 필터링 -->
+                <if test="itemId != null and itemId != 'all'">
+                    AND ITEM_ID = #{itemId}
+                </if>
+
+                <!-- 수주번호 필터링 -->
+                <if test="orderId != null">
+                    AND ORDER_ID = #{orderId}
+                </if>
+
+                <!-- 진행상태 필터링 -->
+                <if test="orderStatus != null">
+                    AND ORDER_STATUS = #{orderStatus}
+                </if>
+            </where>
+        )
+        SELECT
+            ORDER_ID,
+            ORDER_STATUS,
+            CUSTOMER_ID,
+            ITEM_ID,
+            ITEM_PR,
+            ORDER_DATE,
+            MATERIAL_PRICE * ORDER_QTY AS ORDER_PR,
+            (MATERIAL_PRICE * ORDER_QTY) * 0.1 AS TAX,
+            (MATERIAL_PRICE * ORDER_QTY) + ((MATERIAL_PRICE * ORDER_QTY) * 0.1) AS ORDER_SUM,
+            DELIVERY_DATE,
+            UNIT,
+            STANDARD,
+            SALES_REP_ID,
+            ORDER_QTY,
+            ORDER_QTY AS SHIPPED_QTY,
+            ORDER_QTY AS BACKLOG,
+            REGIST_BY,
+            UPDATE_DATE,
+            REMARKS,
+            CREATE_DATE
+        FROM OrderDetails
+        ORDER BY ORDER_ID DESC
+    </select>
+    
    	<!-- DELETE -->
       <delete id="deleteOrder">
         DELETE FROM ORDERS

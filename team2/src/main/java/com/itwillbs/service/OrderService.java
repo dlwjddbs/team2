@@ -18,10 +18,12 @@ public class OrderService {
 
     private final OrderMapper orderMapper;
 
-    // 수주 조회 (orderId가 있으면 상세 조회, 없으면 전체 조회)
-    public Map<String, Object> getOrder(String orderId) {
-        List<Map<String, Object>> orderData = orderMapper.getOrder(orderId);  // orderId가 있으면 상세 조회, 없으면 전체 조회
+    // 수주 조회 (orderId가 있으면 상세 조회, 없으면 전체 조회, 필터링 조건)
+    public Map<String, Object> getFilteredOrders(Map<String, Object> filters) {
+        // 필터 조건에 맞는 수주 데이터를 조회
+        List<Map<String, Object>> orderData = orderMapper.selectFilteredOrders(filters);
         
+        // 결과를 response에 담아 반환
         Map<String, Object> response = new HashMap<>();
         response.put("orders", orderData);
         return response;

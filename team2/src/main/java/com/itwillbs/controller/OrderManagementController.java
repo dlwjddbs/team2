@@ -36,9 +36,26 @@ public class OrderManagementController {
     // 수주 정보 조회
     @GetMapping(URL)
     @ResponseBody
-    public Map<String, Object> getOrder(@RequestParam(name= "orderId", required = false) String orderId) {
-        // orderId가 없으면 전체 수주, 있으면 해당 수주만 조회
-        Map<String, Object> orderData = orderService.getOrder(orderId);  // 주문 번호에 따라 데이터를 조회
+    public Map<String, Object> getOrders(
+            @RequestParam(name = "orderId", required = false) String orderId,
+            @RequestParam(name = "startDate", required = false) String startDate,
+            @RequestParam(name = "endDate", required = false) String endDate,
+            @RequestParam(name = "customerId", required = false) String customerId,
+            @RequestParam(name = "itemId", required = false) String itemId,
+            @RequestParam(name = "orderStatus", required = false) String orderStatus) {
+
+        // 필터 조건을 서비스로 전달
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("orderId", orderId);
+        filters.put("startDate", startDate);
+        filters.put("endDate", endDate);
+        filters.put("customerId", customerId);
+        filters.put("itemId", itemId);
+        filters.put("orderStatus", orderStatus);
+
+        // 필터링된 수주 데이터 조회
+        Map<String, Object> orderData = orderService.getFilteredOrders(filters);
+
         log.info("조회된 수주 데이터: " + orderData);
 
         return orderData;
@@ -48,16 +65,15 @@ public class OrderManagementController {
     public ResponseEntity<Map<String, Object>> deleteOrder(@RequestBody List<String> orderIds) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // 수주 삭제 처리
             orderService.deleteOrder(orderIds);  
             response.put("success", true);
             response.put("message", "수주정보가 성공적으로 삭제되었습니다.");
-            return ResponseEntity.ok(response);  // 성공 시 JSON 응답
+            return ResponseEntity.ok(response);  
         } catch (Exception e) {
-            e.printStackTrace();  // 오류 추적을 위한 로그 출력
+            e.printStackTrace(); 
             response.put("success", false);
             response.put("message", "수주정보 삭제 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);  // 실패 시 JSON 응답
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
         }
     }
 

@@ -15,6 +15,9 @@ public interface OrderMapper {
     // 수주 상세 정보 조회
     List<Map<String, Object>> getOrder(@Param("orderId") String orderId);
     
+    // 필터링된 수주 조회
+	List<Map<String, Object>> selectFilteredOrders(Map<String, Object> filters);
+    
     // 수주 삭제
     void deleteOrder(List<String> orderIds);
 }
