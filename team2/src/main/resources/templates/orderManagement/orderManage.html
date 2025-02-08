@@ -38,7 +38,7 @@
 	rel="stylesheet">
 
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini sidebar-collapse">
 	<div class="wrapper">
 
 		<!-- 상단 메뉴 -->
@@ -164,7 +164,7 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
     
-    var grid;
+    let ord_grid;
     
     const url = '/ajax/order';  // API URL
     
@@ -182,7 +182,7 @@
                 console.log("수주 데이터 로드 성공", data);
 
                 // 그리드 설정
-                grid = new tui.Grid({
+                ord_grid = new tui.Grid({
                     el: document.getElementById('ord_grid'),
                     data: data.orders, 
                     scrollX: true,
@@ -224,7 +224,7 @@
                 });
 
                 // 오류 응답 처리
-                grid.on('failResponse', function (ev) {
+                ord_grid.on('failResponse', function (ev) {
                     alert(JSON.parse(ev.xhr.responseText).message);
                 });
             })
@@ -267,10 +267,10 @@
                     document.getElementById('deliveryDate').innerText = order.DELIVERY_DATE;
                     document.getElementById('itemId').innerText = order.ITEM_ID;
                     document.getElementById('unit').innerText = order.UNIT;
-                    document.getElementById('itemPrice').innerText = order.ITEM_PR.toLocaleString() + ' 원';;
-                    document.getElementById('orderPrice').innerText = order.ORDER_PR.toLocaleString() + ' 원';;
+                    document.getElementById('itemPrice').innerText = order.ITEM_PR.toLocaleString() + ' 원';
+                    document.getElementById('orderPrice').innerText = order.ORDER_PR.toLocaleString() + ' 원';
                     document.getElementById('tax').innerText = order.TAX.toLocaleString() + ' 원';;
-                    document.getElementById('orderSum').innerText = order.ORDER_SUM.toLocaleString() + ' 원';;
+                    document.getElementById('orderSum').innerText = order.ORDER_SUM.toLocaleString() + ' 원';
                     document.getElementById('remarks').innerText = order.REMARKS ? order.REMARKS : ' ';
 
                     $('#modal-lg').modal('show');
@@ -310,13 +310,13 @@
             });
     }
 
-    // selectBox의 옵션을 업데이트하는 함수
+    // selectBox
     function updateSelectBox(data, elementId) {
-        const selectElement = document.getElementById(elementId);  // SelectBox를 삽입할 HTML 요소
+        const selectElement = document.getElementById(elementId);  
 
         // 옵션 생성
         const options = [
-            `<option value="all">전체</option>`,  // "전체" 옵션 추가
+            `<option value="all">전체</option>`,  // 전체 옵션 추가
             ...data.map(item => {
                 return `<option value="${item.CLIENT_ID || item.MATERIAL_ID}">${item.CLIENT_NAME || item.MATERIAL_NAME}</option>`;
             })
@@ -367,35 +367,35 @@
     
  	// delete btn
 	document.getElementById('btn_delete').addEventListener('click', () => {
-	    const selectedRowKeys = grid.getCheckedRowKeys();
-	
+	    const selectedRowKeys = ord_grid.getCheckedRowKeys();
+
 	    if (selectedRowKeys.length === 0) {
 	        alert('삭제할 행을 선택해주세요.');
 	        return;
 	    }
-	
+
 	    // 선택된 행의 orderId 값 가져오기
 	    const orderIds = selectedRowKeys.map(rowKey => {
-	        const rowData = grid.getRow(rowKey);
-	        return rowData.ORDER_ID;  // 실제 필드명에 맞게 수정
+	        const rowData = ord_grid.getRow(rowKey);
+	        return rowData.ORDER_ID;
 	    });
-	
-	    // 서버로 삭제 요청 보내기
+
+	    // 삭제 요청
 	    fetch(`${url}/delete`, {
-	        method: 'DELETE',  // DELETE 메서드 사용
+	        method: 'DELETE',
 	        headers: {
 	            'Content-Type': 'application/json',
 	        },
-	        body: JSON.stringify(orderIds),  // JSON 배열로 보내기
+	        body: JSON.stringify(orderIds),
 	    })
-	    .then(response => response.json())  // 응답을 JSON으로 파싱
+	    .then(response => response.json())
 	    .then(data => {
 	        if (data.success) {
-	            // 삭제 성공 시 그리드에서 행 제거
-	            grid.removeRows(selectedRowKeys);
-	            alert('선택한 주문이 삭제되었습니다.');
+	            ord_grid.removeRow(selectedRowKeys);  
+	            ord_grid.refreshLayout();  
+	            alert('선택한 수주정보가 삭제되었습니다.');
 	        } else {
-	            alert(data.message);  // 오류 메시지 출력
+	            alert(data.message);
 	        }
 	    })
 	    .catch(error => {
@@ -404,8 +404,6 @@
 	    });
 	});
 
-
-    
 </script>
 
 </body>
