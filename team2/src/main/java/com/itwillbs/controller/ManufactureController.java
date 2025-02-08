@@ -39,6 +39,12 @@ public class ManufactureController {
 	public String process() {
 		return "/manufacture/process";
 	}
+	
+	@GetMapping("/routing")
+	public String routing() {
+		return "/manufacture/routing";
+	}
+	
 }
 
 

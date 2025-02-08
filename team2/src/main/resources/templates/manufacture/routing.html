@@ -35,9 +35,7 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
 		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
-<!--		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>-->
-		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
-		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
+		<nav th:replace="~{includes/modals/routingItemAdd :: routingItemAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -53,20 +51,20 @@
 								<div class="card-header">
 									<div class="row">
 										<div class="col-6">
-											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터</p>
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">라우팅</p>
 										</div>
 										<div class="col-6">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_workcenter_add_row" class="btn btn-primary" value="행추가" style="display : none;">
-												<input type="button" id="btn_workcenter_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
-												<input type="button" id="btn_workcenter_toggleEditMode" class="btn btn-primary" value="편집">
-												<input type="button" id="btn_workcenter_modify" class="btn btn-primary" value="저장">
-												<input type="button" id="btn_workcenter_delete" class="btn btn-primary" value="삭제">
+												<input type="button" id="btn_routing_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_routing_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_routing_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_routing_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_routing_delete" class="btn btn-primary" value="삭제">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="card-body" id="workcenterGrid">
+								<div class="card-body" id="routingGrid">
 									<!-- Toast Grid Ajax -->
 								</div>
 							<!-- /.card-body -->
@@ -82,7 +80,7 @@
 							<div class="card-header">
 								<div class="row">
 									<div class="col-6">
-										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터설비</p>
+										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">라우팅 절차</p>
 									</div>
 									<div class="col-6">
 										<div class="card-tools" id="btn_group_equipment" style="text-align: right; display: none;">
@@ -134,22 +132,22 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		// 워크센터
-		let workcenterGrid = null;
-		const workcenterUrl = '/manufacture/workcenter';
-		const workcenterDataSource = {
+		let routingGrid = null;
+		const routingUrl = '/manufacture/routing';
+		const routingDataSource = {
 			api: {
-			    readData: {url: workcenterUrl, method: 'GET'},
-				modifyData: { url: workcenterUrl, method: 'PUT' },
-				deleteData: {url: workcenterUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			    readData: {url: routingUrl, method: 'GET'},
+				modifyData: { url: routingUrl, method: 'PUT' },
+				deleteData: {url: routingUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
-		let workcenterCurrentSelectedRowKey = null;
-		let workcenterCurrentSelectedID = null;
-		let workcenterIsEditModeEnabled = false; 
-		const workcenter_columns = [
-            {header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: null},
-            {header: '워크센터명', name: 'NAME', align: 'left', editor: null},
+		let routingCurrentSelectedRowKey = null;
+		let routingCurrentSelectedID = null;
+		let routingIsEditModeEnabled = false; 
+		const routing_columns = [
+            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
+            {header: '라우팅명', name: 'NAME', align: 'left', editor: null},
 			{
 			    header: '사용여부', 
 			    name: 'USE_YN', 
@@ -158,18 +156,19 @@
 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
 			    }
 			},
+			{header: '공정수', name: 'PROCESS_QUANTITY', align: 'center', editor: null},
+            {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
             {header: '비고', name: 'NOTE', align: 'left', editor: null},
-            {header: '담당자', name: 'MANAGER_ID', align: 'center', editor: null},
-            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', editor: null},
         ];
 		
+		/*
 		// 설비
 		let equipmentGrid = null;
 		const equipmentUrl = '/manufacture/equipment';
 		const equipmentDataSource = {
 			api: {
 				createData: {url: equipmentUrl, method: 'POST'},
-			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '' }},
+			    readData: {url: equipmentUrl, method: 'GET', initParams: { routing_id: '' }},
 			    deleteData: {url: equipmentUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
@@ -187,8 +186,9 @@
 			    }
 			},
 		    {header: '비고', name: 'EQUIPMENT_NOTE', align: 'left', editor: null},
-		    {header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', editor: null, hidden: true},
+		    {header: '워크센터 코드', name: 'ROUTING_ID', align: 'center', editor: null, hidden: true},
 		];
+		*/
 		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
@@ -227,9 +227,9 @@
 			
 			container.appendChild(el);
 			
-			// WORKCENTER_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'WORKCENTER_ID'
-				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
+			// ROUTING_ID, ITEM_ID 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'ROUTING_ID' || props.columnInfo.name == 'ITEM_ID')
+				&& routingGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
 			    button.style.border = 'solid 1px #007BFF';
@@ -246,29 +246,28 @@
 					const row = props.rowKey;
 					const column = props.columnInfo.name;
 					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = workcenterGrid.getValue(row, column);
+					const value = routingGrid.getValue(row, column);
 					
 					switch (column) {
-						case 'WORKCENTER_ID':
+						case 'ROUTING_ID':
 							$("#inputCodeText").val(value);
 							$("#gridCheckedRow").val(row);
 							$("#gridCheckedColumn").val(column);
 
-							tableName = "WORKCENTER";
-							tableCodeId = "WORKCENTER_ID";
-							copyGrid = workcenterGrid;
+							tableName = "ROUTING";
+							tableCodeId = "ROUTING_ID";
+							copyGrid = routingGrid;
 							
 							$('#mesCodeValidate').modal();
 							
 							break;
-						case 'MANAGER_ID':
-							$("#managerRow").val(row);
-							$("#managerColumn").val(column);
+						case 'ITEM_ID':
+							$("#itemRow").val(row);
+							$("#itemColumn").val(column);
+						
+							$('#routingItemAdd').modal();
 							
-							$('#workcenterManagerAdd').modal(); 
 							break;
-							// TODO
-	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
 					}
 			    });
 			}
@@ -311,93 +310,83 @@
 		};
 
 		$(function () {
-			workcenterInit();
+			routingInit();
 		});
 		
 		// 워크센터
-		function workcenterInit() {
-			workcenterGrid = new tui.Grid({
-		        el: document.getElementById('workcenterGrid'),
-		        data: workcenterDataSource,
+		function routingInit() {
+			routingGrid = new tui.Grid({
+		        el: document.getElementById('routingGrid'),
+		        data: routingDataSource,
 		        scrollX: true,
 		        scrollY: true,
 		        bodyHeight: 250,
 		        rowHeaders: ['checkbox'],
 				editingEvent: 'click',
-		        columns: workcenter_columns,
+		        columns: routing_columns,
 		    });
 
-		    workcenterGrid.on('failResponse', function(ev) {
+		    routingGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 			
-			workcenterGrid.on('editingStart', function(ev) {
-			    const {rowKey, columnName, value} = ev;
-			    const rowData = workcenterGrid.getRow(rowKey);
-				
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-// 				if (columnName == 'WORKCENTER_ID' && !rowData.isNew) {
-// 				if (columnName == 'MANAGER_ID') {
-// 					$('#categoryAdd').modal();
-// 					ev.stop();
-// 				}
-			});
-			
-			workcenterGrid.on('click', (ev) => {
-			    if (ev.targetType != "cell" || workcenterIsEditModeEnabled) {
+			routingGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || routingIsEditModeEnabled) {
 					return;
 				}
 
 			    const newRowKey = ev.rowKey;
 				
 				// 새로 추가된 행은 클릭 안되도록.
-				if (workcenterGrid.getRow(newRowKey).isNew) {
+				if (routingGrid.getRow(newRowKey).isNew) {
 					return;
 				}
 
-			    if (workcenterCurrentSelectedRowKey != null) {
-			        workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');
+			    if (routingCurrentSelectedRowKey != null) {
+			        routingGrid.removeRowClassName(routingCurrentSelectedRowKey, 'selected-row');
 			    }
 
+				/*
 				if (equipmentGrid) {
 					equipmentGrid.destroy(); // 설비 그리드 제거
 					equipmentGrid = null;
 				}
+				*/
 				
-			    if (workcenterCurrentSelectedRowKey != newRowKey) {
-			        workcenterGrid.addRowClassName(newRowKey, 'selected-row');
-			        workcenterCurrentSelectedRowKey = newRowKey;
+			    if (routingCurrentSelectedRowKey != newRowKey) {
+			        routingGrid.addRowClassName(newRowKey, 'selected-row');
+			        routingCurrentSelectedRowKey = newRowKey;
 					
 					// 설비 그리드 생성
-					const workcenterID = workcenterGrid.getRow(newRowKey).WORKCENTER_ID;
-					equipmentInit(workcenterID);
-					workcenterCurrentSelectedID = workcenterID;
+					const routingID = routingGrid.getRow(newRowKey).ROUTING_ID;
+//					equipmentInit(routingID);
+					routingCurrentSelectedID = routingID;
 					$("#btn_group_equipment").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
-			        workcenterCurrentSelectedRowKey = null;
-					workcenterCurrentSelectedID = null;
+			        routingCurrentSelectedRowKey = null;
+					routingCurrentSelectedID = null;
 					$("#btn_group_equipment").hide();
 			    }
 			});
 		}
 		
 		// 수정 모드 토글 버튼 이벤트
-		$("#btn_workcenter_toggleEditMode").on("click", function () {
-		    workcenterIsEditModeEnabled = !workcenterIsEditModeEnabled; // 수정 모드 상태 토글
+		$("#btn_routing_toggleEditMode").on("click", function () {
+		    routingIsEditModeEnabled = !routingIsEditModeEnabled; // 수정 모드 상태 토글
 		    
-		    if (workcenterIsEditModeEnabled) {
-				$("#btn_workcenter_add_row").show();
-				$("#btn_workcenter_remove_row").show();
+		    if (routingIsEditModeEnabled) {
+				$("#btn_routing_add_row").show();
+				$("#btn_routing_remove_row").show();
 		    } else {
-		    	$("#btn_workcenter_add_row").hide();
-				$("#btn_workcenter_remove_row").hide();
+		    	$("#btn_routing_add_row").hide();
+				$("#btn_routing_remove_row").hide();
 		    }
 		    
-		    if (workcenterIsEditModeEnabled) {
-		        workcenterGrid.setColumns([
-		        	{header: '워크센터 코드 *', name: 'WORKCENTER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '워크센터명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		    if (routingIsEditModeEnabled) {
+		        routingGrid.setColumns([
+		        	{header: '라우팅 코드 *', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '라우팅명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 				    {
 				        header: '사용여부 *',
 				        name: 'USE_YN',
@@ -407,35 +396,33 @@
 				        },
 				        renderer: { type: CheckboxRenderer }
 				    },
+		            {header: '품목 *', name: 'ITEM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '담당자', name: 'MANAGER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		        ]);
 		    } else {
-		        workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
-		        workcenterGrid.setColumns(workcenter_columns);
+		        routingGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        routingGrid.setColumns(routing_columns);
 		    }
 		});
 
-		$("#btn_workcenter_add_row").on("click", function () {
-		    const newRowKey = workcenterGrid.appendRow(
+		$("#btn_routing_add_row").on("click", function () {
+		    const newRowKey = routingGrid.appendRow(
 		        {
-		        	"WORKCENTER_ID": '',
+		        	"ROUTING_ID": '',
 		        	"NAME": '',
 		        	"USE_YN": 'N',
+		        	"ITEM_ID": '',
 		        	"NOTE": '',
-		        	"MANAGER_ID": '',
-		        	"ROUTING_ID": '',
 		            isNew: true
 		        },
 		        {focus: true}
 		    );
 		});
 		
-		$("#btn_workcenter_remove_row").on("click", function () {
-		    const rowCount = workcenterGrid.getRowCount(); // 현재 행 개수 가져오기
+		$("#btn_routing_remove_row").on("click", function () {
+		    const rowCount = routingGrid.getRowCount(); // 현재 행 개수 가져오기
 		    
-		    const allRows = workcenterGrid.getData(); // 전체 데이터 가져오기
+		    const allRows = routingGrid.getData(); // 전체 데이터 가져오기
 		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
 		    
 		    if (newRows.length === 0) {
@@ -443,18 +430,18 @@
 		        return;
 		    }
 
-		    const lastRowKey = workcenterGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
-		    workcenterGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		    const lastRowKey = routingGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    routingGrid.removeRow(lastRowKey); // 마지막 행 삭제
 		});
-
-		$("#btn_workcenter_modify").on("click", function() {
-			workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+		
+		$("#btn_routing_modify").on("click", function() {
+			routingGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
 			
-		    let createdRows = workcenterGrid.getModifiedRows().createdRows;
-		    let updatedRows = workcenterGrid.getModifiedRows().updatedRows;
+		    let createdRows = routingGrid.getModifiedRows().createdRows;
+		    let updatedRows = routingGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["WORKCENTER_ID", "NAME", "USE_YN"];
+		    const requiredFields = ["ROUTING_ID", "NAME", "USE_YN", "ITEM_ID"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
@@ -486,33 +473,39 @@
 		        return;
 			}
 			
-			workcenterGrid.request('modifyData');
-			workcenterGrid.readData(1, null, true);  // 그리드 새로고침 
-			workcenterGrid.setColumns(workcenter_columns);  // 수정모드 해제 (새로 렌더링)
+			routingGrid.request('modifyData');
+			routingGrid.readData(1, null, true);
+			routingGrid.setColumns(routing_columns);
 			
-			workcenterIsEditModeEnabled = false;
-	    	$("#btn_workcenter_add_row").hide();
-			$("#btn_workcenter_remove_row").hide();
+			routingIsEditModeEnabled = false;
+	    	$("#btn_routing_add_row").hide();
+			$("#btn_routing_remove_row").hide();
 		});
 		
-        $("#btn_workcenter_delete").on("click", function() {
-			workcenterGrid.removeCheckedRows();
+		// TODO
+		// 나중에 라우팅 절차 매핑테이블도 함께 삭제 해줘함.
+		// 그 외
+		// 설비가 워크센터에 등록되어 있으면 워크센터에서 먼저 할당해제하고 설비에서 삭제할 수 있게 해야함.
+		// 공정이 라우팅에 등록되어 있으면 라우팅 먼저 삭제 후 공정 삭제 가능하게 해야함.
+        $("#btn_routing_delete").on("click", function() {
+			routingGrid.removeCheckedRows();
 			
 			// 반드시 removeCheckedRows()후에 실행 순서
 			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = workcenterGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.WORKCENTER_ID))  // 한글 변환
+			const ids = routingGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.ROUTING_ID))  // 한글 변환
 				.join(',');
-			workcenterDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			routingDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
-		    workcenterGrid.request('deleteData');
-			workcenterGrid.reloadData();  // 실패시 테이블 리로드
+		    routingGrid.request('deleteData');
+			routingGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
+		/*
 		// 설비
-		function equipmentInit(workcenter_id) {
+		function equipmentInit(routing_id) {
 			// 파라미터 설정
-			equipmentDataSource.api.readData.initParams.workcenter_id = workcenter_id;
+			equipmentDataSource.api.readData.initParams.routing_id = routing_id;
 			
 			if (equipmentGrid) {
 				equipmentGrid.destroy(); // 기존 그리드 제거
@@ -542,7 +535,7 @@
 		});
 		
 		$("#btn_equipment_modal").on("click", function() {
-			$("#workcenterEquipmentAdd").modal();
+			$("#routingEquipmentAdd").modal();
 		});
 		
 		$("#btn_equipment_delete").on("click", function() {
@@ -558,6 +551,7 @@
 			equipmentGrid.request('deleteData');
 			equipmentGrid.reloadData();  // 실패시 테이블 리로드
 		});
+		*/
 	</script>
 </body>
 </html>

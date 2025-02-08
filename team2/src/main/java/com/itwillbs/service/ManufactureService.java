@@ -219,6 +219,7 @@ public class ManufactureService {
 		return message;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> modifyProcess(Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
@@ -260,6 +261,100 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "deleteProcess 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> selectRouting(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectRouting 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectRouting(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectRouting 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> selectItem(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectItem 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectItem(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectItem 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> modifyRouting(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "modifyRouting 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertRouting(createdRows);
+			}
+			
+			if (updatedRows.size() > 0) {
+				manufactureMapper.updateRouting(updatedRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "modifyRouting 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> deleteRouting(List<String> processIds) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteRouting 성공";
+		
+		try {
+			if (processIds.size() > 0) {
+				manufactureMapper.deleteRouting(processIds);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteRouting 실패";
 		}
 		
 		resultMap.put("result", result);

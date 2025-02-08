@@ -52,7 +52,6 @@
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE WORKCENTER
 	           SET 
-<!--	               WORKCENTER_ID = #{row.WORKCENTER_ID}-->
 	               NAME = #{row.NAME}
 	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
 	             , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
@@ -183,6 +182,69 @@
     <delete id="deleteProcess">
 	    DELETE FROM PROCESS
 	     WHERE PROCESS_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <select id="selectRouting" resultType="map">
+		SELECT 
+			   ROUTING_ID
+			 , NAME
+			 , USE_YN
+			 , ITEM_ID
+			 , NOTE
+			 , PROCESS_QUANTITY
+		  FROM ROUTING
+    </select>
+    
+    <select id="selectItem" resultType="map">
+		SELECT
+		  	   ITEM_ID
+			 , ITEM_NAME
+			 , ITEM_TYPE
+			 , USE_YN
+		  FROM ITEM
+		 WHERE ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+    </select>
+    
+    <insert id="insertRouting">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO ROUTING (
+				  ROUTING_ID
+				, NAME
+				, USE_YN
+				, ITEM_ID
+				, NOTE
+				, PROCESS_QUANTITY
+			)
+			VALUES (
+				  #{item.ROUTING_ID}
+				, #{item.NAME}
+				, #{item.USE_YN}
+				, #{item.ITEM_ID}
+				, #{item.NOTE, jdbcType=VARCHAR}
+				, 0
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateRouting">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE ROUTING
+	           SET 
+	               NAME = #{row.NAME}
+	             , USE_YN = #{row.USE_YN}
+	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+	         WHERE ROUTING_ID = #{row.ROUTING_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteRouting">
+	    DELETE FROM ROUTING
+	     WHERE ROUTING_ID IN
 	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
 	        #{id}
 	    </foreach>

@@ -36,4 +36,14 @@ public interface ManufactureMapper {
 
 	int deleteProcess(List<String> processIds);
 
+	List<Map<String, Object>> selectRouting(Map<String, Object> requestData);
+
+	List<Map<String, Object>> selectItem(Map<String, Object> requestData);
+
+	int insertRouting(List<Map<String, Object>> createdRows);
+
+	int updateRouting(List<Map<String, Object>> updatedRows);
+
+	int deleteRouting(List<String> processIds);
+
 }
