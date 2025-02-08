@@ -61,12 +61,6 @@
 	         WHERE WORKCENTER_ID = #{row.WORKCENTER_ID}
 	    </foreach>
     </update>
-    	
-    <select id="checkDuplicateWorkcenterCode">
-    	SELECT count(*) AS COUNT
-		  FROM WORKCENTER
-		 WHERE WORKCENTER_ID = #{WORKCENTER_ID}
-    </select>
     
     <select id="selectMember" resultType="map">
     	SELECT 
@@ -136,4 +130,20 @@
 			 WHERE WORKCENTER_ID = #{item}
 		</foreach>
     </update>
+    
+    <select id="selectProcess" resultType="map">
+	    SELECT
+			   PROCESS_ID 
+			 , NAME 
+			 , USE_YN 
+			 , INSPECTION_YN 
+			 , NOTE 
+		  FROM PROCESS
+    </select>
+    
+    <select id="checkDuplicateCode">
+    	SELECT count(*) AS COUNT
+		  FROM ${tableName}
+		 WHERE ${tableCodeId} = #{codeVal}
+    </select>
 </mapper>

@@ -91,29 +91,6 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> checkDuplicateWorkcenterCode(Map<String, Object> map) {
-		Map<String, Object> message = new HashMap<>();
-		
-		String result = "중복된 코드입니다.";
-		String resultCode = "0";
-		
-		try {
-			int resultCnt = manufactureMapper.checkDuplicateWorkcenterCode(map);
-			if (resultCnt == 0) {
-				result = "사용가능한 코드입니다.";
-				resultCode = "1";
-			}
-		} catch (Exception e) {
-			result = "조회 실패. 재시도 하세요.";
-			resultCode = "0";
-		}
-		
-		message.put("result", result);
-		message.put("resultCode", resultCode);
-		
-		return message;
-	}
-
 	public Map<String, Object> selectMember(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
@@ -195,6 +172,51 @@ public class ManufactureService {
 		resultMap.put("message", message);
 		
 		return resultMap;
+	}
+
+	public Map<String, Object> selectProcess(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectProcess 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectProcess(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectProcess 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> checkDuplicateCode(Map<String, Object> map) {
+		Map<String, Object> message = new HashMap<>();
+		
+		String result = "중복된 코드입니다.";
+		String resultCode = "0";
+		
+		try {
+			int resultCnt = manufactureMapper.checkDuplicateCode(map);
+			if (resultCnt == 0) {
+				result = "사용가능한 코드입니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			result = "조회 실패. 재시도 하세요.";
+			resultCode = "0";
+		}
+		
+		message.put("result", result);
+		message.put("resultCode", resultCode);
+		
+		return message;
 	}
 	
 }

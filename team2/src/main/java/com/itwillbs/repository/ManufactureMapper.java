@@ -16,8 +16,6 @@ public interface ManufactureMapper {
 	
 	int deleteWorkcenter(List<String> idList);
 
-	int checkDuplicateWorkcenterCode(Map<String, Object> map);
-
 	List<Map<String, Object>> selectMember(Map<String, Object> requestData);
 
 	List<Map<String, Object>> selectEquipment(Map<String, Object> requestData);
@@ -27,5 +25,9 @@ public interface ManufactureMapper {
 	int deleteEquipment(List<String> equipmentIds);
 
 	int deleteEquipmentByWorkcenterId(List<String> idList);
+
+	List<Map<String, Object>> selectProcess(Map<String, Object> requestData);
+
+	int checkDuplicateCode(Map<String, Object> map);
 
 }

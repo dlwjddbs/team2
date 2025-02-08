@@ -34,7 +34,8 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
-		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>
+		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
+<!--		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>-->
 		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
 		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
 
@@ -249,17 +250,15 @@
 					
 					switch (column) {
 						case 'WORKCENTER_ID':
-							$("#workcenterCode").val(value);
-							$("#workcenterRow").val(row);
-							$("#workcenterColumn").val(column);
+							$("#inputCodeText").val(value);
+							$("#gridCheckedRow").val(row);
+							$("#gridCheckedColumn").val(column);
+
+							tableName = "WORKCENTER";
+							tableCodeId = "WORKCENTER_ID";
+							copyGrid = workcenterGrid;
 							
-							$("#checkDuplicateCodeBtn").show();
-							$("#modifyCodeBtn").hide();
-							$("#saveCode").attr("disabled", true);
-							$("#workcenterCode").attr("disabled", false);
-							$("#validationWorkcenterCodeMessage").text('');
-							
-							$('#workcenterCodeAdd').modal();
+							$('#mesCodeValidate').modal();
 							
 							break;
 						case 'MANAGER_ID':

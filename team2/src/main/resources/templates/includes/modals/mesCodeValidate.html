@@ -1,0 +1,159 @@
+<!-- 모달창 -->
+<div class="modal fade" id="mesCodeValidate" th:fragment="mesCodeValidate">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">코드 중복 확인</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="gridCheckedRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="gridCheckedColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<label>코드</label>
+							<div class="input-group">
+								<input type="text" id="inputCodeText" class="form-control" placeholder="코드를 입력하세요">
+								<div class="input-group-append">
+									<button class="btn btn-primary" id="checkDuplicateCodeBtn" type="button">중복확인</button>
+									<button class="btn btn-primary" id="modifyCodeBtn" type="button" style="display: none;">수정</button>
+								</div>
+							</div>
+							<span id="validationInputCodeTextMessage" class="form-text mt-1"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveCode" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="mesCodeValidate" th:inline="javascript">
+	/* 
+	====================코드중복체크 모달 사용법 ===========================
+	모달 show이전에 아래의 값들을 할당해야함.
+	workcenter.html 참고.
+	=================================================================
+	button.addEventListener('click', function() {
+		const row = props.rowKey;
+		const column = props.columnInfo.name;
+		const value = processGrid.getValue(row, column);  // 값을 가져올 그리드로 바꿔야함.
+		
+		$("#inputCodeText").val(value);  // 그리드에 출력되어있는 기존의 값
+		$("#gridCheckedRow").val(row);  // 선택한 행
+		$("#gridCheckedColumn").val(column);  // 선택한 열
+		
+		tableName = "PROCESS";  // DB테이블명
+		tableCodeId = "PROCESS_ID";  // 중복체크할 컬럼 ID
+		copyGrid = processGrid;  // 선택한값 집어넣을 그리드 객체
+		
+		$('#mesCodeValidate').modal();
+	}
+	*/
+	
+	const dangerText = "form-text text-danger mt-1";
+	let tableName = "";
+	let tableCodeId = "";
+	let copyGrid = null;
+	
+	$('#mesCodeValidate').on('shown.bs.modal', function () {
+		$("#checkDuplicateCodeBtn").show();
+		$("#modifyCodeBtn").hide();
+		$("#saveCode").attr("disabled", true);
+		$("#inputCodeText").attr("disabled", false);
+		$("#validationInputCodeTextMessage").text('');
+	});
+	
+	$("#checkDuplicateCodeBtn").on("click", function() {
+		const inputCodeText = $("#inputCodeText").val().trim();
+		
+		if (inputCodeText == null || inputCodeText == '') {
+			validationInputCodeTextMessage.textContent = "코드를 입력하세요.";
+	        validationInputCodeTextMessage.className = dangerText
+			
+			return;
+		}
+		
+		const filteredValues = copyGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row[tableCodeId]);
+
+		if (filteredValues.includes(inputCodeText)) {
+			validationInputCodeTextMessage.textContent = '신규 행에서의 중복입니다.';
+			validationInputCodeTextMessage.className = dangerText
+			$("#saveCode").attr("disabled", true);
+			
+			return;
+		}
+		
+		$.ajax({
+            type : "POST",
+            url : "/manufacture/checkDuplicateCode",
+            data : {
+            	codeVal : inputCodeText,
+            	tableName : tableName,
+            	tableCodeId : tableCodeId,
+			},
+            success : function(res){
+				if (res.resultCode == 1) {
+					validationInputCodeTextMessage.textContent = res.result;
+					validationInputCodeTextMessage.className = "form-text text-success mt-1";
+					$("#inputCodeText").attr("disabled", true);
+					$("#saveCode").attr("disabled", false);
+					
+					$("#checkDuplicateCodeBtn").hide();
+					$("#modifyCodeBtn").show();
+				} else {
+					validationInputCodeTextMessage.textContent = res.result;
+					validationInputCodeTextMessage.className = dangerText
+					$("#saveCode").attr("disabled", true);
+				}
+            },
+            error : function(e){
+                console.log("checkDuplicateInputCodeText() ajax 실패");
+            }
+        });
+	});
+	
+	$("#saveCode").on("click", function() {
+		const gridCheckedRow = $("#gridCheckedRow").val();
+		const gridCheckedColumn = $("#gridCheckedColumn").val();
+		const inputCodeText = $("#inputCodeText").val();
+		
+		copyGrid.setValue(gridCheckedRow, gridCheckedColumn, inputCodeText);
+		$('#mesCodeValidate').modal('hide');
+		
+		validationInputCodeTextMessage.textContent = '';
+		$("#saveCode").attr("disabled", true);
+	});
+	
+	$("#modifyCodeBtn").on("click", function() {
+		$("#checkDuplicateCodeBtn").show();
+		$("#modifyCodeBtn").hide();
+		$("#saveCode").attr("disabled", true);
+		$("#inputCodeText").attr("disabled", false);
+	});
+</script>

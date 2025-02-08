@@ -32,6 +32,7 @@ public class ManufactureRestController {
 	private final String workcenter_url = "/manufacture/workcenter";
 	private final String manager_url = "/manufacture/workcenterManager";
 	private final String equipment_url = "/manufacture/equipment";
+	private final String process_url = "/manufacture/process";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -78,6 +79,10 @@ public class ManufactureRestController {
         return manufactureService.deleteEquipment(equipmentIds);
 	}
 	
+	@GetMapping(process_url)
+	public Map<String, Object> getProcess(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProcess(requestData);
+	}
 }
 
 
