@@ -128,4 +128,12 @@
 			 WHERE EQUIPMENT_ID = #{item}
 		</foreach>
     </update>
+    
+	<update id="deleteEquipmentByWorkcenterId">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE EQUIPMENT 
+			   SET WORKCENTER_ID = NULL
+			 WHERE WORKCENTER_ID = #{item}
+		</foreach>
+    </update>
 </mapper>

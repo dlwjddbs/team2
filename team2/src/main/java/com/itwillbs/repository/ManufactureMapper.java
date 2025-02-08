@@ -26,4 +26,6 @@ public interface ManufactureMapper {
 
 	int deleteEquipment(List<String> equipmentIds);
 
+	int deleteEquipmentByWorkcenterId(List<String> idList);
+
 }

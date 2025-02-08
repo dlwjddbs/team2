@@ -68,6 +68,7 @@ public class ManufactureService {
 		return resultMap;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> deleteWorkcenter(List<String> idList) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -77,6 +78,7 @@ public class ManufactureService {
 		try {
 			if (idList.size() > 0) {
 				manufactureMapper.deleteWorkcenter(idList);
+				manufactureMapper.deleteEquipmentByWorkcenterId(idList);
 			}
 		} catch (Exception e) {
 			result = false;
