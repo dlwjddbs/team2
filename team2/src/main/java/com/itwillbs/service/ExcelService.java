@@ -311,11 +311,13 @@ public class ExcelService {
 	}
 
 	// 엑셀 양식 생성 메서드
-	public byte[] createExcelTemplate(String tableName) throws IOException {
-
-		List<String> columnNames = testMapper.getColumnNames(tableName); // 컬럼명 가져오기
-
-		log.info("columnNames : " + columnNames);
+	public byte[] createExcelTemplate(String tableName, List<String> headers) throws IOException {
+				
+//		List<String> columnNames = testMapper.getColumnNames(tableName); // 컬럼명 가져오기
+//
+//		log.info("columnNames : " + columnNames);
+		
+		log.info("headers : " + headers);
 
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			Sheet sheet = workbook.createSheet("Template");
@@ -347,14 +349,14 @@ public class ExcelService {
 
 		    cell.setCellStyle(style);
 		    
-			// row1 - 컬럼명 추가
+			// row1 - Grid에서 전달한 header 추가 (컬럼명 추가)
 			Row row1 = sheet.createRow(1);
-			for (int i = 0; i < columnNames.size(); i++) {
-				row1.createCell(i).setCellValue(columnNames.get(i)); // 여기서 바로 추가
+			for (int i = 0; i < headers.size(); i++) {
+				row1.createCell(i).setCellValue(headers.get(i)); // 여기서 바로 추가
 			}
 			
 			// 열 너비 설정 (단위: 1/256 * 글자 크기)
-			for (int i = 0; i < columnNames.size(); i++) {
+			for (int i = 0; i < headers.size(); i++) {
 				sheet.setColumnWidth(i, 5000);	// 5000 = 약 20글자 정도의 너비
 				//sheet.autoSizeColumn(i);	// (각 컬럼의 내용에 맞게 셀 크기 자동 조정)
 			}

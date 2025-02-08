@@ -101,23 +101,26 @@ public class ExcelController {
 	}
 
 	// 엑셀 양식 다운로드
-	@GetMapping("/ajax/downloadTemplate")
-	public ResponseEntity<byte[]> downloadExcelTemplate(@RequestParam("tableName") String tableName) {
+	@PostMapping("/ajax/downloadTemplate")
+	public ResponseEntity<byte[]> downloadExcelTemplate(@RequestBody Map<String, Object> requestData) {
 		log.info("============= 엑셀 양식 다운로드 시작 =============");
 
 		try {
+			String tableName = (String) requestData.get("tableName");
+			List<String> headers = (List<String>) requestData.get("headers");
+			
 			// 엑셀 양식 생성
-			byte[] excelData = excelService.createExcelTemplate(tableName);
+			byte[] excelData = excelService.createExcelTemplate(tableName, headers);
 
 			// HTTP 응답 설정
-			HttpHeaders headers = new HttpHeaders();
+			HttpHeaders headersConfig  = new HttpHeaders();
 			// headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-			headers.setContentType(
+			headersConfig .setContentType(
 					// MIME 타입 변경 (xlsx)
 					MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-			headers.setContentDispositionFormData("attachment", tableName + "_template.xlsx");
+			headersConfig .setContentDispositionFormData("attachment", tableName + "_template.xlsx");
 
-			return ResponseEntity.ok().headers(headers).body(excelData);
+			return ResponseEntity.ok().headers(headersConfig).body(excelData);
 		} catch (IOException e) {
 			return ResponseEntity.internalServerError().build();
 		}

@@ -47,13 +47,46 @@
 <!-- /.모달창 -->
 
 <script th:fragment="excelModal" th:inline="javascript">
-
+	
+	// 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
+	// 현재 화면에 보이는 그리드 중 가장 먼저 찾은 그리드를 반환
+	function findGrid() { 
+	    let activeGrid = null;
+		
+	    for (let key in window.gridInstances) {
+	        if (window.gridInstances.hasOwnProperty(key)) {
+	            let gridInfo = window.gridInstances[key];
+	            if ($(gridInfo.element).is(":visible")) {
+	                activeGrid = gridInfo.instance;
+	                break;
+	            }
+	        }
+	    }
+		
+	    return activeGrid;
+	}
+	
+	// 특정 key 값에 해당하는 Grid 찾기
+	/*
+	function findGridByKey(gridKey) {
+	    for (let key in window.gridInstances) {
+	        if (window.gridInstances.hasOwnProperty(key)) {
+	            let gridInfo = window.gridInstances[key];
+	            if (gridInfo.element.id === gridKey) { // gridKey에 해당하는 ID 찾기
+	                return gridInfo.instance;
+	            }
+	        }
+	    }
+		
+	    return null;
+	}
+	*/
+	
 	// 엑셀 데이터를 Grid의 name과 자동 매핑
 	function autoMapExcelData(excelData, gridInstance) {
 	    if (excelData.length === 0) return [];
 	
-	    // Toast UI Grid 컬럼 정보 가져오기
-	    // [{name, header}, ...]
+	    // Toast UI Grid 컬럼 정보 가져오기 - [{name, header}, ...]
 	    const gridColumns = gridInstance.getColumns();
 	
 	    // 첫 번째 행 (엑셀 header) 추출
@@ -64,11 +97,11 @@
 	    gridColumns.forEach(column => {
 	        let matchedHeader = excelHeaders.find(header => header === column.header); // header 값이 일치하는지 확인
 	        if (matchedHeader) {
-	            headerMap[matchedHeader] = column.name; // '설비코드' → 'EQUIPMENT_ID'
+	            headerMap[matchedHeader] = column.name; // 'header' → 'name'
 	        }
 	    });
 	
-	    console.log("자동 매핑 결과 :", headerMap);
+	    console.log("자동 매핑 결과 : ", headerMap);
 	
 	    // 엑셀 데이터를 Grid의 name 기준으로 변환
 	    return excelData.map(row => {
@@ -106,18 +139,7 @@
 				console.log("엑셀 데이터 : ", res);
 				
 	            // 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
-	            let activeGrid = null;
-	            for (let key in window.gridInstances) {
-	                if (window.gridInstances.hasOwnProperty(key)) {
-	                	// 각 그리드 정보 가져오기
-	                    let gridInfo = window.gridInstances[key];
-	                	// 화면에 보이는 그리드 확인
-	                    if ($(gridInfo.element).is(":visible")) {
-	                        activeGrid = gridInfo.instance;
-	                        break;
-	                    }
-	                }
-	            }
+	            let activeGrid = findGrid();
 
 	            if (activeGrid) {
 	                // 엑셀 데이터를 Grid의 name에 맞게 자동 변환
@@ -179,10 +201,25 @@
 			alert("테이블(양식)명을 입력하세요.");
 			return;
 		}
-	
+		
+		// Grid에서 헤더 정보 가져오기
+		const grid = findGrid(); // 현재 화면에 보이는 Grid 가져오기
+		
+		if (!grid) {
+		    alert("현재 화면에 표시된 그리드가 없습니다.");
+		    return;
+		}
+		
+		const headers = grid.getColumns().map(col => `${col.header} (${col.name})`);
+		
 		$.ajax({
-			url: "/ajax/downloadTemplate?tableName=" + tableName,
-			method: "GET",
+			url: "/ajax/downloadTemplate",
+			method: "POST",
+			contentType: "application/json",
+			data: JSON.stringify({
+			    tableName: tableName,
+			    headers: headers
+			}),
 			xhrFields: {
 				responseType: "blob"  // 바이너리 데이터로 응답 받기
 			},
