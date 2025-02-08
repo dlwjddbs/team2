@@ -83,6 +83,20 @@ public class ManufactureRestController {
 	public Map<String, Object> getProcess(@RequestParam Map<String, Object> requestData) {
 		return manufactureService.selectProcess(requestData);
 	}
+	
+	@PutMapping(process_url)
+	public Map<String, Object> modifyProcess(@RequestBody Map<String, Object> requestData) {
+		return manufactureService.modifyProcess(requestData);
+	}
+	
+	@DeleteMapping(process_url)
+	public Map<String, Object> deleteProcess(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> processIds = Arrays.asList(decodedIds.split(","));
+	    
+        return manufactureService.deleteProcess(processIds);
+	}
 }
 
 

@@ -52,8 +52,8 @@
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE WORKCENTER
 	           SET 
-	               WORKCENTER_ID = #{row.WORKCENTER_ID}
-	             , NAME = #{row.NAME}
+<!--	               WORKCENTER_ID = #{row.WORKCENTER_ID}-->
+	               NAME = #{row.NAME}
 	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
 	             , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
 	             , USE_YN = #{row.USE_YN}
@@ -146,4 +146,45 @@
 		  FROM ${tableName}
 		 WHERE ${tableCodeId} = #{codeVal}
     </select>
+    
+    <insert id="insertProcess">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PROCESS (
+				  PROCESS_ID
+				, NAME
+				, USE_YN
+				, INSPECTION_YN
+				, NOTE
+			)
+			VALUES (
+				  #{item.PROCESS_ID, jdbcType=VARCHAR}
+				, #{item.NAME}
+				, #{item.USE_YN}
+				, #{item.INSPECTION_YN}
+				, #{item.NOTE, jdbcType=VARCHAR}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateProcess">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE PROCESS
+	           SET 
+	               NAME = #{row.NAME}
+	             , USE_YN = #{row.USE_YN}
+	             , INSPECTION_YN = #{row.INSPECTION_YN}
+	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+	         WHERE PROCESS_ID = #{row.PROCESS_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteProcess">
+	    DELETE FROM PROCESS
+	     WHERE PROCESS_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
 </mapper>

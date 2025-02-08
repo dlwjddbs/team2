@@ -218,5 +218,54 @@ public class ManufactureService {
 		
 		return message;
 	}
+
+	public Map<String, Object> modifyProcess(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "modifyProcess 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertProcess(createdRows);
+			}
+			
+			if (updatedRows.size() > 0) {
+				manufactureMapper.updateProcess(updatedRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "modifyProcess 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> deleteProcess(List<String> processIds) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteProcess 성공";
+		
+		try {
+			if (processIds.size() > 0) {
+				manufactureMapper.deleteProcess(processIds);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteProcess 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }

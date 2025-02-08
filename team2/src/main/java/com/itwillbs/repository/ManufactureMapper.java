@@ -30,4 +30,10 @@ public interface ManufactureMapper {
 
 	int checkDuplicateCode(Map<String, Object> map);
 
+	int insertProcess(List<Map<String, Object>> createdRows);
+
+	int updateProcess(List<Map<String, Object>> updatedRows);
+
+	int deleteProcess(List<String> processIds);
+
 }

@@ -107,8 +107,8 @@
 		const processDataSource = {
 			api: {
 			    readData: {url: processUrl, method: 'GET'},
-//				modifyData: { url: processUrl, method: 'PUT' },
-//				deleteData: {url: processUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+				modifyData: { url: processUrl, method: 'PUT' },
+				deleteData: {url: processUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
@@ -320,7 +320,6 @@
 		    );
 		});
 		
-		/*
 		$("#btn_process_remove_row").on("click", function () {
 		    const rowCount = processGrid.getRowCount(); // 현재 행 개수 가져오기
 		    
@@ -344,7 +343,7 @@
 		    
 		    // 필수 입력 컬럼
 		    const requiredFields = ["PROCESS_ID", "NAME", "USE_YN", "INSPECTION_YN"];
-
+			
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
 		        	row[field] && row[field].trim() !== ''
@@ -396,7 +395,6 @@
 		    processGrid.request('deleteData');
 			processGrid.reloadData();  // 실패시 테이블 리로드
 		});
-		*/
 	</script>
 </body>
 </html>
