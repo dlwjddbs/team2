@@ -34,7 +34,7 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
-		<nav th:replace="~{includes/modals/itemAdd :: itemAdd}"></nav>
+		<nav th:replace="~{includes/modals/itemCodeAdd :: itemCodeAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -110,8 +110,8 @@
 										</div>
 										<div class="col-6">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_item_add_row" class="btn btn-primary" value="행추가" style="display : none;">
-												<input type="button" id="btn_item_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_item_add_row" class="btn btn-primary" value="신규">
+<!--												<input type="button" id="btn_item_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">-->
 												<input type="button" id="btn_item_toggleEditMode" class="btn btn-primary" value="편집">
 												<input type="button" id="btn_item_modify" class="btn btn-primary" value="저장">
 												<input type="button" id="btn_item_delete" class="btn btn-primary" value="삭제">
@@ -128,33 +128,6 @@
 						</div>
 					<!-- /.col -->
 					</div>
-				<!-- /.row -->
-<!--				<div class="row">-->
-<!--					<div class="col-12">-->
-<!--						<div class="card">-->
-<!--							<div class="card-header">-->
-<!--								<div class="row">-->
-<!--									<div class="col-6">-->
-<!--										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">워크센터설비</p>-->
-<!--									</div>-->
-<!--									<div class="col-6">-->
-<!--										<div class="card-tools" style="text-align: right;">-->
-<!--											<input type="button" id="btn_add_row2" class="btn btn-primary" value="행추가">-->
-<!--											<input type="button" id="btn_insert2" class="btn btn-primary" value="등록">-->
-<!--											<input type="button" id="btn_update2" class="btn btn-primary" value="수정">-->
-<!--											<input type="button" id="btn_delete2" class="btn btn-primary" value="삭제">-->
-<!--										</div>-->
-<!--									</div>-->
-<!--								</div>-->
-<!--							</div>-->
-<!--							<div class="card-body" id="toast_single2">-->
-<!--								 Toast Grid Ajax -->
-<!--							</div>-->
-<!--						 /.card-body -->
-<!--						</div>-->
-<!--					 /.card -->
-<!--					</div>-->
-<!--				</div>-->
 				<!-- /.row -->
 				</div>
 			<!-- /.container-fluid -->
@@ -191,7 +164,7 @@
 		const itemUrl = '/iteminfo/item';
 		const itemDataSource = {
 			api: {
-				//createData: {url: itemUrl, method: 'POST'},
+				createData: {url: itemUrl, method: 'POST'},
 			    readData: {url: itemUrl, method: 'GET'},
 				modifyData: { url: itemUrl, method: 'PUT' },
 				deleteData: {url: itemUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
@@ -220,6 +193,7 @@
             {header: '입고검사', name: 'INB_INSP', align: 'center', editor: null},
             {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', editor: null},
             {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', editor: null},
+            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
         ];
 		
 		const TextInputRenderer = function(props) {
@@ -259,44 +233,6 @@
 			
 			container.appendChild(el);
 			
-			// ITEM_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'ITEM_ID'
-				&& itemGrid.getValue(props.rowKey, 'isNew') == null)) {
-				const button = document.createElement('button');
-			    button.textContent = '🔍';
-			    button.style.border = 'solid 1px #007BFF';
-			    button.style.background = 'white';
-			    button.style.color = 'white';
-			    button.style.padding = '6px 10px';
-			    button.style.cursor = 'pointer';
-			    button.style.borderRadius = '4px';
-			    button.style.marginRight = '5px';
-				
-				container.appendChild(button);
-					
-				button.addEventListener('click', function() {
-					const row = props.rowKey;
-					const column = props.columnInfo.name;
-					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = itemGrid.getValue(row, column);
-					
-					switch (column) {
-						case 'ITEM_ID':
-							$("#itemCode").val(value);
-							$("#itemRow").val(row);
-							$("#itemColumn").val(column);
-							
-							$("#checkDuplicateCodeBtn").show();
-							$("#modifyCodeBtn").hide();
-							$("#saveCode").attr("disabled", true);
-							$("#itemCode").attr("disabled", false);
-							$("#validationItemCodeMessage").text('');
-							
-							$('#itemCodeAdd').modal();
-						break;
-					}
-			    });
-			}
 			
 		    this.el = container;
 		    this.input = el;
@@ -389,15 +325,7 @@
 		
 		// 수정 모드 토글 버튼 이벤트
 		$("#btn_item_toggleEditMode").on("click", function () {
-		    itemIsEditModeEnabled = !itemIsEditModeEnabled; // 수정 모드 상태 토글
-		    
-		    if (itemIsEditModeEnabled) {
-				$("#btn_item_add_row").show();
-				$("#btn_item_remove_row").show();
-		    } else {
-		    	$("#btn_item_add_row").hide();
-				$("#btn_item_remove_row").hide();
-		    }
+		    itemIsEditModeEnabled = !itemIsEditModeEnabled; // 수정 모드 상태 토글 
 		    
 		    if (itemIsEditModeEnabled) {
 		        itemGrid.setColumns([
@@ -428,26 +356,31 @@
 		    }
 		});
 
+		// 수정 모드 토글 버튼 이벤트
 		$("#btn_item_add_row").on("click", function () {
-		    const newRowKey = itemGrid.appendRow(
-		        {
-		        	"ITEM_ID": '',
-		        	"ITEM_NAME": '',
-		        	"ITEM_TYPE": '',
-		        	"MAIN_NAME": '',
-		        	"SUB_NAME": '',
-		        	"USE_YN": 'N',
-		        	"ITEM_UNIT": '',
-		        	"CLIENT_NAME": '',
-		        	"ITEM_COAST": '',
-		        	"INB_INSP": '',
-		        	"WAREHOUSE_NAME": '',
-		        	"SAFETY_INVENTORY": '',
-		            isNew: true
-		        },
-		        {focus: true}
-		    );
+		    $("#itemCodeAdd").modal("show");
 		});
+
+		// $("#btn_item_add_row").on("click", function () {
+		   // const newRowKey = itemGrid.appendRow(
+		     //   {
+		      //  	"ITEM_ID": '',
+		        //	"ITEM_NAME": '',
+		       // 	"ITEM_TYPE": '',
+		        //	"MAIN_NAME": '',
+		        //	"SUB_NAME": '',
+		        //	"USE_YN": 'N',
+		   //     	"ITEM_UNIT": '',
+		     //   	"CLIENT_NAME": '',
+		       // 	"ITEM_COAST": '',
+		     //   	"INB_INSP": '',
+		       // 	"WAREHOUSE_NAME": '',
+		       // 	"SAFETY_INVENTORY": '',
+		      //      isNew: true
+		    //    },
+		    //    {focus: true}
+		 //   );
+	//	});
 		
 		$("#btn_item_remove_row").on("click", function () {
 		    const rowCount = itemrGrid.getRowCount(); // 현재 행 개수 가져오기
@@ -524,6 +457,53 @@
 		    itemGrid.request('deleteData');
 			itemGrid.reloadData();  // 실패시 테이블 리로드
 		});
+		
+		$(document).ready(function () {
+			
+			$.ajax({
+				url: '/ajax/getMesCommonCode',
+				method: 'POST',
+				success: function (data) {
+
+					function mesCommonCodeByGroup(dataArray) {
+						let groupedData = {};
+						dataArray.forEach(item => {
+							if (!groupedData[item.MAIN_ID]) {
+								groupedData[item.MAIN_ID] = [];
+							}
+							groupedData[item.MAIN_ID].push(item);
+						});
+						return groupedData;
+					}
+
+					function populateSelectBox(selectBoxId, dataArray, placeholder) {
+						let selectBox = $(selectBoxId);
+						selectBox.empty();
+						selectBox.append(`<option selected disabled>${placeholder}</option>`);
+						dataArray.forEach(item => {
+							let option = $('<option></option>')
+								.val(item.SUB_ID)
+								.text(item.SUB_ID + (item.SUB_NAME ? ` (${item.SUB_NAME})` : ''));
+							selectBox.append(option);
+						});
+					}
+
+					let groupedData = mesCommonCodeByGroup(data);
+
+					if (groupedData["MATL"]) {
+						populateSelectBox("#ITEM_TYPE", groupedData["MATL"], "유형선택");
+					}
+
+					if (groupedData["UNIT"]) {
+						populateSelectBox("#ITEM_UNIT", groupedData["UNIT"], "단위선택");
+					}
+
+				},
+				error: function (xhr, status, error) {
+					console.error("Error fetching data:", error);
+				}
+			});
+		});			
 	</script>
 </body>
 </html>

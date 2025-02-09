@@ -64,4 +64,28 @@ public class ItemInfoService {
 		return message;
 	}
 	
+	// 공통코드 출력
+	public List<Map<String, Object>> getMesCommonCode() {
+		List<Map<String, Object>> data = itemInfoMapper.selectMesCommonCode(); 
+		return data;
+	}
+
+	public Map<String, Object> addItemInfo(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Boolean result = true;
+		String message = "addItemInfo 성공";
+		
+		try {
+			itemInfoMapper.addItemInfo(createdRows);
+		} catch (Exception e) {
+			result = false;
+			message = "addItemInfo 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
 }

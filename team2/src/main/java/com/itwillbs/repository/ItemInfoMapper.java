@@ -12,5 +12,11 @@ public interface ItemInfoMapper {
 	List<Map<String, Object>> selectItemInfo();
 
 	int checkDuplicateItemCode(Map<String, Object> map);
+	
+	// 공통코드 출력
+	List<Map<String, Object>> selectMesCommonCode();
+	
+	// 품목정보 등록
+	int addItemInfo(List<Map<String, Object>> createdRows);
 
 }
