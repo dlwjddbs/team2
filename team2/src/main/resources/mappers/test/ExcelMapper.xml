@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.ExcelMapper">
+	<select id="getColumnNames" parameterType="map" resultType="string">
+	    SELECT COLUMN_NAME 
+	    FROM ALL_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+    	ORDER BY COLUMN_ID
+	</select>
+	
+	<select id="getColumnTypes" resultType="map">
+	    SELECT COLUMN_NAME, DATA_TYPE 
+	    FROM USER_TAB_COLUMNS 
+	    WHERE TABLE_NAME = #{tableName}
+	</select>
+	
+	<select id="checkDuplicateCode">
+    	SELECT count(*) AS COUNT
+		  FROM ${tableName}
+		 WHERE ${tableCodeId} = #{codeVal}
+    </select>
+    
+    <!-- 기존 데이터 조회 -->
+    <select id="selectExistingData" resultType="map">
+        SELECT * 
+          FROM ${tableName}
+    </select>
+
+    <!-- 데이터 삽입 -->
+	<insert id="insertExcelData">
+	    INSERT ALL
+	    <foreach collection="dataList" item="data">
+	        INTO ${tableName}
+	        <trim prefix="(" suffix=")" suffixOverrides=",">
+	            <foreach collection="data.keys" item="column">
+	                ${column},
+	            </foreach>
+	        </trim>
+	        VALUES
+	        <trim prefix="(" suffix=")" suffixOverrides=",">
+	            <foreach collection="data.values" item="value">
+	                #{value},
+	            </foreach>
+	        </trim>
+	    </foreach>
+	    SELECT 1 FROM DUAL
+	</insert>
+
+    <!-- 데이터 업데이트 -->
+    <update id="updateExcelData">
+        MERGE INTO ${tableName} t
+	    USING (
+	        <foreach collection="list" item="row" separator=" UNION ALL ">
+	            SELECT #{row[tableCodeId]} AS ${tableCodeId},
+	            <foreach collection="row" item="value" index="column" separator=",">
+	                #{value} AS ${column}
+	            </foreach>
+	            FROM DUAL
+	        </foreach>
+	    ) src
+	    ON (TRIM(t.${tableCodeId}) = TRIM(src.${tableCodeId}))
+	    WHEN MATCHED THEN 
+	        UPDATE SET 
+	        <foreach collection="columns" item="column" separator=",">
+	            t.${column} = src.${column}
+	        </foreach>
+    </update>
+
+    <!-- 데이터 삭제 -->
+    <delete id="deleteExcelData">
+        DELETE FROM ${tableName} 
+         WHERE ${tableCodeId} IN
+        <foreach collection="keyValues" item="keyValue" open="(" separator="," close=")">
+            #{keyValue}
+        </foreach>
+    </delete>
+
+</mapper>

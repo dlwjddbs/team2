@@ -29,41 +29,41 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Log
 public class ExcelController {
-	
+
 	private final String URL = "/ajax/excelToastTest";
-	
+
 	private final ExcelService excelService;
-	
+
 	@GetMapping(URL)
 	public Map<String, Object> getExcelToastTest() {
 		log.info("============= getExcelToastTest =============");
 
 		return excelService.selectExcelToastTest();
 	}
-	
+
 	@PostMapping(URL)
 	public Map<String, Object> insertToastTest(@RequestBody Map<String, Object> requestData) {
-	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
-        return excelService.insertToastTest(createdRows);
-	}	
-	
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>) requestData.get("createdRows");
+
+		return excelService.insertToastTest(createdRows);
+	}
+
 	@DeleteMapping(URL)
 	public Map<String, Object> deleteToastTest(@RequestHeader("X-Delete-IDs") String ids) {
-        List<String> idList = Arrays.asList(ids.split(","));
-        
-        return excelService.deleteToastTest(idList);
+		List<String> idList = Arrays.asList(ids.split(","));
+
+		return excelService.deleteToastTest(idList);
 	}
-	
+
 	// 엑셀 업로드 (수정된 데이터만 DB에 update)
 	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
 	@PutMapping(URL)
 	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
-		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
-		
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>) requestData.get("updatedRows");
+
 		return excelService.updateToastTest(updatedRows);
-	}	
-	
+	}
+
 	// 엑셀 업로드
 	@PostMapping("/ajax/uploadExcel")
 	public ResponseEntity<List<Map<String, Object>>> uploadExcel(@RequestParam("file") MultipartFile file) {
@@ -81,23 +81,25 @@ public class ExcelController {
 		// JSON 반환
 		return ResponseEntity.ok(dataList);
 	}
-	
+
 	// 엑셀 업로드 (수정된 데이터만 DB에 update)
 	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
 	@PostMapping("/ajax/updateExcelData")
-	public ResponseEntity<?> updateExcelData(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<?> updateExcelData(@RequestParam("tableName") String tableName,
+			@RequestParam("tableCodeId") String tableCodeId, 
+			@RequestParam("file") MultipartFile file) {
 		log.info("============= 엑셀 업로드 시작 (db 수정 동작) =============");
-		
-	    try {
-	    	 // 엑셀 데이터 파싱
-	        List<Map<String, Object>> uploadedData = excelService.parseExcelFile(file);
-	        
-	        int updatedCount = excelService.updateModifiedData(uploadedData);
-	        
-	        return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
-	    }
+
+		try {
+			// 엑셀 데이터 파싱
+			List<Map<String, Object>> uploadedData = excelService.parseExcelFile(file);
+
+			int updatedCount = excelService.updateModifiedData(tableName, tableCodeId, uploadedData);
+
+			return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
+		}
 	}
 
 	// 엑셀 양식 다운로드
@@ -108,22 +110,22 @@ public class ExcelController {
 		try {
 			String tableName = (String) requestData.get("tableName");
 			List<String> headers = (List<String>) requestData.get("headers");
-			
+
 			// 엑셀 양식 생성
 			byte[] excelData = excelService.createExcelTemplate(tableName, headers);
 
 			// HTTP 응답 설정
-			HttpHeaders headersConfig  = new HttpHeaders();
+			HttpHeaders headersConfig = new HttpHeaders();
 			// headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-			headersConfig .setContentType(
+			headersConfig.setContentType(
 					// MIME 타입 변경 (xlsx)
 					MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-			headersConfig .setContentDispositionFormData("attachment", tableName + "_template.xlsx");
+			headersConfig.setContentDispositionFormData("attachment", tableName + "_template.xlsx");
 
 			return ResponseEntity.ok().headers(headersConfig).body(excelData);
 		} catch (IOException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
-	
+
 }

@@ -29,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itwillbs.repository.ExcelMapper;
 import com.itwillbs.repository.SalaryMapper;
 import com.itwillbs.repository.TestMapper;
 
@@ -41,6 +42,7 @@ import lombok.extern.java.Log;
 public class ExcelService {
 
 	private final TestMapper testMapper;
+	private final ExcelMapper excelMapper;
 
 	public Map<String, Object> selectExcelToastTest() {
 		log.info("============= selectExcelToastTest =============");
@@ -110,8 +112,10 @@ public class ExcelService {
 		return resultMap;
 	}
 
-	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입하는 메서드
-	public int updateModifiedData(List<Map<String, Object>> uploadedData) {
+	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입, 삭제하는 메서드
+	public int updateModifiedData(String tableName, 
+			String tableCodeId, 
+			List<Map<String, Object>> uploadedData) {
 
 		if (uploadedData.isEmpty()) {
 			return 0; // 데이터가 없으면 처리할 필요 없음
@@ -122,79 +126,64 @@ public class ExcelService {
 		int deleteCount = 0;
 		int result = 0;
 		
-		// 유효한 데이터 리스트 생성
-		List<Map<String, Object>> validDataList = new ArrayList<>();
+	    // 유효한 데이터 리스트 생성
+	    List<Map<String, Object>> validDataList = uploadedData.stream()
+	        .filter(row -> row.get(tableCodeId) != null && !row.get(tableCodeId).toString().trim().isEmpty())
+	        .collect(Collectors.toList());
 
-		// 업로드된 데이터에서 유효한 데이터만 필터링
-		for (Map<String, Object> row : uploadedData) {
-		    String id = (String) row.get("ID");
-		    // ID가 null이 아니고, 빈 문자열이 아닌 경우
-		    if (id != null && !id.trim().isEmpty()) {
-		        // ID를 포함한 유효한 데이터 추가
-		        validDataList.add(row);
-		    }
-		}
-		
-		// 유효한 데이터가 비어 있는지 체크
-		if (validDataList.isEmpty()) {
-		    return 0; // 유효한 데이터가 없으면 처리할 필요 없음
-		}
+	    if (validDataList.isEmpty()) {
+	        return 0; // 유효한 데이터가 없으면 처리할 필요 없음
+	    }
 
-		// 기존 데이터를 한 번에 조회
-		List<Map<String, Object>> existingDataList = testMapper.selectToastTest();
+	    // 기존 데이터를 조회
+		List<Map<String, Object>> existingDataList = excelMapper.selectExistingData(tableName);
 		
-		// DB에서 컬럼 타입 조회
-	    //Map<String, String> columnTypes = testMapper.getColumnTypes(tableName);
-	    
 		// 기존 데이터를 Map<ID, Map<String, Object>> 형태로 변환 (조회 속도 개선)
-		Map<String, Map<String, Object>> existingDataMap = existingDataList.stream()
-				.collect(Collectors.toMap(row -> (String) row.get("ID"), row -> row));
+	    Map<String, Map<String, Object>> existingDataMap = existingDataList.stream()
+	            .collect(Collectors.toMap(row -> (String) row.get(tableCodeId), row -> row));
 
-		// 변경된 데이터만 추려서 업데이트, 삽입, 삭제 리스트 생성
-		List<Map<String, Object>> dataToUpdate = new ArrayList<>();
-		List<Map<String, Object>> dataToInsert = new ArrayList<>();
-		List<String> dataToDelete = new ArrayList<>(existingDataMap.keySet()); // 기존 데이터 ID 목록
+	    // 변경된 데이터만 추려서 업데이트, 삽입, 삭제 리스트 생성
+	    List<Map<String, Object>> dataToUpdate = new ArrayList<>();
+	    List<Map<String, Object>> dataToInsert = new ArrayList<>();
+	    List<String> dataToDelete = new ArrayList<>(existingDataMap.keySet()); // 기존 데이터 ID 목록
 
-		for (Map<String, Object> newRow : validDataList) {
-			String id = (String) newRow.get("ID");
-			Map<String, Object> existingRow = existingDataMap.get(id);
-			log.info("existingRow : " + existingRow);
+	    for (Map<String, Object> newRow : validDataList) {
+	        Object keyValue = newRow.get(tableCodeId);
+	        Map<String, Object> existingRow = existingDataMap.get(keyValue);
 
-			if (existingRow != null) {
-				// 기존 데이터가 있고, 변경된 경우 업데이트 리스트에 추가
-				if (!isSameData(existingRow, newRow)) {
-//					Map<String, Object> convertedRow = convertDataTypes(newRow, columnTypes);
-//			        dataToUpdate.add(convertedRow);
-					dataToUpdate.add(newRow);
-					log.info("dataToUpdate : " + dataToUpdate);
-				}
-				// 기존 데이터가 존재하면 삭제 후보에서 제외
-				dataToDelete.remove(id);
-				log.info("dataToDelete : " + dataToDelete);
-			} else {
-				// 기존 데이터가 없는 경우 삽입 리스트에 추가
-				dataToInsert.add(newRow);
-				log.info("dataToInsert : " + dataToInsert);
-			}
-		}
+	        if (existingRow != null) {
+	            // 기존 데이터와 비교하여 변경된 경우만 업데이트
+	            if (!isSameData(existingRow, newRow)) {
+	                dataToUpdate.add(newRow);
+	            }
+	            // 기존 데이터가 존재하면 삭제 후보에서 제외
+	            dataToDelete.remove(keyValue);
+	        } else {
+	            // 기존 데이터가 없는 경우 삽입 리스트에 추가
+	            dataToInsert.add(newRow);
+	        }
+	    }
 
 		// 변경된 데이터만 일괄 업데이트 실행
 		if (!dataToUpdate.isEmpty()) {
-			result = testMapper.updateToastTestById(dataToUpdate);
+			log.info("update 실행");
+			result = excelMapper.updateExcelData(tableName, tableCodeId, dataToUpdate);
 			updateCount += result;
 			log.info("updateCount : " + updateCount);
 		}
 
 		// 새로운 데이터 일괄 삽입 실행
 		if (!dataToInsert.isEmpty()) {
-			result = testMapper.insertToastTest(dataToInsert);
+			log.info("insert 실행");
+			result = excelMapper.insertExcelData(tableName, dataToInsert);
 			insertCount += result;
 			log.info("insertCount : " + insertCount);
 		}
 
 		// 삭제 실행
 		if (!dataToDelete.isEmpty()) {
-			result = testMapper.deleteToastTest(dataToDelete);
+			log.info("delete 실행");
+			result = excelMapper.deleteExcelData(tableName, tableCodeId, dataToDelete);
 			deleteCount += result;
 			log.info("deleteCount : " + deleteCount);
 		}
@@ -207,14 +196,32 @@ public class ExcelService {
 	// 기존 데이터와 업로드된 데이터 비교 메서드 (변경 여부 체크)
 	// 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
 	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
-		for (String key : oldData.keySet()) {
-			if (!Objects.equals(oldData.get(key), newData.get(key))) {
-				return false;
-			}
-		}
+	    for (String key : oldData.keySet()) {
+	        Object oldValue = oldData.get(key);
+	        Object newValue = newData.get(key);
 
-		return true;
+	        // NULL 처리 (NULL은 빈 문자열로 변환)
+	        String oldStr = (oldValue == null) ? "" : String.valueOf(oldValue).trim();
+	        String newStr = (newValue == null) ? "" : String.valueOf(newValue).trim();
+
+	        // 대소문자 무시 비교
+	        if (!oldStr.equalsIgnoreCase(newStr)) {
+	            return false;
+	        }
+	    }
+	    return true;
 	}
+	
+//	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
+//		for (String key : oldData.keySet()) {
+//			if (!Objects.equals(oldData.get(key), newData.get(key))) {
+//				return false;
+//			}
+//		}
+//
+//		return true;
+//	}
+	
 //    private boolean isSameData(Map<String, Object> existingRow, Map<String, Object> newRow) {
 //        for (String key : newRow.keySet()) {
 //            Object oldValue = existingRow.get(key);
@@ -312,20 +319,15 @@ public class ExcelService {
 
 	// 엑셀 양식 생성 메서드
 	public byte[] createExcelTemplate(String tableName, List<String> headers) throws IOException {
-				
-//		List<String> columnNames = testMapper.getColumnNames(tableName); // 컬럼명 가져오기
-//
-//		log.info("columnNames : " + columnNames);
-		
 		log.info("headers : " + headers);
 
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 			Sheet sheet = workbook.createSheet("Template");
 			
-//            // row0 - 양식 규칙 (높이 지정)
-//            Row row0 = sheet.createRow(0);
-//            row0.setHeight((short) 600);  // 높이 지정 (단위: 1/20 포인트)
-//            row0.createCell(0).setCellValue("양식 규칙");
+//          // row0 - 양식 규칙 (높이 지정)
+//          Row row0 = sheet.createRow(0);
+//          row0.setHeight((short) 600);  // 높이 지정 (단위: 1/20 포인트)
+//          row0.createCell(0).setCellValue("양식 규칙");
 
 			// row0 - 양식 규칙 추가
 			Row row0 = sheet.createRow(0);
