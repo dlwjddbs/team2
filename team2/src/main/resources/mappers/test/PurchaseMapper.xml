@@ -104,14 +104,9 @@ WHERE pd.PO_ID = #{PO_ID}
     WHERE po.PO_ID = #{poId}
 </insert>
     
-    <!-- 모달창 재료 목록 -->
-	<select id="getMaterialList" resultType="map">
-    	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE
-    	FROM MATERIAL
-    </select>
-    
-<!--    거래처 목록-->
-    <select id="getClientList" resultType="map">
+        
+<!-- 거래처 목록 -->
+    <select id="getClientList" resultType="map" parameterType="map">
     	SELECT CLIENT_ID, CLIENT_NAME
     	FROM CLIENT
     	 WHERE 
@@ -123,6 +118,22 @@ WHERE pd.PO_ID = #{PO_ID}
 		   AND CLIENT_NAME = #{client_name}
 		</if>
     </select>
-    
+
+
+<!-- 모달창 재료 목록 -->
+	<select id="getMaterialList" resultType="map" parameterType="map">
+    	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE
+    	FROM MATERIAL
+    	WHERE 
+		 	   1 = 1
+		<if test='material_id != null and material_id != ""'>
+		   AND MATERIAL_ID = #{material_id}
+		</if>
+		<if test='material_name != null and material_name != ""'>
+		   AND MATERIAL_NAME = #{material_name}
+		</if>
+    </select>
+
+
 </mapper>
 

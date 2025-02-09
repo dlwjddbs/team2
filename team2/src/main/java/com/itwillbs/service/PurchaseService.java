@@ -1,5 +1,6 @@
 package com.itwillbs.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,16 +75,13 @@ public class PurchaseService {
         return count;
 }
 
-	public List<Map<String, Object>> getMaterialList(Map<String, Object> map) {
-		return purchaseMapper.getMaterialList(map);
-	}
 
 	public Map<String, Object> getClientList(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "selectMember 성공";
+		String message = "selectClient 성공";
 		
 		try {
 			List<Map<String, Object>> purchaseList = purchaseMapper.getClientList(requestData);
@@ -99,6 +97,16 @@ public class PurchaseService {
 		
 		return resultMap;
 	}	
+	
+	
+
+	public List<Map<String, Object>> getMaterialList(Map<String, Object> requestData) {
+	
+		List<Map<String, Object>> materialList = purchaseMapper.getMaterialList(requestData);
+		
+		
+		return materialList;
+	}
 	
 	
 }
