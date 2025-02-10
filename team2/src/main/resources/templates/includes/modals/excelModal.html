@@ -25,9 +25,9 @@
 			            <div class="input-group mb-3">
 			                <input type="file" class="form-control" id="excelFile">
 			                <div class="input-group-append">
-			                    <button class="btn btn-primary" id="btn_excel_upload">불러오기</button>
-			                    <button class="btn btn-primary" id="btn_db_update">업로드</button>
-			                    <button class="btn btn-danger" id="btn_ㄷxcel_reset">초기화</button>
+			                    <button class="btn btn-primary" id="btn_excel_read">불러오기</button>
+			                    <button class="btn btn-primary" id="btn_excel_update">업로드</button>
+			                    <button class="btn btn-danger" id="btn_excel_reset">초기화</button>
 			                </div>
 			            </div>
 			        </div>
@@ -124,8 +124,8 @@
 	    });
 	}
 
-	// 엑셀 업로드 버튼 클릭 이벤트
-	$('#btn_excel_upload').on('click', function () {
+	// 엑셀 불러오기 버튼 클릭 이벤트
+	$('#btn_excel_read').on('click', function () {
 		
 	    let fileInput = document.getElementById('excelFile');
 	    let file = fileInput.files[0];
@@ -139,7 +139,7 @@
 	    formData.append("file", file);
 	    
 		$.ajax({
-			url: "/ajax/uploadExcel", // 서버 업로드 URL
+			url: "/ajax/readExcel", // 서버 업로드 URL
 			type: "POST",
 			data: formData,
 			processData: false,
@@ -147,7 +147,7 @@
 			success: function (res) {
 				console.log("엑셀 데이터 : ", res);
 				
-	            // 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
+	            // 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음 (첫번째 그리드)
 	            let activeGrid = findGrid();
 
 	            if (activeGrid) {
@@ -170,58 +170,46 @@
 		});
 	});
 	
-	// 엑셀 업로드시 수정된 행(row)만 db에 업데이트 이벤트 (수정 중)
-	// 250209 TODO : 수정 구현, 수정할 때 엑셀 header에서 
-	// 괄호 안 내용만을 인식하고 그걸 가지고 수정 필요
-	$('#btn_db_update').on('click', function () {
-		
+	// 엑셀 업로드시 수정된 행(row)만 db에 update 이벤트
+	$('#btn_excel_update').on('click', function () {
 		// 엑셀 파일 업로드시 수정된 행(row)만 db에 업데이트
 		let fileInput = document.getElementById('excelFile');
+		
 		let file = fileInput.files[0];
-	
 		if (!file) {
 			alert("파일을 선택하세요.");
 			return;
 		}
-	
+
+		let activeGrid = findGrid();
+		if (!activeGrid) {
+		    alert("보이는 그리드를 찾을 수 없습니다.");
+		    return;
+		}
+
+		// Grid의 {header → name} 매핑 정보 추출
+		let gridColumns = activeGrid.getColumns();  // [{ name: "EQUIPMENT_ID", header: "설비코드" }, ...]
+		let headerToNameMap = {};
+		gridColumns.forEach(col => {
+		    headerToNameMap[col.header] = col.name;
+		});
+		console.log("Grid 매핑 정보 : ", headerToNameMap);
+		
 		let formData = new FormData();
-		formData.append("file", file);
 		formData.append("tableName", tableName);  // 적용할 테이블명
 		formData.append("tableCodeId", tableCodeId);  // 기본 키 컬럼명 (ex: "ID")
+		formData.append("headerMap", JSON.stringify(headerToNameMap));  // JSON으로 변환하여 전송
+		formData.append("file", file);
+
 		
-        let activeGrid = findGrid();
-
-        if (activeGrid) {
-            // 엑셀 데이터를 Grid의 name에 맞게 자동 변환
-            let transformedData = autoMapExcelData(res, activeGrid);
-            console.log("엑셀 데이터 (매핑 전) :", res);
-            console.log("엑셀 데이터 (매핑 후) :", transformedData);
-
-            alert("엑셀 불러오기 성공!");
-            activeGrid.resetData(transformedData); // 변환된 데이터 적용
-        }
-	
 		$.ajax({
-			url: "/ajax/updateExcelData",
+			url: "/ajax/modifyExcelData",
 			type: "POST",
 			data: formData,
 			processData: false,
 			contentType: false,
 			success: function (res) {
-				
-				// 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
-				/*
-				let activeGrid = findGrid();
-				
-				if (activeGrid) {
-					alert(res.message);
-					grid.reloadData();  // 업로드 후 그리드 새로고침
-				} else {
-				    alert("보이는 그리드를 찾을 수 없습니다.");
-				    alert("엑셀 불러오기 실패!");
-				}
-				*/
-				
+
 				alert(res.message);
 				grid.reloadData();  // 업로드 후 그리드 새로고침
 			},
@@ -230,12 +218,13 @@
 				alert("엑셀 DB 업데이트 중 오류가 발생했습니다.");
 			}
 		});
+		
 	});
 	
 	// 엑셀 양식 다운로드 버튼 클릭 이벤트
 	$('#btn_excel_template').on('click', function () {
 		// Grid에서 헤더 정보 가져오기
-		const grid = findGrid(); // 현재 화면에 보이는 Grid 가져오기
+		const grid = findGrid(); // 현재 화면에 보이는 Grid 가져오기 (첫번째 그리드)
 		
 		if (!grid) {
 		    alert("현재 화면에 표시된 그리드가 없습니다.");
@@ -276,6 +265,12 @@
 				console.error("다운로드 실패 : ", error);
 			}
 		});
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$('#btn_excel_reset').on('click', function () {
+	    // 파일 선택 초기화
+	    $('#excelFile').val('');
 	});
 
 </script>

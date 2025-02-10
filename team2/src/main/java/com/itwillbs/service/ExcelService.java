@@ -113,23 +113,32 @@ public class ExcelService {
 		return resultMap;
 	}
 
-	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입, 삭제하는 메서드
+	// 엑셀에서 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입, 삭제하는 메서드
 	@Transactional(rollbackFor = Exception.class)
-	public int updateModifiedData(String tableName, 
-								  String tableCodeId, 
-								  List<Map<String, Object>> uploadedData) {
+	public int modifyExcelData(String tableName, 
+							   String tableCodeId, 
+							   Map<String, String> headerMap,
+							   List<Map<String, Object>> uploadedData) {
 
 		if (uploadedData.isEmpty()) {
 			return 0; // 데이터가 없으면 처리할 필요 없음
 		}
-
+		
+		// updateCount의 경우 몇개를 update해도 -1로 반환되는 문제가 있음
+		// 기능상 문제는 없기에 count는 제거 예정
 		int updateCount = 0;
 		int insertCount = 0;
 		int deleteCount = 0;
 		int result = 0;
 		
+		// Grid의 name과 엑셀의 header(1행)을 매핑
+		List<Map<String, Object>> convertedExcelData = excelHeadersToGrid(uploadedData, headerMap);
+		
+		log.info("convertedExcelData : " + convertedExcelData);
+		
 	    // 엑셀 데이터에서 유효한 데이터 리스트 생성
-	    List<Map<String, Object>> validDataList = uploadedData.stream()
+		// tableCodeId(PK) 값이 존재하는 행을 찾아서 리스트에 저장
+	    List<Map<String, Object>> validDataList = convertedExcelData.stream()
 	        .filter(row -> row.get(tableCodeId) != null && !row.get(tableCodeId).toString().trim().isEmpty())
 	        .collect(Collectors.toList());
 
@@ -158,7 +167,7 @@ public class ExcelService {
 	    List<Map<String, Object>> dataToUpdate = new ArrayList<>();
 	    List<Map<String, Object>> dataToInsert = new ArrayList<>();
 	    List<String> dataToDelete = new ArrayList<>(existingDataMap.keySet()); // 기존 데이터 ID 목록
-
+	    
 	    for (Map<String, Object> newRow : validDataList) {
 	        Object keyValue = newRow.get(tableCodeId);
 	        Map<String, Object> existingRow = existingDataMap.get(keyValue);
@@ -184,6 +193,7 @@ public class ExcelService {
 	    log.info("dataToUpdate : " + dataToUpdate.size());
 	    log.info("dataToDelete : " + dataToDelete.size());
 	    
+	    /*
 		// 새로운 데이터 일괄 삽입 실행
 		if (!dataToInsert.isEmpty()) {
 			log.info("insert 실행");
@@ -207,133 +217,10 @@ public class ExcelService {
 			deleteCount += result;
 			log.info("deleteCount : " + deleteCount);
 		}
-
+		*/
 		// 결과 로깅
 		log.info("Total processed rows (updated + inserted + deleted): " + result);
 		return updateCount + insertCount + deleteCount;
-	}
-
-	// 기존 데이터와 업로드된 데이터 비교 메서드 (변경 여부 체크)
-	// 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
-	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
-	    for (String key : oldData.keySet()) {
-	        Object oldValue = oldData.get(key);
-	        Object newValue = newData.get(key);
-
-	        // NULL 처리 (NULL은 빈 문자열로 변환)
-	        String oldStr = (oldValue == null) ? "" : String.valueOf(oldValue).trim();
-	        String newStr = (newValue == null) ? "" : String.valueOf(newValue).trim();
-
-	        // 대소문자 무시 비교
-	        if (!oldStr.equalsIgnoreCase(newStr)) {
-	            return false;
-	        }
-	    }
-	    return true;
-	}
-	
-//	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
-//		for (String key : oldData.keySet()) {
-//			if (!Objects.equals(oldData.get(key), newData.get(key))) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-	
-//    private boolean isSameData(Map<String, Object> existingRow, Map<String, Object> newRow) {
-//        for (String key : newRow.keySet()) {
-//            Object oldValue = existingRow.get(key);
-//            log.info("oldValue : " + oldValue);
-//            Object newValue = newRow.get(key);
-//            log.info("newValue : " + newValue);
-//            
-//            if (!Objects.equals(oldValue, newValue)) {
-//            	log.info("다른거 확인됨!");
-//                return false; // 하나라도 다르면 변경됨
-//            }
-//        }
-//        return true; // 모든 값이 동일하면 변경 없음
-//    }
-
-	// 엑셀 파일 파싱 메서드
-	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {
-		List<Map<String, Object>> dataList = new ArrayList<>();
-
-		// 엑셀 97 - 2003 까지는 HSSF(xls), 엑셀 2007 이상은 XSSF(xlsx)
-		try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-			// 첫 번째 시트 선택, 전체 행 개수 가져오기
-			Sheet sheet = workbook.getSheetAt(0);
-			int rowCount = sheet.getPhysicalNumberOfRows();
-
-			// header 읽기 (2번째 행부터 시작)
-			Row headerRow = sheet.getRow(1);
-			List<String> headers = new ArrayList<>();
-
-			// 2번째 행의 모든 셀을 읽어서 headers 리스트에 저장
-			for (Cell cell : headerRow) {
-				headers.add(cell.getStringCellValue().trim());
-			}
-
-			// 데이터 읽기 (3번째 행부터)
-			for (int i = 2; i < rowCount; i++) {
-				Row row = sheet.getRow(i);
-
-				if (row == null)
-					continue;
-
-				Map<String, Object> rowData = new LinkedHashMap<>();
-
-				// header를 Key로, 셀의 값을 Value로 저장
-				for (int j = 0; j < headers.size(); j++) {
-					Cell cell = row.getCell(j);
-					String header = headers.get(j);
-
-					rowData.put(header, getCellValue(cell));
-				}
-
-				dataList.add(rowData);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return dataList;
-	}
-
-	// 엑셀 셀 데이터 변환 메서드
-	// 데이터의 안정성과 일관성을 위해 사용 (데이터 타입이 혼합된 경우 예외 발생 가능성 높음)
-	private Object getCellValue(Cell cell) {
-		if (cell == null) {
-			return ""; // 빈 셀 처리
-		}
-		switch (cell.getCellType()) {
-		case STRING:
-			return cell.getStringCellValue(); // 문자열
-		case NUMERIC:
-			if (DateUtil.isCellDateFormatted(cell)) { 
-				// 날짜 포맷이면 변환
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				return sdf.format(cell.getDateCellValue());
-			}
-			return (cell.getNumericCellValue() % 1 == 0) ? (int) cell.getNumericCellValue() // 정수면 int로 변환
-					: cell.getNumericCellValue(); // 실수면 그대로 반환
-		case BOOLEAN:
-			return cell.getBooleanCellValue(); // Boolean (true, false)
-		default:
-			return ""; // 기타 (날짜 등) 처리
-		}
-	}
-	
-	// 빈 행인지 확인하는 메서드 
-	private boolean isRowEmpty(Row row) {
-	    for (Cell cell : row) {
-	        if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).toString().trim().isEmpty()) {
-	            return false; // 하나라도 값이 있으면 빈 행이 아님
-	        }
-	    }
-	    return true; // 모든 셀이 비어있으면 빈 행
 	}
 
 	// 엑셀 양식 생성 메서드
@@ -387,7 +274,148 @@ public class ExcelService {
 		}
 	}
 
-	// 엑셀 데이터 타입 변환 메서드 (미구현)
+	// 엑셀 파일 파싱 메서드
+	public List<Map<String, Object>> parseExcelFile(MultipartFile file) {
+		List<Map<String, Object>> dataList = new ArrayList<>();
+
+		// 엑셀 97 - 2003 까지는 HSSF(xls), 엑셀 2007 이상은 XSSF(xlsx)
+		try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+			// 첫 번째 시트 선택, 전체 행 개수 가져오기
+			Sheet sheet = workbook.getSheetAt(0);
+			int rowCount = sheet.getPhysicalNumberOfRows();
+
+			// header 읽기 (2번째 행부터 시작)
+			Row headerRow = sheet.getRow(1);
+			List<String> headers = new ArrayList<>();
+
+			// 2번째 행의 모든 셀을 읽어서 headers 리스트에 저장
+			for (Cell cell : headerRow) {
+				headers.add(cell.getStringCellValue().trim());
+			}
+
+			// 데이터 읽기 (3번째 행부터)
+			for (int i = 2; i < rowCount; i++) {
+				Row row = sheet.getRow(i);
+
+				if (row == null)
+					continue;
+
+				Map<String, Object> rowData = new LinkedHashMap<>();
+
+				// header를 Key로, 셀의 값을 Value로 저장
+				for (int j = 0; j < headers.size(); j++) {
+					Cell cell = row.getCell(j);
+					String header = headers.get(j);
+
+					rowData.put(header, getCellValue(cell));
+				}
+
+				dataList.add(rowData);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return dataList;
+	}
+
+	// 기존 데이터와 업로드된 데이터 비교 메서드 (변경 여부 체크)
+	// 모든 값이 같으면 업데이트 X, 하나라도 다르면 db에 업데이트 실행
+	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
+	    for (String key : oldData.keySet()) {
+	        Object oldValue = oldData.get(key);
+	        Object newValue = newData.get(key);
+
+	        // NULL 처리 (NULL은 빈 문자열로 변환)
+	        String oldStr = (oldValue == null) ? "" : String.valueOf(oldValue).trim();
+	        String newStr = (newValue == null) ? "" : String.valueOf(newValue).trim();
+
+	        // 대소문자 무시 비교
+	        if (!oldStr.equalsIgnoreCase(newStr)) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+	
+//	private boolean isSameData(Map<String, Object> oldData, Map<String, Object> newData) {
+//		for (String key : oldData.keySet()) {
+//			if (!Objects.equals(oldData.get(key), newData.get(key))) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
+	
+//    private boolean isSameData(Map<String, Object> existingRow, Map<String, Object> newRow) {
+//        for (String key : newRow.keySet()) {
+//            Object oldValue = existingRow.get(key);
+//            log.info("oldValue : " + oldValue);
+//            Object newValue = newRow.get(key);
+//            log.info("newValue : " + newValue);
+//            
+//            if (!Objects.equals(oldValue, newValue)) {
+//            	log.info("다른거 확인됨!");
+//                return false; // 하나라도 다르면 변경됨
+//            }
+//        }
+//        return true; // 모든 값이 동일하면 변경 없음
+//    }
+	
+	// 엑셀 셀 데이터 변환 메서드
+	// 데이터의 안정성과 일관성을 위해 사용 (데이터 타입이 혼합된 경우 예외 발생 가능성 높음)
+	private Object getCellValue(Cell cell) {
+		if (cell == null) {
+			return ""; // 빈 셀 처리
+		}
+		switch (cell.getCellType()) {
+		case STRING:
+			return cell.getStringCellValue(); // 문자열
+		case NUMERIC:
+			if (DateUtil.isCellDateFormatted(cell)) { 
+				// 날짜 포맷이면 변환
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				return sdf.format(cell.getDateCellValue());
+			}
+			return (cell.getNumericCellValue() % 1 == 0) ? (int) cell.getNumericCellValue() // 정수면 int로 변환
+					: cell.getNumericCellValue(); // 실수면 그대로 반환
+		case BOOLEAN:
+			return cell.getBooleanCellValue(); // Boolean (true, false)
+		default:
+			return ""; // 기타 (날짜 등) 처리
+		}
+	}
+	
+    // Grid의 name과 엑셀의 header을 매핑하는 메서드
+    private List<Map<String, Object>> excelHeadersToGrid(List<Map<String, Object>> excelData, Map<String, String> headerMap) {
+        List<Map<String, Object>> mappedData = new ArrayList<>();
+
+        for (Map<String, Object> row : excelData) {
+            Map<String, Object> mappedRow = new HashMap<>();
+            for (Map.Entry<String, Object> entry : row.entrySet()) {
+                String excelHeader = entry.getKey();
+                if (headerMap.containsKey(excelHeader)) {
+                    mappedRow.put(headerMap.get(excelHeader), entry.getValue());  // 'header' → 'name' 변환
+                }
+            }
+            mappedData.add(mappedRow);
+        }
+
+        return mappedData;
+    }
+    
+	// 빈 행인지 확인하는 메서드 (미사용)
+	private boolean isRowEmpty(Row row) {
+	    for (Cell cell : row) {
+	        if (cell != null && cell.getCellType() != CellType.BLANK && !getCellValue(cell).toString().trim().isEmpty()) {
+	            return false; // 하나라도 값이 있으면 빈 행이 아님
+	        }
+	    }
+	    return true; // 모든 셀이 비어있으면 빈 행
+	}
+
+	// 엑셀 데이터 타입 변환 메서드 (미사용)
 	// 테이블 컬럼 타입을 기반으로 변환 적용
 	// 현재 테이블 이름을 어떻게 찾을건지 생각해야함 (250210 : tableName 받아오는 식으로)
 	public Map<String, Object> convertDataTypes(Map<String, Object> rowData, Map<String, String> columnTypes) {

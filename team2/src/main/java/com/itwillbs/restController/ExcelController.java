@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itwillbs.service.ExcelService;
 
 import lombok.RequiredArgsConstructor;
@@ -55,9 +57,9 @@ public class ExcelController {
 		return excelService.deleteToastTest(idList);
 	}
 
-	// 엑셀 업로드
-	@PostMapping("/ajax/uploadExcel")
-	public ResponseEntity<List<Map<String, Object>>> uploadExcel(@RequestParam("file") MultipartFile file) {
+	// 엑셀 불러오기
+	@PostMapping("/ajax/readExcel")
+	public ResponseEntity<List<Map<String, Object>>> readExcel(@RequestParam("file") MultipartFile file) {
 		log.info("============= 엑셀 업로드 시작 =============");
 
 		if (file.isEmpty()) {
@@ -74,19 +76,28 @@ public class ExcelController {
 	}
 
 	// 엑셀 업로드 (수정된 데이터만 DB에 update)
-	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
-	@PostMapping("/ajax/updateExcelData")
-	public ResponseEntity<?> updateExcelData(@RequestParam("tableName") String tableName,
-			@RequestParam("tableCodeId") String tableCodeId, 
-			@RequestParam("file") MultipartFile file) {
+	// 기존 데이터와 비교 후 수정된 데이터만 업데이트, 삽입, 삭제
+	@PostMapping("/ajax/modifyExcelData")
+	public ResponseEntity<?> modifyExcel(@RequestParam("tableName") String tableName,
+										 @RequestParam("tableCodeId") String tableCodeId, 
+										 @RequestParam("headerMap") String headerMapJson,
+										 @RequestParam("file") MultipartFile file) {
 		log.info("============= 엑셀 업로드 시작 (db 수정 동작) =============");
 
 		try {
+            // JSON 문자열 → Map 변환
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, String> headerMap = objectMapper.readValue(headerMapJson, new TypeReference<>() {});
+            
+            log.info("headerMap : " + headerMap);
+            
 			// 엑셀 데이터 파싱
 			List<Map<String, Object>> uploadedData = excelService.parseExcelFile(file);
+			
+			int updatedCount = excelService.modifyExcelData(tableName, tableCodeId, headerMap, uploadedData);
 
-			int updatedCount = excelService.updateModifiedData(tableName, tableCodeId, uploadedData);
-
+			log.info("updatedCount : " + updatedCount);
+			
 			return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
