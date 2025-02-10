@@ -147,8 +147,8 @@ public class PurchaseController {
 		
 		@PostMapping(purchaseMtl)
 		@ResponseBody
-		public List<Map<String, Object>> getMaterialList(@RequestParam Map<String, Object> requestData) {
-			System.out.println("자재리스트" + requestData);
+		public List<Map<String, Object>> getMaterialList(@RequestBody  Map<String, Object> requestData ) {
+			System.out.println("자재리스트" + requestData.toString());
 			List<Map<String, Object>> getMaterialList = purchaseService.getMaterialList(requestData);
 			return getMaterialList;
 		}

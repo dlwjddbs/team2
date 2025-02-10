@@ -8,19 +8,29 @@
 	
 <!--	발주 리스트-->
 	<select id="getPurchaseList" resultType="map">	
-	SELECT PO_ID,
-		   PO_NUM,
-		   PO_COUNT,
-		   PO_PRICE,
-		   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
-		   (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = PO.MEMBER_ID) AS MEMBER_NAME,
-		   CLIENT_ID,
-		   (SELECT CLIENT_NAME FROM CLIENT WHERE CLIENT_ID = PO.CLIENT_ID) AS CLIENT_NAME,
-		   PO_STATUS,
-		   TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
-		   (SELECT NAME FROM MEMBER M2 WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
-	FROM 
-		PURCHASE_ORDER PO
+	SELECT 
+        PO.PO_ID,
+    PO.PO_NUM,
+    (SELECT NVL(SUM(PD.PO_COUNT), 0)
+     FROM PO_DETAIL PD 
+     WHERE PD.PO_ID = PO.PO_ID) AS PO_COUNT,
+    (SELECT TO_CHAR(NVL(SUM(PD.TOTAL_PRICE), 0), 'FM9,999,999') || '원'
+     FROM PO_DETAIL PD 
+     WHERE PD.PO_ID = PO.PO_ID) AS PO_PRICE,
+    TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+    (SELECT NAME 
+     FROM MEMBER M1 
+     WHERE M1.MEMBER_ID = PO.MEMBER_ID) AS MEMBER_NAME,
+    PO.CLIENT_ID,
+    (SELECT CLIENT_NAME 
+     FROM CLIENT 
+     WHERE CLIENT_ID = PO.CLIENT_ID) AS CLIENT_NAME,
+    PO.PO_STATUS,
+    TO_CHAR(PO.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+    (SELECT NAME 
+     FROM MEMBER M2 
+     WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
+FROM PURCHASE_ORDER PO
 	</select>
 	
 <!--	발주 등록-->
@@ -66,18 +76,20 @@ WHERE CLIENT_ID = #{cltId}
     SELECT 
     pd.PODETAIL_ID,
     pd.MATERIAL_ID,
+    TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
     pd.PO_COUNT,
     pd.TOTAL_PRICE,
     pd.UPDATE_DATE,
     pd.UPDATE_MEMBER,
     m.MATERIAL_NAME,
-    m.MATERIAL_PRICE
+    TO_CHAR(m.MATERIAL_PRICE, 'FM9,999,999') || '원' AS MATERIAL_PRICE
 FROM PO_DETAIL pd
 JOIN PURCHASE_ORDER p 
     ON pd.PO_ID = p.PO_ID
 JOIN MATERIAL m
     ON pd.MATERIAL_ID = m.MATERIAL_ID
-WHERE pd.PO_ID = #{PO_ID}   
+WHERE pd.PO_ID = #{PO_ID}
+ORDER BY PODETAIL_ID DESC
  </select>
 
 <!-- 발주 상세 등록    -->
@@ -103,7 +115,24 @@ WHERE pd.PO_ID = #{PO_ID}
     JOIN MATERIAL m ON m.MATERIAL_ID = #{MATERIAL_ID}
     WHERE po.PO_ID = #{poId}
 </insert>
-    
+
+<!-- 발주 상세 수정 -->
+<update id="updateDetail" parameterType="map">
+    UPDATE PO_DETAIL
+    	SET 
+       	 	MATERIAL_ID = #{MATERIAL_ID, jdbcType=VARCHAR},
+       	 	PO_COUNT = #{PO_COUNT},
+       	 	TOTAL_PRICE   = #{PO_COUNT} * PO_PRICE,
+       	 	UPDATE_DATE = CURRENT_DATE,
+       	 	UPDATE_MEMBER = #{UPDATE_MEM}
+    WHERE PODETAIL_ID = #{PODETAIL_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
+
+<!-- DELETE (데이터 삭제) -->
+    <delete id="deleteDetail" parameterType="map">
+        DELETE FROM PO_DETAIL 
+        	WHERE PODETAIL_ID = #{PODETAIL_ID}
+    </delete>
         
 <!-- 거래처 목록 -->
     <select id="getClientList" resultType="map" parameterType="map">
@@ -130,7 +159,7 @@ WHERE pd.PO_ID = #{PO_ID}
 		   AND MATERIAL_ID = #{material_id}
 		</if>
 		<if test='material_name != null and material_name != ""'>
-		   AND MATERIAL_NAME = #{material_name}
+		   AND MATERIAL_NAME LIKE '%' || #{material_name} || '%'
 		</if>
     </select>
 
