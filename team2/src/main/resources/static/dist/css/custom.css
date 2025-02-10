@@ -13,7 +13,7 @@
 		}
 		
 	.tui-datepicker, .tui-rangepicker, .tui-select-box-dropdown{
-		z-index: 100;
+		z-index: 1060;
 	}
 	
 	.form-control{
@@ -24,12 +24,24 @@
 		max-width: 160px;
 	}
 	
+	.form-control[readonly]{
+		border: 0!important;
+		padding: 0!important;
+		background-color: #fff!important;
+	}
+	
 	.form-control:focus, .dropdown-toggle[aria-expanded="true"], .tui-datepicker-input input:focus{
 		box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
 		outline : 0;
 		border-color : #86b7fe;
 		background : #fff;
 		color: #212529;
+	}
+	
+	.form-control[readonly]:focus{
+		border: 0 !important;
+		box-shadow: none !important;
+		background: #fff;
 	}
 	
 	.show>.btn-light.dropdown-toggle, .tui-datepicker-input{
@@ -67,6 +79,7 @@
 		text-decoration: none;
 	}
 	
+	
 }
 
 #orderDetailTable{
@@ -75,6 +88,10 @@
 		th{
 			background: #F4F5F6;
 			font-weight: bold;
+		}
+		
+		.tui-datepicker{
+			z-index: 1060 !important;
 		}
 	}	
 }

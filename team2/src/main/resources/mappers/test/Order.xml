@@ -95,7 +95,7 @@
 
                 <!-- 수주번호 필터링 -->
                 <if test="orderId != null">
-                    AND ORDER_ID = #{orderId}
+                    AND ORDER_ID LIKE '%' || #{orderId} || '%'
                 </if>
 
                 <!-- 진행상태 필터링 -->
@@ -128,6 +128,19 @@
         FROM OrderDetails
         ORDER BY ORDER_ID DESC
     </select>
+    
+    <!-- UPDATE -->
+    <update id="updateOrder">
+        UPDATE ORDERS
+        SET
+        	ORDER_DATE = TO_DATE(#{orderDate}, 'YYYY-MM-DD'),
+            CUSTOMER_ID = #{customerId},
+            SALES_REP_ID = #{salesRepId},
+            DELIVERY_DATE = TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'),
+            ITEM_ID = #{itemId},
+            REMARKS = #{remarks}
+        WHERE ORDER_ID = #{orderId}
+    </update>
     
    	<!-- DELETE -->
       <delete id="deleteOrder">

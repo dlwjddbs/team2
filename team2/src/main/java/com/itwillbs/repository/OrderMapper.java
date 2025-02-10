@@ -20,4 +20,6 @@ public interface OrderMapper {
     
     // 수주 삭제
     void deleteOrder(List<String> orderIds);
+
+	void updateOrder(Map<String, Object> orderData);
 }

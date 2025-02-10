@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -59,6 +60,22 @@ public class OrderManagementController {
         log.info("조회된 수주 데이터: " + orderData);
 
         return orderData;
+    }
+
+    @PostMapping(URL + "/update")
+    public ResponseEntity<Map<String, Object>> updateOrder(@RequestBody Map<String, Object> orderData) {
+    	Map<String, Object> response = new HashMap<>();
+    	try {
+    		orderService.updateOrder(orderData);
+    		response.put("success", true);
+    		response.put("message", "수주정보가 성공적으로 수정되었습니다.");
+    		return ResponseEntity.ok(response);
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		response.put("success", false);
+            response.put("message", "수주정보 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
+    	}
     }
     
     @DeleteMapping(URL + "/delete")

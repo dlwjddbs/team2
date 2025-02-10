@@ -32,4 +32,8 @@ public class OrderService {
     public void deleteOrder(List<String> orderIds) {
         orderMapper.deleteOrder(orderIds);
     }
+
+	public void updateOrder(Map<String, Object> orderData) {
+		orderMapper.updateOrder(orderData);
+	}
 }
