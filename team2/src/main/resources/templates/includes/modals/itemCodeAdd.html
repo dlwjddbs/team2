@@ -19,19 +19,15 @@
  							<div class="col-md-6"> 
 								<div class="form-group">
 									<label for="exampleInputEmail1">회사명</label>
-									<select class="form-control select" id="ITEM_TYPE">
-										<option selected="selected" disabled>유형 선택</option>
-										<option value="DEV">원자재</option>												
-										<option value="HR">반제품</option>												
-										<option value="AC">완제품</option>												
+									<select class="form-control select" id="CLIENT_NAME">
+										<option selected="selected" disabled>회사 선택</option>
 									</select>
 								</div>
  							</div>
 							<div class="col-md-3">
-								<label>사용여부</label><br> <input id="USE_YN" type="radio"
-									name="use_yn_update" value="Y"> 사용 &nbsp; <input
-									id="USE_YN_N" type="radio" name="use_yn_update" value="N">
-								미사용
+								<label>사용여부</label><br> 
+								<input type="radio" name="use_status" value="Y" checked> 사용 &nbsp;
+			                    <input type="radio" name="use_status" value="N"> 미사용
 							</div>
 							<div class="col-md-3">
 								<div class="form-group">
@@ -55,7 +51,7 @@
 												type="button" style="display: none;">수정</button>
 										</div>
 									</div>
-									<span id="validationEquipCodeMessage" class="form-text mt-1"></span>
+									<span id="validationItemCodeMessage" class="form-text mt-1"></span>
 				            </div>
 							<div class="col-md-6">
 								<div class="form-group">
@@ -80,16 +76,11 @@
 							            <div class="col-md-6">
 							                <select class="form-control select" id="MAIN_NAME" name="MAIN_NAME">
 							                    <option selected="selected" disabled>대분류</option>
-							                    <option value="AS">대리</option>                                                
-							                    <option value="MG">과장</option>                                                
 							                </select>
 							            </div>
 							            <div class="col-md-6">
 							                <select class="form-control select" id="SUB_NAME" name="SUB_NAME">
 							                    <option selected="selected" disabled>소분류</option>                                                
-							                    <option value="AS">대리</option>                                                
-							                    <option value="MG">과장</option>                                                
-							                    <option value="SM">차장</option>                                                
 							                </select>
 							            </div>
 							        </div>
@@ -132,7 +123,7 @@
 				<div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal">닫기</button>
-						<button type="button" id="submitBtn2" class="btn btn-primary">저장</button>
+						<button type="button" id="submitBtn2" class="btn btn-primary">등록</button>
 					</div>
 				</div>
 				<!-- /.모달창 푸터-->
@@ -141,3 +132,75 @@
 		</div>
 	</div>
 </div>
+
+<script th:fragment="itemCodeAdd" th:inline="javascript">
+	const dangerText = "form-text text-danger mt-1";
+	
+	$("#checkDuplicateCodeBtn").on("click", function() {
+		const itemCode = $("#itemCode").val().trim();
+		
+		if (itemCode == null || itemCode == '') {
+			validationItemCodeMessage.textContent = "코드를 입력하세요.";
+			validationItemCodeMessage.className = dangerText
+			
+			return;
+		}
+		
+		const filteredValues = itemGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row['ITEM_ID']);
+
+		if (filteredValues.includes(itemCode)) {
+			validationItemCodeMessage.textContent = '신규 행에서의 중복입니다.';
+			validationItemCodeMessage.className = dangerText
+			$("#saveCode").attr("disabled", true);
+			
+			return;
+		}
+		
+		$.ajax({
+            type : "POST",
+            url : "/item/checkDuplicateItemCode",
+            data : {
+            	ITEM_ID : itemCode
+			},
+            success : function(res){
+				if (res.resultCode == 1) {
+					validationItemCodeMessage.textContent = res.result;
+					validationItemCodeMessage.className = "form-text text-success mt-1";
+					$("#itemCode").attr("disabled", true);
+					$("#saveCode").attr("disabled", false);
+					
+					$("#checkDuplicateItemCode").hide();
+					$("#modifyCodeBtn").show();
+				} else {
+					validationItemCodeMessage.textContent = res.result;
+					validationItemCodeMessage.className = dangerText
+					$("#saveCode").attr("disabled", true);
+				}
+            },
+            error : function(e){
+                console.log("checkDuplicateItemCode() ajax 실패");
+            }
+        });
+	});
+	
+	$("#saveCode").on("click", function() {
+		const itemRow = $("#itemRow").val();
+		const itemColumn = $("#itemColumn").val();
+		const itemCode = $("#itemCode").val();
+		
+		itemGrid.setValue(itemRow, itemColumn, itemCode);
+		$('#itemCodeAdd').modal('hide');
+		
+		validationItemCodeMessage.textContent = '';
+		$("#saveCode").attr("disabled", true);
+	});
+	
+	$("#modifyCodeBtn").on("click", function() {
+		$("#checkDuplicateCodeBtn").show();
+		$("#modifyCodeBtn").hide();
+		$("#saveCode").attr("disabled", true);
+		$("#itemCode").attr("disabled", false);
+	});
+</script>
