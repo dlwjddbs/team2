@@ -17,6 +17,7 @@ public class ClientController {
 	
 	@GetMapping("/client")
 	public String client() {
+		log.info("============= item =============");
 		return "/clientinfo/client";
 	}
 	
