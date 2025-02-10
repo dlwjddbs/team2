@@ -4,7 +4,7 @@
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
 			<div class="modal-header">
-				<h4 class="modal-title">엑셀</h4>
+				<h4 class="modal-title">데이터 업로드(엑셀)</h4>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -49,26 +49,10 @@
 <script th:fragment="excelModal" th:inline="javascript">
 	
 	/* 
-	====================코드중복체크 모달 사용법 ===========================
-	모달 show이전에 아래의 값들을 할당해야함.
-	workcenter.html 참고.
+	==================== 엑셀 모달 사용법 ===========================
+
 	=================================================================
-	button.addEventListener('click', function() {
-		const row = props.rowKey;
-		const column = props.columnInfo.name;
-		const value = processGrid.getValue(row, column);  // 사용할 그리드 - 변경필요.
-		
-		$("#inputCodeText").val(value);  // 그리드에 출력되어있는 기존의 값
-		$("#gridCheckedRow").val(row);  // 선택한 행
-		$("#gridCheckedColumn").val(column);  // 선택한 열
-		
-		tableName = "PROCESS";  // DB테이블명 - 변경필요.
-		tableCodeId = "PROCESS_ID";  // 중복체크할 컬럼 ID - 변경필요.
-		copyGrid = processGrid;  // 선택한값 집어넣을 그리드 객체 - 변경필요.
-		
-		// 위에서 변경필요한 값들 수정한 다음 모달 띄움.
-		$('#mesCodeValidate').modal();
-	}
+
 	*/
 	
 	let tableName = "";
@@ -79,7 +63,6 @@
 	// 현재 화면에 보이는 그리드 중 가장 먼저 찾은 그리드를 반환
 	function findGrid() { 
 	    let activeGrid = null;
-		
 	    for (let key in window.gridInstances) {
 	        if (window.gridInstances.hasOwnProperty(key)) {
 	            let gridInfo = window.gridInstances[key];
@@ -89,7 +72,6 @@
 	            }
 	        }
 	    }
-		
 	    return activeGrid;
 	}
 	
@@ -104,7 +86,6 @@
 	            }
 	        }
 	    }
-		
 	    return null;
 	}
 	*/
@@ -207,6 +188,18 @@
 		formData.append("file", file);
 		formData.append("tableName", tableName);  // 적용할 테이블명
 		formData.append("tableCodeId", tableCodeId);  // 기본 키 컬럼명 (ex: "ID")
+		
+        let activeGrid = findGrid();
+
+        if (activeGrid) {
+            // 엑셀 데이터를 Grid의 name에 맞게 자동 변환
+            let transformedData = autoMapExcelData(res, activeGrid);
+            console.log("엑셀 데이터 (매핑 전) :", res);
+            console.log("엑셀 데이터 (매핑 후) :", transformedData);
+
+            alert("엑셀 불러오기 성공!");
+            activeGrid.resetData(transformedData); // 변환된 데이터 적용
+        }
 	
 		$.ajax({
 			url: "/ajax/updateExcelData",

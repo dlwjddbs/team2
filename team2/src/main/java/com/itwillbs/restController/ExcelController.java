@@ -55,15 +55,6 @@ public class ExcelController {
 		return excelService.deleteToastTest(idList);
 	}
 
-	// 엑셀 업로드 (수정된 데이터만 DB에 update)
-	// 기존 데이터와 비교 후 수정된 데이터만 업데이트
-	@PutMapping(URL)
-	public Map<String, Object> updateToastTest(@RequestBody Map<String, Object> requestData) {
-		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>) requestData.get("updatedRows");
-
-		return excelService.updateToastTest(updatedRows);
-	}
-
 	// 엑셀 업로드
 	@PostMapping("/ajax/uploadExcel")
 	public ResponseEntity<List<Map<String, Object>>> uploadExcel(@RequestParam("file") MultipartFile file) {

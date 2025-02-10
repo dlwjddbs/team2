@@ -94,6 +94,10 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+	
+		tableName = "TEST";
+		tableCodeId = "ID";
+		
 		let grid1;
 		const url = '/ajax/excelToastTest';
 		const dataSource = {
@@ -204,6 +208,8 @@
 
 			let formData = new FormData();
 			formData.append("file", file);
+			formData.append("tableName", tableName);  // 적용할 테이블명
+			formData.append("tableCodeId", tableCodeId);  // 기본 키 컬럼명 (ex: "ID")
 
 			$.ajax({
 			    url: "/ajax/updateExcelData",
@@ -257,7 +263,7 @@
 		
 		// 엑셀 양식 다운로드
 		function downloadExcelTemplate() {
-			// 급여 테이블로 테스트
+			
 		    const tableName = prompt("다운로드할 테이블(양식)명을 입력하세요.", "TEST");
 		    
 		    if (!tableName) {

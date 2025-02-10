@@ -27,6 +27,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.itwillbs.repository.ExcelMapper;
@@ -40,7 +41,7 @@ import lombok.extern.java.Log;
 @RequiredArgsConstructor
 @Log
 public class ExcelService {
-
+//
 	private final TestMapper testMapper;
 	private final ExcelMapper excelMapper;
 
@@ -113,9 +114,10 @@ public class ExcelService {
 	}
 
 	// 엑셀 수정된 데이터만 db에 업데이트 및 새로운 데이터 삽입, 삭제하는 메서드
+	@Transactional(rollbackFor = Exception.class)
 	public int updateModifiedData(String tableName, 
-			String tableCodeId, 
-			List<Map<String, Object>> uploadedData) {
+								  String tableCodeId, 
+								  List<Map<String, Object>> uploadedData) {
 
 		if (uploadedData.isEmpty()) {
 			return 0; // 데이터가 없으면 처리할 필요 없음
@@ -126,7 +128,7 @@ public class ExcelService {
 		int deleteCount = 0;
 		int result = 0;
 		
-	    // 유효한 데이터 리스트 생성
+	    // 엑셀 데이터에서 유효한 데이터 리스트 생성
 	    List<Map<String, Object>> validDataList = uploadedData.stream()
 	        .filter(row -> row.get(tableCodeId) != null && !row.get(tableCodeId).toString().trim().isEmpty())
 	        .collect(Collectors.toList());
@@ -134,9 +136,19 @@ public class ExcelService {
 	    if (validDataList.isEmpty()) {
 	        return 0; // 유효한 데이터가 없으면 처리할 필요 없음
 	    }
-
+	    
+	    log.info("validDataList : " + validDataList);
+	    
+	    // 엑셀 데이터에서 컬럼명 리스트 생성
+	    List<String> validColumns = validDataList.stream()
+	            .flatMap(map -> map.keySet().stream()) // 각 맵의 키를 스트림으로 변환
+	            .distinct() // 중복 제거
+	            .collect(Collectors.toList()); // List로 수집
+	    
+	    log.info("validColumns : " + validColumns);
+	    
 	    // 기존 데이터를 조회
-		List<Map<String, Object>> existingDataList = excelMapper.selectExistingData(tableName);
+		List<Map<String, Object>> existingDataList = excelMapper.selectExistingData(tableName, validColumns);
 		
 		// 기존 데이터를 Map<ID, Map<String, Object>> 형태로 변환 (조회 속도 개선)
 	    Map<String, Map<String, Object>> existingDataMap = existingDataList.stream()
@@ -150,19 +162,35 @@ public class ExcelService {
 	    for (Map<String, Object> newRow : validDataList) {
 	        Object keyValue = newRow.get(tableCodeId);
 	        Map<String, Object> existingRow = existingDataMap.get(keyValue);
+	        log.info("existingRow : " + existingRow);
 
 	        if (existingRow != null) {
 	            // 기존 데이터와 비교하여 변경된 경우만 업데이트
 	            if (!isSameData(existingRow, newRow)) {
 	                dataToUpdate.add(newRow);
+	                log.info("dataToUpdate : " + dataToUpdate);
 	            }
 	            // 기존 데이터가 존재하면 삭제 후보에서 제외
 	            dataToDelete.remove(keyValue);
+	            log.info("dataToDelete : " + dataToDelete);
 	        } else {
 	            // 기존 데이터가 없는 경우 삽입 리스트에 추가
 	            dataToInsert.add(newRow);
+	            log.info("dataToInsert : " + dataToInsert);
 	        }
 	    }
+	    
+	    log.info("dataToInsert : " + dataToInsert.size());
+	    log.info("dataToUpdate : " + dataToUpdate.size());
+	    log.info("dataToDelete : " + dataToDelete.size());
+	    
+		// 새로운 데이터 일괄 삽입 실행
+		if (!dataToInsert.isEmpty()) {
+			log.info("insert 실행");
+			result = excelMapper.insertExcelData(tableName, dataToInsert);
+			insertCount += result;
+			log.info("insertCount : " + insertCount);
+		}
 
 		// 변경된 데이터만 일괄 업데이트 실행
 		if (!dataToUpdate.isEmpty()) {
@@ -170,14 +198,6 @@ public class ExcelService {
 			result = excelMapper.updateExcelData(tableName, tableCodeId, dataToUpdate);
 			updateCount += result;
 			log.info("updateCount : " + updateCount);
-		}
-
-		// 새로운 데이터 일괄 삽입 실행
-		if (!dataToInsert.isEmpty()) {
-			log.info("insert 실행");
-			result = excelMapper.insertExcelData(tableName, dataToInsert);
-			insertCount += result;
-			log.info("insertCount : " + insertCount);
 		}
 
 		// 삭제 실행
@@ -218,7 +238,6 @@ public class ExcelService {
 //				return false;
 //			}
 //		}
-//
 //		return true;
 //	}
 	
@@ -331,14 +350,13 @@ public class ExcelService {
 
 			// row0 - 양식 규칙 추가
 			Row row0 = sheet.createRow(0);
-			row0.createCell(0).setCellValue("양식 규칙 (이 부분은 지우고 사용해주세요)");
 			
-		    // 셀 병합 (A1 ~ D1)
-		    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
+		    // 셀 병합
+		    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, headers.size() - 1));
 
 		    // 병합된 셀에 내용 추가
 		    Cell cell = row0.createCell(0);
-		    cell.setCellValue("양식 규칙 (이 부분은 지우고 사용해주세요)");
+		    cell.setCellValue("양식 규칙 [이 부분은 지우고 사용해주세요] ex)설비[EQUIP] -> 설비");
 
 		    // 스타일 적용 (선택 사항)
 		    CellStyle style = sheet.getWorkbook().createCellStyle();
@@ -359,7 +377,7 @@ public class ExcelService {
 			
 			// 열 너비 설정 (단위: 1/256 * 글자 크기)
 			for (int i = 0; i < headers.size(); i++) {
-				sheet.setColumnWidth(i, 5000);	// 5000 = 약 20글자 정도의 너비
+				sheet.setColumnWidth(i, 6000);	// ex) 5000 = 약 20글자 정도의 너비
 				//sheet.autoSizeColumn(i);	// (각 컬럼의 내용에 맞게 셀 크기 자동 조정)
 			}
 
@@ -371,7 +389,7 @@ public class ExcelService {
 
 	// 엑셀 데이터 타입 변환 메서드 (미구현)
 	// 테이블 컬럼 타입을 기반으로 변환 적용
-	// 현재 테이블 이름을 어떻게 찾을건지 생각해야함 
+	// 현재 테이블 이름을 어떻게 찾을건지 생각해야함 (250210 : tableName 받아오는 식으로)
 	public Map<String, Object> convertDataTypes(Map<String, Object> rowData, Map<String, String> columnTypes) {
 		Map<String, Object> convertedRow = new HashMap<>();
 
@@ -406,26 +424,4 @@ public class ExcelService {
 
 		return convertedRow;
 	}
-
-	// 엑셀 수정된 데이터만 db에 업데이트하는 메서드 (미구현)
-	// 현재 그리드에 있는 내용을 db에 업데이트
-	public Map<String, Object> updateToastTest(List<Map<String, Object>> updatedRows) {
-		Map<String, Object> resultMap = new HashMap<>();
-
-		Boolean result = true;
-		String message = "updateToastTest 성공";
-
-		try {
-			testMapper.updateToastTest(updatedRows);
-		} catch (Exception e) {
-			result = false;
-			message = "updateToastTest 실패";
-		}
-
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-
-		return resultMap;
-	}
-
 }

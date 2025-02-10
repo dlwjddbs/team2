@@ -26,8 +26,13 @@
     
     <!-- 기존 데이터 조회 -->
     <select id="selectExistingData" resultType="map">
-        SELECT * 
-          FROM ${tableName}
+	    SELECT 
+	    <trim suffixOverrides=",">
+	        <foreach collection="columns" item="column" separator=",">
+	            ${column}
+	        </foreach>
+	    </trim>
+	    FROM ${tableName}
     </select>
 
     <!-- 데이터 삽입 -->
@@ -51,25 +56,53 @@
 	</insert>
 
     <!-- 데이터 업데이트 -->
-    <update id="updateExcelData">
-        MERGE INTO ${tableName} t
+	<update id="updateExcelData">
+	    MERGE INTO ${tableName} t
 	    USING (
-	        <foreach collection="list" item="row" separator=" UNION ALL ">
-	            SELECT #{row[tableCodeId]} AS ${tableCodeId},
-	            <foreach collection="row" item="value" index="column" separator=",">
-	                #{value} AS ${column}
-	            </foreach>
+	        <foreach collection="dataList" item="row" separator=" UNION ALL ">
+	            SELECT #{row.${tableCodeId}} AS ${tableCodeId},
+	            <trim suffixOverrides=",">
+		            <foreach collection="row" item="value" index="column" separator=",">
+		            	<if test="column != tableCodeId">
+		                	#{value} AS ${column}
+		                </if>
+		            </foreach>
+	            </trim>
 	            FROM DUAL
 	        </foreach>
 	    ) src
 	    ON (TRIM(t.${tableCodeId}) = TRIM(src.${tableCodeId}))
 	    WHEN MATCHED THEN 
 	        UPDATE SET 
+	        <trim suffixOverrides=",">
+		        <foreach collection="dataList[0].keySet()" item="column" separator=",">
+		            <if test="column != tableCodeId">
+		                t.${column} = src.${column}
+		            </if>
+		        </foreach>
+	        </trim>
+	        
+<!-- 		MERGE INTO ${tableName} t
+	    USING (
+	        SELECT * FROM (
+	            <foreach collection="dataList" item="row" separator=" UNION ALL ">
+	                SELECT 
+	                    #{row[tableCodeId]} AS ${tableCodeId},
+	                    <foreach collection="row" item="value" index="column" separator=",">
+	                        #{value} AS ${column}
+	                    </foreach>
+	                FROM DUAL
+	            </foreach>
+	        )
+	    ) src
+	    ON (NVL(t.${tableCodeId}, 'NULL') = NVL(src.${tableCodeId}, 'NULL'))
+	    WHEN MATCHED THEN 
+	        UPDATE SET 
 	        <foreach collection="columns" item="column" separator=",">
 	            t.${column} = src.${column}
-	        </foreach>
-    </update>
-
+	        </foreach>     --> 
+	</update>
+	
     <!-- 데이터 삭제 -->
     <delete id="deleteExcelData">
         DELETE FROM ${tableName} 
