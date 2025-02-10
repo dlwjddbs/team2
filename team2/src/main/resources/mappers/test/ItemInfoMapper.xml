@@ -23,10 +23,53 @@
 				WHERE I.CLIENT_ID = C.CLIENT_ID) AS CLIENT_NAME
 		    , I.ITEM_COST
 		    , I.INB_INSP
+		    , I.DESCRIPTION
 		    , (SELECT WAREHOUSE_NAME
 		    	FROM WAREHOUSE w 
 		    	WHERE I.WAREHOUSE_ID = W.WAREHOUSE_ID) AS WAREHOUSE_NAME
-		    , I.SAFTY_INVENTORY
-		FROM ITEM I;
+		    , I.SAFETY_INVENTORY
+		FROM ITEM I
     </select>
+    
+    <select id="selectMesCommonCode" resultType="map">
+		SELECT 
+		 	  MAIN_ID
+			, SUB_ID
+			, SUB_NAME
+		FROM MES_COMMON
+		WHERE MAIN_ID IN ('MATL', 'UNIT') 
+		AND USE_STATUS = 'Y'
+    </select>
+    
+    <insert id="addItemInfo">
+	    INSERT INTO ITEM (
+			  ITEM_ID
+			, CLIENT_ID
+			, ITEM_NAME
+			, ITEM_TYPE
+			, MAIN_ID
+			, SUB_ID
+			, USE_YN
+			, ITEM_UNIT
+			, ITEM_COST
+			, INB_INSP
+			, WAREHOUSE_ID
+			, SAFETY_INVENTORY
+			, DESCRIPTION
+		) VALUES (
+			  #{ITEM_ID}
+			, #{CLIENT_ID}
+			, #{ITEM_NAME}			
+			, #{ITEM_TYPE}
+			, #{MAIN_ID}
+			, #{SUB_ID}
+			, #{USE_YN}
+			, #{ITEM_UNIT}
+			, #{ITEM_COST}
+			, #{INB_INSP}
+			, #{WAREHOUSE_ID}
+			, #{SAFETY_INVENTORY}
+			, #{DESCRIPTION}
+		)
+    </insert>
 </mapper>

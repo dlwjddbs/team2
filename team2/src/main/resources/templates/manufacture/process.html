@@ -34,7 +34,7 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
-<!--		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>-->
+		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -50,20 +50,20 @@
 								<div class="card-header">
 									<div class="row">
 										<div class="col-6">
-											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">거래처 등록</p>
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">공정</p>
 										</div>
 										<div class="col-6">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_client_add_row" class="btn btn-primary" value="행추가" style="display : none;">
-												<input type="button" id="btn_client_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
-												<input type="button" id="btn_client_toggleEditMode" class="btn btn-primary" value="편집">
-												<input type="button" id="btn_client_modify" class="btn btn-primary" value="저장">
-												<input type="button" id="btn_client_delete" class="btn btn-primary" value="삭제">
+												<input type="button" id="btn_process_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_process_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_process_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_process_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_process_delete" class="btn btn-primary" value="삭제">
 											</div>
 										</div>
 									</div>
 								</div>
-								<div class="card-body" id="clientGrid">
+								<div class="card-body" id="processGrid">
 									<!-- Toast Grid Ajax -->
 								</div>
 							<!-- /.card-body -->
@@ -101,28 +101,38 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		let clientGrid = null;
-		const clientUrl = '/clientinfo/client';
-		const clientDataSource = {
+		// 워크센터
+		let processGrid = null;
+		const processUrl = '/manufacture/process';
+		const processDataSource = {
 			api: {
-			    readData: {url: clientUrl, method: 'GET'},
-				modifyData: { url: clientUrl, method: 'PUT' },
-				deleteData: {url: clientUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			    readData: {url: processUrl, method: 'GET'},
+				modifyData: { url: processUrl, method: 'PUT' },
+				deleteData: {url: processUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
-		let clientCurrentSelectedRowKey = null;
-		let clientIsEditModeEnabled = false; 
-		const client_columns = [
-            {header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null},
-            {header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
-            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'left', editor: null},
-            {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: null},
-            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
-            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
-            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
-            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', editor: null},
-            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
+		let processIsEditModeEnabled = false; 
+		const process_columns = [
+            {header: '공정 코드', name: 'PROCESS_ID', align: 'center', editor: null},
+            {header: '공정명', name: 'NAME', align: 'left', editor: null},
+			{
+			    header: '사용여부', 
+			    name: 'USE_YN', 
+			    align: 'center',
+			    formatter: function({value}) {
+			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+			    }
+			},
+			{
+			    header: '검사여부', 
+			    name: 'INSPECTION_YN', 
+			    align: 'center',
+			    formatter: function({value}) {
+			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+			    }
+			},
+            {header: '비고', name: 'NOTE', align: 'left', editor: null},
         ];
 		
 		const TextInputRenderer = function(props) {
@@ -162,9 +172,9 @@
 			
 			container.appendChild(el);
 			
-			// CLIENT_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'CLIENT_ID'
-				&& clientGrid.getValue(props.rowKey, 'isNew') == null)) {
+			// PROCESS_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'PROCESS_ID'
+				&& processGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
 			    button.style.border = 'solid 1px #007BFF';
@@ -181,23 +191,17 @@
 					const row = props.rowKey;
 					const column = props.columnInfo.name;
 					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = clientGrid.getValue(row, column);
+					const value = processGrid.getValue(row, column);
 					
-					switch (column) {
-						case 'CLIENT_ID':
-							$("#clientCode").val(value);
-							$("#clientRow").val(row);
-							$("#clientColumn").val(column);
-							
-							$("#checkDuplicateCodeBtn").show();
-							$("#modifyCodeBtn").hide();
-							$("#saveCode").attr("disabled", true);
-							$("#clientCode").attr("disabled", false);
-							$("#validationClientCodeMessage").text('');
-							
-							$('#clientCodeAdd').modal();
-						break;
-					}
+					$("#inputCodeText").val(value);
+					$("#gridCheckedRow").val(row);
+					$("#gridCheckedColumn").val(column);
+					
+					tableName = "PROCESS";
+					tableCodeId = "PROCESS_ID";
+					copyGrid = processGrid;
+					
+					$('#mesCodeValidate').modal();
 			    });
 			}
 			
@@ -239,106 +243,87 @@
 		};
 
 		$(function () {
-			clientInit();
+			processInit();
 		});
 		
-		function clientInit() {
-			clientGrid = new tui.Grid({
-		        el: document.getElementById('clientGrid'),
-		        data: clientDataSource,
+		// 워크센터
+		function processInit() {
+			processGrid = new tui.Grid({
+		        el: document.getElementById('processGrid'),
+		        data: processDataSource,
 		        scrollX: true,
 		        scrollY: true,
-		        bodyHeight: 250,
+		        bodyHeight: 600,
 		        rowHeaders: ['checkbox'],
 				editingEvent: 'click',
-		        columns: client_columns,
+		        columns: process_columns,
 		    });
 
-		    clientGrid.on('failResponse', function(ev) {
+		    processGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
-			
-			clientGrid.on('editingStart', function(ev) {
-			    const {rowKey, columnName, value} = ev;
-			    const rowData = clientGrid.getRow(rowKey);
-			});
-			
-			clientGrid.on('click', (ev) => {
-			    if (ev.targetType != "cell" || clientIsEditModeEnabled) {
-					return;
-				}
-
-			    const newRowKey = ev.rowKey;
-
-			    if (clientCurrentSelectedRowKey != null) {
-			        clientGrid.removeRowClassName(clientCurrentSelectedRowKey, 'selected-row');
-			    }
-
-			    if (clientCurrentSelectedRowKey != newRowKey) {
-			        clientGrid.addRowClassName(newRowKey, 'selected-row');
-			        clientCurrentSelectedRowKey = newRowKey;
-					// 추가 그리드 생성시 사용할 ID값
-			        //console.log('Selected ID:' + workcenterGrid.getRow(newRowKey).ID);
-			    } else {
-			        // 같은 행을 클릭한 경우 선택 해제
-			        clientCurrentSelectedRowKey = null;
-			    }
-			});
 		}
 		
 		// 수정 모드 토글 버튼 이벤트
-		$("#btn_client_toggleEditMode").on("click", function () {
-		    clientIsEditModeEnabled = !clientIsEditModeEnabled; // 수정 모드 상태 토글
+		$("#btn_process_toggleEditMode").on("click", function () {
+		    processIsEditModeEnabled = !processIsEditModeEnabled; // 수정 모드 상태 토글
 		    
-		    if (clientIsEditModeEnabled) {
-				$("#btn_client_add_row").show();
-				$("#btn_client_remove_row").show();
+		    if (processIsEditModeEnabled) {
+				$("#btn_process_add_row").show();
+				$("#btn_process_remove_row").show();
 		    } else {
-		    	$("#btn_client_add_row").hide();
-				$("#btn_client_remove_row").hide();
+		    	$("#btn_process_add_row").hide();
+				$("#btn_process_remove_row").hide();
 		    }
 		    
-		    if (clientIsEditModeEnabled) {
-		        clientGrid.setColumns([
-		        	{header: '거래처 코드', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '비고', name: 'DESCRIPTION', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-					
+		    if (processIsEditModeEnabled) {
+		        processGrid.setColumns([
+		        	{header: '공정 코드 *', name: 'PROCESS_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '공정명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+				    {
+				        header: '사용여부 *',
+				        name: 'USE_YN',
+				        align: 'center',
+				        formatter: function({value}) {
+				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+				        },
+				        renderer: { type: CheckboxRenderer }
+				    },
+				    {
+				        header: '검사여부 *',
+				        name: 'INSPECTION_YN',
+				        align: 'center',
+				        formatter: function({value}) {
+				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+				        },
+				        renderer: { type: CheckboxRenderer }
+				    },
+		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		        ]);
 		    } else {
-		        clientGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
-		        clientGrid.setColumns(client_columns);
+		        processGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        processGrid.setColumns(process_columns);
 		    }
 		});
 
-		$("#btn_client_add_row").on("click", function () {
-		    const newRowKey = clientGrid.appendRow(
+		$("#btn_process_add_row").on("click", function () {
+		    const newRowKey = processGrid.appendRow(
 		        {
-		        	"CLIENT_ID": '',
-		        	"CLIENT_NAME": '',
-		        	"CLIENT_TYPE": '',
-		        	"BUSINESS_NUMBER": '',
-		        	"CEO_NAME": '',
-		        	"CLIENT_TEL": '',
-		        	"RESP_NAME": '',
-		        	"CLIENT_STATUS": 'Y',
-		        	"DESCRIPTION": '',
+		        	"PROCESS_ID": '',
+		        	"NAME": '',
+		        	"USE_YN": 'N',
+		        	"INSPECTION_YN": 'N',
+		        	"NOTE": '',
 		            isNew: true
 		        },
 		        {focus: true}
 		    );
 		});
 		
-		$("#btn_client_remove_row").on("click", function () {
-		    const rowCount = clientGrid.getRowCount(); // 현재 행 개수 가져오기
+		$("#btn_process_remove_row").on("click", function () {
+		    const rowCount = processGrid.getRowCount(); // 현재 행 개수 가져오기
 		    
-		    const allRows = clientGrid.getData(); // 전체 데이터 가져오기
+		    const allRows = processGrid.getData(); // 전체 데이터 가져오기
 		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
 		    
 		    if (newRows.length === 0) {
@@ -346,19 +331,19 @@
 		        return;
 		    }
 
-		    const lastRowKey = clientGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
-		    clientGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		    const lastRowKey = processGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    processGrid.removeRow(lastRowKey); // 마지막 행 삭제
 		});
 
-		$("#btn_client_modify").on("click", function() {
-			clientGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+		$("#btn_process_modify").on("click", function() {
+			processGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
 			
-		    let createdRows = clientGrid.getModifiedRows().createdRows;
-		    let updatedRows = clientGrid.getModifiedRows().updatedRows;
+		    let createdRows = processGrid.getModifiedRows().createdRows;
+		    let updatedRows = processGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["CLIENT_ID", "CLIENT_NAME", "CLIENT_STATUS"];
-
+		    const requiredFields = ["PROCESS_ID", "NAME", "USE_YN", "INSPECTION_YN"];
+			
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
 		        	row[field] && row[field].trim() !== ''
@@ -389,26 +374,27 @@
 		        return;
 			}
 			
-			clientGrid.request('modifyData');
-			clientGrid.setColumns(client_columns);
+			processGrid.request('modifyData');
+			processGrid.readData(1, null, true);
+			processGrid.setColumns(process_columns);
 			
-			clientIsEditModeEnabled = false;
-	    	$("#btn_client_add_row").hide();
-			$("#btn_client_remove_row").hide();
+			processIsEditModeEnabled = false;
+	    	$("#btn_process_add_row").hide();
+			$("#btn_process_remove_row").hide();
 		});
 		
-        $("#btn_client_delete").on("click", function() {
-			clientGrid.removeCheckedRows();
+        $("#btn_process_delete").on("click", function() {
+			processGrid.removeCheckedRows();
 			
 			// 반드시 removeCheckedRows()후에 실행 순서
 			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = clientGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.CLIENT_ID))  // 한글 변환
+			const ids = processGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.PROCESS_ID))  // 한글 변환
 				.join(',');
-			clientDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			processDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
-		    clientGrid.request('deleteData');
-			clientGrid.reloadData();  // 실패시 테이블 리로드
+		    processGrid.request('deleteData');
+			processGrid.reloadData();  // 실패시 테이블 리로드
 		});
 	</script>
 </body>

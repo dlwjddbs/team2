@@ -52,8 +52,7 @@
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE WORKCENTER
 	           SET 
-	               WORKCENTER_ID = #{row.WORKCENTER_ID}
-	             , NAME = #{row.NAME}
+	               NAME = #{row.NAME}
 	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
 	             , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
 	             , USE_YN = #{row.USE_YN}
@@ -61,12 +60,6 @@
 	         WHERE WORKCENTER_ID = #{row.WORKCENTER_ID}
 	    </foreach>
     </update>
-    	
-    <select id="checkDuplicateWorkcenterCode">
-    	SELECT count(*) AS COUNT
-		  FROM WORKCENTER
-		 WHERE WORKCENTER_ID = #{WORKCENTER_ID}
-    </select>
     
     <select id="selectMember" resultType="map">
     	SELECT 
@@ -128,4 +121,132 @@
 			 WHERE EQUIPMENT_ID = #{item}
 		</foreach>
     </update>
+    
+	<update id="deleteEquipmentByWorkcenterId">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE EQUIPMENT 
+			   SET WORKCENTER_ID = NULL
+			 WHERE WORKCENTER_ID = #{item}
+		</foreach>
+    </update>
+    
+    <select id="selectProcess" resultType="map">
+	    SELECT
+			   PROCESS_ID 
+			 , NAME 
+			 , USE_YN 
+			 , INSPECTION_YN 
+			 , NOTE 
+		  FROM PROCESS
+    </select>
+    
+    <select id="checkDuplicateCode">
+    	SELECT count(*) AS COUNT
+		  FROM ${tableName}
+		 WHERE ${tableCodeId} = #{codeVal}
+    </select>
+    
+    <insert id="insertProcess">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PROCESS (
+				  PROCESS_ID
+				, NAME
+				, USE_YN
+				, INSPECTION_YN
+				, NOTE
+			)
+			VALUES (
+				  #{item.PROCESS_ID, jdbcType=VARCHAR}
+				, #{item.NAME}
+				, #{item.USE_YN}
+				, #{item.INSPECTION_YN}
+				, #{item.NOTE, jdbcType=VARCHAR}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateProcess">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE PROCESS
+	           SET 
+	               NAME = #{row.NAME}
+	             , USE_YN = #{row.USE_YN}
+	             , INSPECTION_YN = #{row.INSPECTION_YN}
+	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+	         WHERE PROCESS_ID = #{row.PROCESS_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteProcess">
+	    DELETE FROM PROCESS
+	     WHERE PROCESS_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <select id="selectRouting" resultType="map">
+		SELECT 
+			   ROUTING_ID
+			 , NAME
+			 , USE_YN
+			 , ITEM_ID
+			 , NOTE
+			 , PROCESS_QUANTITY
+		  FROM ROUTING
+    </select>
+    
+    <select id="selectItem" resultType="map">
+		SELECT
+		  	   ITEM_ID
+			 , ITEM_NAME
+			 , ITEM_TYPE
+			 , USE_YN
+		  FROM ITEM
+		 WHERE ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+    </select>
+    
+    <insert id="insertRouting">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO ROUTING (
+				  ROUTING_ID
+				, NAME
+				, USE_YN
+				, ITEM_ID
+				, NOTE
+				, PROCESS_QUANTITY
+			)
+			VALUES (
+				  #{item.ROUTING_ID}
+				, #{item.NAME}
+				, #{item.USE_YN}
+				, #{item.ITEM_ID}
+				, #{item.NOTE, jdbcType=VARCHAR}
+				, 0
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateRouting">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE ROUTING
+	           SET 
+	               NAME = #{row.NAME}
+	             , USE_YN = #{row.USE_YN}
+	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+	         WHERE ROUTING_ID = #{row.ROUTING_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteRouting">
+	    DELETE FROM ROUTING
+	     WHERE ROUTING_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
 </mapper>

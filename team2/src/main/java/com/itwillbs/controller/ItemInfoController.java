@@ -1,5 +1,6 @@
 package com.itwillbs.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itwillbs.service.EquipmentService;
 import com.itwillbs.service.ItemInfoService;
 
@@ -35,6 +38,18 @@ public class ItemInfoController {
 		Map<String, Object> message = itemInfoService.checkDuplicateItemCode(map);
 		
 		return message;
+	}
+	
+	// 공통코드 출력
+	@PostMapping("/ajax/getMesCommonCode")
+	@ResponseBody
+	public List<Map<String, Object>> getMesCommonCode() throws JsonProcessingException {
+		List<Map<String, Object>> data = itemInfoService.getMesCommonCode();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+		
+		return data;
 	}
 	
 }

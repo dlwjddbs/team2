@@ -1,6 +1,7 @@
 package com.itwillbs.controller;
 
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -26,13 +27,24 @@ public class ManufactureController {
 		return "/manufacture/workcenter";
 	}
 	
-	@PostMapping("/manufacture/checkDuplicateWorkcenterCode")
+	@PostMapping("/manufacture/checkDuplicateCode")
 	@ResponseBody
-	public Map<String, Object> checkDuplicateWorkcenterCode(@RequestParam Map<String, Object> map) {
-		Map<String, Object> message = manufactureService.checkDuplicateWorkcenterCode(map);
+	public Map<String, Object> checkDuplicateCode(@RequestParam Map<String, Object> map) {
+		Map<String, Object> message = manufactureService.checkDuplicateCode(map);
 		
 		return message;
 	}
+	
+	@GetMapping("/process")
+	public String process() {
+		return "/manufacture/process";
+	}
+	
+	@GetMapping("/routing")
+	public String routing() {
+		return "/manufacture/routing";
+	}
+	
 }
 
 

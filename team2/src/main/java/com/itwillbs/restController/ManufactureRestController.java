@@ -32,6 +32,9 @@ public class ManufactureRestController {
 	private final String workcenter_url = "/manufacture/workcenter";
 	private final String manager_url = "/manufacture/workcenterManager";
 	private final String equipment_url = "/manufacture/equipment";
+	private final String process_url = "/manufacture/process";
+	private final String routing_url = "/manufacture/routing";
+	private final String item_url = "/manufacture/routingItem";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -76,6 +79,49 @@ public class ManufactureRestController {
 	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
 	    
         return manufactureService.deleteEquipment(equipmentIds);
+	}
+	
+	@GetMapping(process_url)
+	public Map<String, Object> getProcess(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProcess(requestData);
+	}
+	
+	@PutMapping(process_url)
+	public Map<String, Object> modifyProcess(@RequestBody Map<String, Object> requestData) {
+		return manufactureService.modifyProcess(requestData);
+	}
+	
+	@DeleteMapping(process_url)
+	public Map<String, Object> deleteProcess(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> processIds = Arrays.asList(decodedIds.split(","));
+	    
+        return manufactureService.deleteProcess(processIds);
+	}
+	
+	@GetMapping(routing_url)
+	public Map<String, Object> getRouting(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectRouting(requestData);
+	}
+	
+	@GetMapping(item_url)
+	public Map<String, Object> getItem(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectItem(requestData);
+	}
+	
+	@PutMapping(routing_url)
+	public Map<String, Object> modifyRouting(@RequestBody Map<String, Object> requestData) {
+		return manufactureService.modifyRouting(requestData);
+	}
+	
+	@DeleteMapping(routing_url)
+	public Map<String, Object> deleteRouting(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> processIds = Arrays.asList(decodedIds.split(","));
+	    
+        return manufactureService.deleteRouting(processIds);
 	}
 	
 }

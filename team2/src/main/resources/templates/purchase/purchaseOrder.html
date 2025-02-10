@@ -220,7 +220,7 @@
 				};
 				const columns = [
 					{header: 'P/O번호', name: 'PO_ID', align: 'center' },
-					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
+					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center'},
 					{header: '주문번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
 					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
@@ -253,37 +253,13 @@
 				// grid2 컬럼 설정 (구매 발주 상세)
 				const columns2 = [
 				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
-					{header: '품목코드', name: 'MATERIAL_ID', align: 'center', formatter: function({ value, row }) {
-// 						return `
-// 						<div style="display: flex; justify-content: flex-end; align-items: center;">
-// 						<span class="material-id-display" style="text-align: center; width: 100%; display: inline-block;">
-// 				          ${value ? value : ''}
-// 				        </span>
-// 				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
-// 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
-// 						              🔍
-// 						          </button>
-// 						      </div> `;
-					            }},
-					{header: '품목명', name: 'MATERIAL_NAME', align: 'center', formatter: function({ value, row }) {
-// 						return `
-// 						<div style="display: flex; justify-content: flex-end; align-items: center;">
-// 						<span class="material-nm-display" style="text-align: center; width: 100%; display: inline-block;">
-// 				          ${value ? value : ''}
-// 				        </span>	
-// 				        <button class="material-modal-btn" data-row-key="${row.rowKey}" 
-// 						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
-// 						              🔍
-// 						          </button>
-// 						      </div> `;
-					            }},
-					{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
-					{header: '단가', name: 'MATERIAL_PRICE', align: 'center', editor: 'text'},
-					{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
-					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
-					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-					//{header: '납기일', name: 'DELIVERY_DATE', align: 'center', editor: 'text'},
-					//{header: '상태', name: 'PO_STATUS', align: 'center'},
+				{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},					            
+				{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},					            
+				{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
+				{header: '단가', name: 'MATERIAL_PRICE', align: 'center'},
+				{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
+				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
+				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
 				];
 
 
@@ -392,9 +368,10 @@
 				        scrollY: true,
 				        bodyHeight: 250,
 				        rowHeaders: ['checkbox'],
+				        editingEvent: 'click',
 				        pageOptions: {
 				            useClient: true,  // 클라이언트에서 페이징 처리
-				            perPage: 10        // 페이지당 10개
+				            perPage: 6        // 페이지당 10개
 				        },
 				        columns: columns2,
 				    });
@@ -511,20 +488,6 @@
 					);
 				});
 
-// 				$("#btn_add_row2").on("click", function () {
-// 					let today = new Date();
-// 					let year = today.getFullYear(); // 년도
-// 					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
-// 					let date = String(today.getDate()).padStart(2, "0");  // 날짜
-// 					const newRowKey = grid2.appendRow(
-// 						{
-// 							"PO_DATE": year + '-' + month + '-' + date,
-
-// 						},
-// 						{focus: true}
-// 					);
-// 				});
-
 				// 저장 버튼 이벤트
 				save.addEventListener('mousedown', handleSave);
 				saveDetail.addEventListener('mousedown', detailSave);
@@ -640,50 +603,11 @@
 					Notiflix.Notify.failure('저장 실패!');
 				}
 
-// // 				품목 모달 열기
-// 				let selectedRowKey = null;
-
-// 			    $(document).on("click", ".material-modal-btn", function () {
-// 			        selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
-// 			        loadMaterialList(); // 품목 리스트 불러오기
-// 			        $("#materialModal").modal("show");
-// 			    });
-
-// 				$(document).on("click", ".select-material", function () {
-// 							        const MATERIAL_ID = $(this).data("material-id");
-// 							        const MATERIAL_NAME = $(this).data("material-name");
-// 							        const MATERIAL_PRICE = $(this).data("material-price");
-							        
-// 							        if (selectedRowKey !== null) {
-// 							            grid2.setValue(selectedRowKey, "MATERIAL_ID", MATERIAL_ID);
-// 							            grid2.setValue(selectedRowKey, "MATERIAL_NAME", MATERIAL_NAME);
-// 							            grid2.setValue(selectedRowKey, "MATERIAL_PRICE", MATERIAL_PRICE);
-// 							            console.log(`grid2 업데이트 완료: ${MATERIAL_ID}, ${MATERIAL_NAME}, ${MATERIAL_PRICE}`);
-// 							        }else {
-// 							            console.error("grid2에서 올바른 행을 찾을 수 없음!");
-// 							        }
-							        
-// 							        $("#materialModal").modal("hide");
-// 							    });
-								
-				
-			
-
-			
-		
-// 		$("#btn_equipment_add").on("click", function() {
-// 			equipmentGrid.request('createData');
-// 			equipmentGrid.reloadData();  // 실패시 테이블 리로드
-// 		});
 		
 		$("#material-modal-btn").on("click", function() {
 			$("#purchaseMtl").modal("show");
 		});
-				
-				
-				
-																
-	
+
 					$(document).on("click", ".client-modal-btn", function (props) {
 						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
 						 const rowKey = $(this).data("row-key");
@@ -695,7 +619,7 @@
 							    });							
 					
 					
-				$(document).on("click", ".material-modal-btn", function (props) {
+				/*$(document).on("click", ".material-modal-btn", function (props) {
 					// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
 					 const rowKey = $(this).data("row-key");
 			    // 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
@@ -703,7 +627,7 @@
 					
 					$("#purchaseMtl").modal("show");
 						       // loadClientList(); // 거래처 리스트 불러오기
-						    });
+						    });*/
 				
 			</script>
 </body>

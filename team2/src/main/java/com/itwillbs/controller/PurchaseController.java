@@ -29,6 +29,8 @@ public class PurchaseController {
 	private final PurchaseService purchaseService;
 	
 	private final String purchaseClt = "/purchase/purchaseClt";
+	private final String purchaseMtl = "/purchase/purchaseMlt";
+	
 	
 	@GetMapping("/purchase")
 	public String purchase(@AuthenticationPrincipal User user) {
@@ -136,21 +138,23 @@ public class PurchaseController {
 		    return ResponseEntity.ok(responseMap);
 		}
 		
-		
-		@GetMapping("/getMaterialList")
-		@ResponseBody
-		public List<Map<String, Object>> getMaterialList(@RequestParam Map<String, Object> map, Model model) {
-			System.out.println("리스트" + map);
-			return purchaseService.getMaterialList(map);
-		}
-		
-		
 		@GetMapping(purchaseClt)
 		@ResponseBody
 		public Map<String, Object> getClientList(@RequestParam Map<String, Object> requestData) {
 			System.out.println("거래처 리스트" + requestData);
 			return purchaseService.getClientList(requestData);
 		}
-	
-	
+		
+		@PostMapping(purchaseMtl)
+		@ResponseBody
+		public List<Map<String, Object>> getMaterialList(@RequestBody  Map<String, Object> requestData ) {
+			System.out.println("자재리스트" + requestData.toString());
+			List<Map<String, Object>> getMaterialList = purchaseService.getMaterialList(requestData);
+			return getMaterialList;
+		}
+		
+		
+		
+		
+				
 }

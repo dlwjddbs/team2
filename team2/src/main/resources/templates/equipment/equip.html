@@ -135,6 +135,10 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+		
+		tableName = "EQUIPMENT";
+		tableCodeId = "EQUIPMENT_ID";
+		
 		let equipGrid = null;
 		let equipCurrentSelectedRowKey = null;
 		let equipIsEditModeEnabled = false; 
@@ -479,6 +483,7 @@
 			// Grid 데이터 가져오기
 			const jsonData = equipGrid.getData(); // getData() 사용
 			const headers = equipGrid.getColumns().map(col => col.header);
+			const names = equipGrid.getColumns().map(col => col.name);
 			const data = jsonData.map(row => equipGrid.getColumns().map(col => row[col.name] || ""));
 		
 			// 엑셀 시트 생성 (1행: 제목, 2행부터 데이터)
@@ -495,7 +500,8 @@
 		    ];
 		    
 			// 컬럼 자동 너비 조정
-		    const colWidths = headers.map(header => ({ wch: header.length + 5 }));
+		    //const colWidths = headers.map(header => ({ wch: header.length + 5 }));
+		    const colWidths = names.map(names => ({ wch: names.length + 5 }));
 		    worksheet['!cols'] = colWidths;
 		
 			// 워크북 생성
