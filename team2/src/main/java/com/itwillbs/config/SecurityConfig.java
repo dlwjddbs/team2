@@ -47,6 +47,8 @@ public class SecurityConfig {
 			            		, "/order/**"
 			            		, "/manufacture/**"
 			            		, "/equipment/**"
+			            		, "/clientinfo/**"
+			            		, "/iteminfo/**"
 			            ) // 특정 경로 CSRF 비활성화
 			        )				
 				.formLogin(formLoginCustomizer

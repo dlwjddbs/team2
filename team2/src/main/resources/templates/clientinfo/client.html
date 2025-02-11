@@ -34,6 +34,7 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
+		<!-- 거래처 코드 중복처리 검증 모달 -->		
 		<nav th:replace="~{includes/modals/clientCodeAdd :: clientCodeAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
@@ -101,6 +102,7 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+		// 거래처 정보
 		let clientGrid = null;
 		const clientUrl = '/clientinfo/client';
 		const clientDataSource = {
@@ -121,7 +123,20 @@
             {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
             {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
             {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
-            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', editor: null},
+            {
+				header: '거래상태',
+				name: 'CLIENT_STATUS', 
+				align: 'left', 
+					editor: {
+								type: 'select',  // 드롭다운 타입 설정
+								options: {
+								listItems: [
+									        { text: '거래중', value: '거래중' },
+								    	    { text: '거래중지', value: '거래중지' }
+								      ]
+								    }
+								  },
+							  },
             {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
         ];
 		
@@ -214,30 +229,6 @@
 		    this.input.value = props.value;
 		}
 		
-		const CheckboxRenderer = function(props) {
-		    const el = document.createElement('input');
-		    el.type = 'checkbox';
-		    el.checked = (props.value === '거래중');  // 초기값 지정
-		
-			el.addEventListener('change', function() {
-		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? '거래중' : '거래중지'); // 즉시 값 업데이트
-		    });
-		    		
-		    this.el = el;
-		};
-
-		CheckboxRenderer.prototype.getElement = function() {
-		    return this.el;
-		};
-
-		CheckboxRenderer.prototype.getValue = function() {
-		    return this.el.checked ? '거래중' : '거래중지';
-		};
-
-		CheckboxRenderer.prototype.mounted = function() {
-		    this.el.focus();
-		};
-
 		$(function () {
 			clientInit();
 		});
@@ -307,7 +298,16 @@
 		            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', 
+					editor: {
+					    type: 'select',  // 드롭다운 타입 설정
+					    options: {
+					      listItems: [
+					        { text: '거래중', value: '거래중' },
+					        { text: '거래중지', value: '거래중지' }
+					      ]
+					    }
+					  }}, 
 		            {header: '비고', name: 'DESCRIPTION', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 					
 		        ]);

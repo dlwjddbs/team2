@@ -61,7 +61,7 @@ public class ClientInfoService {
 			}
 		} catch (Exception e) {
 			result = false;
-			message = "modifyClientInfo 실패";
+			message = "modifyToastTest 실패";
 		}
 		
 		resultMap.put("result", result);
