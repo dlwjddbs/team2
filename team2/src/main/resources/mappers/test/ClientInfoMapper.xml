@@ -19,4 +19,65 @@
 		FROM CLIENT
 		ORDER BY CLIENT_ID ASC 
     </select>
+
+    <insert id="insertClientInfo">
+    	INSERT ALL
+		<foreach collection="list" item="item">
+			INTO CLIENT (
+				  CLIENT_ID
+				, CLIENT_NAME
+				, CLIENT_TYPE
+				, BUSINESS_NUMBER
+				, CEO_NAME
+				, CLIENT_TEL
+				, RESP_NAME
+				, CLIENT_STATUS
+				, DESCRIPTION
+			)
+			VALUES (
+				  #{item.CLIENT_ID}
+				, #{item.CLIENT_NAME}
+				, #{item.CLIENT_TYPE}
+				, #{item.BUSINESS_NUMBER}
+				, #{item.CEO_NAME}
+				, #{item.CLIENT_TEL}
+				, #{item.RESP_NAME}
+				, #{item.CLIENT_STATUS}
+				, #{item.DESCRIPTION, jdbcType=VARCHAR}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateClientInfo">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE CLIENT
+	           SET 
+	               CLIENT_ID = #{row.CLIENT_ID}
+	             , CLIENT_NAME = #{row.CLIENT_NAME}
+	             , CLIENT_TYPE = #{row.CLIENT_TYPE}
+	             , BUSINESS_NUMBER = #{row.BUSINESS_NUMBER, jdbcType=VARCHAR}
+	             , CEO_NAME = #{row.CEO_NAME}
+	             , CLIENT_TEL = #{row.CLIENT_TEL}
+	             , RESP_NAME = #{row.RESP_NAME}
+	             , CLIENT_STATUS = #{row.CLIENT_STATUS}
+	             , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
+	         WHERE CLIENT_ID = #{row.CLIENT_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteClientInfo">
+	    DELETE FROM CLIENT
+	     WHERE CLIENT_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <select id="checkDuplicateClientCode">
+    	SELECT count(*) AS COUNT
+		  FROM CLIENT
+		 WHERE CLIENT_ID = #{CLIENT_ID}
+    </select>
+        
 </mapper>

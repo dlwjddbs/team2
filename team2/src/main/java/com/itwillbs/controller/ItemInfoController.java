@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itwillbs.service.EquipmentService;
 import com.itwillbs.service.ItemInfoService;
 
 import lombok.RequiredArgsConstructor;

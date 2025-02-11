@@ -34,7 +34,7 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
-<!--		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>-->
+		<nav th:replace="~{includes/modals/clientCodeAdd :: clientCodeAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -217,10 +217,10 @@
 		const CheckboxRenderer = function(props) {
 		    const el = document.createElement('input');
 		    el.type = 'checkbox';
-		    el.checked = (props.value === 'Y');  // 초기값 지정
+		    el.checked = (props.value === '거래중');  // 초기값 지정
 		
 			el.addEventListener('change', function() {
-		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? '거래중' : '거래중지'); // 즉시 값 업데이트
 		    });
 		    		
 		    this.el = el;
@@ -231,7 +231,7 @@
 		};
 
 		CheckboxRenderer.prototype.getValue = function() {
-		    return this.el.checked ? 'Y' : 'N';
+		    return this.el.checked ? '거래중' : '거래중지';
 		};
 
 		CheckboxRenderer.prototype.mounted = function() {
@@ -327,7 +327,7 @@
 		        	"CEO_NAME": '',
 		        	"CLIENT_TEL": '',
 		        	"RESP_NAME": '',
-		        	"CLIENT_STATUS": 'Y',
+		        	"CLIENT_STATUS": '거래중',
 		        	"DESCRIPTION": '',
 		            isNew: true
 		        },
