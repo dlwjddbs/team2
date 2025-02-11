@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.GoodsOrderMapper">
+
+<select id="getGoodsList" resultType="map">
+	SELECT 
+		GO.GO_ID,
+		GO.PO_ID,
+		TO_CHAR(GO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+		MM.NAME AS MEMBER_NAME,
+		C.CLIENT_NAME,
+		GO.GO_COUNT,
+		GO.GO_PRICE,
+		TO_CHAR(GO.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+		UM.NAME AS UPDATE_MEMBER,
+		GO.GO_STATUS
+	FROM
+		GOODS_ORDER GO
+	LEFT JOIN CLIENT C ON GO.CLIENT_ID = C.CLIENT_ID
+	LEFT JOIN MEMBER MM ON GO.MEMBER_ID = MM.MEMBER_ID
+	LEFT JOIN MEMBER UM ON GO.UPDATE_MEMBER = UM.MEMBER_ID
+	ORDER BY GO.CREATE_DATE DESC
+</select>
+
+
+
+<select id="getGoodsPoList" resultType="map" parameterType="map">
+    SELECT 
+    	PO.PO_ID, 
+    	TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE, 
+    	C.CLIENT_NAME    	
+    FROM PURCHASE_ORDER PO
+    LEFT JOIN CLIENT C ON PO.CLIENT_ID = C.CLIENT_ID
+    	 WHERE 
+		 	   1 = 1
+		<if test='po_id != null and po_id != ""'>
+		   AND PO_ID = #{po_id}
+		</if>
+		<if test='create_date != null and create_date != ""'>
+		   AND TRUNC(PO.CREATE_DATE) = TO_DATE(#{create_date}, 'YYYY-MM-DD')
+		</if>
+    </select>
+
+
+</mapper>
