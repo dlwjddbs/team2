@@ -60,7 +60,7 @@
 
 					<div class="row">
 						<div class="col-12">
-							<div class="card mx-3">
+							<div class="card mx-3 condition">
 								<div class="d-flex justify-content-between px-3 py-3">
 									<div class="d-flex">
 										<div class="d-flex">
@@ -287,7 +287,8 @@
 						document.getElementById('salesRepId').value = order.SALES_REP_ID;
 						document.getElementById('deliveryDate').value = order.DELIVERY_DATE;
 						document.getElementById('unit').value = order.UNIT;
-						document.getElementById('itemPrice').value = order.ITEM_PR.toLocaleString() + ' 원';
+						document.getElementById('orderQty').value = order.ORDER_QTY;
+						/* document.getElementById('itemPrice').value = order.ITEM_PR.toLocaleString() + ' 원'; */
 						document.getElementById('orderPrice').value = order.ORDER_PR.toLocaleString() + ' 원';
 						document.getElementById('tax').value = order.TAX.toLocaleString() + ' 원';
 						document.getElementById('orderSum').value = order.ORDER_SUM.toLocaleString() + ' 원';
@@ -341,11 +342,8 @@
 				salesRepId: document.getElementById('salesRepId').value,
 				deliveryDate: document.getElementById('deliveryDate').value,
 				itemId: document.getElementById('itemId').value,
-				unit: document.getElementById('unit').value,
-				itemPrice: document.getElementById('itemPrice').value,
-				orderPrice: document.getElementById('orderPrice').value,
-				tax: document.getElementById('tax').value,
-				orderSum: document.getElementById('orderSum').value,
+				orderQty: document.getElementById('orderQty').value,
+				orderPr: document.getElementById('orderSum').value,
 				remarks: document.getElementById('remarks').value,
 			};
 
@@ -408,17 +406,49 @@
 
 		// 품목 Select Box
 		function loadItemList() {
-			fetch('/getMaterialList')
-				.then(response => response.json())
-				.then(data => {
-					console.log("품목 리스트 데이터:", data);
-					updateSelectBox(data, 'itemInput');  // 'itemInput' SelectBox 업데이트
-					updateSelectBox(data, 'itemId');
-				})
-				.catch(error => {
-					console.error("품목 리스트를 불러오는 데 실패했습니다.", error);
-				});
+		    fetch('/getItemList')
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("품목 리스트 데이터:", data);
+
+		            // 품목 리스트와 가격을 Map 형태로 구성
+		            const itemPriceList = data.reduce((acc, item) => {
+		                acc[item.ITEM_ID] = item.ITEM_PRICE;  // 품목 ID를 키로, 가격을 값으로 매핑
+		                return acc;
+		            }, {});
+
+		            // 품목 SelectBox 업데이트
+		            updateSelectBox(data, 'itemInput');
+		            updateSelectBox(data, 'itemId');
+
+		            // 품목명이 변경될 때마다 가격 업데이트
+		            document.getElementById('itemId').addEventListener('change', function() {
+		                const selectedItemId = this.value;  // 선택된 품목 ID
+		                const selectedItemPrice = itemPriceList[selectedItemId];  // 해당 품목의 가격을 가져옴
+
+		                // 선택된 품목 가격이 존재하면 공급가 업데이트
+		                if (selectedItemPrice !== undefined) {
+		                	const orderQty = document.getElementById('orderQty').value;
+		                	const tax = orderQty * 0.1;
+		                	const orderSum = selectedItemPrice + tax;
+		                	
+		                    document.getElementById('orderPrice').value = selectedItemPrice * orderQty;
+		                    document.getElementById('tax').value = tax;
+		                    document.getElementById('orderSum').value = orderSum;
+		                    
+		                } else {
+		                    // 품목 가격이 없으면 공급가를 0으로 설정
+		                    document.getElementById('orderPrice').value = '0';
+		                    document.getElementById('tax').value = '0';
+		                    document.getElementById('orderSum').value = '0';
+		                }
+		            });
+		        })
+		        .catch(error => {
+		            console.error("품목 리스트를 불러오는 데 실패했습니다.", error);
+		        });
 		}
+		
 
 		// selectBox
 		function updateSelectBox(data, elementId) {
@@ -428,7 +458,7 @@
 			const options = [
 				`<option value="all">전체</option>`,  // 전체 옵션 추가
 				...data.map(item => {
-					return `<option value="${item.CLIENT_ID || item.MATERIAL_ID}">${item.CLIENT_NAME || item.MATERIAL_NAME}</option>`;
+					return `<option value="${item.CLIENT_ID || item.ITEM_ID}">${item.CLIENT_NAME || item.ITEM_NAME}</option>`;
 				})
 			].join("");
 

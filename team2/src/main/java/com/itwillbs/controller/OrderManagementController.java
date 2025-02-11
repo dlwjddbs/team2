@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itwillbs.service.OrderService;
 
+import ch.qos.logback.core.model.Model;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,6 +94,13 @@ public class OrderManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
         }
     }
+    
+    @GetMapping("/getItemList")
+	@ResponseBody
+	public List<Map<String, Object>> getItemList(@RequestParam Map<String, Object> map, Model model) {
+		System.out.println("품목 리스트" + map);
+		return orderService.getItemList(map);
+	}
 
 }
 

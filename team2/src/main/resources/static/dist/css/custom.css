@@ -8,9 +8,19 @@
 		margin-right: 0.5rem;
 	}
 	
-	.tui-select-box-input{
+	.condition .tui-select-box-input{
 		min-width: 150px;
 		}
+		
+	.condition{
+		.form-control{
+			max-width: 160px;
+			}
+			
+		.bootstrap-select{
+			width: 140px !important;
+		}	
+	}
 		
 	.tui-datepicker, .tui-rangepicker, .tui-select-box-dropdown{
 		z-index: 1060;
@@ -20,14 +30,52 @@
 		height: 28px;
 		padding: 0 8px;
 		font-size: 13px;
-		border-radius: 0;
-		max-width: 160px;
+		border-radius: 0;		
 	}
 	
-	.form-control[readonly]{
+		.dropdown-toggle{
+		height: 28px;
+		padding: 0 8px;
+		font-size: 13px;
+		border-radius: 0;
+		min-width: 140px;
+		background:#fff;
+		border: 1px solid #ced4da;
+		.filter-option-inner-inner{
+			height: 20px;
+			padding-top: 3px;
+		}
+	}
+	
+	.dropdown-menu{
+		font-size : 0.8rem !important;
+	}
+	
+	
+	.form-control[readonly], .tui-datepicker-input:has(.editable[readonly]){
 		border: 0!important;
 		padding: 0!important;
 		background-color: #fff!important;
+		
+		.editable{
+			background-color: #fff!important;
+			padding: 0!important;
+		}
+		.tui-ico-date{
+			display: none;
+		}
+	}
+	
+	.bootstrap-select:has(.editable[disabled]){
+		.dropdown-toggle{
+			border: 0!important;
+			padding: 0!important;
+			background-color: #fff!important;
+		}	
+		
+		.dropdown-toggle:after{
+			display:none;
+		}
 	}
 	
 	.form-control:focus, .dropdown-toggle[aria-expanded="true"], .tui-datepicker-input input:focus{
@@ -48,28 +96,7 @@
 		background:#fff !important;
 		border: 1px solid #ced4da !important;
 	}
-	.bootstrap-select{
-		width: 140px !important;
-	}
-	.dropdown-toggle{
-		height: 28px;
-		padding: 0 8px;
-		font-size: 13px;
-		border-radius: 0;
-		min-width: 140px;
-		background:#fff;
-		border: 1px solid #ced4da;
-		.filter-option-inner-inner{
-			height: 20px;
-			padding-top: 3px;
-		}
-	}
-	
-	.dropdown-menu{
-		font-size : 0.8rem !important;
-	}
-	
-	
+
 	.btn-sm{
 		font-size: 0.8rem;
 		font-weight: bold;

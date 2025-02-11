@@ -22,4 +22,6 @@ public interface OrderMapper {
     void deleteOrder(List<String> orderIds);
 
 	void updateOrder(Map<String, Object> orderData);
+
+	List<Map<String, Object>> getItemList(Map<String, Object> map);
 }

@@ -36,4 +36,8 @@ public class OrderService {
 	public void updateOrder(Map<String, Object> orderData) {
 		orderMapper.updateOrder(orderData);
 	}
+
+	public List<Map<String, Object>> getItemList(Map<String, Object> map) {
+		return orderMapper.getItemList(map);
+	}
 }
