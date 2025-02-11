@@ -268,6 +268,10 @@ public class ExcelService {
 				row1.createCell(i).setCellValue(headers.get(i)); // 여기서 바로 추가
 			}
 			
+			// row2 - 양식 규칙 추가
+			Row row2 = sheet.createRow(2);
+			
+			
 			// 열 너비 설정 (단위: 1/256 * 글자 크기)
 			for (int i = 0; i < headers.size(); i++) {
 				sheet.setColumnWidth(i, 6000);	// ex) 5000 = 약 20글자 정도의 너비
