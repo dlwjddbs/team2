@@ -94,11 +94,15 @@ public class ExcelController {
 			// 엑셀 데이터 파싱
 			List<Map<String, Object>> uploadedData = excelService.parseExcelFile(file);
 			
-			int updatedCount = excelService.modifyExcelData(tableName, tableCodeId, headerMap, uploadedData);
+			int modifiedCount = excelService.modifyExcelData(tableName, tableCodeId, headerMap, uploadedData);
 
-			log.info("updatedCount : " + updatedCount);
+			log.info("modifiedCount : " + modifiedCount);
 			
-			return ResponseEntity.ok(Map.of("message", updatedCount + "건의 데이터가 업데이트되었습니다."));
+			if (modifiedCount == 0) {
+				return ResponseEntity.ok(Map.of("message", "수정된 데이터가 없습니다."));
+			} else {
+				return ResponseEntity.ok(Map.of("message", modifiedCount + "건의 데이터가 업데이트되었습니다."));
+			}	
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "업로드 실패"));
 		}

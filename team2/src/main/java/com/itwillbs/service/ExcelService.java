@@ -172,6 +172,7 @@ public class ExcelService {
 	        Object keyValue = newRow.get(tableCodeId);
 	        Map<String, Object> existingRow = existingDataMap.get(keyValue);
 	        log.info("existingRow : " + existingRow);
+	        
 
 	        if (existingRow != null) {
 	            // 기존 데이터와 비교하여 변경된 경우만 업데이트
@@ -193,7 +194,12 @@ public class ExcelService {
 	    log.info("dataToUpdate : " + dataToUpdate.size());
 	    log.info("dataToDelete : " + dataToDelete.size());
 	    
-	    /*
+	    // 만약 업데이트할 데이터, 삽입할 데이터, 삭제할 데이터가 하나도 없으면 업데이트 불필요
+	    if (dataToUpdate.isEmpty() && dataToInsert.isEmpty() && dataToDelete.isEmpty()) {
+	        log.info("업데이트할 내용이 없습니다.");
+	        return 0;  // 업데이트 불필요
+	    }
+	    
 		// 새로운 데이터 일괄 삽입 실행
 		if (!dataToInsert.isEmpty()) {
 			log.info("insert 실행");
@@ -217,7 +223,7 @@ public class ExcelService {
 			deleteCount += result;
 			log.info("deleteCount : " + deleteCount);
 		}
-		*/
+		
 		// 결과 로깅
 		log.info("Total processed rows (updated + inserted + deleted): " + result);
 		return updateCount + insertCount + deleteCount;

@@ -49,81 +49,88 @@
 <script th:fragment="excelModal" th:inline="javascript">
 	
 	/* 
-	==================== 엑셀 모달 사용법 ===========================
+	========================== 엑셀 모달 사용법 ==========================
+	1. <head>에 SheetJS (Excel 변환 라이브러리) 추가. (/equipment/equip 페이지 참고)
+	
+	2. 엑셀이 필요한 그리드에 class="tui-grid"를 추가.
+		ex) <div id="equipGrid" class="tui-grid">
+		
+	3. 그리드 정보를 저장하기 위한 전역변수 추가.
+		자바스크립트에 window.gridInstances = window.gridInstances || {};
+		
+	4. 엑셀 파일 이름과 시트 이름 저장하기 위한 전역변수 추가.
+		다운로드할 파일 이름 변경이 필요하시면 fileName을 수정해주세요.
+		ex) fileName = "설비정보_엑셀_테스트.xlsx";
+			sheetName = "설비정보_테스트";	
+		
+	5. 엑셀 버튼 및 기능 추가.
+		- 사용할 페이지에 버튼 추가.
+			<button class="btn btn-success" id="btn_excel_download">
+		    	<i class="fas fa-download"></i> 엑셀 다운로드
+		    </button>
+            <button class="btn btn-primary" id="btn_excel">
+                <i class="fas fa-upload"></i> 데이터 업로드
+            </button>
+                
+        - 자바스크립트의 $(function () { }); 안에 추가.
+			$('#btn_excel').on('click', function () {
+				$('#excelModal').modal();
+			});
+        
+        - function grid() 안에 추가 및 수정. (사용하시는 그리드 명으로 수정)
+        	ex)
+			window.gridInstances['equipGrid'] = {
+				    instance: equipGrid,
+				    element: document.getElementById('equipGrid')
+			};
 
-	=================================================================
-
+	==================================================================
 	*/
 	
 	let tableName = "";
 	let tableCodeId = "";
-	let copyGrid = null;
 	
-	// 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
-	// 현재 화면에 보이는 그리드 중 가장 먼저 찾은 그리드를 반환
-	function findGrid() { 
-	    let activeGrid = null;
-	    for (let key in window.gridInstances) {
-	        if (window.gridInstances.hasOwnProperty(key)) {
-	            let gridInfo = window.gridInstances[key];
-	            if ($(gridInfo.element).is(":visible")) {
-	                activeGrid = gridInfo.instance;
-	                break;
-	            }
-	        }
-	    }
-	    return activeGrid;
-	}
+	let sheetName = "";
+	let fileName = "";
 	
-	// 특정 key 값에 해당하는 Grid 찾기
-	/*
-	function findGridByKey(gridKey) {
-	    for (let key in window.gridInstances) {
-	        if (window.gridInstances.hasOwnProperty(key)) {
-	            let gridInfo = window.gridInstances[key];
-	            if (gridInfo.element.id === gridKey) { // gridKey에 해당하는 ID 찾기
-	                return gridInfo.instance;
-	            }
-	        }
-	    }
-	    return null;
-	}
-	*/
+	// 엑셀 다운로드 버튼 클릭 이벤트
+	// 현재 그리드를 엑셀로 다운로드
+	$(document).on('click', '#btn_excel_download', function () {	
+		// 페이지 제목 가져오기
+		const pageTitle = document.getElementById("pageHeaderTitle").innerText || "제목 없음";
 	
-	// 엑셀 데이터를 Grid의 name과 자동 매핑
-	function autoMapExcelData(excelData, gridInstance) {
-	    if (excelData.length === 0) 
-			return [];
+		// Grid 데이터 가져오기
+		const jsonData = equipGrid.getData(); // getData() 사용
+		const headers = equipGrid.getColumns().map(col => col.header);
+		const names = equipGrid.getColumns().map(col => col.name);
+		const data = jsonData.map(row => equipGrid.getColumns().map(col => row[col.name] || ""));
 	
-	    // Toast UI Grid 컬럼 정보 가져오기 - [{name, header}, ...]
-	    const gridColumns = gridInstance.getColumns();
+		// 엑셀 시트 생성 (1행: 제목, 2행부터 데이터)
+	    const worksheet = XLSX.utils.aoa_to_sheet([
+	        [pageTitle],	// 1행: 제목
+	        headers,		// 2행: 컬럼명
+	        ...data			// 3행부터 데이터
+	    ]);
+		
+	    // 제목 열 병합 설정 (A1 ~ 마지막 컬럼 병합)
+	    // 가운데 정렬 미구현
+	    worksheet['!merges'] = [
+	        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } } // 1행 전체 병합
+	    ];
+	    
+		// 컬럼 자동 너비 조정
+	    //const colWidths = headers.map(header => ({ wch: header.length + 5 }));
+	    const colWidths = names.map(names => ({ wch: names.length + 5 }));
+	    worksheet['!cols'] = colWidths;
 	
-	    // 첫 번째 행 (엑셀 header) 추출
-	    const excelHeaders = Object.keys(excelData[0]);
+		// 워크북 생성
+		const workbook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 	
-	    // 엑셀 header와 Grid의 name을 자동 매핑
-	    const headerMap = {};
-	    gridColumns.forEach(column => {
-	        let matchedHeader = excelHeaders.find(header => header === column.header); // header 값이 일치하는지 확인
-	        if (matchedHeader) {
-	            headerMap[matchedHeader] = column.name; // 'header' → 'name'
-	        }
-	    });
+		// 파일 다운로드
+		XLSX.writeFile(workbook, fileName);
+	});
 	
-	    console.log("자동 매핑 결과 : ", headerMap);
-	
-	    // 엑셀 데이터를 Grid의 name 기준으로 변환
-	    return excelData.map(row => {
-	        let newRow = {};
-	        Object.keys(row).forEach(header => {
-	            if (headerMap[header]) {
-	                newRow[headerMap[header]] = row[header]; // 매칭된 키로 변경
-	            }
-	        });
-	        return newRow;
-	    });
-	}
-
 	// 엑셀 불러오기 버튼 클릭 이벤트
 	$('#btn_excel_read').on('click', function () {
 		
@@ -200,7 +207,6 @@
 		formData.append("tableCodeId", tableCodeId);  // 기본 키 컬럼명 (ex: "ID")
 		formData.append("headerMap", JSON.stringify(headerToNameMap));  // JSON으로 변환하여 전송
 		formData.append("file", file);
-
 		
 		$.ajax({
 			url: "/ajax/modifyExcelData",
@@ -209,9 +215,8 @@
 			processData: false,
 			contentType: false,
 			success: function (res) {
-
 				alert(res.message);
-				grid.reloadData();  // 업로드 후 그리드 새로고침
+				activeGrid.reloadData();  // 업로드 후 그리드 새로고침
 			},
 			error: function (xhr, status, err) {
 				console.error("DB 업데이트 실패 : ", err);
@@ -272,5 +277,70 @@
 	    // 파일 선택 초기화
 	    $('#excelFile').val('');
 	});
+	
+	// 전역 객체에서 모든 그리드 인스턴스를 순회하며 보이는 그리드를 찾음
+	// 현재 화면에 보이는 그리드 중 가장 먼저 찾은 그리드를 반환
+	function findGrid() { 
+	    let activeGrid = null;
+	    for (let key in window.gridInstances) {
+	        if (window.gridInstances.hasOwnProperty(key)) {
+	            let gridInfo = window.gridInstances[key];
+	            if ($(gridInfo.element).is(":visible")) {
+	                activeGrid = gridInfo.instance;
+	                break;
+	            }
+	        }
+	    }
+	    return activeGrid;
+	}
+	
+	// 특정 key 값에 해당하는 Grid 찾기
+	/*
+	function findGridByKey(gridKey) {
+	    for (let key in window.gridInstances) {
+	        if (window.gridInstances.hasOwnProperty(key)) {
+	            let gridInfo = window.gridInstances[key];
+	            if (gridInfo.element.id === gridKey) { // gridKey에 해당하는 ID 찾기
+	                return gridInfo.instance;
+	            }
+	        }
+	    }
+	    return null;
+	}
+	*/
+	
+	// 엑셀 데이터를 Grid의 name과 자동 매핑
+	function autoMapExcelData(excelData, gridInstance) {
+	    if (excelData.length === 0) 
+			return [];
+	
+	    // Toast UI Grid 컬럼 정보 가져오기 - [{name, header}, ...]
+	    const gridColumns = gridInstance.getColumns();
+	
+	    // 첫 번째 행 (엑셀 header) 추출
+	    const excelHeaders = Object.keys(excelData[0]);
+	
+	    // 엑셀 header와 Grid의 name을 자동 매핑
+	    const headerMap = {};
+	    gridColumns.forEach(column => {
+	        let matchedHeader = excelHeaders.find(header => header === column.header); // header 값이 일치하는지 확인
+	        if (matchedHeader) {
+	            headerMap[matchedHeader] = column.name; // 'header' → 'name'
+	        }
+	    });
+	
+	    console.log("자동 매핑 결과 : ", headerMap);
+	
+	    // 엑셀 데이터를 Grid의 name 기준으로 변환
+	    return excelData.map(row => {
+	        let newRow = {};
+	        Object.keys(row).forEach(header => {
+	            if (headerMap[header]) {
+	                newRow[headerMap[header]] = row[header]; // 매칭된 키로 변경
+	            }
+	        });
+	        return newRow;
+	    });
+	}
 
 </script>

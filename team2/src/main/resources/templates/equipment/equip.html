@@ -26,7 +26,7 @@
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	<!-- SheetJS (Excel 변환 라이브러리) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-	
+
 	<style>
 	    .selected-row {
 	        background-color: #d1ffd6;
@@ -51,8 +51,9 @@
 		<nav th:replace="~{includes/modals/excelModal :: excelModal}"></nav>
 		
 		<!-- 설비코드 중복처리 검증 모달 -->
+		<!-- <nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav> -->
 		<nav th:replace="~{includes/modals/equipCodeAdd :: equipCodeAdd}"></nav>
-
+		
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
@@ -139,6 +140,10 @@
 		tableName = "EQUIPMENT";
 		tableCodeId = "EQUIPMENT_ID";
 		
+		// test용 엑셀 파일 이름 (수정 필요)
+		fileName = "설비정보_엑셀_테스트.xlsx";
+		sheetName = "설비정보_테스트";
+		
 		let equipGrid = null;
 		let equipCurrentSelectedRowKey = null;
 		let equipIsEditModeEnabled = false; 
@@ -147,10 +152,8 @@
 		window.gridInstances = window.gridInstances || {};
 		
 		const equipUrl = '/equipment/equip';
-		const excelUrl = '/ajax/excelToastTest';
 		const equipDataSource = {
 			api: {
-				//createData: {url: equipUrl, method: 'POST'},
 				readData: {url: equipUrl, method: 'GET'},
 				modifyData: {url: equipUrl, method: 'PUT'},
 				deleteData: {url: equipUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
@@ -472,45 +475,6 @@
 			equipGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
-		$("#btn_excel_download").on("click", function() {      
-			// test용 엑셀 파일
-			const sheetName = "설비정보_테스트";
-			const fileName = "설비정보_엑셀_테스트.xlsx";
-			
-			// 페이지 제목 가져오기
-			const pageTitle = document.getElementById("pageHeaderTitle").innerText || "제목 없음";
-		
-			// Grid 데이터 가져오기
-			const jsonData = equipGrid.getData(); // getData() 사용
-			const headers = equipGrid.getColumns().map(col => col.header);
-			const names = equipGrid.getColumns().map(col => col.name);
-			const data = jsonData.map(row => equipGrid.getColumns().map(col => row[col.name] || ""));
-		
-			// 엑셀 시트 생성 (1행: 제목, 2행부터 데이터)
-		    const worksheet = XLSX.utils.aoa_to_sheet([
-		        [pageTitle],	// 1행: 제목
-		        headers,		// 2행: 컬럼명
-		        ...data			// 3행부터 데이터
-		    ]);
-			
-		    // 제목 열 병합 설정 (A1 ~ 마지막 컬럼 병합)
-		    // 가운데 정렬 미구현
-		    worksheet['!merges'] = [
-		        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } } // 1행 전체 병합
-		    ];
-		    
-			// 컬럼 자동 너비 조정
-		    //const colWidths = headers.map(header => ({ wch: header.length + 5 }));
-		    const colWidths = names.map(names => ({ wch: names.length + 5 }));
-		    worksheet['!cols'] = colWidths;
-		
-			// 워크북 생성
-			const workbook = XLSX.utils.book_new();
-			XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-		
-			// 파일 다운로드
-			XLSX.writeFile(workbook, fileName);
-		});
 	</script>
 </body>
 
