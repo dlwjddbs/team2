@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구매입고등록</title>
+
+<!-- 	토스트 페이징 -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css">
+<!-- Bootstrap & CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+<!-- DataTables -->
+<link rel="stylesheet"
+	href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet"
+	href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="../../plugins/daterangepicker/daterangepicker.css">
+<!-- Toast Grid -->
+<link rel="stylesheet"
+	href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+<!-- jQuery OrgChart CSS CDN -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css"
+	integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
+<!-- 			토스트 페이징 -->
+<script
+	src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
+
+<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+
+
+<style>
+.table-container {
+	margin-top: 20px;
+}
+
+.divider {
+	border-top: 4px solid #000;
+	margin: 30px 0;
+}
+
+.btn-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.hidden {
+	display: none;
+}
+</style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+<!-- 			<nav th:replace="~{includes/modals/purchaseMtl :: purchaseMtl}"></nav> -->
+<!-- 			<nav th:replace="~{includes/modals/purchaseClt :: purchaseClt}"></nav> -->
+
+
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+
+			<section class="content">
+				<div class="container-fluid">
+					<!-- 첫 번째 row (구매발주) -->
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<h5>입고</h5>
+									<div class="card-tools">
+										<input type="button" id="btn_add_row" class="btn btn-primary"
+											value="신규"> <input type="button" id="save"
+											class="btn btn-primary" value="저장"> <input
+											type="button" id="btn_delete" class="btn btn-primary"
+											onclick="deleteRows(this.id)" value="삭제">
+									</div>
+								</div>
+								<div class="card-body">
+									<div id="toast_main"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 구분선 -->
+					<div class="divider hidden" id="divider"></div>
+
+					<!-- 두 번째 row (구매발주 상세) -->
+					<div class="row hidden" id="detail_section">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<h5>입고 상세</h5>
+									<div class="card-tools" id="btn_goods_detail"
+										style="text-align: right;">
+										<input type="button" id="material-modal-btn"
+											class="btn btn-primary" value="신규"> <input
+											type="button" id="saveDetail" class="btn btn-primary"
+											value="저장"> <input type="button" id="btn_delete2"
+											class="btn btn-primary" onclick="deleteRows(this.id)"
+											value="삭제">
+									</div>
+								</div>
+								<div class="card-body">
+									<div id="toast_detail"></div>
+									<!-- 구매발주 상세 영역 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+
+
+			<style>
+.selected-row {
+	background-color: #d1ffd6;
+}
+
+.deselected-row {
+	background-color: #ffd1d1;
+}
+</style>
+			<!-- Page specific script -->
+			<script>
+				const token = $("meta[name='_csrf']").attr("content")
+				const header = $("meta[name='_csrf_header']").attr("content");
+				const name = $("#userName").val();
+
+				$(function () {
+					initGrids();
+				});
+
+				// Toast Grid 설정
+				let cltId = "";
+				let grid1;
+				let grid2;
+
+				const url = 'getGoods';
+				const dataSource = {
+					api: {
+						createData: {url: url, method: 'POST', headers: {[header]: token}},
+						readData: {url: url, method: 'POST', headers: {[header]: token}},
+						updateData: {url: url, method: 'PUT', headers: {[header]: token}},
+						deleteData: {url: url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+					},
+					contentType: 'application/json',
+				};
+				const columns = [
+					{header: '입고번호', name: 'GO_ID', align: 'center'},
+					{header: '입고일자', name: 'CREATE_DATE', align: 'center'},
+					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
+					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
+					{header: '거래처', name: 'CLIENT_NAME', align: 'center', 	formatter: function({ value, row }) {
+						return `
+						<div style="display: flex; justify-content: flex-end; align-items: center;">
+						<span class="client-id-display" style="text-align: center; width: 100%; display: inline-block;">
+				          ${value ? value : ''}
+				        </span>
+						          <button class="client-modal-btn" data-row-key="${row.rowKey}" 
+						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
+						              🔍
+						          </button>
+						      </div> `;
+					            }},
+					{header: '품목(수)', name: 'PO_COUNT', align: 'center'},
+					{header: '총금액', name: 'GO_PRICE', align: 'center'},
+					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
+					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
+					{header: '상태', name: 'GO_STATUS', align: 'center',
+						formatter: ({value}) => {
+							const color = {"미결": "red", "마감": "blue"}[value] || "black";
+							return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
+						}
+					}
+				];
+				
+				let poId = "";
+				
+				// grid2 컬럼 설정 (구매 발주 상세)
+				const columns2 = [
+				{header: '상세번호', name: 'GO_ID', align: 'center'},
+				{header: 'P/O번호', name: 'PO_ID', align: 'center'},
+				{header: '상세번호', name: 'PO_ID', align: 'center'},
+				{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},					            
+				{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},					            
+				{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
+				{header: '단가', name: 'MATERIAL_PRICE', align: 'center'},
+				{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
+				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
+				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
+				{header: '상태', name: 'PO_STATUS', align: 'center', editor: 'text',
+					formatter: ({value}) => {
+						const color = {"미결": "red", "마감": "blue"}[value] || "black";
+						return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
+					}
+				}
+				];
+
+
+				let rowIdx;
+				function initGrids() {
+					grid1 = new tui.Grid({
+						el: document.getElementById('toast_main'),
+						data: dataSource,
+						scrollX: true,
+						scrollY: true,
+						rowHeaders: ['checkbox'],
+						editingEvent: 'click',
+						pageOptions: {
+				            useClient: true,  // 서버에서 페이징 처리
+				            perPage: 10        // 페이지당 10개
+				        },
+						columns: columns,
+					});
+
+
+					fetch('/getPurchase', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							[header]: token
+						},
+						body: JSON.stringify({})
+					})
+						.then(response => response.json())
+						.then(data => {
+							grid1.resetData(data);
+ 							
+						})
+						.catch(error => console.error("데이터 불러오기 실패:", error));
+
+					// 구매발주 상세 리스트를 숨김 상태에서 시작
+					$("#detail_section").hide();
+					$("#divider").hide();
+
+					// 행 클릭 시 상세 리스트 보이기
+					grid1.on('click', function (ev) {
+						if (ev.rowKey === null)
+							return;
+						const selectedRow = grid1.getRow(ev.rowKey);
+						poId = selectedRow.PO_ID;
+						if (!selectedRow) return;
+						rowIdx = ev.rowKey;
+						
+						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
+						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
+
+						// 선택한 발주번호(PO_ID)로 상세 데이터 요청
+						if(selectedRow.PO_ID != null){
+							fetch('/getPurchaseDetail', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+									[header]: token
+								},
+								body: JSON.stringify({PO_ID: selectedRow.PO_ID})
+							})
+								.then(response => response.json())
+								.then(data => {
+									dtlGrid(data);
+								})
+								.catch(error => console.error("grid2 데이터 불러오기 실패:", error));
+						}
+					});
+
+					// 더블 클릭하면 상세 리스트 숨기기
+					grid1.on('dblclick', function () {
+						$("#detail_section").fadeOut(300).removeClass("visible").addClass("hidden");
+						$("#divider").fadeOut(300).removeClass("visible").addClass("hidden");
+						grid2.resetData([]);
+					});
+
+
+						
+					function dtlGrid(data) {
+				
+				
+				    // 기존 그리드가 없을 때만 새로 생성
+				   if (!grid2) {
+					   grid2 = new tui.Grid({
+				        el: document.getElementById('toast_detail'),
+				        data: [],  // API 데이터 사용
+				        scrollX: true,
+				        scrollY: true,
+				        bodyHeight: 250,
+				        rowHeaders: ['checkbox'],
+				        editingEvent: 'click',
+				        pageOptions: {
+				            useClient: true,  // 클라이언트에서 페이징 처리
+				            perPage: 6        // 페이지당 10개
+				        },
+				        columns: columns2,
+				    });
+
+   } 			
+						
+   grid2.resetData(data);					
+		
+						
+						
+	
+						// grid2 값 변경 시 자동 계산 (총금액 업데이트)
+					    grid2.on('afterChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName, value }) => {
+					            const newValue = Number(value) || 0;
+					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
+
+					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트
+					            if (newValue !== previousValue) {
+					                if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
+					                    const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
+					                    const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
+					                    const totalPrice = count * price; // 총금액 계산
+
+					                    grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice);
+					                }
+					            }
+					        });
+					    });
+						
+						
+						// 체크박스가 활성화된 행의 index를 배열에 저장
+						grid2.on('check', (ev) => {
+							delRows.push(ev.rowKey);
+						});
+						
+						let totalItemCount = 0;
+					    let totalItemPrice = 0;
+					    const previousCellValues = {}; // 변경 전 셀 값을 저장하는 객체
+
+					    // 변경 전 값 저장 (beforeChange 이벤트)
+					    grid2.on('beforeChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName }) => {
+					            if (!previousCellValues[rowKey]) {
+					                previousCellValues[rowKey] = {};
+					            }
+					            // 변경 전 값을 grid2에서 가져와 저장 (DB에서 불러온 기존 값 포함)
+					            const previousValue = Number(grid2.getValue(rowKey, columnName)) || 0;
+					            previousCellValues[rowKey][columnName] = previousValue;
+					        });
+					    });
+						
+					    
+					    // 값 변경 시 총합 업데이트 (이전 값 반영)
+					    grid2.on('afterChange', (event) => {
+					        event.changes.forEach(({ rowKey, columnName, value }) => {
+					            const newValue = Number(value) || 0;
+					            // 이전 값이 존재하지 않는 경우 0으로 처리
+					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
+
+					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트 (중복 방지)
+					            if (newValue !== previousValue) {
+					                if (columnName === "PO_COUNT") {
+					                    totalItemCount = totalItemCount - previousValue + newValue;
+					                    grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
+					                } else if (columnName === "PO_PRICE") {
+					                    totalItemPrice = totalItemPrice - previousValue + newValue;
+					                    grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
+					                }
+					            }
+					        });
+					    });
+					}
+
+				}
+
+				$("#btn_add_row").on("click", function () {
+					let today = new Date();
+					let year = today.getFullYear(); // 년도
+					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
+					let date = String(today.getDate()).padStart(2, "0");  // 날짜
+					const newRowKey = grid1.appendRow(
+						{
+							"CREATE_DATE": year + '-' + month + '-' + date,
+							"PO_STATUS": '미결',
+						},
+						{	
+							focus: true
+						}
+					);
+				});
+
+				// 저장 버튼 이벤트
+				save.addEventListener('mousedown', handleSave);
+				saveDetail.addEventListener('mousedown', detailSave);
+				
+				
+				//삭제
+				let delRows = [];
+
+				function deleteRows(btnId) {
+
+					let gridNm = "";
+
+					if (btnId == "btn_delete") {
+						gridNm = grid1;
+					} else {
+						gridNm = grid2;
+					}
+
+					const checkedRows = gridNm.getCheckedRows(); // 체크된 행 가져오기
+
+					if (checkedRows.length === 0) {
+						alert("삭제할 행을 선택하세요.");
+						return;
+					}
+
+					checkedRows.forEach(row => {
+						delRows.push({...row, rowType: "delete"}); // 삭제할 데이터를 delRows 배열에 저장
+						gridNm.removeRow(row.rowKey); // 화면에서 행 삭제
+					});
+
+				}
+
+
+
+				// 저장 함수
+				function handleSave() {
+					grid1.blur(); // 포커스 해제
+
+					const modifiedRows = grid1.getModifiedRows();
+					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert", cltId:cltId}));
+					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update", cltId:cltId}));
+					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete", cltId:cltId}));
+
+					const allData = [...createdRows, ...updatedRows, ...deletedRows];
+
+					if (allData.length === 0) {
+						alert("변경된 데이터가 없습니다.");
+						return;
+					}
+
+
+					$.ajax({
+						url: "/savePurchase",
+						type: 'POST',
+						contentType: "application/json",
+						data: JSON.stringify(allData),
+						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+						success: (res) => {
+							if (res.status == "success") {
+								showSuccess("저장 성공!", true);
+								delRows = []; // 삭제 목록 초기화 (성공 시)
+							} else {
+								showError("저장 실패");
+							}
+						},
+						error: () => showError("서버 오류 발생"),
+					});
+				}
+
+				// 저장 함수
+				function detailSave() {
+					grid2.blur(); // 포커스 해제
+
+					const modifiedRows2 = grid2.getModifiedRows();
+					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert", poId:poId}));
+					const updatedRows2 = modifiedRows2.updatedRows.map(row => ({...row, rowType: "update", poId:poId}));
+					const deletedRows2 = modifiedRows2.deletedRows.map(row => ({...row, rowType: "delete", poId:poId}));
+
+					const allData = [...createdRows2, ...updatedRows2, ...deletedRows2];
+					
+					if (allData.length === 0) {
+						alert("변경된 데이터가 없습니다.");
+						return;
+					}
+
+
+					$.ajax({
+						url: "/saveDetail",
+						type: 'POST',
+						contentType: "application/json",
+						data: JSON.stringify(allData),
+						beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+						success: (res) => {
+							if (res.status == "success") {
+								showSuccess("상세 저장 성공!", true);
+								delRows = []; // 삭제 목록 초기화 (성공 시)
+							} else {
+								showError("상세 저장 실패");
+							}
+						},
+						error: () => showError("서버 오류 발생"),
+					});
+				}
+				
+				
+
+				// 메시지
+				function showSuccess(message, reload = false) {
+					Notiflix.Notify.success('저장 성공!');
+				}
+
+				function showError(message) {
+					Notiflix.Notify.failure('저장 실패!');
+				}
+
+		
+		$("#material-modal-btn").on("click", function() {
+			$("#purchaseMtl").modal("show");
+		});
+
+					$(document).on("click", ".client-modal-btn", function (props) {
+						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
+						 const rowKey = $(this).data("row-key");
+				    // 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
+				    $("#clientRow").val(rowKey);
+						
+						$("#purchaseClt").modal("show");
+							       // loadClientList(); // 거래처 리스트 불러오기
+							    });							
+
+				
+			</script>
+</body>
+
+</html>

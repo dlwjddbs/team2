@@ -104,7 +104,7 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<h5>구매발주</h5>
+									<h5>발주</h5>
 									<div class="card-tools">
 										<input type="button" id="btn_add_row" class="btn btn-primary"
 											value="신규"> <input type="button" id="save"
@@ -128,7 +128,7 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<h5>구매발주 상세</h5>
+									<h5>발주 상세</h5>
 									<div class="card-tools" id="btn_purchase_detail"
 										style="text-align: right;">
 										<input type="button" id="material-modal-btn"
@@ -148,39 +148,6 @@
 					</div>
 				</div>
 
-				<!-- 품목 조회 모달 -->
-				<div class="modal fade" id="materialModal" tabindex="-1"
-					aria-labelledby="materialModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content" style="width: 150%; margin: auto;">
-							<div class="modal-header">
-								<h5 class="modal-title" id="materialModalLabel">품목 조회</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"
-									aria-label="Close"></button>
-							</div>
-							<div class="modal-body">
-								<table class="table table-bordered">
-									<thead>
-										<tr>
-											<th>품목코드</th>
-											<th>품목명</th>
-											<th>단가</th>
-											<th>선택</th>
-										</tr>
-									</thead>
-									<tbody id="modalMaterialList">
-										<!--                         여기에 동적으로 데이터를 추가 -->
-									</tbody>
-								</table>
-
-								<!-- 				페이징 버튼을 표시할 영역 -->
-								<div id="paginationContainer"
-									class="mt-3 d-flex justify-content-center">
-									<!-- 				          여기에 이전, 페이지번호, 다음 버튼 생성 -->
-								</div>
-							</div>
-						</div>
-					</div>
 			</section>
 
 
@@ -221,7 +188,6 @@
 				const columns = [
 					{header: 'P/O번호', name: 'PO_ID', align: 'center' },
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center'},
-					{header: '주문번호', name: 'PO_NUM', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
 					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
 					{header: '거래처', name: 'CLIENT_NAME', align: 'center', 	formatter: function({ value, row }) {
@@ -237,7 +203,7 @@
 						      </div> `;
 					            }},
 					{header: '품목(수)', name: 'PO_COUNT', align: 'center'},
-					{header: '금액', name: 'PO_PRICE', align: 'center'},
+					{header: '총금액', name: 'PO_PRICE', align: 'center'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
 					{header: '상태', name: 'PO_STATUS', align: 'center',
