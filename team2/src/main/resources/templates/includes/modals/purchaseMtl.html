@@ -231,9 +231,7 @@
 	});
     // materialGrid는 구매발주 상세 그리드(이미 생성되어 있다고 가정)
     selectedMaterialList.forEach(function(data) {
-    	var currentRowCount = grid2.getData().length;
-    	data.rowKey = currentRowCount; 
-    	grid2.appendRow(data);
+    	grid2.appendRow(data, {at:data.rowKey});
     	console.info(data);
     });
     $("#purchaseMtl").modal("hide");

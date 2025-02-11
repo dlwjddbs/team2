@@ -125,7 +125,8 @@ public class PurchaseController {
 		    }
 
 		    result += purchaseService.insertDetail(insertList);
-		    result += purchaseService.updateDetail(updateList);
+//		    result += purchaseService.updateDetail(updateList);
+		    result += purchaseService.updateDetailAndStatus(updateList);
 		    result += purchaseService.deleteDetail(deleteList);
 		    
 		    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력

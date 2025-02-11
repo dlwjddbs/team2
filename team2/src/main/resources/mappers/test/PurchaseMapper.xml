@@ -31,6 +31,7 @@
      FROM MEMBER M2 
      WHERE M2.MEMBER_ID = PO.UPDATE_MEMBER) AS UPDATE_MEMBER
 FROM PURCHASE_ORDER PO
+ORDER BY CREATE_DATE DESC
 	</select>
 	
 <!--	발주 등록-->
@@ -73,7 +74,8 @@ WHERE CLIENT_ID = #{cltId}
     </delete>
     
     <select id="getPurchaseDetail" resultType="map" parameterType="map">
-    SELECT 
+    SELECT
+    ROW_NUMBER() OVER (ORDER BY TO_NUMBER(pd.PODETAIL_ID)) AS SEQ,  -- 숫자 변환 후 정렬
     pd.PODETAIL_ID,
     pd.MATERIAL_ID,
     TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
@@ -82,14 +84,15 @@ WHERE CLIENT_ID = #{cltId}
     pd.UPDATE_DATE,
     pd.UPDATE_MEMBER,
     m.MATERIAL_NAME,
-    TO_CHAR(m.MATERIAL_PRICE, 'FM9,999,999') || '원' AS MATERIAL_PRICE
+    TO_CHAR(m.MATERIAL_PRICE, 'FM9,999,999') || '원' AS MATERIAL_PRICE,
+    pd.PO_STATUS
 FROM PO_DETAIL pd
 JOIN PURCHASE_ORDER p 
     ON pd.PO_ID = p.PO_ID
 JOIN MATERIAL m
     ON pd.MATERIAL_ID = m.MATERIAL_ID
 WHERE pd.PO_ID = #{PO_ID}
-ORDER BY PODETAIL_ID DESC
+ORDER BY TO_NUMBER(pd.PODETAIL_ID)
  </select>
 
 <!-- 발주 상세 등록    -->
@@ -124,9 +127,41 @@ ORDER BY PODETAIL_ID DESC
        	 	PO_COUNT = #{PO_COUNT},
        	 	TOTAL_PRICE   = #{PO_COUNT} * PO_PRICE,
        	 	UPDATE_DATE = CURRENT_DATE,
-       	 	UPDATE_MEMBER = #{UPDATE_MEM}
+       	 	UPDATE_MEMBER = #{UPDATE_MEM},
+       	 	PO_STATUS = #{PO_STATUS}
     WHERE PODETAIL_ID = #{PODETAIL_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
 	</update>
+
+
+<update id="updatePurchaseStatus" parameterType="map">
+    <![CDATA[
+  UPDATE PURCHASE_ORDER
+  SET PO_STATUS = (
+    SELECT 
+      CASE 
+        WHEN MIN(PD.PO_STATUS) = '미결' AND MAX(PD.PO_STATUS) = '미결' THEN '미결'
+        WHEN MIN(PD.PO_STATUS) = '마감' AND MAX(PD.PO_STATUS) = '마감' THEN '마감'
+        ELSE '진행중'
+      END
+    FROM PO_DETAIL PD
+    WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID
+  )
+  WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}
+    AND PO_STATUS <> (
+      SELECT 
+        CASE 
+          WHEN MIN(PD.PO_STATUS) = '미결' AND MAX(PD.PO_STATUS) = '미결' THEN '미결'
+          WHEN MIN(PD.PO_STATUS) = '마감' AND MAX(PD.PO_STATUS) = '마감' THEN '마감'
+          ELSE '진행중'
+        END
+      FROM PO_DETAIL PD
+      WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID
+    )
+]]>
+</update>
+
+
+
 
 <!-- DELETE (데이터 삭제) -->
     <delete id="deleteDetail" parameterType="map">
