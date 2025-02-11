@@ -118,25 +118,12 @@
 		const client_columns = [
             {header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null},
             {header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
-            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'left', editor: null},
+            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'center', editor: null},
             {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: null},
             {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
             {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
             {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
-            {
-				header: '거래상태',
-				name: 'CLIENT_STATUS', 
-				align: 'left', 
-					editor: {
-								type: 'select',  // 드롭다운 타입 설정
-								options: {
-								listItems: [
-									        { text: '거래중', value: '거래중' },
-								    	    { text: '거래중지', value: '거래중지' }
-								      ]
-								    }
-								  },
-							  },
+            {header: '거래상태', name: 'CLIENT_STATUS', align: 'center', editor: null},
             {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
         ];
 		
@@ -159,6 +146,42 @@
 		TextInputRenderer.prototype.render = function (props) {
 			this.el.value = props.value;
 		}
+		
+		
+		const SelectBoxRenderer = function (props) {
+		    const el = document.createElement('select'); // select 요소 생성
+		    el.style.width = 'calc(90% - 10px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.margin = 'auto 5px';
+
+		    // 드롭다운 옵션 설정
+		    const options = [
+		        { text: '거래중', value: '거래중' },
+		        { text: '거래중지', value: '거래중지' }
+		    ];
+
+		    options.forEach(option => {
+		        const optionEl = document.createElement('option');
+		        optionEl.value = option.value;
+		        optionEl.textContent = option.text;
+		        if (props.value === option.value) {
+		            optionEl.selected = true; // 현재 값과 일치하면 선택
+		        }
+		        el.appendChild(optionEl);
+		    });
+
+		    this.el = el;
+		    this.render(props);
+		};
+
+		SelectBoxRenderer.prototype.getElement = function () {
+		    return this.el;
+		};
+
+		SelectBoxRenderer.prototype.render = function (props) {
+		    this.el.value = props.value;
+		};
 		
 		const TextInputBtnRenderer = function(props) {
 		    const container = document.createElement('div');
@@ -293,21 +316,38 @@
 		        clientGrid.setColumns([
 		        	{header: '거래처 코드', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {
+						header: '거래처 유형', 
+						name: 'CLIENT_TYPE', 
+						align: 'center', 
+						editor: {
+							type: 'select',  // 드롭다운 타입 설정
+							options: {
+								listItems: [
+									{ text: '매입사', value: '매입사' },
+						        	{ text: '매출사', value: '매출사' }
+						      	]
+						    }
+							  },
+						  renderer: { type: TextInputRenderer }},
 		            {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '거래상태', name: 'CLIENT_STATUS', align: 'left', 
-					editor: {
-					    type: 'select',  // 드롭다운 타입 설정
-					    options: {
-					      listItems: [
-					        { text: '거래중', value: '거래중' },
-					        { text: '거래중지', value: '거래중지' }
-					      ]
-					    }
-					  }}, 
+		            {
+						header: '거래상태',
+						name: 'CLIENT_STATUS', 
+						align: 'center', 
+						editor: {
+							type: 'select',  // 드롭다운 타입 설정
+							options: {
+								listItems: [
+									{ text: '거래중', value: '거래중' },
+						        	{ text: '거래중지', value: '거래중지' }
+						      	]
+						    }
+					  			},
+				  			renderer: { type: SelectBoxRenderer }}, 
 		            {header: '비고', name: 'DESCRIPTION', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 					
 		        ]);
