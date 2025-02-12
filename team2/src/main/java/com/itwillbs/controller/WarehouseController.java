@@ -26,13 +26,19 @@ public class WarehouseController {
 		return "/warehouse/whse";
 	}
 	
-//	@PostMapping("/warehouse/checkDuplicateWhseCode")
-//	@ResponseBody
-//	public Map<String, Object> checkDuplicateWhseCode(@RequestParam Map<String, Object> map) {
-//		log.info("============= checkDuplicateWhseCode =============");
-//		
-//		Map<String, Object> message = warehouseService.checkDuplicateWhseCode(map);
-//		
-//		return message;
-//	}
+	@PostMapping("/warehouse/checkDuplicateWhseCode")
+	@ResponseBody
+	public Map<String, Object> checkDuplicateWhseCode(@RequestParam Map<String, Object> map) {
+		log.info("============= checkDuplicateWhseCode =============");
+		
+		Map<String, Object> message = warehouseService.checkDuplicateWhseCode(map);
+		
+		return message;
+		
+	}
+	
+	@GetMapping("/whseLocation")
+	public String process() {
+		return "/warehouse/location";
+	}
 }

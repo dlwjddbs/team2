@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.WarehouseMapper">
+    <select id="selectWarehouse" resultType="map">
+		SELECT
+			  WAREHOUSE_ID
+			, WAREHOUSE_NAME
+			, WAREHOUSE_TYPE
+			, LOCATION_COUNT
+			, WAREHOUSE_STATUS 
+		FROM WAREHOUSE
+		ORDER BY WAREHOUSE_ID ASC
+    </select>
+ 
+    <insert id="insertWarehouse">
+		INSERT ALL
+		    <foreach collection="list" item="item">
+		        INTO WAREHOUSE (
+		              WAREHOUSE_ID
+		            , WAREHOUSE_NAME
+		            , WAREHOUSE_TYPE
+		            , WAREHOUSE_STATUS
+		        )
+		        VALUES (
+		              #{item.WAREHOUSE_ID}
+		            , #{item.WAREHOUSE_NAME}
+		            , #{item.WAREHOUSE_TYPE} 
+		            , #{item.WAREHOUSE_STATUS}
+		        )
+		    </foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateWarehouse">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE WAREHOUSE
+	           SET 
+	               WAREHOUSE_ID = #{row.WAREHOUSE_ID}
+	             , WAREHOUSE_NAME = #{row.WAREHOUSE_NAME}
+	             , WAREHOUSE_TYPE = #{row.WAREHOUSE_TYPE}
+	             , WAREHOUSE_STATUS = #{row.WAREHOUSE_STATUS}
+	         WHERE WAREHOUSE_ID = #{row.WAREHOUSE_ID}
+	    </foreach>
+    </update>
+    
+    <delete id="deleteWarehouse">
+	    DELETE FROM WAREHOUSE
+	     WHERE WAREHOUSE_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <select id="checkDuplicateWhseCode">
+    	SELECT count(*) AS COUNT
+		  FROM WAREHOUSE
+		 WHERE WAREHOUSE_ID = #{WAREHOUSE_ID}
+    </select> 
+    
+</mapper>

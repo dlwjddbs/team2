@@ -158,7 +158,9 @@
 		    // 드롭다운 옵션 설정
 		    const options = [
 		        { text: '거래중', value: '거래중' },
-		        { text: '거래중지', value: '거래중지' }
+		        { text: '거래중지', value: '거래중지' },
+		        { text: '매입사', value: '매입사' },
+		        { text: '매출사', value: '매출사' }
 		    ];
 
 		    options.forEach(option => {
@@ -329,7 +331,7 @@
 						      	]
 						    }
 							  },
-						  renderer: { type: TextInputRenderer }},
+						  renderer: { type: SelectBoxRenderer }}, 
 		            {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
