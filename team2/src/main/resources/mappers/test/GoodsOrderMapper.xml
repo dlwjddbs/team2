@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.GoodsOrderMapper">
+
+<select id="getGoodsList" resultType="map">
+	SELECT 
+		GO.GO_ID,
+		GO.PO_ID,
+		TO_CHAR(GO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+		MM.NAME AS MEMBER_NAME,
+		C.CLIENT_NAME,
+		GO.GO_COUNT,
+		GO.GO_PRICE,
+		TO_CHAR(GO.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+		UM.NAME AS UPDATE_MEMBER,
+		GO.GO_STATUS
+	FROM
+		GOODS_ORDER GO
+	LEFT JOIN CLIENT C ON GO.CLIENT_ID = C.CLIENT_ID
+	LEFT JOIN MEMBER MM ON GO.MEMBER_ID = MM.MEMBER_ID
+	LEFT JOIN MEMBER UM ON GO.UPDATE_MEMBER = UM.MEMBER_ID
+	ORDER BY GO.CREATE_DATE DESC
+</select>
+
+
+
+<select id="getGoodsPoList" resultType="map" parameterType="map">
+    SELECT 
+        PO.PO_ID, 
+        TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE, 
+        C.CLIENT_NAME    	
+    FROM PURCHASE_ORDER PO
+    LEFT JOIN CLIENT C ON PO.CLIENT_ID = C.CLIENT_ID
+    WHERE 1 = 1
+      -- GOODS_ORDER에 존재하지 않는 PO_ID만 선택
+      AND PO.PO_ID NOT IN (SELECT GO.PO_ID FROM GOODS_ORDER GO)
+      <if test='po_id != null and po_id != ""'>
+          AND PO.PO_ID = #{po_id}
+      </if>
+      <if test='create_date != null and create_date != ""'>
+          AND TRUNC(PO.CREATE_DATE) = TO_DATE(#{create_date}, 'YYYY-MM-DD')
+      </if>
+</select>
+
+	<insert id="insertGoods" parameterType="map">
+	INSERT INTO GOODS_ORDER (
+        GO_ID,
+        PO_ID,
+        CREATE_DATE,
+        MEMBER_ID,
+        CLIENT_ID,
+        GO_STATUS
+    )
+    SELECT 
+        'GO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(GO_SEQ.NEXTVAL, 4, '0') AS GO_ID,
+        p.PO_ID,
+        SYSDATE,
+        #{INSERT_MEM},
+        c.CLIENT_ID,
+        #{GO_STATUS, jdbcType=VARCHAR}
+    FROM PURCHASE_ORDER p
+    JOIN CLIENT c 
+      ON p.CLIENT_ID = c.CLIENT_ID
+    WHERE p.PO_ID = #{PO_ID}	
+
+</insert>
+
+	<update id="updateGoods" parameterType="map">
+    UPDATE GOODS_ORDER
+    	SET 
+       	 	CREATE_DATE = CURRENT_DATE,
+       	 	GO_COUNT = #{GO_COUNT, jdbcType=VARCHAR},
+       	 	UPDATE_DATE = CURRENT_DATE,
+       	 	UPDATE_MEMBER = #{UPDATE_MEM},
+       	 	GO_STATUS = #{GO_STATUS}
+    WHERE GO_ID = #{GO_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
+
+
+<!-- DELETE (데이터 삭제) -->
+    <delete id="deleteGoods">
+        DELETE FROM GOODS_ORDER
+        	WHERE GO_ID = #{GO_ID}
+    </delete>
+
+	<select id="getGoodsDetail" resultType="map" parameterType="map">
+	SELECT
+    ROW_NUMBER() OVER (ORDER BY TO_NUMBER(gd.GODETAIL_ID)) AS SEQ,
+    gd.GODETAIL_ID,
+    go.PO_ID,              -- GOODS_ORDER 테이블의 PO_ID
+    pd.PODETAIL_ID,
+    m.MATERIAL_ID,
+    m.MATERIAL_NAME,
+    pd.PO_COUNT AS GO_COUNT,
+    TO_CHAR(pd.PO_PRICE, 'FM9,999,999') || '원' AS GO_PRICE,
+    TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
+    gd.UPDATE_DATE,
+    gd.UPDATE_MEMBER,
+    pd.PO_STATUS AS GO_STATUS
+FROM GOODS_ORDER go
+LEFT JOIN GO_DETAIL gd
+    ON gd.GO_ID = go.GO_ID
+LEFT JOIN PO_DETAIL pd
+    ON go.PO_ID = pd.PO_ID   -- GOODS_ORDER의 PO_ID를 기준으로 조인
+LEFT JOIN MATERIAL m
+    ON pd.MATERIAL_ID = m.MATERIAL_ID
+WHERE go.GO_ID = #{GO_ID}
+	</select>
+
+
+
+
+
+
+
+
+
+
+</mapper>

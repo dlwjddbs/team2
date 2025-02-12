@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +28,7 @@ public class PurchaseController {
 	private final PurchaseService purchaseService;
 	
 	private final String purchaseClt = "/purchase/purchaseClt";
-	private final String purchaseMtl = "/purchase/purchaseMlt";
+	private final String purchaseMtl = "/purchase/purchaseMtl";
 	
 	
 	@GetMapping("/purchase")
@@ -148,7 +147,7 @@ public class PurchaseController {
 		
 		@PostMapping(purchaseMtl)
 		@ResponseBody
-		public List<Map<String, Object>> getMaterialList(@RequestBody  Map<String, Object> requestData ) {
+		public List<Map<String, Object>> getMaterialList(@RequestBody Map<String, Object> requestData ) {
 			System.out.println("자재리스트" + requestData.toString());
 			List<Map<String, Object>> getMaterialList = purchaseService.getMaterialList(requestData);
 			return getMaterialList;

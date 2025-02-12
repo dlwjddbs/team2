@@ -1,6 +1,5 @@
 package com.itwillbs.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,11 +127,9 @@ public class PurchaseService {
 	
 	
 
-	public List<Map<String, Object>> getMaterialList(Map<String, Object> requestData) {
-	
+	public List<Map<String, Object>> getMaterialList(Map<String, Object> requestData) {	
 		List<Map<String, Object>> materialList = purchaseMapper.getMaterialList(requestData);
-		
-		
+				
 		return materialList;
 	}
 	

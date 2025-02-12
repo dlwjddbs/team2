@@ -46,13 +46,12 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		<!-- /.좌측 메뉴 -->
-		
+				
+		<!-- 설비코드 중복처리 검증 모달 -->
+		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
+
 		<!-- 엑셀 기능 모달 -->
 		<nav th:replace="~{includes/modals/excelModal :: excelModal}"></nav>
-		
-		<!-- 설비코드 중복처리 검증 모달 -->
-		<!-- <nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav> -->
-		<nav th:replace="~{includes/modals/equipCodeAdd :: equipCodeAdd}"></nav>
 		
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -106,7 +105,7 @@
 											</div>
 										</div>
 									</div>
-									<div id="equipGrid" class="tui-grid">
+									<div id="equipGrid">
 										<!-- Toast Grid Ajax -->
 									</div>
 								</div>
@@ -235,21 +234,14 @@
 					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
 					const value = equipGrid.getValue(row, column);
 					
-					switch (column) {
-						case 'EQUIPMENT_ID':
-							$("#equipCode").val(value);
-							$("#equipRow").val(row);
-							$("#equipColumn").val(column);
-							
-							$("#checkDuplicateCodeBtn").show();
-							$("#modifyCodeBtn").hide();
-							$("#saveCode").attr("disabled", true);
-							$("#equipCode").attr("disabled", false);
-							$("#validationWorkcenterCodeMessage").text('');
-							
-							$('#equipCodeAdd').modal();
-						break;
-					}
+					$("#inputCodeText").val(value);  // 그리드에 출력되어있는 기존의 값
+					$("#gridCheckedRow").val(row);  // 선택한 행
+					$("#gridCheckedColumn").val(column);  // 선택한 열
+					
+					copyGrid = equipGrid;  // 선택한 값 집어넣을 그리드 객체
+					
+					// 위에서 변경필요한 값들 수정한 다음 모달 띄움.
+					$('#mesCodeValidate').modal();
 			    });
 			}
 			

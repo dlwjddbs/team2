@@ -270,7 +270,19 @@ public class ExcelService {
 			
 			// row2 - 양식 규칙 추가
 			Row row2 = sheet.createRow(2);
-			
+			for (int i = 0; i < headers.size(); i++) {
+			    String value = headers.get(i);
+
+			    if (value.contains("_NAME")) {
+			    	row2.createCell(i).setCellValue("예: 홍길동");  // 이름 예시
+			    } else if (value.contains("_DATE") || value.contains("_TIME") || value.contains("_UPDATE")) {
+			    	row2.createCell(i).setCellValue("예: 20240311232846 (년월일시분초)");	// 날짜 예시
+			    } else if (value.contains("_YN") || value.contains("STATUS")) {
+			    	row2.createCell(i).setCellValue("예: Y = '사용' / N = '미사용'");	// 사용, 미사용 예시
+			    } else {
+			    	row2.createCell(i).setCellValue("입력");  // 기본 값
+			    }
+			}
 			
 			// 열 너비 설정 (단위: 1/256 * 글자 크기)
 			for (int i = 0; i < headers.size(); i++) {

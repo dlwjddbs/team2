@@ -342,6 +342,7 @@ public class ManufactureService {
 		return resultMap;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> deleteRouting(List<String> processIds) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -351,10 +352,59 @@ public class ManufactureService {
 		try {
 			if (processIds.size() > 0) {
 				manufactureMapper.deleteRouting(processIds);
+				manufactureMapper.deleteRoutingSequence(processIds);
 			}
 		} catch (Exception e) {
 			result = false;
 			message = "deleteRouting 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> selectRoutingSequence(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectRoutingSequence 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectRoutingSequence(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectRoutingSequence 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> insertRoutingSequence(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Boolean result = true;
+		String message = "insertRoutingSequence 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertRoutingSequence(createdRows);
+			
+				Map<String, Object> map = createdRows.get(0);
+				map.put("createdRowsCnt", createdRows.size());
+				manufactureMapper.updateRoutingProcessQuantity(map);
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			result = false;
+			message = "insertRoutingSequence 실패";
 		}
 		
 		resultMap.put("result", result);

@@ -82,12 +82,12 @@
   // 그리드 컬럼 정의
   const materialColumns = [
     { header: '품목 코드', name: 'MATERIAL_ID', align: 'center', editor: null },
-    { header: '품목명', name: 'MATERIAL_NAME', align: 'left', editor: null },
+    { header: '품목명', name: 'MATERIAL_NAME', align: 'center', editor: null },
     { header: '단가', name: 'MATERIAL_PRICE', align: 'center', editor: null }
   ];
   const selectedMaterialColumns = [
     { header: '품목코드', name: 'MATERIAL_ID', align: 'center', editor: null },
-    { header: '품목명', name: 'MATERIAL_NAME', align: 'left', editor: null }
+    { header: '품목명', name: 'MATERIAL_NAME', align: 'center', editor: null }
   ];
 
   // 모달 그리드 초기화 함수 (자재 목록)
@@ -107,7 +107,7 @@
 
     // 전체 자재 목록 초기 로드
     $.ajax({
-      url: '/purchase/purchaseMlt',
+      url: '/purchase/purchaseMtl',
       type: 'POST',
       contentType: "application/json",
       data: JSON.stringify({}),
@@ -194,7 +194,7 @@
     const selectedMaterialIds = selectedMaterialList.map(item => item.MATERIAL_ID);
 
     $.ajax({
-      url: '/purchase/purchaseMlt',
+      url: '/purchase/purchaseMtl',
       type: 'POST',
       contentType: "application/json",
       data: JSON.stringify({ material_name: materialParam.material_name }),
@@ -231,8 +231,9 @@
 	});
     // materialGrid는 구매발주 상세 그리드(이미 생성되어 있다고 가정)
     selectedMaterialList.forEach(function(data) {
-    	grid2.appendRow(data, {at:data.rowKey});
-    	console.info(data);
+    	delete data.rowKey; // 또는 data.rowKey = newUniqueKey();
+        grid2.appendRow(data, { at: 0 });
+        console.info(data);
     });
     $("#purchaseMtl").modal("hide");
   });

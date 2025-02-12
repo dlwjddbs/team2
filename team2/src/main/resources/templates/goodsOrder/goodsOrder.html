@@ -91,8 +91,8 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-<!-- 			<nav th:replace="~{includes/modals/purchaseMtl :: purchaseMtl}"></nav> -->
-<!-- 			<nav th:replace="~{includes/modals/purchaseClt :: purchaseClt}"></nav> -->
+			<nav th:replace="~{includes/modals/goodsPo :: goodsPo}"></nav>
+			<!-- 			<nav th:replace="~{includes/modals/purchaseClt :: purchaseClt}"></nav> -->
 
 
 			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
@@ -106,10 +106,10 @@
 								<div class="card-header">
 									<h5>입고</h5>
 									<div class="card-tools">
-										<input type="button" id="btn_add_row" class="btn btn-primary"
-											value="신규"> <input type="button" id="save"
-											class="btn btn-primary" value="저장"> <input
-											type="button" id="btn_delete" class="btn btn-primary"
+										<input type="button" id="goods-modal-btn"
+											class="btn btn-primary" value="신규"> <input
+											type="button" id="save" class="btn btn-primary" value="저장">
+										<input type="button" id="btn_delete" class="btn btn-primary"
 											onclick="deleteRows(this.id)" value="삭제">
 									</div>
 								</div>
@@ -129,8 +129,7 @@
 							<div class="card">
 								<div class="card-header">
 									<h5>입고 상세</h5>
-									<div class="card-tools" id="btn_goods_detail"
-										style="text-align: right;">
+									<div class="card-tools">
 										<input type="button" id="material-modal-btn"
 											class="btn btn-primary" value="신규"> <input
 											type="button" id="saveDetail" class="btn btn-primary"
@@ -147,10 +146,10 @@
 						</div>
 					</div>
 				</div>
-				
 
 
-			<style>
+
+				<style>
 .selected-row {
 	background-color: #d1ffd6;
 }
@@ -159,8 +158,8 @@
 	background-color: #ffd1d1;
 }
 </style>
-			<!-- Page specific script -->
-			<script>
+				<!-- Page specific script -->
+				<script>
 				const token = $("meta[name='_csrf']").attr("content")
 				const header = $("meta[name='_csrf_header']").attr("content");
 				const name = $("#userName").val();
@@ -170,7 +169,7 @@
 				});
 
 				// Toast Grid 설정
-				let cltId = "";
+				let goId = "";
 				let grid1;
 				let grid2;
 
@@ -186,26 +185,16 @@
 				};
 				const columns = [
 					{header: '입고번호', name: 'GO_ID', align: 'center'},
+					{header: 'P/O번호', name: 'PO_ID', hidden: true},
 					{header: '입고일자', name: 'CREATE_DATE', align: 'center'},
 					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
 					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
-					{header: '거래처', name: 'CLIENT_NAME', align: 'center', 	formatter: function({ value, row }) {
-						return `
-						<div style="display: flex; justify-content: flex-end; align-items: center;">
-						<span class="client-id-display" style="text-align: center; width: 100%; display: inline-block;">
-				          ${value ? value : ''}
-				        </span>
-						          <button class="client-modal-btn" data-row-key="${row.rowKey}" 
-						              style="border: none; background: none; color: #007bff; cursor: pointer; font-size: 15px;">
-						              🔍
-						          </button>
-						      </div> `;
-					            }},
-					{header: '품목(수)', name: 'PO_COUNT', align: 'center'},
+					{header: '거래처', name: 'CLIENT_NAME', align: 'center'},
+					{header: '품목(수)', name: 'GO_COUNT', align: 'center'},
 					{header: '총금액', name: 'GO_PRICE', align: 'center'},
 					{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 					{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-					{header: '상태', name: 'GO_STATUS', align: 'center',
+					{header: '상태', name: 'GO_STATUS', align: 'center', editor: 'text',
 						formatter: ({value}) => {
 							const color = {"미결": "red", "마감": "blue"}[value] || "black";
 							return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
@@ -213,21 +202,21 @@
 					}
 				];
 				
-				let poId = "";
+				
 				
 				// grid2 컬럼 설정 (구매 발주 상세)
 				const columns2 = [
-				{header: '상세번호', name: 'GO_ID', align: 'center'},
+				{header: '상세번호', name: 'GO_ID', hidden: true},
 				{header: 'P/O번호', name: 'PO_ID', align: 'center'},
-				{header: '상세번호', name: 'PO_ID', align: 'center'},
+				{header: '발주상세번호', name: 'PODETAIL_ID', hidden: true},
 				{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},					            
 				{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},					            
-				{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
-				{header: '단가', name: 'MATERIAL_PRICE', align: 'center'},
+				{header: '수량', name: 'GO_COUNT', align: 'center', editor: 'text'},
+				{header: '단가', name: 'GO_PRICE', align: 'center'},
 				{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
 				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-				{header: '상태', name: 'PO_STATUS', align: 'center', editor: 'text',
+				{header: '상태', name: 'GO_STATUS', align: 'center', editor: 'text',
 					formatter: ({value}) => {
 						const color = {"미결": "red", "마감": "blue"}[value] || "black";
 						return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
@@ -253,7 +242,7 @@
 					});
 
 
-					fetch('/getPurchase', {
+					fetch('/getGoods', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -268,16 +257,17 @@
 						})
 						.catch(error => console.error("데이터 불러오기 실패:", error));
 
-					// 구매발주 상세 리스트를 숨김 상태에서 시작
+					// 구매입고 상세 리스트를 숨김 상태에서 시작
 					$("#detail_section").hide();
 					$("#divider").hide();
 
 					// 행 클릭 시 상세 리스트 보이기
 					grid1.on('click', function (ev) {
+						
 						if (ev.rowKey === null)
 							return;
 						const selectedRow = grid1.getRow(ev.rowKey);
-						poId = selectedRow.PO_ID;
+						goId = selectedRow.GO_ID;
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
 						
@@ -285,14 +275,14 @@
 						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");
 
 						// 선택한 발주번호(PO_ID)로 상세 데이터 요청
-						if(selectedRow.PO_ID != null){
-							fetch('/getPurchaseDetail', {
+						if(selectedRow.GO_ID != null){
+							fetch('/getGoodsDetail', {
 								method: 'POST',
 								headers: {
 									'Content-Type': 'application/json',
 									[header]: token
 								},
-								body: JSON.stringify({PO_ID: selectedRow.PO_ID})
+								body: JSON.stringify({GO_ID: selectedRow.GO_ID})
 							})
 								.then(response => response.json())
 								.then(data => {
@@ -312,8 +302,7 @@
 
 						
 					function dtlGrid(data) {
-				
-				
+								
 				    // 기존 그리드가 없을 때만 새로 생성
 				   if (!grid2) {
 					   grid2 = new tui.Grid({
@@ -346,9 +335,9 @@
 
 					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트
 					            if (newValue !== previousValue) {
-					                if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
-					                    const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
-					                    const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
+					                if (columnName === "GO_COUNT" || columnName === "GO_PRICE") {
+					                    const count = Number(grid2.getValue(rowKey, "GO_COUNT")) || 0;
+					                    const price = Number(grid2.getValue(rowKey, "GO_PRICE")) || 0;
 					                    const totalPrice = count * price; // 총금액 계산
 
 					                    grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice);
@@ -389,12 +378,12 @@
 
 					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트 (중복 방지)
 					            if (newValue !== previousValue) {
-					                if (columnName === "PO_COUNT") {
+					                if (columnName === "GO_COUNT") {
 					                    totalItemCount = totalItemCount - previousValue + newValue;
-					                    grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
-					                } else if (columnName === "PO_PRICE") {
+					                    grid1.setValue(rowIdx, "GO_COUNT", totalItemCount);
+					                } else if (columnName === "GO_PRICE") {
 					                    totalItemPrice = totalItemPrice - previousValue + newValue;
-					                    grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
+					                    grid1.setValue(rowIdx, "GO_PRICE", totalItemPrice);
 					                }
 					            }
 					        });
@@ -402,22 +391,6 @@
 					}
 
 				}
-
-				$("#btn_add_row").on("click", function () {
-					let today = new Date();
-					let year = today.getFullYear(); // 년도
-					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
-					let date = String(today.getDate()).padStart(2, "0");  // 날짜
-					const newRowKey = grid1.appendRow(
-						{
-							"CREATE_DATE": year + '-' + month + '-' + date,
-							"PO_STATUS": '미결',
-						},
-						{	
-							focus: true
-						}
-					);
-				});
 
 				// 저장 버튼 이벤트
 				save.addEventListener('mousedown', handleSave);
@@ -458,9 +431,9 @@
 					grid1.blur(); // 포커스 해제
 
 					const modifiedRows = grid1.getModifiedRows();
-					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert", cltId:cltId}));
-					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update", cltId:cltId}));
-					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete", cltId:cltId}));
+					const createdRows = modifiedRows.createdRows.map(row => ({...row, rowType: "insert"}));
+					const updatedRows = modifiedRows.updatedRows.map(row => ({...row, rowType: "update"}));
+					const deletedRows = modifiedRows.deletedRows.map(row => ({...row, rowType: "delete"}));
 
 					const allData = [...createdRows, ...updatedRows, ...deletedRows];
 
@@ -469,9 +442,15 @@
 						return;
 					}
 
+					for (let row of createdRows) {
+			              if (!row.PO_ID) {
+			                  alert("새로운 입고 행에 P/O번호가 누락되었습니다.");
+			                  return;
+			              }
+			          }
 
 					$.ajax({
-						url: "/savePurchase",
+						url: "/saveGoods",
 						type: 'POST',
 						contentType: "application/json",
 						data: JSON.stringify(allData),
@@ -533,12 +512,22 @@
 				function showError(message) {
 					Notiflix.Notify.failure('저장 실패!');
 				}
-
-		
+				
+				
+				
+				
+		$("#goods-modal-btn").on("click", function() {
+					$("#goodsPo").modal("show");
+				});
+				
+				
+				
+				
+				
 		$("#material-modal-btn").on("click", function() {
 			$("#purchaseMtl").modal("show");
 		});
-
+		
 					$(document).on("click", ".client-modal-btn", function (props) {
 						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
 						 const rowKey = $(this).data("row-key");
