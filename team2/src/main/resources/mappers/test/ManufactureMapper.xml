@@ -138,6 +138,15 @@
 			 , INSPECTION_YN 
 			 , NOTE 
 		  FROM PROCESS
+		 WHERE
+			   1 = 1
+   		<if test='inspection_yn != null and inspection_yn != ""'>
+			AND INSPECTION_YN = #{inspection_yn}
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (PROCESS_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
+					OR NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+		</if>
     </select>
     
     <select id="checkDuplicateCode">
@@ -249,4 +258,65 @@
 	        #{id}
 	    </foreach>
     </delete>
+    
+	<delete id="deleteRoutingSequence">
+	    DELETE FROM PROCESS_ROUTING_MAPPING
+	     WHERE ROUTING_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+	<select id="selectRoutingSequence" resultType="map">
+		SELECT 
+			   prm.SORT_ORDER 		AS SORT_ORDER
+			 , p.NAME 				AS NAME
+			 , prm.PROCESS_ID 		AS PROCESS_ID
+			 , p.INSPECTION_YN 		AS INSPECTION_YN
+			 , prm.IS_LAST_ORDER 	AS IS_LAST_ORDER
+		  FROM PROCESS_ROUTING_MAPPING prm
+		  	   INNER JOIN PROCESS p 
+					   ON prm.PROCESS_ID = p.PROCESS_ID 
+		 WHERE prm.ROUTING_ID = #{routing_id}
+    </select>
+    
+    <insert id="insertRoutingSequence">
+<!--     	트리거  -->
+    
+<!-- 	    CREATE SEQUENCE SEQ_PROCESS_ROUTING_MAPPING_ID -->
+<!-- 	    START WITH 1 -->
+<!-- 	    INCREMENT BY 1 -->
+<!-- 	    NOCACHE -->
+<!-- 	    NOCYCLE; -->
+    
+<!--     	CREATE OR REPLACE TRIGGER TRG_PROCESS_ROUTING_MAPPING_ID -->
+<!-- 		BEFORE INSERT ON PROCESS_ROUTING_MAPPING -->
+<!-- 		FOR EACH ROW -->
+<!-- 		BEGIN -->
+<!-- 		    :NEW.PROCESS_ROUTING_MAPPING_ID := 'PRM' || LPAD(SEQ_PROCESS_ROUTING_MAPPING_ID.NEXTVAL, 10, '0'); -->
+<!-- 		END; -->
+    
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PROCESS_ROUTING_MAPPING (
+				  PROCESS_ID
+				, ROUTING_ID
+				, SORT_ORDER
+				, IS_LAST_ORDER
+			)
+			VALUES (
+				  #{item.PROCESS_ID}
+				, #{item.ROUTING_ID}
+				, #{item.SORT_ORDER}
+				, #{item.IS_LAST_ORDER}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <update id="updateRoutingProcessQuantity">
+    	UPDATE ROUTING
+    	   SET PROCESS_QUANTITY = #{createdRowsCnt}
+    	 WHERE ROUTING_ID = #{ROUTING_ID}
+    </update>
 </mapper>

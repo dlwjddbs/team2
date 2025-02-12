@@ -36,6 +36,7 @@
 
 		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
 		<nav th:replace="~{includes/modals/routingItemAdd :: routingItemAdd}"></nav>
+		<nav th:replace="~{includes/modals/routingSequenceAdd :: routingSequenceAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -83,15 +84,14 @@
 										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">라우팅 절차</p>
 									</div>
 									<div class="col-6">
-										<div class="card-tools" id="btn_group_equipment" style="text-align: right; display: none;">
-											<input type="button" id="btn_equipment_modal" class="btn btn-primary" value="추가">
-											<input type="button" id="btn_equipment_add" class="btn btn-primary" value="저장">
-											<input type="button" id="btn_equipment_delete" class="btn btn-primary" value="제거">
+										<div class="card-tools" id="btn_group_sequence" style="text-align: right; display: none;">
+											<input type="button" id="btn_sequence_modal" class="btn btn-primary" value="추가">
+											<input type="button" id="btn_sequence_add" class="btn btn-primary" value="저장">
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="card-body" id="equipmentGrid">
+							<div class="card-body" id="sequenceGrid">
 								<!-- Toast Grid Ajax -->
 							</div>
 						<!-- /.card-body -->
@@ -131,7 +131,7 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		// 워크센터
+		// 라우팅
 		let routingGrid = null;
 		const routingUrl = '/manufacture/routing';
 		const routingDataSource = {
@@ -161,34 +161,39 @@
             {header: '비고', name: 'NOTE', align: 'left', editor: null},
         ];
 		
-		/*
-		// 설비
-		let equipmentGrid = null;
-		const equipmentUrl = '/manufacture/equipment';
-		const equipmentDataSource = {
+		// 라우팅 절차
+		let sequenceGrid = null;
+		const sequenceUrl = '/manufacture/sequence';
+		const sequenceDataSource = {
 			api: {
-				createData: {url: equipmentUrl, method: 'POST'},
-			    readData: {url: equipmentUrl, method: 'GET', initParams: { routing_id: '' }},
-			    deleteData: {url: equipmentUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+				createData: {url: sequenceUrl, method: 'POST'},
+			    readData: {url: sequenceUrl, method: 'GET', initParams: { routing_id: '' }},
+			    deleteData: {url: sequenceUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 		};
-		let equipmentCurrentSelectedRowKey = null;
-		const equipment_columns = [
-		    {header: '설비 코드', name: 'EQUIPMENT_ID', align: 'center', editor: null},
-		    {header: '설비명', name: 'EQUIPMENT_NAME', align: 'left', editor: null},
+		let sequenceCurrentSelectedRowKey = null;
+		const sequence_columns = [
+		    {header: '순서', name: 'SORT_ORDER', align: 'center', editor: null},
+		    {header: '공정코드', name: 'PROCESS_ID', align: 'left', editor: null},
+		    {header: '공정명', name: 'NAME', align: 'left', editor: null},
 			{
-			    header: '사용여부', 
-			    name: 'EQUIPMENT_STATUS', 
+			    header: '검사여부', 
+			    name: 'INSPECTION_YN', 
 			    align: 'center',
 			    formatter: function({value}) {
 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
 			    }
 			},
-		    {header: '비고', name: 'EQUIPMENT_NOTE', align: 'left', editor: null},
-		    {header: '워크센터 코드', name: 'ROUTING_ID', align: 'center', editor: null, hidden: true},
+			{
+			    header: '최종여부', 
+			    name: 'IS_LAST_ORDER', 
+			    align: 'center',
+			    formatter: function({value}) {
+			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+			    }
+			},
 		];
-		*/
 		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
@@ -313,7 +318,7 @@
 			routingInit();
 		});
 		
-		// 워크센터
+		// 라우팅
 		function routingInit() {
 			routingGrid = new tui.Grid({
 		        el: document.getElementById('routingGrid'),
@@ -346,20 +351,19 @@
 			        routingGrid.removeRowClassName(routingCurrentSelectedRowKey, 'selected-row');
 			    }
 
-				/*
-				if (equipmentGrid) {
-					equipmentGrid.destroy(); // 설비 그리드 제거
-					equipmentGrid = null;
+				if (sequenceGrid) {
+					sequenceGrid.destroy(); // 라우팅 절차 그리드 제거
+					sequenceGrid = null;
 				}
-				*/
 				
 			    if (routingCurrentSelectedRowKey != newRowKey) {
 			        routingGrid.addRowClassName(newRowKey, 'selected-row');
 			        routingCurrentSelectedRowKey = newRowKey;
 					
-					// 설비 그리드 생성
+					// 라우팅 절차 그리드 생성
 					const routingID = routingGrid.getRow(newRowKey).ROUTING_ID;
-//					equipmentInit(routingID);
+					const processCount = routingGrid.getRow(newRowKey).PROCESS_QUANTITY;
+					sequenceInit(routingID, processCount);
 					routingCurrentSelectedID = routingID;
 					$("#btn_group_equipment").show();
 			    } else {
@@ -498,60 +502,52 @@
 			routingDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
 		    routingGrid.request('deleteData');
-			routingGrid.reloadData();  // 실패시 테이블 리로드
+		    
+		    window.location.reload();
+// 			routingGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
-		/*
-		// 설비
-		function equipmentInit(routing_id) {
+		// 라우팅 절차
+		function sequenceInit(routing_id, processCount) {
 			// 파라미터 설정
-			equipmentDataSource.api.readData.initParams.routing_id = routing_id;
+			sequenceDataSource.api.readData.initParams.routing_id = routing_id;
 			
-			if (equipmentGrid) {
-				equipmentGrid.destroy(); // 기존 그리드 제거
-				equipmentGrid = null;
+			if (sequenceGrid) {
+				sequenceGrid.destroy(); // 기존 그리드 제거
+				sequenceGrid = null;
 			}
 			
-			equipmentGrid = new tui.Grid({
-		        el: document.getElementById('equipmentGrid'),
-		        data: equipmentDataSource,
+			sequenceGrid = new tui.Grid({
+		        el: document.getElementById('sequenceGrid'),
+		        data: sequenceDataSource,
 		        scrollX: true,
 		        scrollY: true,
 		        bodyHeight: 250,
 		        rowHeaders: ['checkbox'],
-		        columns: equipment_columns,
+		        columns: sequence_columns,
 		    });
 			
-			$("#btn_group_equipment").show();
+			if (processCount > 0) {
+				$("#btn_group_sequence").hide();
+			} else {
+				$("#btn_group_sequence").show();
+			}
 
-		    equipmentGrid.on('failResponse', function(ev) {
+		    sequenceGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
 		
-		$("#btn_equipment_add").on("click", function() {
-			equipmentGrid.request('createData');
-			equipmentGrid.reloadData();  // 실패시 테이블 리로드
+		$("#btn_sequence_add").on("click", function() {
+			sequenceGrid.request('createData');
+			
+			window.location.reload();
+// 			sequenceGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
-		$("#btn_equipment_modal").on("click", function() {
-			$("#routingEquipmentAdd").modal();
+		$("#btn_sequence_modal").on("click", function() {
+			$("#routingSequenceAdd").modal();
 		});
-		
-		$("#btn_equipment_delete").on("click", function() {
-			equipmentGrid.removeCheckedRows();
-			
-			// 반드시 removeCheckedRows()후에 실행 순서
-			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = equipmentGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.EQUIPMENT_ID))  // 한글 변환
-				.join(',');
-			equipmentDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
-			
-			equipmentGrid.request('deleteData');
-			equipmentGrid.reloadData();  // 실패시 테이블 리로드
-		});
-		*/
 	</script>
 </body>
 </html>
