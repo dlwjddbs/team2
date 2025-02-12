@@ -82,13 +82,13 @@
   // 그리드 컬럼 정의
   const purchaseColumns = [
     { header: '발주코드', name: 'PO_ID', align: 'center', editor: null },
-    { header: '발주일자', name: 'CREATE_DATE', align: 'left', editor: null },
+    { header: '발주일자', name: 'CREATE_DATE', align: 'center', editor: null },
     { header: '거래처코드', name: 'CLIENT_ID', hidden: true},
 	{ header: '거래처', name: 'CLIENT_NAME', align: 'center', editor: null },
   ];
-  const selectedMaterialColumns = [
+  const selectedPurchaseColumns = [
     { header: '발주코드', name: 'PO_ID', align: 'center', editor: null },
-    { header: '발주일자', name: 'CREATE_DATE', align: 'left', editor: null }
+    { header: '발주일자', name: 'CREATE_DATE', align: 'center', editor: null }
   ];
 
   // 모달 그리드 초기화 함수 (발주 목록)
@@ -126,15 +126,15 @@
       if (ev.targetType !== "cell") return;
       const rowKey = ev.rowKey;
       const rowData = purchaseModalGrid.getRow(rowKey);
-      const materialId = rowData.MATERIAL_ID;
+      const poId = rowData.PO_ID;
       if (purchaseModalGrid.getRowClassName(rowKey).includes('selected-row')) {
         purchaseModalGrid.removeRowClassName(rowKey, 'selected-row');
-        selectedPurchaseList = selectedPurchaseList.filter(item => item.MATERIAL_ID !== materialId);
+        selectedPurchaseList = selectedPurchaseList.filter(item => item.PO_ID !== poId);
       } else {
         selectedPurchaseList.push({
-          MATERIAL_ID: materialId,
-          MATERIAL_NAME: rowData.MATERIAL_NAME,
-          MATERIAL_PRICE: rowData.MATERIAL_PRICE,
+        	PO_ID: poId,
+          CREATE_DATE: rowData.CREATE_DATE,
+          CLIENT_NAME: rowData.CLIENT_NAME,
           isNew: true
         });
         purchaseModalGrid.addRowClassName(rowKey, 'selected-row');
@@ -145,7 +145,7 @@
   }
 
   // 선택 목록 그리드 초기화 함수
-  function initMaterialModalSelectedGrid() {
+  function initPurchaseModalSelectedGrid() {
     if (purchaseModalSelectedGrid) {
       purchaseModalSelectedGrid.destroy();
       purchaseModalSelectedGrid = null;
@@ -156,19 +156,19 @@
       scrollX: true,
       scrollY: true,
       bodyHeight: 250,
-      columns: selectedMaterialColumns
+      columns: selectedPurchaseColumns
     });
     // 선택 목록 클릭 시 항목 제거
     purchaseModalSelectedGrid.on('click', function(ev) {
       if (ev.targetType !== "cell") return;
       const rowKey = ev.rowKey;
       const rowData = purchaseModalSelectedGrid.getRow(rowKey);
-      const materialId = rowData.MATERIAL_ID;
-      selectedPurchaseList = selectedPurchaseList.filter(item => item.MATERIAL_ID !== materialId);
+      const poId = rowData.PO_ID;
+      selectedPurchaseList = selectedPurchaseList.filter(item => item.PO_ID !== poId);
       purchaseModalSelectedGrid.removeRow(rowKey);
       // 자재 목록에서 하이라이트 제거
       purchaseModalGrid.getData().forEach(function(row) {
-        if (row.MATERIAL_ID === materialId) {
+        if (row.PO_ID === poId) {
           purchaseModalGrid.removeRowClassName(row.rowKey, 'selected-row');
         }
       });
@@ -179,12 +179,12 @@
   $('#goodsPo').on('shown.bs.modal', function () {
     selectedPurchaseList = [];
     initPurchaseModalGrid();
-    initMaterialModalSelectedGrid();
+    initPurchaseModalSelectedGrid();
   });
 
   // 자재 검색 버튼 클릭 이벤트
-  $("#btnMaterialSearch").on("click", function() {
-    const searchKeyword = $("#materialSearchKeyword").val().trim();
+  $("#btnPurchaseSearch").on("click", function() {
+    const searchKeyword = $("#purchaseSearchKeyword").val().trim();
     if (!searchKeyword) {
       alert("검색어를 입력하세요.");
       return;
@@ -192,10 +192,10 @@
     // 검색 파라미터 설정 (서버는 { po_id: "검색어" } 형식을 기대)
     purchaseParam.po_id = searchKeyword;
 
-    const selectedMaterialIds = selectedPurchaseList.map(item => item.MATERIAL_ID);
+    const selectedPurchaseIds = selectedPurchaseList.map(item => item.PO_ID);
 
     $.ajax({
-      url: '/purchase/purchaseMtl',
+      url: '/goods/goodsPo',
       type: 'POST',
       contentType: "application/json",
       data: JSON.stringify({ po_id: purchaseParam.po_id }),
@@ -206,7 +206,7 @@
         // 기존 선택 항목 하이라이트 재적용
         setTimeout(() => {
           purchaseModalGrid.getData().forEach(function(row) {
-            if (selectedMaterialIds.includes(row.MATERIAL_ID)) {
+            if (selectedMaterialIds.includes(row.PO_ID)) {
               purchaseModalGrid.addRowClassName(row.rowKey, 'selected-row');
             }
           });
@@ -218,22 +218,24 @@
     });
   });
 
-  // 적용 버튼 클릭 이벤트: 선택된 자재를 구매발주 상세 그리드에 추가 (여기서는 materialGrid를 사용)
-  $("#saveMaterial").on('click', function() {
+  // 적용 버튼 클릭 이벤트: 선택된 자재를 구매발주 상세 그리드에 추가 (여기서는 purchaseGrid를 사용)
+  $("#savePurchase").on('click', function() {
 	  
-	  const rowKeysToDelete = grid2.getData()
+	  const rowKeysToDelete = grid1.getData()
 	    .filter(row => row.isNew)
 	    .map(row => row.rowKey);
 	
 	  
 	// 구매발주 그리드 기존의 새로 추가된 행 삭제
 	rowKeysToDelete.forEach(function(key) {
-		grid2.removeRow(key);
+		grid1.removeRow(key);
 	});
     // materialGrid는 구매발주 상세 그리드(이미 생성되어 있다고 가정)
     selectedPurchaseList.forEach(function(data) {
-    	grid2.appendRow(data, {at:data.rowKey});
-    	console.info(data);
+    	delete data.rowKey; // 또는 data.rowKey = newUniqueKey();
+    	data.GO_STATUS = '미결';
+        grid1.appendRow(data, { at: 0 });
+        console.info(data);
     });
     $("#goodsPo").modal("hide");
   });

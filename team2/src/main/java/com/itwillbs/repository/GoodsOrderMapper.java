@@ -12,4 +12,12 @@ public interface GoodsOrderMapper {
 
 	List<Map<String, Object>> getGoodsPoList(Map<String, Object> requestData);
 
+	int insertGoods(Map<String, Object> data);
+
+	int updateGoods(Map<String, Object> data);
+
+	int deleteGoods(Map<String, Object> data);
+
+	List<Map<String, Object>> getGoodsDetail(Map<String, Object> map);
+
 }
