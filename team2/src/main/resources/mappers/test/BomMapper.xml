@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.BomMapper">
+
+    <select id="selectBom" resultType="map">
+        SELECT
+			   BOM_ID
+			 , ITEM_ID
+			 , PARENT_ID
+          FROM BOM
+    </select>
+    
+    <insert id="insertBom">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO BOM (
+				  BOM_ID
+				, ITEM_ID
+				, PARENT_ID
+			)
+			VALUES (
+				  #{item.BOM_ID}
+				, #{item.ITEM_ID, jdbcType=VARCHAR}
+				, #{item.PARENT_ID, jdbcType=VARCHAR}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <delete id="deleteBom">
+	    DELETE FROM BOM
+	     WHERE BOM_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <update id="updateBom">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE BOM
+	           SET 
+	               BOM_ID = #{row.BOM_ID}
+	             , ITEM_ID = #{row.ITEM_ID, jdbcType=VARCHAR}
+	             , PARENT_ID = #{row.PARENT_ID, jdbcType=VARCHAR}
+	         WHERE BOM_ID = #{row.BOM_ID}
+	    </foreach>
+    </update>
+    
+    <select id="selectBomDetail" resultType="map">
+		SELECT 
+			   BOM_DETAIL_ID 	AS BOM_DETAIL_ID
+			 , ITEM_ID 	AS ITEM_ID
+			 , REQUIRED_AMOUNT AS REQUIRED_AMOUNT
+			 , BOM_ID	AS BOM_ID
+		  FROM BOM_DETAIL
+		 WHERE
+		 	   1 = 1
+		<choose>
+			<when test='bom_id != null and bom_id != ""'>
+				AND BOM_ID = #{bom_id}
+			</when>
+			<otherwise>
+				AND BOM_ID IS NULL
+			</otherwise>
+		</choose>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (BOM_DETAIL_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
+					OR EQUIPMENT_NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+		</if>
+    </select>
+    
+    <update id="addBomDetail">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE BOM_DETAIL 
+			   SET BOM_ID = #{item.BOM_ID}
+			 WHERE BOM_DETAIL_ID = #{item.BOM_DETAIL_ID}
+		</foreach>
+    </update>
+    
+	<update id="deleteBomDetail">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE BOM_DETAIL 
+			   SET BOM_ID = NULL
+			 WHERE BOM_DETAIL_ID = #{item}
+		</foreach>
+    </update>
+    
+	<update id="deleteBomDetailByBomId">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE BOM_DETAIL 
+			   SET BOM_ID = NULL
+			 WHERE BOM_ID = #{item}
+		</foreach>
+    </update>
+</mapper>

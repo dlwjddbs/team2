@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+
+		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
+		
+		<nav th:replace="~{includes/modals/bomDetailAdd :: bomDetailAdd}"></nav>
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-6">
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">BOM</p>
+										</div>
+										<div class="col-6">
+											<div class="card-tools" style="text-align: right;">
+												<input type="button" id="btn_bom_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_bom_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_bom_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_bom_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_bom_delete" class="btn btn-primary" value="삭제">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body" id="bomGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<div class="row">
+									<div class="col-6">
+										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">BOM 상세</p>
+									</div>
+									<div class="col-6">
+										<div class="card-tools" id="btn_group_bomDetail" style="text-align: right; display: none;">
+											<input type="button" id="btn_bomDetail_modal" class="btn btn-primary" value="추가">
+											<input type="button" id="btn_bomDetail_add" class="btn btn-primary" value="저장">
+											<input type="button" id="btn_bomDetail_delete" class="btn btn-primary" value="제거">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body" id="bomDetailGrid">
+								<!-- Toast Grid Ajax -->
+							</div>
+						<!-- /.card-body -->
+						</div>
+					<!-- /.card -->
+					</div>
+				</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	
+	<style>
+	    .selected-row {
+	        background-color: #d1ffd6;
+	    }
+	    .deselected-row {
+	        background-color: #ffd1d1;
+	    }
+		.modal-custom-size {
+			max-width: 1300px;
+		}
+	</style>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		// BOM
+		let bomGrid = null;
+		const bomUrl = '/manufacture/bom';
+		const bomDataSource = {
+			api: {
+			    readData: {url: bomUrl, method: 'GET'},
+				modifyData: { url: bomUrl, method: 'PUT' },
+				deleteData: {url: bomUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+	    };
+		let bomCurrentSelectedRowKey = null;
+		let bomCurrentSelectedID = null;
+		let bomIsEditModeEnabled = false; 
+		const bom_columns = [
+            {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null},
+            {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
+            {header: '상위 코드', name: 'PARENT_ID', align: 'center', editor: null},
+        ];
+		
+		// BOM 상세
+		let bomDetailGrid = null;
+		const bomDetailUrl = '/manufacture/bomDetail';
+		const bomDetailDataSource = {
+			api: {
+				createData: {url: bomDetailUrl, method: 'POST'},
+			    readData: {url: bomDetailUrl, method: 'GET', initParams: { BOM_ID: '' }},
+			    deleteData: {url: bomDetailUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+		};
+		let bomDetailCurrentSelectedRowKey = null;
+		const bomDetail_columns = [
+		    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null},
+            {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
+            {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'center', editor: null},
+		    {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null, hidden: true},
+		];
+		
+		const TextInputRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+		  	
+		  	this.el = el;
+		  	this.render(props);
+		}
+
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+		
+		const TextInputBtnRenderer = function(props) {
+		    const container = document.createElement('div');
+		    container.style.display = 'flex';
+		    container.style.alignItems = 'center';
+		    container.style.gap = '5px';
+		    
+		    const el = document.createElement('input');
+		    el.type = 'text';
+		    el.style.width = 'calc(100% - 10px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.color = 'solid 1px #ddd';
+		    el.style.marginLeft = '1px';
+		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+			container.appendChild(el);
+			
+			// BOM_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'BOM_ID'
+				&& bomGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+			    button.textContent = '🔍';
+			    button.style.border = 'solid 1px #007BFF';
+			    button.style.background = 'white';
+			    button.style.color = 'white';
+			    button.style.padding = '6px 10px';
+			    button.style.cursor = 'pointer';
+			    button.style.borderRadius = '4px';
+			    button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = bomGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'BOM_ID':
+							$("#inputCodeText").val(value);
+							$("#gridCheckedRow").val(row);
+							$("#gridCheckedColumn").val(column);
+
+							tableName = "BOM";
+							tableCodeId = "BOM_ID";
+							copyGrid = bomGrid;
+							
+							$('#mesCodeValidate').modal();
+							
+							break;
+						case 'MANAGER_ID':
+							$("#managerRow").val(row);
+							$("#managerColumn").val(column);
+							
+							$('#bomManagerAdd').modal(); 
+							break;
+							// TODO
+	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
+					}
+			    });
+			}
+			
+		    this.el = container;
+		    this.input = el;
+		    this.render(props);
+		}
+
+		TextInputBtnRenderer.prototype.getElement = function () {
+		    return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+		    this.input.value = props.value;
+		}
+		
+		const CheckboxRenderer = function(props) {
+		    const el = document.createElement('input');
+		    el.type = 'checkbox';
+		    el.checked = (props.value === 'Y');  // 초기값 지정
+		
+			el.addEventListener('change', function() {
+		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+		    });
+		    		
+		    this.el = el;
+		};
+
+		CheckboxRenderer.prototype.getElement = function() {
+		    return this.el;
+		};
+
+		CheckboxRenderer.prototype.getValue = function() {
+		    return this.el.checked ? 'Y' : 'N';
+		};
+
+		CheckboxRenderer.prototype.mounted = function() {
+		    this.el.focus();
+		};
+
+		$(function () {
+			bomInit();
+		});
+		
+		// BOM
+		function bomInit() {
+			bomGrid = new tui.Grid({
+		        el: document.getElementById('bomGrid'),
+		        data: bomDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+				editingEvent: 'click',
+		        columns: bom_columns,
+		    });
+
+		    bomGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+			
+			bomGrid.on('editingStart', function(ev) {
+			    const {rowKey, columnName, value} = ev;
+			    const rowData = bomGrid.getRow(rowKey);
+				
+				// PK 수정 불가 && 새로 추가된 행은 작성 가능
+// 				if (columnName == 'BOM_ID' && !rowData.isNew) {
+// 				if (columnName == 'MANAGER_ID') {
+// 					$('#categoryAdd').modal();
+// 					ev.stop();
+// 				}
+			});
+			
+			bomGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || bomIsEditModeEnabled) {
+					return;
+				}
+
+			    const newRowKey = ev.rowKey;
+				
+				// 새로 추가된 행은 클릭 안되도록.
+				if (bomGrid.getRow(newRowKey).isNew) {
+					return;
+				}
+
+			    if (bomCurrentSelectedRowKey != null) {
+			        bomGrid.removeRowClassName(bomCurrentSelectedRowKey, 'selected-row');
+			    }
+
+				if (bomDetailGrid) {
+					bomDetailGrid.destroy(); // BOM 상세 코드 그리드 제거
+					bomDetailGrid = null;
+				}
+				
+			    if (bomCurrentSelectedRowKey != newRowKey) {
+			        bomGrid.addRowClassName(newRowKey, 'selected-row');
+			        bomCurrentSelectedRowKey = newRowKey;
+					
+					// BOM 상세 그리드 생성
+					const bomID = bomGrid.getRow(newRowKey).BOM_ID;
+					bomDetailInit(bomID);
+					bomCurrentSelectedID = bomID;
+					$("#btn_group_bomDetail").show();
+			    } else {
+			        // 같은 행을 클릭한 경우 선택 해제
+			        bomCurrentSelectedRowKey = null;
+					bomCurrentSelectedID = null;
+					$("#btn_group_bomDetail").hide();
+			    }
+			});
+		}
+		
+		// 수정 모드 토글 버튼 이벤트
+		$("#btn_bom_toggleEditMode").on("click", function () {
+		    bomIsEditModeEnabled = !bomIsEditModeEnabled; // 수정 모드 상태 토글
+		    
+		    if (bomIsEditModeEnabled) {
+				$("#btn_bom_add_row").show();
+				$("#btn_bom_remove_row").show();
+		    } else {
+		    	$("#btn_bom_add_row").hide();
+				$("#btn_bom_remove_row").hide();
+		    }
+		    
+		    if (bomIsEditModeEnabled) {
+		        bomGrid.setColumns([
+		        	{header: 'BOM 코드 *', name: 'BOM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '상위 코드 *', name: 'PARENT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		        ]);
+		    } else {
+		        bomGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        bomGrid.setColumns(bom_columns);
+		    }
+		});
+
+		$("#btn_bom_add_row").on("click", function () {
+		    const newRowKey = bomGrid.appendRow(
+		        {
+		        	"BOM_ID": '',
+		        	"ITEM_ID": '',
+		        	"PARENT_ID": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+		});
+		
+		$("#btn_bom_remove_row").on("click", function () {
+		    const rowCount = bomGrid.getRowCount(); // 현재 행 개수 가져오기
+		    
+		    const allRows = bomGrid.getData(); // 전체 데이터 가져오기
+		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
+		    
+		    if (newRows.length === 0) {
+		        alert("삭제할 수 있는 신규 행이 없습니다.");
+		        return;
+		    }
+
+		    const lastRowKey = bomGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    bomGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		});
+
+		$("#btn_bom_modify").on("click", function() {
+			bomGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+			
+		    let createdRows = bomGrid.getModifiedRows().createdRows;
+		    let updatedRows = bomGrid.getModifiedRows().updatedRows;
+		    
+		    // 필수 입력 컬럼
+		    const requiredFields = ["BOM_ID", "ITEM_ID", "PARENT_ID"];
+
+		    let validCreatedRows = createdRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    let validUpdatedRows = updatedRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    if (createdRows.length == 0 && updatedRows.length == 0) {
+		    	alert("수정된 데이터가 없습니다.");
+		        return;
+		    }
+
+			if (createdRows.length > 0) {
+				if ((validCreatedRows.length == 0)
+					|| (validCreatedRows.length != createdRows.length)) {
+					alert("필수값을 모두 입력해주세요.");
+			        return;
+				}
+			}
+				
+			if (updatedRows.length > 0 && validUpdatedRows.length == 0) {
+				alert("필수값을 모두 입력해주세요.");
+		        return;
+			}
+			
+			bomGrid.request('modifyData');
+			bomGrid.readData(1, null, true);  // 그리드 새로고침 
+			bomGrid.setColumns(bom_columns);  // 수정모드 해제 (새로 렌더링)
+			
+			bomIsEditModeEnabled = false;
+	    	$("#btn_bom_add_row").hide();
+			$("#btn_bom_remove_row").hide();
+		});
+		
+        $("#btn_bom_delete").on("click", function() {
+			bomGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = bomGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.bom_ID))  // 한글 변환
+				.join(',');
+			bomDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+		    bomGrid.request('deleteData');
+			bomGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		// BOM 상세 코드
+		function bomDetailInit(bom_id) {
+			// 파라미터 설정
+			bomDetailDataSource.api.readData.initParams.bom_id = bom_id;
+			
+			if (bomDetailGrid) {
+				bomDetailGrid.destroy(); // 기존 그리드 제거
+				bomDetailGrid = null;
+			}
+			
+			bomDetailGrid = new tui.Grid({
+		        el: document.getElementById('bomDetailGrid'),
+		        data: bomDetailDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+		        columns: bomDetail_columns
+		    });
+			
+			$("#btn_group_bomDetail").show();
+
+		    bomDetailGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+		}
+		
+		$("#btn_bomDetail_add").on("click", function() {
+			bomDetailGrid.request('createData');
+			bomDetailGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		$("#btn_bomDetail_modal").on("click", function() {
+			$("#bomDetailAdd").modal();
+		});
+		
+		$("#btn_bomDetail_delete").on("click", function() {
+			bomDetailGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = bomDetailGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.bomDetail_ID))  // 한글 변환
+				.join(',');
+			bomDetailDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+			bomDetailGrid.request('deleteData');
+			bomDetailGrid.reloadData();  // 실패시 테이블 리로드
+		});
+	</script>
+</body>
+</html>
