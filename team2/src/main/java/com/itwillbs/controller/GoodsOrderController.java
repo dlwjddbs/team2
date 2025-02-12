@@ -26,6 +26,7 @@ public class GoodsOrderController {
 	private final GoodsOrderService goodsOrderService;
 	
 	private final String goodsPo = "/goods/goodsPo";
+
 	
 	@GetMapping("/goodsOrder")
 	public String purchase(@AuthenticationPrincipal User user) {
@@ -34,7 +35,8 @@ public class GoodsOrderController {
 //  }
 		return "goodsOrder/goodsOrder";
 	}
-		
+
+//	입고 리스트
 	@PostMapping("getGoods")
 	@ResponseBody
 	public List<Map<String, Object>> getGoodsList(@RequestBody Map<String, Object> map) {
@@ -44,6 +46,7 @@ public class GoodsOrderController {
 		return goodsList;
 	}
 	
+//	입고 등록
 	@PostMapping("/saveGoods")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> saveGoods(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {
@@ -82,7 +85,7 @@ public class GoodsOrderController {
 	    
 	    return ResponseEntity.ok(responseMap);
 	}
-	
+//	입고에 발주리스트 등록
 	@PostMapping(goodsPo)
 	@ResponseBody
 	public List<Map<String, Object>> getGoodsPoList(@RequestBody Map<String, Object> requestData ) {
@@ -91,6 +94,7 @@ public class GoodsOrderController {
 		return getGoodsPoList;
 	}
 	
+//	입고 상세 리스트
 	@PostMapping("getGoodsDetail")
 	@ResponseBody
 	public List<Map<String, Object>> getGoodsDetail(@RequestBody Map<String, Object> map) {
@@ -99,5 +103,45 @@ public class GoodsOrderController {
 		System.out.println("goodsList: " + goodsDetail);
 		return goodsDetail;
 	}
+	
+//	@PostMapping("/saveGoodsDetail")
+//	@ResponseBody
+//	public ResponseEntity<Map<String, Object>> saveGoodsDetail(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {
+//	    int result = 0;
+//	    String id = user.getUsername();
+//	    
+//	    List<Map<String, Object>> insertList = new ArrayList<>();
+//	    List<Map<String, Object>> updateList = new ArrayList<>();
+//	    List<Map<String, Object>> deleteList = new ArrayList<>();
+//
+//	    for (Map<String, Object> data : dataList) {
+//	    	data.put("UPDATE_MEM", id);
+//	        String rowType = (String) data.get("rowType");
+//	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
+//
+//	        if ("insert".equals(rowType)) {
+//	            insertList.add(data);
+//	        } else if ("update".equals(rowType)) {
+//	            updateList.add(data);
+//	        } else if ("delete".equals(rowType)) {
+//	            deleteList.add(data);
+//	        }
+//	    }
+//
+//	    result += purchaseService.insertDetail(insertList);
+////	    result += purchaseService.updateDetail(updateList);
+//	    result += purchaseService.updateDetailAndStatus(updateList);
+//	    result += purchaseService.deleteDetail(deleteList);
+//	    
+//	    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
+//	 // JSON 형태로 응답 반환 (undefined 방지)
+//	    Map<String, Object> responseMap = new HashMap<>();
+//	    responseMap.put("status", "success");
+//	    responseMap.put("message", "저장이 완료되었습니다!");
+//	    responseMap.put("affectedRows", result);
+//	    
+//	    return ResponseEntity.ok(responseMap);
+//	}
+	
 	
 }
