@@ -40,4 +40,27 @@ public class OrderService {
 	public List<Map<String, Object>> getItemList(Map<String, Object> map) {
 		return orderMapper.getItemList(map);
 	}
+
+	public Map<String, Object> getClientList(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectClient 성공";
+		
+		try {
+			List<Map<String, Object>> purchaseList = orderMapper.getClientList(requestData);
+			content.put("contents", purchaseList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "getClientList 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
 }

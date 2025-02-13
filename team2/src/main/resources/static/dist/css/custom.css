@@ -66,6 +66,14 @@
 		}
 	}
 	
+	.tui-datetime-input:has(.editable[readonly]){
+		width: 80px!important;
+		
+		#orderDate{
+			width: 80px!important;
+		}
+	}
+	
 	.bootstrap-select:has(.editable[disabled]){
 		.dropdown-toggle{
 			border: 0!important;
@@ -115,10 +123,19 @@
 		th{
 			background: #F4F5F6;
 			font-weight: bold;
+			vertical-align: middle;
 		}
 		
 		.tui-datepicker{
 			z-index: 1060 !important;
 		}
 	}	
+	
+	.custom-text{
+		font-size: 0.8rem;
+			font-weight: bold;
+		div{
+			color: #1c8aeb;
+			}
+	}
 }

@@ -24,4 +24,6 @@ public interface OrderMapper {
 	void updateOrder(Map<String, Object> orderData);
 
 	List<Map<String, Object>> getItemList(Map<String, Object> map);
+
+	List<Map<String, Object>> getClientList(Map<String, Object> requestData);
 }

@@ -19,7 +19,7 @@
                 ORDER_QTY,
                 TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
                 (SELECT ITEM_UNIT FROM ITEM M2 WHERE M2.ITEM_ID = ORDR.ITEM_ID) AS UNIT,
-                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.SALES_REP_ID) AS SALES_REP_ID,
+                (SELECT RESP_NAME FROM CLIENT C WHERE C.CLIENT_ID = ORDR.CUSTOMER_ID) AS SALES_REP_ID,
                 (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.REGIST_BY) AS REGIST_BY,
                 TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
                 REMARKS,
@@ -65,7 +65,7 @@
                 ORDER_QTY,
                 TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
                 (SELECT ITEM_UNIT FROM ITEM M2 WHERE M2.ITEM_ID = ORDR.ITEM_ID) AS UNIT,
-                (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.SALES_REP_ID) AS SALES_REP_ID,
+                (SELECT RESP_NAME FROM CLIENT C WHERE C.CLIENT_ID = ORDR.CUSTOMER_ID) AS SALES_REP_ID,
                 (SELECT NAME FROM MEMBER M1 WHERE M1.MEMBER_ID = ORDR.REGIST_BY) AS REGIST_BY,
                 TO_CHAR(UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
                 REMARKS,
@@ -136,7 +136,8 @@
             ORDER_QTY = #{orderQty},
             ITEM_ID = #{itemId},
             ORDER_PR = #{orderPr},
-            REMARKS = #{remarks}
+            REMARKS = #{remarks},
+            UPDATE_DATE = SYSDATE
         WHERE ORDER_ID = #{orderId}
     </update>
     
@@ -155,4 +156,17 @@
     	FROM ITEM
     </select>
     
+    <!-- clientList -->
+    <select id="getClientList" resultType="map" parameterType="map">
+    	SELECT CLIENT_ID, CLIENT_NAME, CLIENT_TYPE, RESP_NAME, CLIENT_STATUS
+    	FROM CLIENT
+    	WHERE 
+		 	   1 = 1
+		<if test='client_id != null and client_id != ""'>
+		   AND CLIENT_ID = #{client_id}
+		</if>
+		<if test='client_name != null and client_name != ""'>
+		   AND CLIENT_NAME = #{client_name}
+		</if>
+    </select>
 </mapper>

@@ -4,7 +4,8 @@
 			<!-- 모달창 헤더 -->
 			<div class="modal-header">
 				<h4 class="modal-title">수주 상세정보</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
@@ -13,71 +14,84 @@
 			<!-- form -->
 			<form method="post" id="orderDetailTable">
 				<div class="modal-body">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<div class="custom-text d-flex">
+							수주번호 :
+							<div id="orderId" class="ml-1"></div>
+						</div>
+						<div class="custom-text d-flex align-items-center">
+							수주날짜 :
+							<div
+								class="tui-datepicker-input tui-datetime-input tui-has-focus ml-1">
+								<input type="text" id="orderDate" class="editable"
+									aria-label="Date-Time"> <span class="tui-ico-date"></span>
+							</div>
+							<div id="orderDate-container" style="margin-top: -1px;"></div>
+
+
+						</div>
+					</div>
 					<table class="table">
 						<tbody>
 							<tr>
-								<th>수주일자</th>
-								<td>
-									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-									    <input type="text" id="orderDate" class="editable" aria-label="Date-Time">
-									    <span class="tui-ico-date"></span>
-									</div>
-									<div id="orderDate-container" style="margin-top: -1px;"></div>
-								</td>
-
-								<th>수주번호</th>
-								<td><input type="text" id="orderId" class="form-control" readonly></td>
-								<th>등록자</th>
-								<td><input type="text" id="registBy" class="form-control" readonly></td>
-							</tr>
-							<tr>
 								<th>거래처</th>
-								<td>
-									<select id="customerId" name="customerId" class="selectpicker form-control editable"
-										data-live-search="true"></select>
-								</td>
+								<td><select id="customerId" name="customerId"
+									class="selectpicker form-control editable"
+									data-live-search="true"></select></td>
 								<th>담당자</th>
-								<td><input type="text" id="salesRepId" class="form-control editable" readonly></td>
+								<td><input type="text" id="salesRepId" class="form-control"
+									readonly></td>
 								<th>납품예정일</th>
 								<td>
-									<div class="tui-datepicker-input tui-datetime-input tui-has-focus">
-										<input type="text" id="deliveryDate" class="editable" aria-label="Date-Time" />
-										<span class="tui-ico-date"></span>
+									<div
+										class="tui-datepicker-input tui-datetime-input tui-has-focus">
+										<input type="text" id="deliveryDate" class="editable"
+											aria-label="Date-Time" /> <span class="tui-ico-date"></span>
 									</div>
 									<div id="deliveryDate-container" style="margin-top: -1px;"></div>
 								</td>
 							</tr>
+					
 							<tr>
 								<th>품목명</th>
-								<td>
-									<select id="itemId" name="itemId" class="selectpicker form-control editable"
-																			data-live-search="true"></select>
-								</td>
+								<td><select id="itemId" name="itemId"
+									class="selectpicker form-control editable"
+									data-live-search="true"></select></td>
 								<th>단위</th>
-								<td><input type="text" id="unit" class="form-control" readonly></td>
+								<td><input type="text" id="unit" class="form-control"
+									readonly></td>
 								<th>수량</th>
-								<td><input type="number" id="orderQty" class="form-control editable" readonly></td>
+								<td><input type="number" id="orderQty"
+									class="form-control editable" readonly></td>
 							</tr>
 							<tr>
 								<th>공급가</th>
-								<td><input type="text" id="orderPrice" class="form-control" readonly></td>
+								<td><input type="text" id="orderPrice" class="form-control"
+									readonly></td>
 								<th>부가세</th>
-								<td><input type="text" id="tax" class="form-control" readonly></td>
+								<td><input type="text" id="tax" class="form-control"
+									readonly></td>
 								<th>합계</th>
-								<td><input type="text" id="orderSum" class="form-control" readonly></td>
+								<td><input type="text" id="orderSum" class="form-control"
+									readonly></td>
 							</tr>
 							<tr>
 								<th>비고</th>
-								<td colspan="5"><input type="text" id="remarks" class="form-control editable" readonly>
-								</td>
+								<td colspan="5"><input type="text" id="remarks"
+									class="form-control editable" readonly></td>
 							</tr>
 						</tbody>
 					</table>
+					<div  class="custom-text d-flex justify-content-end"> 등록자 : 
+					<div id="registBy" class="ml-1"></div>
+					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">닫기</button>
 					<button type="button" class="btn btn-primary" id="btn_edit">수정</button>
-					<button type="button" class="btn btn-success" id="btn_save" style="display: none;">저장</button>
+					<button type="button" class="btn btn-success" id="btn_save"
+						style="display: none;">저장</button>
 				</div>
 			</form>
 		</div>

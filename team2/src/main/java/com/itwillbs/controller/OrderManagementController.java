@@ -101,6 +101,13 @@ public class OrderManagementController {
 		System.out.println("품목 리스트" + map);
 		return orderService.getItemList(map);
 	}
+    
+	@GetMapping("/getCltList")
+	@ResponseBody
+	public Map<String, Object> getClientList(@RequestParam Map<String, Object> requestData) {
+		System.out.println("거래처 리스트" + requestData);
+		return orderService.getClientList(requestData);
+	}
 
 }
 
