@@ -198,13 +198,16 @@
     
     <select id="selectRouting" resultType="map">
 		SELECT 
-			   ROUTING_ID
-			 , NAME
-			 , USE_YN
-			 , ITEM_ID
-			 , NOTE
-			 , PROCESS_QUANTITY
-		  FROM ROUTING
+			   r.ROUTING_ID			AS ROUTING_ID
+			 , r.NAME				AS  NAME
+			 , r.USE_YN				AS USE_YN
+			 , r.ITEM_ID			AS ITEM_ID
+			 , i.ITEM_NAME 			AS ITEM_NAME
+			 , r.NOTE				AS NOTE
+			 , r.PROCESS_QUANTITY	AS PROCESS_QUANTITY
+		  FROM ROUTING r
+			   INNER JOIN ITEM i
+					   ON r.ITEM_ID = i.ITEM_ID 
     </select>
     
     <select id="selectItem" resultType="map">

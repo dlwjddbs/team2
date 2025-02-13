@@ -38,6 +38,7 @@
 <!--		<nav th:replace="~{includes/modals/workcenterCodeAdd :: workcenterCodeAdd}"></nav>-->
 		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
 		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
+		<nav th:replace="~{includes/modals/workcenterRoutingAdd :: workcenterRoutingAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -266,9 +267,15 @@
 							$("#managerColumn").val(column);
 							
 							$('#workcenterManagerAdd').modal(); 
+							
 							break;
-							// TODO
-	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
+						case 'ROUTING_ID': 
+							$("#routingRow").val(row);
+							$("#routingColumn").val(column);
+							
+							$('#workcenterRoutingAdd').modal(); 
+							
+							break;
 					}
 			    });
 			}
