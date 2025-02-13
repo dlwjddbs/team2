@@ -74,7 +74,7 @@ public class PurchaseController {
 		        } else { // 마감
 		        	data.put("PO_STATUS", "Y");
 		        }
-		        
+		        System.out.println("dataaaaa " + data);
 		        if ("insert".equals(rowType)) {
 		            insertList.add(data);
 		        } else if ("update".equals(rowType)) {
@@ -135,18 +135,18 @@ public class PurchaseController {
 		        }
 		        
 		        if ("insert".equals(rowType)) {
-		            insertList.add(data);
+		            result += purchaseService.insertDetail(data);
 		        } else if ("update".equals(rowType)) {
-		            updateList.add(data);
+		        	result += purchaseService.updateDetail(data);
 		        } else if ("delete".equals(rowType)) {
-		            deleteList.add(data);
+		        	result += purchaseService.deleteDetail(data);
 		        }
 		    }
 
-		    result += purchaseService.insertDetail(insertList);
-//		    result += purchaseService.updateDetail(updateList);
-		    result += purchaseService.updateDetailAndStatus(updateList);
-		    result += purchaseService.deleteDetail(deleteList);
+		    
+		    
+//		    result += purchaseService.updateDetailAndStatus(updateList);
+		    
 		    
 		    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
 		 // JSON 형태로 응답 반환 (undefined 방지)

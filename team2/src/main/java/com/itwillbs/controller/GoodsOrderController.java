@@ -167,20 +167,28 @@ public class GoodsOrderController {
 	        String status = String.valueOf(data.get("GO_STATUS")).trim(); // 발주 상태
 	        // 파라미터로 가져오는 상태값에 따라 공통코드에 맞춰서 PO_STATUS 값 변경
 	        if(status.equals("미결")) { // 미결
-	        	data.put("PO_STATUS", "N");
+	        	data.put("GO_STATUS", "N");
 	        } else if(status.equals("진행중")) { // 진행중
-	        	data.put("PO_STATUS", "I");
+	        	data.put("GO_STATUS", "I");
 	        } else { // 마감
-	        	data.put("PO_STATUS", "Y");
+	        	data.put("GO_STATUS", "Y");
 	        }
-	        
-	        if ("insert".equals(rowType)) {
-	            insertList.add(data);
-	        }
+
 	    }
+	    
+	 // 1️ 입고 (`INSERT`) 실행
+	        result += goodsOrderService.insertGoDetail(dataList);
+
+	    // 2️ 발주 상세 (`UPDATE PO_DETAIL`) 실행
+	        result += goodsOrderService.updatePoDetail(dataList);
+
+	    // 3️ 발주 상태 (`UPDATE PURCHASE_ORDER`) 실행
+	        result += goodsOrderService.updatePurchaseOrderStatus(dataList);
+	    
+	 // 4 입고 상태 (`updateGoodsOrderStatus`) 실행
+	        result += goodsOrderService.updateGoodsOrderStatus(dataList);
 	        
-	        // 필요한 경우, 기타 데이터 전처리 수행
-	        result += goodsOrderService.insertGoDetail(insertList);
+	    System.out.println(dataList.toString());
 	        
 	    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
 	    

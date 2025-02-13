@@ -28,5 +28,5 @@ public interface PurchaseMapper {
 
 	List<Map<String, Object>> getMaterialList(Map<String, Object> requestData);
 
-	void updatePurchaseStatus(Map<String, Object> params);
+//	void updatePurchaseStatus(Map<String, Object> params);
 }
