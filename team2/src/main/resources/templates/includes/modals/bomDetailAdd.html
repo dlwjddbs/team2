@@ -29,27 +29,19 @@
 								<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 									<div class="d-flex">
 										<div class="d-flex">
-											<label class="col-form-label mr-3">사용여부</label> 
-											<select class="appointGubun" id="use_yn" name="appointGubun" style="min-width: 120px">
-												<option value="" selected>전체</option>
-												<option value="Y">사용</option>
-												<option value="N">미사용</option>
-											</select>
-										</div>
-										<div class="d-flex ml-4">
-											<label for="" class="col-form-label mr-3" style="min-width: 120px;">설비코드/설비명</label>
+											<label class="col-form-label mr-3" style="min-width: 150px;">BOM 코드 / 품목 코드</label> 
 											<input type="text" class="form-control float-right" id="bomDetailSearchKeyword">
 										</div>
 									</div>
 									<div class="d-flex">
-										<button type="button" class="btn btn-primary" id="btnbomDetailSearch">조회</button>
+										<button type="button" class="btn btn-primary" id="btnBomDetailSearch">조회</button>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-8">
-								<span style="padding-left: 20px;">설비 목록</span>
+								<span style="padding-left: 20px;">BOM 상세 목록</span>
 								<div class="card-body" id="bomDetailModalGrid" style="padding-top: 10px;">
 									<!-- Toast Grid Ajax -->
 								</div>
@@ -83,15 +75,13 @@
 	let selectedBomDetailList = [];
 	let bomDetailModalSelectedGrid = null;
 	const bomDetailSelected_columns = [
-	    {header: '설비 코드', name: 'EQUIPMENT_ID', align: 'center', editor: null},
+	    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null},
 	    {header: '설비명', name: 'EQUIPMENT_NAME', align: 'left', editor: null},
 	];
-	let bomDetailParam = {use_yn: '', searchKeyword: ''};
+	let bomDetailParam = {searchKeyword: ''};
 	
 	$('#bomDetailAdd').on('shown.bs.modal', function () {
 		selectedBomDetailList.length = 0;
-		$("#use_yn").val("").attr("selected", "selected");
-		bomDetailParam.use_yn = '';
 		bomDetailParam.searchKeyword = '';
         
 		bomDetailModalInit();
@@ -99,7 +89,7 @@
 	
 	function bomDetailModalInit() {
 		// 파라미터 설정
-		bomDetailDataSource.api.readData.initParams.workcenter_id = '';
+		bomDetailDataSource.api.readData.initParams.bom_id = '';
 		
 		if (bomDetailModalGrid) {
 			bomDetailModalGrid.destroy(); // 기존 그리드 제거
@@ -127,22 +117,21 @@
 		            if (bomDetailModalGrid.getData().length > 0) {
 		    	    	const bomDetailGridNewRows = bomDetailGrid.getData().filter(row => row.isNew);
 		    		    const selectedRowKeys = bomDetailModalGrid.getData()
-		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.EQUIPMENT_ID == row.EQUIPMENT_ID))
+		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.BOM_DETAIL_ID == row.BOM_DETAIL_ID))
 		    			    .map(row => row.rowKey);
 		    		    
-		    		    // 설비 그리드에서 새로 추가된 행 가져와서 설비모달에 선택값 그대로 적용함.
+		    		    // BOM 상세 그리드에서 새로 추가된 행 가져와서 BOM 상세 모달에 선택값 그대로 적용함.
 		    		    selectedRowKeys.forEach(function(key) {
 			    		    bomDetailModalGrid.addRowClassName(key, 'selected-row');
 		    		    });
 		    		    
-		    		    // 설비 그리드에서 새로 추가된 행 selectedBomDetailList 초기값 설정
+		    		    // BOM 상세 그리드에서 새로 추가된 행 selectedBomDetailList 초기값 설정
 		    		    bomDetailGridNewRows.forEach(function(row) {
 		    		    	const mapRowData = {
-		    		        	"EQUIPMENT_ID": row.EQUIPMENT_ID,
-		    		        	"EQUIPMENT_NAME": row.EQUIPMENT_NAME,
-		    		        	"EQUIPMENT_STATUS": row.EQUIPMENT_STATUS,
-		    		        	"EQUIPMENT_NOTE": row.EQUIPMENT_NOTE,
-		    		        	"WORKCENTER_ID": workcenterCurrentSelectedID,
+		    		        	"BOM_DETAIL_ID": row.BOM_DETAIL_ID,
+		    		        	"ITEM_ID": row.ITEM_ID,
+		    		        	"REQUIRED_AMOUNT": row.REQUIRED_AMOUNT,
+		    		        	"BOM_ID": bomCurrentSelectedID,
 		    		            isNew: true
 		    			    };
 		    		    	
@@ -168,24 +157,23 @@
 		    const newRowKey = ev.rowKey;
 		    const isSelectedRow = bomDetailModalGrid.getRowClassName(newRowKey).includes('selected-row');
 		    const rowData = bomDetailModalGrid.getRow(newRowKey);
-		    const bomDetail_id = rowData.EQUIPMENT_ID;
+		    const bomDetail_id = rowData.BOM_DETAIL_ID;
 		    
 		    if (isSelectedRow) {
 		    	bomDetailModalGrid.removeRowClassName(newRowKey, 'selected-row');
-		    	selectedBomDetailList = selectedBomDetailList.filter(item => item.EQUIPMENT_ID != bomDetail_id);
+		    	selectedBomDetailList = selectedBomDetailList.filter(item => item.BOM_DETAIL_ID != bomDetail_id);
 				
 				bomDetailModalSelectedGrid.getData().forEach(row => {
-				    if (bomDetail_id == row.EQUIPMENT_ID) {
+				    if (bomDetail_id == row.BOM_DETAIL_ID) {
 						bomDetailModalSelectedGrid.removeRow(row.rowKey)
 				    }
 				});
 		    } else {
 		    	const mapRowData = {
-		        	"EQUIPMENT_ID": bomDetail_id,
-		        	"EQUIPMENT_NAME": rowData.EQUIPMENT_NAME,
-		        	"EQUIPMENT_STATUS": rowData.EQUIPMENT_STATUS,
-		        	"EQUIPMENT_NOTE": rowData.EQUIPMENT_NOTE,
-		        	"WORKCENTER_ID": workcenterCurrentSelectedID,
+		        	"BOM_DETAIL_ID": bomDetail_id,
+		        	"ITEM_ID": rowData.ITEM_ID,
+		        	"REQUIRED_AMOUNT": rowData.REQUIRED_AMOUNT,
+		        	"BOM_ID": bomCurrentSelectedID,
 		            isNew: true
 			    };
 		    	
@@ -202,12 +190,12 @@
 		    .filter(row => row.isNew)
 		    .map(row => row.rowKey);
 		
-		// 워크센터설비 그리드 기존의 새로 추가된 행 삭제
+		// BOM 상세 그리드 기존의 새로 추가된 행 삭제
 		rowKeysToDelete.forEach(function(key) {
 			bomDetailGrid.removeRow(key);
 		});
 		
-		// 새로 선택된 값 워크센터설비 그리드 행 추가
+		// 새로 선택된 값  BOM 상세 그리드 행 추가
 		selectedBomDetailList.forEach(function(data) {
 			bomDetailGrid.appendRow(data);
 		});
@@ -240,13 +228,13 @@
 			const rowData = bomDetailModalSelectedGrid.getRow(newRowKey);
 			const allData = bomDetailModalSelectedGrid.getData();
 			
-			const bomDetail_id = rowData.EQUIPMENT_ID;
-			selectedBomDetailList = selectedBomDetailList.filter(item => item.EQUIPMENT_ID != BomDetail_id);
+			const bomDetail_id = rowData.BOM_DETAIL_ID;
+			selectedBomDetailList = selectedBomDetailList.filter(item => item.BOM_DETAIL_ID != BomDetail_id);
 			
 			bomDetailModalSelectedGrid.removeRow(newRowKey);
 			
 			bomDetailModalGrid.getData().forEach(row => {
-			    if (bomDetail_id == row.EQUIPMENT_ID) {
+			    if (bomDetail_id == row.BOM_DETAIL_ID) {
 			        bomDetailModalGrid.removeRowClassName(row.rowKey, 'selected-row');
 			    }
 			});
@@ -256,16 +244,16 @@
 	$("#btnBomDetailSearch").on("click", function() {
 		bomDetailParam.searchKeyword = $("#bomDetailSearchKeyword").val();
 		
-		const selectedBomDetailIds = selectedBomDetailList.map(row => row.EQUIPMENT_ID);
+		const selectedBomDetailIds = selectedBomDetailList.map(row => row.BOM_DETAIL_ID);
 		bomDetailModalGrid.readData(1, bomDetailParam, true);
 
 		bomDetailModalGrid.off('onGridUpdated');
 		bomDetailModalGrid.on('onGridUpdated', () => {
 		    const updatedRows = bomDetailModalGrid.getData();
 			
-		    // 기존 선택된 설비 ID가 있는 행에 'selected-row' 클래스 추가
+		    // 기존 선택된 BOM 상세 ID가 있는 행에 'selected-row' 클래스 추가
 		    updatedRows.forEach(row => {
-		        if (selectedBomDetailIds.includes(row.EQUIPMENT_ID)) {
+		        if (selectedBomDetailIds.includes(row.BOM_DETAIL_ID)) {
 		            bomDetailModalGrid.addRowClassName(row.rowKey, 'selected-row');
 		        }
 		    });

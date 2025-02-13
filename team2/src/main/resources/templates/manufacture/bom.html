@@ -242,14 +242,6 @@
 							$('#mesCodeValidate').modal();
 							
 							break;
-						case 'MANAGER_ID':
-							$("#managerRow").val(row);
-							$("#managerColumn").val(column);
-							
-							$('#bomManagerAdd').modal(); 
-							break;
-							// TODO
-	//					case 'ROUTING_ID': $('#categoryAdd').modal(); break;
 					}
 			    });
 			}
@@ -351,7 +343,11 @@
 					
 					// BOM 상세 그리드 생성
 					const bomID = bomGrid.getRow(newRowKey).BOM_ID;
-					bomDetailInit(bomID);
+					// BOM 개수 (테이블에 추가 필요)
+					//const bomCount = bomGrid.getRow(newRowKey).BOM_COUNT;
+					const bomCount = bomGrid.getRow(newRowKey)?.BOM_COUNT || 0;
+
+					bomDetailInit(bomID, bomCount);
 					bomCurrentSelectedID = bomID;
 					$("#btn_group_bomDetail").show();
 			    } else {
@@ -379,7 +375,7 @@
 		        bomGrid.setColumns([
 		        	{header: 'BOM 코드 *', name: 'BOM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '상위 코드 *', name: 'PARENT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '상위 코드', name: 'PARENT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		        ]);
 		    } else {
 		        bomGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
@@ -421,7 +417,7 @@
 		    let updatedRows = bomGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["BOM_ID", "ITEM_ID", "PARENT_ID"];
+		    const requiredFields = ["BOM_ID", "ITEM_ID"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
@@ -468,7 +464,7 @@
 			// 반드시 removeCheckedRows()후에 실행 순서
 			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
 			const ids = bomGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.bom_ID))  // 한글 변환
+				.map(row => encodeURIComponent(row.BOM_ID))  // 한글 변환
 				.join(',');
 			bomDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
@@ -477,7 +473,7 @@
 		});
 		
 		// BOM 상세 코드
-		function bomDetailInit(bom_id) {
+		function bomDetailInit(bom_id, bomCount) {
 			// 파라미터 설정
 			bomDetailDataSource.api.readData.initParams.bom_id = bom_id;
 			
@@ -496,7 +492,11 @@
 		        columns: bomDetail_columns
 		    });
 			
-			$("#btn_group_bomDetail").show();
+			if (bomCount > 0) {
+				$("#btn_group_bomDetail").hide();
+			} else {
+				$("#btn_group_bomDetail").show();
+			}
 
 		    bomDetailGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
@@ -504,11 +504,13 @@
 		}
 		
 		$("#btn_bomDetail_add").on("click", function() {
+			console.log("BOM 상세 저장 버튼 클릭!")
 			bomDetailGrid.request('createData');
 			bomDetailGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
 		$("#btn_bomDetail_modal").on("click", function() {
+			console.log("BOM 상세 모달 열림!")
 			$("#bomDetailAdd").modal();
 		});
 		

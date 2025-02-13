@@ -52,10 +52,10 @@
     
     <select id="selectBomDetail" resultType="map">
 		SELECT 
-			   BOM_DETAIL_ID 	AS BOM_DETAIL_ID
-			 , ITEM_ID 	AS ITEM_ID
-			 , REQUIRED_AMOUNT AS REQUIRED_AMOUNT
-			 , BOM_ID	AS BOM_ID
+			   BOM_DETAIL_ID 					AS BOM_DETAIL_ID
+			 , ITEM_ID							AS ITEM_ID
+			 , REQUIRED_AMOUNT 					AS REQUIRED_AMOUNT
+			 , BOM_ID							AS BOM_ID
 		  FROM BOM_DETAIL
 		 WHERE
 		 	   1 = 1
@@ -69,7 +69,7 @@
 		</choose>
 		<if test='searchKeyword != null and searchKeyword != ""'>
 			AND (BOM_DETAIL_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
-					OR EQUIPMENT_NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+					OR ITEM_ID LIKE concat('%', concat(#{searchKeyword}, '%')))
 		</if>
     </select>
     
