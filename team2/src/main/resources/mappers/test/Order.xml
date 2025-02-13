@@ -125,6 +125,19 @@
         ORDER BY ORDER_ID DESC
     </select>
     
+    <!-- INSERT -->
+	<insert id="insertOrder">
+	    INSERT INTO ORDERS (
+	        ORDER_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
+	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, CREATE_DATE, UPDATE_DATE
+	    )
+	    VALUES (
+	        TO_DATE(#{orderDate}, 'YYYY-MM-DD'), #{customerId}, 
+	        #{salesRepId}, TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'), 
+	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, SYSDATE, SYSDATE
+	    )
+	</insert>
+    
     <!-- UPDATE -->
     <update id="updateOrder">
         UPDATE ORDERS

@@ -12,7 +12,7 @@
 				<img class="img-circle elevation-2" th:src="${userInfo.PROFILE_PIC}" alt="/images/default.jpg">
 			</div>
 			<div class="info">
-				<a th:href="@{/mypage}" class="d-block"><span th:text="${userInfo.NAME}"></span></a>
+				<a th:href="@{/mypage}" class="d-block"><span id="userName" th:text="${userInfo.NAME}"></span></a>
 			</div>
 		</div>
 

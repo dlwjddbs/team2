@@ -62,6 +62,24 @@ public class OrderManagementController {
 
         return orderData;
     }
+    
+    @PostMapping(URL + "/insert")
+    public ResponseEntity<Map<String, Object>> insertOrder(@RequestBody Map<String, Object> orderData) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // insertOrder 메서드를 호출하여 새 수주 정보를 DB에 추가
+            orderService.insertOrder(orderData);  
+            response.put("success", true);
+            response.put("message", "수주정보가 성공적으로 등록되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "수주정보 등록 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
+        }
+    }
+
 
     @PostMapping(URL + "/update")
     public ResponseEntity<Map<String, Object>> updateOrder(@RequestBody Map<String, Object> orderData) {

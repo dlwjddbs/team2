@@ -222,6 +222,9 @@
 							scrollX: true,
 							scrollY: true,
 							rowHeaders: ['checkbox'],
+							evenRow: {
+				                background: '#fee'
+				            },				            
 							columnOptions: {
 								resizable: true,
 							},
@@ -307,12 +310,14 @@
 						document.getElementById('deliveryDate').value = order.DELIVERY_DATE;
 						document.getElementById('unit').value = order.UNIT;
 						document.getElementById('orderQty').value = order.ORDER_QTY;
-						/* document.getElementById('itemPrice').value = order.ITEM_PR.toLocaleString() + ' 원'; */
 						document.getElementById('orderPrice').value = order.ORDER_PR.toLocaleString() + ' 원';
 						document.getElementById('tax').value = order.TAX.toLocaleString() + ' 원';
 						document.getElementById('orderSum').value = order.ORDER_SUM.toLocaleString() + ' 원';
 						document.getElementById('remarks').value = order.REMARKS ? order.REMARKS : ' ';
 
+						// 팝업 타이틀 수정
+					    document.querySelector('#orderDetailModal .modal-title').textContent = '수주 상세정보';
+						
 						// 거래처 ID 값 설정
 						const customerId = order.CUSTOMER_ID.trim();
 						const itemId = order.ITEM_ID.trim();
@@ -330,8 +335,8 @@
 						);
 
 						// selectpicker 갱신
-						$('#customerId').selectpicker('refresh');  // selectpicker 스타일 갱신
-						$('#itemId').selectpicker('refresh');  // selectpicker 스타일 갱신
+						$('#customerId').selectpicker('refresh').selectpicker('option', 'noneSelectedText', '선택하세요'); 
+						$('#itemId').selectpicker('refresh').selectpicker('option', 'noneSelectedText', '선택하세요');
 
 						// 모달 창 표시
 						$('#orderDetailModal').modal('show');
@@ -350,11 +355,12 @@
 		document.getElementById('btn_edit').addEventListener('click', function () {
 			setReadOnly(false);
 			document.getElementById('btn_edit').style.display = 'none'; // 수정 버튼 숨기기
-			document.getElementById('btn_save').style.display = 'inline'; // 저장 버튼 표시
+			document.getElementById('btn_update').style.display = 'inline'; // 저장 버튼 표시
+			document.getElementById('btn_save').style.display = 'none'; // 저장 버튼 표시
 		});
 
 		// 저장 버튼 클릭 시 서버에 수정된 데이터 전송
-		document.getElementById('btn_save').addEventListener('click', function () {
+		document.getElementById('btn_update').addEventListener('click', function () {
 		    const orderData = {
 		        orderDate: document.getElementById('orderDate').value,
 		        orderId: document.getElementById('orderId').textContent,
@@ -379,9 +385,10 @@
 		    })
 		        .then(response => {
 		            if (response.ok) {
-		                alert('수정된 정보가 저장되었습니다.');
+		                alert('수주정보가 저장되었습니다.');
 		                setReadOnly(true);
 		                document.getElementById('btn_edit').style.display = 'inline';
+		                document.getElementById('btn_update').style.display = 'none';
 		                document.getElementById('btn_save').style.display = 'none';
 		            } else {
 		                alert('저장 실패');
@@ -405,9 +412,29 @@
 
 		// modal 초기화
 		$('#orderDetailModal').on('hidden.bs.modal', function () {
+			
+			document.getElementById('orderId').textContent = '';  // 주문 ID 초기화
+		    document.getElementById('orderDate').value = '';  // 수주 날짜 초기화
+		    document.getElementById('customerId').value = '';  // 거래처 초기화
+		    document.getElementById('salesRepId').value = '';  // 담당자 초기화
+		    document.getElementById('deliveryDate').value = '';  // 납품 예정일 초기화
+		    document.getElementById('itemId').value = '';  // 품목명 초기화
+		    document.getElementById('unit').value = '';  // 단위 초기화
+		    document.getElementById('orderQty').value = '';  // 수량 초기화
+		    document.getElementById('orderPrice').value = '';  // 공급가 초기화
+		    document.getElementById('tax').value = '';  // 부가세 초기화
+		    document.getElementById('orderSum').value = '';  // 합계 초기화
+		    document.getElementById('remarks').value = '';  // 비고 초기화
+		    document.getElementById('registBy').textContent = '';  // 등록자 초기화						
+		    
+		    // selectpicker 갱신
+		    $('#customerId').selectpicker('refresh');
+		    $('#itemId').selectpicker('refresh');
+		    
 			// 수정 버튼 표시, 저장 버튼 숨기기
 			document.getElementById('btn_edit').style.display = 'inline';
 			document.getElementById('btn_save').style.display = 'none';
+			document.getElementById('btn_update').style.display = 'none';
 
 			// 모든 input을 읽기 전용으로 설정
 			setReadOnly(true);
@@ -458,7 +485,10 @@
 
 		            // 품목 리스트와 가격을 Map 형태로 구성
 		            const itemPriceList = data.reduce((acc, item) => {
-		                acc[item.ITEM_ID] = item.ITEM_PRICE;  // 품목 ID를 키로, 가격을 값으로 매핑
+		            	 acc[item.ITEM_ID] = {
+		                         price: item.ITEM_PRICE,  // 품목 ID를 키로, 가격을 값으로 매핑
+		                         unit: item.UNIT          // 품목 ID를 키로, 단위를 값으로 매핑
+		                     };
 		                return acc;
 		            }, {});
 
@@ -469,37 +499,49 @@
 		            // 품목명이 변경될 때마다 가격 업데이트
 		            document.getElementById('itemId').addEventListener('change', function() {
 		                const selectedItemId = this.value;  // 선택된 품목 ID
-		                const selectedItemPrice = itemPriceList[selectedItemId];  // 해당 품목의 가격을 가져옴
+		                const selectedItem = itemPriceList[selectedItemId];  // 해당 품목의 가격과 단위
 
 		                // 선택된 품목 가격이 존재하면 공급가 업데이트
-		                if (selectedItemPrice !== undefined) {
-		                	const orderQty = document.getElementById('orderQty').value;
-		                	const tax = (selectedItemPrice * 0.1) * orderQty;
-		                	const orderSum = (selectedItemPrice * orderQty) + tax;
-		                	
-		                    document.getElementById('orderPrice').value = (selectedItemPrice * orderQty).toLocaleString() + ' 원';
-		                    document.getElementById('tax').value = tax.toLocaleString() + ' 원';
-		                    document.getElementById('orderSum').value = orderSum.toLocaleString() + ' 원';
+						 if (selectedItem) {
+		                    const selectedItemPrice = selectedItem.price;  // 품목의 가격
+		                    const selectedItemUnit = selectedItem.unit;    // 품목의 단위
+		
+		                    console.log(selectedItemPrice, 'selectedItemPrice');
+		
+		                    // 선택된 품목 가격이 존재하면 공급가 업데이트
+		                    if (selectedItemPrice !== undefined) {
+		                        const orderQty = document.getElementById('orderQty').value;
+		                        const tax = (selectedItemPrice * 0.1) * orderQty;
+		                        const orderSum = (selectedItemPrice * orderQty) + tax;
+		
+		                        document.getElementById('orderPrice').value = (selectedItemPrice * orderQty).toLocaleString() + ' 원';
+		                        document.getElementById('tax').value = tax.toLocaleString() + ' 원';
+		                        document.getElementById('orderSum').value = orderSum.toLocaleString() + ' 원';
+		                        document.getElementById('unit').value = selectedItemUnit;  // 단위 설정
+		                    }
 		                    
 		                } else {
 		                    // 품목 가격이 없으면 공급가를 0으로 설정
 		                    document.getElementById('orderPrice').value = '0';
 		                    document.getElementById('tax').value = '0';
 		                    document.getElementById('orderSum').value = '0';
+		                    document.getElementById('unit').value = '';
 		                }
 		            });
 		            
-		         // 수량(orderQty)이 변경될 때마다 가격 업데이트
+		            // 수량(orderQty)이 변경될 때마다 가격 업데이트
 		            document.getElementById('orderQty').addEventListener('change', function() {
 		                const orderQty = this.value;  // 변경된 수량
 		                const selectedItemId = document.getElementById('itemId').value;  // 선택된 품목 ID
-		                const selectedItemPrice = itemPriceList[selectedItemId];  // 해당 품목의 가격을 가져옴
+		                const selectedItem = itemPriceList[selectedItemId];  // 해당 품목의 가격과 단위를 가져옴
 
-		                // 품목 가격이 존재하면 공급가와 세금 및 총 금액을 다시 계산
-		                if (selectedItemPrice !== undefined) {
+		                if (selectedItem) {
+		                    const selectedItemPrice = selectedItem.price;  // 가격
+		                    const selectedItemUnit = selectedItem.unit;    // 단위
+
 		                    const tax = (selectedItemPrice * 0.1) * orderQty;
 		                    const orderSum = (selectedItemPrice * orderQty) + tax;
-		                    
+
 		                    document.getElementById('orderPrice').value = (selectedItemPrice * orderQty).toLocaleString() + ' 원';
 		                    document.getElementById('tax').value = tax.toLocaleString() + ' 원';
 		                    document.getElementById('orderSum').value = orderSum.toLocaleString() + ' 원';
@@ -523,7 +565,7 @@
 
 			// 옵션 생성
 			const options = [
-				`<option value="all">전체</option>`,  // 전체 옵션 추가
+				`<option value="all" ${!data.some(item => item.ORDER_ID) ? 'selected' : ''} disabled>전체</option>`,  // 전체 옵션 추가
 				...data.map(item => {
 					return `<option value="${item.CLIENT_ID || item.ITEM_ID}">${item.CLIENT_NAME || item.ITEM_NAME}</option>`;
 				})
@@ -531,7 +573,11 @@
 
 			selectElement.innerHTML = options;  // 옵션을 SelectBox에 삽입
 
-			$(selectElement).selectpicker('refresh');  // selectpicker 새로고침
+			$(selectElement).selectpicker('destroy');  // selectpicker 새로고침
+			$(selectElement).selectpicker({
+		        noneSelectedText: '선택하세요'
+		    }); 
+			
 		}
 
 		//dateRange
@@ -584,8 +630,99 @@
 
 		// add btn
 		document.getElementById('btn_add').addEventListener('click', () => {
-			$('#orderDetailModal').modal('show');
-		})
+		    // 입력 필드를 초기화
+		    const today = new Date();
+		    const year = today.getFullYear();
+		    const month = String(today.getMonth() + 1).padStart(2, '0');
+		    const day = String(today.getDate()).padStart(2, '0');
+		    const formattedDate = `${year}-${month}-${day}`;
+		    const userName = document.getElementById('userName').textContent;
+
+		    document.getElementById('orderDate').value = formattedDate;  // 오늘 날짜로 설정
+		    document.getElementById('orderId').textContent = '';  // 주문 ID 초기화
+		    document.getElementById('customerId').value = '';  // 거래처 초기화
+		    document.getElementById('salesRepId').value = '';  // 담당자 초기화
+		    document.getElementById('deliveryDate').value = '';  // 납품 예정일 초기화
+		    document.getElementById('itemId').value = '';  // 품목명 초기화
+		    document.getElementById('unit').value = '';  // 단위 초기화
+		    document.getElementById('orderQty').value = '';  // 수량 초기화
+		    document.getElementById('orderPrice').value = '';  // 공급가 초기화
+		    document.getElementById('tax').value = '';  // 부가세 초기화
+		    document.getElementById('orderSum').value = '';  // 합계 초기화
+		    document.getElementById('remarks').value = '';  // 비고 초기화
+		    document.getElementById('registBy').textContent = userName;  // 등록자 초기화
+
+		    // 팝업 타이틀 수정
+		    document.querySelector('#orderDetailModal .modal-title').textContent = '수주 등록';
+		  
+		    // 수정 버튼 클릭 시 입력 모드로 변경
+		    setReadOnly(false);
+		    
+			// selectpicker 갱신
+		    $('#customerId').selectpicker('destroy'); 
+		    $('#customerId').selectpicker({
+		        noneSelectedText: '선택하세요'
+		    });  
+
+		    $('#itemId').selectpicker('destroy'); 
+		    $('#itemId').selectpicker({
+		        noneSelectedText: '선택하세요'
+		    }); 
+
+		    
+		    document.getElementById('btn_edit').style.display = 'none'; // 수정 버튼 숨기기
+		    document.getElementById('btn_save').style.display = 'inline'; // 저장 버튼 표시
+		    document.getElementById('btn_update').style.display = 'none'; // 저장 버튼 표시
+		    
+
+		    // 모달 표시
+		    $('#orderDetailModal').modal('show');
+		});
+
+		
+		// save btn
+		document.getElementById('btn_save').addEventListener('click', () => {
+		    // orderData 객체 정의
+		    const orderData = {
+		        orderDate: document.getElementById('orderDate').value,
+		        orderId: document.getElementById('orderId').textContent,  // 새로운 수주 ID가 생성되어야 합니다.
+		        customerId: document.getElementById('customerId').value,
+		        salesRepId: document.getElementById('salesRepId').value,
+		        deliveryDate: document.getElementById('deliveryDate').value,
+		        itemId: document.getElementById('itemId').value,
+		        orderQty: document.getElementById('orderQty').value,
+		        orderPr: document.getElementById('orderSum').value.replace(/[^0-9.-]+/g, ''),
+		        remarks: document.getElementById('remarks').value,
+		        remarks: document.getElementById('registBy').textContent,
+		    };
+
+		    // 전송할 데이터 확인
+		    console.log(orderData); 
+
+		    fetch(`${url}/insert`, {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json',
+		        },
+		        body: JSON.stringify(orderData)
+		    })
+		    .then(response => {
+		        if (response.ok) {
+		            alert('수주정보가 저장되었습니다.');
+		            setReadOnly(true);
+		            document.getElementById('btn_edit').style.display = 'inline';
+		            document.getElementById('btn_save').style.display = 'none';
+		            document.getElementById('btn_update').style.display = 'none';
+		        } else {
+		            alert('저장 실패');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        alert('서버와의 통신에 실패했습니다.');
+		    });
+		});
+
 
 		// delete btn
 		document.getElementById('btn_delete').addEventListener('click', () => {
