@@ -55,12 +55,17 @@ public class WarehouseRestController {
 		return warehouseService.selectLocation(requestData);
 	}
 	
-	@PostMapping(location_url)
+//	@PostMapping(location_url)
+//	public Map<String, Object> addLocation(@RequestBody Map<String, Object> requestData) {
+//	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+//		
+//        return warehouseService.addLocation(createdRows);
+//	}
+	
+	@PutMapping(location_url)
 	public Map<String, Object> addLocation(@RequestBody Map<String, Object> requestData) {
-	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
-        return warehouseService.addLocation(createdRows);
-	}
+		return warehouseService.addLocation(requestData);
+	}	
 	
 	@DeleteMapping(location_url)
 	public Map<String, Object> deleteLocation(@RequestHeader("X-Delete-IDs") String encodedIds) {

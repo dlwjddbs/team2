@@ -168,8 +168,9 @@
 		const locationUrl = '/warehouse/location';
 		const locationDataSource = {
 			api: {
-				createData: {url: locationUrl, method: 'POST'},
+				// createData: {url: locationUrl, method: 'POST'},
 			    readData: {url: locationUrl, method: 'GET', initParams: { warehouse_id: '' }},
+				modifyData: { url: locationUrl, method: 'PUT' },
 			    deleteData: {url: locationUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
@@ -179,8 +180,10 @@
 		const location_columns = [
 		    {header: '구역 코드', name: 'LOCATION_ID', align: 'center', editor: null},
 		    {header: '구역명', name: 'LOCATION_NAME', align: 'left', editor: null},
+		    {header: '자재 코드', name: 'PRODUCT_ID', align: 'left', editor: null},
 		    {header: '정렬', name: 'LOCATION_ORDER', align: 'left', editor: null},
 		    {header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'left', editor: null},
+		    {header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'left', editor: null},
 			{
 			    header: '사용여부', 
 			    name: 'USE_YN', 
@@ -583,9 +586,9 @@
 		        return;
 			}
 			
-			whseGrid.request('modifyData');
+			whseGrid.request('createData');
 			whseGrid.readData(1, null, true);  // 그리드 새로고침 
-			whseGrid.setColumns(whse_columns);  // 수정모드 해제 (새로 렌더링)
+			//whseGrid.setColumns(whse_columns);  // 수정모드 해제 (새로 렌더링)
 			
 			whseIsEditModeEnabled = false;
 	    	$("#btn_whse_add_row").hide();
@@ -641,9 +644,10 @@
 		        {
 		            "LOCATION_ID": '',
 		            "LOCATION_NAME": '',
-		            "MATERIAL_ID": '',
+		            "PRODUCT_ID": '',
 		            "LOCATION_ORDER": '',
 		            "CURRENT_QUANTITY": '',
+		            "RESERVED_QUANTITY": '',
 		            "USE_YN": 'Y',
 		            "DESCRIPTION": '',
 		            isNew: true
@@ -657,8 +661,10 @@
 		        locationGrid.setColumns([
 		            { header: '구역 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
 		            { header: '구역명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '자재 코드 *', name: 'PRODUCT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            { header: '수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {
 		                header: '사용여부 *',
 		                name: 'USE_YN',
@@ -676,21 +682,38 @@
 		    }
 		});
 
+		// $("#btn_location_add").on("click", function() {
+			//	locationGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+				
+			  //  let createdRows = locationGrid.getModifiedRows().createdRows;
+			    
+			    // 필수 입력 컬럼
+			  //  const requiredFields = ["LOCATION_ID", "LOCATION_NAME", "PRODUCT_ID", "USE_YN"];
 
-
-		$("#btn_location_delete").on("click", function() {
-			locationGrid.removeCheckedRows();
-			
-			// 반드시 removeCheckedRows()후에 실행 순서
-			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = locationGrid.getModifiedRows().deletedRows
-				.map(row => encodeURIComponent(row.LOCATION_ID))  // 한글 변환
-				.join(',');
-			locationDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
-			
-			locationGrid.request('deleteData');
+			   // let validCreatedRows = createdRows.filter(row =>
+			     //   requiredFields.every(field => 
+			       // 	row[field] && row[field].trim() !== ''
+			       // )
+			  //  );
+			    
+		//		if (createdRows.length > 0) {
+			//		if ((validCreatedRows.length == 0)
+				//		|| (validCreatedRows.length != createdRows.length)) {
+					//	alert("필수값을 모두 입력해주세요.");
+				    //    return;
+			//		}
+		//		}
+					
+			//	locationGrid.request('modifyData');
+			//	locationGrid.readData(1, null, true);  // 그리드 새로고침 
+				
+		//	});
+		
+		$("#btn_location_add").on("click", function() {
+			locationGrid.request('createData');
 			locationGrid.reloadData();  // 실패시 테이블 리로드
 		});
+		
 	</script>
 </body>
 </html>

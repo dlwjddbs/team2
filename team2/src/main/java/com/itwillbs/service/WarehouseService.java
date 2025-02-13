@@ -150,7 +150,7 @@ public class WarehouseService {
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "selectEquipment 성공";
+		String message = "selectLocation 성공";
 		
 		try {
 			List<Map<String, Object>> locationList = warehouseMapper.selectLocation(requestData);
@@ -158,7 +158,7 @@ public class WarehouseService {
 			resultMap.put("data", content);
 		} catch (Exception e) {
 			result = false;
-			message = "selectEquipment 실패";
+			message = "selectLocation 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -167,16 +167,41 @@ public class WarehouseService {
 		return resultMap;
 	}
 
-	public Map<String, Object> addLocation(List<Map<String, Object>> createdRows) {
+//	public Map<String, Object> addLocation(List<Map<String, Object>> createdRows) {
+//		Map<String, Object> resultMap = new HashMap<>();
+//		Boolean result = true;
+//		String message = "addLocation 성공";
+//		
+//		try {
+//			warehouseMapper.addLocation(createdRows);
+//		} catch (Exception e) {
+//			result = false;
+//			message = "addLocation 실패";
+//		}
+//		
+//		resultMap.put("result", result);
+//		resultMap.put("message", message);
+//		
+//		return resultMap;
+//	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> addLocation(Map<String, Object> requestData) {
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
 		Map<String, Object> resultMap = new HashMap<>();
+		
 		Boolean result = true;
-		String message = "addLocation 성공";
+		String message = "modifyToastTest 성공";
 		
 		try {
-			warehouseMapper.addLocation(createdRows);
+			if (createdRows.size() > 0) {
+				warehouseMapper.insertLocation(createdRows);
+			}
+			
 		} catch (Exception e) {
 			result = false;
-			message = "addLocation 실패";
+			message = "modifyToastTest 실패";
 		}
 		
 		resultMap.put("result", result);

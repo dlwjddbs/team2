@@ -30,9 +30,9 @@
 								<input type="text" id="locationCode" class="form-control"
 									placeholder="코드를 입력하세요">
 								<div class="input-group-append">
-									<button class="btn btn-primary" id="checkDuplicateCodeBtn"
+									<button class="btn btn-primary" id="checkDuplicateLocCodeBtn"
 										type="button">중복확인</button>
-									<button class="btn btn-primary" id="modifyCodeBtn"
+									<button class="btn btn-primary" id="modifyLocCodeBtn"
 										type="button" style="display: none;">수정</button>
 								</div>
 							</div>
@@ -46,7 +46,7 @@
 			<div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
-					<button type="submit" class="btn btn-primary" id="saveCode"
+					<button type="submit" class="btn btn-primary" id="saveLocCode"
 						disabled>입력</button>
 				</div>
 			</div>
@@ -57,9 +57,8 @@
 <!-- /.모달창 -->
 
 <script th:fragment="locationCodeAdd" th:inline="javascript">
-	const dangerText = "form-text text-danger mt-1";
 	
-	$("#checkDuplicateCodeBtn").on("click", function() {
+	$("#checkDuplicateLocCodeBtn").on("click", function() {
 		const locationCode = $("#locationCode").val().trim();
 		
 		if (locationCode == null || locationCode == '') {
@@ -76,14 +75,14 @@
 		if (filteredValues.includes(locationCode)) {
 			validationlocationCodeMessage.textContent = '신규 행에서의 중복입니다.';
 			validationlocationCodeMessage.className = dangerText
-			$("#saveCode").attr("disabled", true);
+			$("#saveLocCode").attr("disabled", true);
 			
 			return;
 		}
 		
 		$.ajax({
             type : "POST",
-            url : "/warehouse/checkDuplicatelocationCode",
+            url : "/warehouse/checkDuplicateLocationCode",
             data : {
             	LOCATION_ID : locationCode
 			},
@@ -92,23 +91,23 @@
 					validationlocationCodeMessage.textContent = res.result;
 					validationlocationCodeMessage.className = "form-text text-success mt-1";
 					$("#locationCode").attr("disabled", true);
-					$("#saveCode").attr("disabled", false);
+					$("#saveLocCode").attr("disabled", false);
 					
-					$("#checkDuplicateCodeBtn").hide();
-					$("#modifyCodeBtn").show();
+					$("#checkDuplicateLocCodeBtn").hide();
+					$("#modifyLocCodeBtn").show();
 				} else {
 					validationlocationCodeMessage.textContent = res.result;
 					validationlocationCodeMessage.className = dangerText
-					$("#saveCode").attr("disabled", true);
+					$("#saveLocCode").attr("disabled", true);
 				}
             },
             error : function(e){
-                console.log("checkDuplicatelocationCode() ajax 실패");
+                console.log("checkDuplicateLocationCode() ajax 실패");
             }
         });
 	});
 	
-	$("#saveCode").on("click", function() {
+	$("#saveLocCode").on("click", function() {
 		const locationRow = $("#locationRow").val();
 		const locationColumn = $("#locationColumn").val();
 		const locationCode = $("#locationCode").val();
@@ -117,13 +116,13 @@
 		$('#locationCodeAdd').modal('hide');
 		
 		validationlocationCodeMessage.textContent = '';
-		$("#saveCode").attr("disabled", true);
+		$("#saveLocCode").attr("disabled", true);
 	});
 	
-	$("#modifyCodeBtn").on("click", function() {
-		$("#checkDuplicateCodeBtn").show();
-		$("#modifyCodeBtn").hide();
-		$("#saveCode").attr("disabled", true);
+	$("#modifyLocCodeBtn").on("click", function() {
+		$("#checkDuplicateLocCodeBtn").show();
+		$("#modifyLocCodeBtn").hide();
+		$("#saveLocCode").attr("disabled", true);
 		$("#locationCode").attr("disabled", false);
 	});
 </script>

@@ -67,45 +67,97 @@
 		 WHERE LOCATION_ID = #{LOCATION_ID}
     </select> 
     
+    <!-- 창고 제품 위치 조회 -->
     <select id="selectLocation" resultType="map">
 		SELECT 
-			   LOCATION_ID
-			 , LOCATION_NAME
-			 , MATERIAL_ID
-			 , LOCATION_ORDER
-			 , TO_CHAR(CURRENT_QUANTITY, 'FM999,999,999,999') AS CURRENT_QUANTITY
-			 , USE_YN
-		  FROM ITEM_LOCATION
-		 WHERE
-		 	   1 = 1
+	      IL.LOCATION_ID
+	    , IL.LOCATION_NAME
+	    , CASE WHEN W.WAREHOUSE_TYPE = '원자재'  THEN IL.MATERIAL_ID 
+	           WHEN W.WAREHOUSE_TYPE IN('반제품', '완제품') THEN IL.ITEM_ID
+	         END AS PRODUCT_ID
+	    , IL.LOCATION_ORDER
+	    , TO_CHAR(IL.CURRENT_QUANTITY, 'FM999,999,999,999') AS CURRENT_QUANTITY
+	    , TO_CHAR(IL.RESERVED_QUANTITY, 'FM999,999,999,999') AS RESERVED_QUANTITY
+	    , IL.USE_YN
+	    , IL.DESCRIPTION
+		  FROM ITEM_LOCATION IL
+		      INNER JOIN WAREHOUSE W 
+		            ON IL.WAREHOUSE_ID = W.WAREHOUSE_ID
+		 WHERE 
+		      1 = 1
 		<choose>
-			<when test='warehouse_id != null and warehouse_id != ""'>
-				AND WAREHOUSE_ID = #{warehouse_id}
-			</when>
-			<otherwise>
-				AND WAREHOUSE_ID IS NULL
-			</otherwise>
+		   <when test="warehouse_id != null and warehouse_id != ''">
+		      AND IL.WAREHOUSE_ID = #{warehouse_id}
+		   </when>
+		   <otherwise>
+		      AND IL.WAREHOUSE_ID IS NULL
+		   </otherwise>
 		</choose>
     </select>
     
-  <update id="addLocation">
-    <foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-        UPDATE ITEM_LOCATION
-        SET LOCATION_NAME = #{item.LOCATION_NAME}
-          , MATERIAL_ID = #{item.MATERIAL_ID}
-          , LOCATION_ORDER = #{item.LOCATION_ORDER}
-          , CURRENT_QUANTITY = TO_NUMBER(#{item.CURRENT_QUANTITY})  <!-- 숫자로 변환 -->
-          , USE_YN = #{item.USE_YN}
-        WHERE LOCATION_ID = #{item.LOCATION_ID}  <!-- LOCATION_ID 추가 -->
-          AND WAREHOUSE_ID = #{item.WAREHOUSE_ID};
-    </foreach>
-</update>
+<!--	<update id="addLocation">-->
+<!--	   <foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">-->
+<!--		    UPDATE ITEM_LOCATION-->
+<!--		    SET LOCATION_ID = #{item.LOCATION_ID} -->
+<!--		      , LOCATION_NAME = #{item.LOCATION_NAME}-->
+<!--		      , PRODUCT_ID = (-->
+<!--			       	 SELECT CASE -->
+<!--			                   WHEN W.WAREHOUSE_TYPE = '원자재' THEN IL.MATERIAL_ID-->
+<!--			                   WHEN W.WAREHOUSE_TYPE IN ('반제품', '완제품') THEN IL.ITEM_ID-->
+<!--			                   ELSE NULL-->
+<!--			               END-->
+<!--				        FROM WAREHOUSE W-->
+<!--				        WHERE W.WAREHOUSE_ID = IL.WAREHOUSE_ID-->
+<!--   					 ),-->
+<!--		      , LOCATION_ORDER = #{item.LOCATION_ORDER}-->
+<!--		      , CURRENT_QUANTITY = TO_NUMBER(#{item.CURRENT_QUANTITY})  -->
+<!--		      , RESERVED_QUANTITY = TO_NUMBER(#{item.RESERVED_QUANTITY})  -->
+<!--		      , USE_YN = #{item.USE_YN}-->
+<!--		    WHERE WAREHOUSE_ID = #{item.WAREHOUSE_ID};-->
+<!--	    </foreach>-->
+<!--	</update>-->
     
+    <insert id="insertLocation">
+	    INSERT INTO ITEM_LOCATION (
+	        LOCATION_ID,
+	        LOCATION_NAME,
+	        MATERIAL_ID,
+	        ITEM_ID,
+	        LOCATION_ORDER,
+	        CURRENT_QUANTITY,
+	        RESERVED_QUANTITY,
+	        USE_YN,
+	        DESCRIPTION,
+	        WAREHOUSE_ID
+	    )
+	    VALUES (
+	        #{location_id},
+	        #{location_name},
+	        <choose>
+	            <when test="warehouse_type == '원자재'">
+	                #{product_id}, NULL
+	            </when>
+	            <when test="warehouse_type == '반제품' or warehouse_type == '완제품'">
+	                NULL, #{product_id}
+	            </when>
+	            <otherwise>
+	                NULL, NULL
+	            </otherwise>
+	        </choose>,
+	        #{location_order},
+	        #{current_quantity},
+	        #{reserved_quantity},
+	        #{use_yn},
+	        #{description},
+	        #{warehouse_id}
+	    )
+    </insert>
+	
 	<update id="deleteLocation">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE EQUIPMENT 
-			   SET WORKCENTER_ID = NULL
-			 WHERE EQUIPMENT_ID = #{item}
+		    UPDATE ITEM_LOCATION 
+			   SET WAREHOUSE_ID = NULL
+			 WHERE LOCATION_ID = #{item}
 		</foreach>
     </update>
     
