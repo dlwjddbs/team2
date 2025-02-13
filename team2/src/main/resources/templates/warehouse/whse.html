@@ -84,7 +84,7 @@
 									</div>
 									<div class="col-6">
 										<div class="card-tools" id="btn_group_location" style="text-align: right; display: none;">
-											<input type="button" id="btn_location_modal" class="btn btn-primary" value="추가">
+											<input type="button" id="btn_location_add_row" class="btn btn-primary" value="추가">
 											<input type="button" id="btn_location_add" class="btn btn-primary" value="저장">
 											<input type="button" id="btn_location_delete" class="btn btn-primary" value="제거">
 										</div>
@@ -565,15 +565,49 @@
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
+		$("#btn_location_add_row").on("click", function () {
+		    const newRowKey = locationGrid.appendRow(
+		        {
+		        	"LOCATION_ID": '',
+		        	"LOCATION_NAME": '',
+		        	"MATERIAL_ID": '',
+		        	"LOCATION_ORDER": '',
+		        	"CURRENT_QUANTITY": '',
+		        	"USE_YN": 'Y',
+		        	"DESCRIPTION": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+			
+					    whseIsEditModeEnabled = !whseIsEditModeEnabled; // 수정 모드 상태 토글
+					    
+					    if (whseIsEditModeEnabled) {
+					        locationGrid.setColumns([
+					        	{header: '위치 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+					            {header: '위치명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+					            {header: '자재명', name: 'MATERIAL_ID', align: 'center', renderer: { type: TextInputRenderer }},
+					            {header: '정렬', name: 'LOCATION_ORDER', align: 'center', renderer: { type: TextInputRenderer }},
+					            {header: '수량', name: 'CURRENT_QUANTITY', align: 'center', renderer: { type: TextInputRenderer }},
+					            {header: '정렬', name: 'USE_YN', align: 'center', renderer: { type: TextInputRenderer }},
+					            {header: '정렬', name: 'DESCRIPTION', align: 'center', renderer: { type: TextInputRenderer }},
+					        ]);
+					    } else {
+					        locationGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+					        locationGrid.setColumns(location_columns);
+					    }
+					});
 
-		$("#btn_location_add").on("click", function() {
-			locationGrid.request('createData');
-			locationGrid.reloadData();  // 실패시 테이블 리로드
-		});
 
-		$("#btn_location_modal").on("click", function() {
-			$("#whseLocationAdd").modal();
-		});
+
+		// $("#btn_location_add").on("click", function() {
+		//	locationGrid.request('createData');
+		//	locationGrid.reloadData();  // 실패시 테이블 리로드
+	//	});
+
+	//	$("#btn_location_modal").on("click", function() {
+		//	$("#whseLocationAdd").modal();
+	//	});
 
 		$("#btn_location_delete").on("click", function() {
 			locationGrid.removeCheckedRows();
