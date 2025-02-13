@@ -20,4 +20,10 @@ public interface GoodsOrderMapper {
 
 	List<Map<String, Object>> getGoodsDetail(Map<String, Object> map);
 
+	int updateDetail(Map<String, Object> data);
+
+	int deletePurchase(Map<String, Object> data);
+
+	int insertGoDetail(Map<String, Object> data);
+
 }

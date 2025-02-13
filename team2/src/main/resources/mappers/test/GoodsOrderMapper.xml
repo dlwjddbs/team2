@@ -17,7 +17,7 @@
     TO_CHAR(NVL(SUM(PD.TOTAL_PRICE), 0), 'FM9,999,999') || '원' AS GO_PRICE,
     TO_CHAR(GO.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
     UM.NAME AS UPDATE_MEMBER,
-    GO.GO_STATUS
+    (SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = GO.GO_STATUS AND MAIN_ID = 'STATUS') AS GO_STATUS
 FROM
     GOODS_ORDER GO
 LEFT JOIN PO_DETAIL PD ON GO.PO_ID = PD.PO_ID
@@ -71,7 +71,7 @@ ORDER BY GO.CREATE_DATE DESC
         SYSDATE,
         #{INSERT_MEM},
         c.CLIENT_ID,
-        #{GO_STATUS, jdbcType=VARCHAR}
+        #{GO_STATUS}
     FROM PURCHASE_ORDER p
     JOIN CLIENT c 
       ON p.CLIENT_ID = c.CLIENT_ID
@@ -110,7 +110,7 @@ ORDER BY GO.CREATE_DATE DESC
     TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
     gd.UPDATE_DATE,
     gd.UPDATE_MEMBER,
-    pd.PO_STATUS AS GO_STATUS
+     (SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = pd.PO_STATUS AND MAIN_ID = 'STATUS') AS GO_STATUS
 FROM GOODS_ORDER go
 LEFT JOIN GO_DETAIL gd
     ON gd.GO_ID = go.GO_ID
@@ -121,13 +121,23 @@ LEFT JOIN MATERIAL m
 WHERE go.GO_ID = #{GO_ID}
 	</select>
 
+<!-- 발주 상세 수정 -->
+<update id="updateDetail" parameterType="map">
+    UPDATE GO_DETAIL
+    	SET 
+       	 	GO_COUNT = #{GO_COUNT},
+       	 	TOTAL_PRICE   = #{GO_COUNT} * GO_PRICE,
+       	 	UPDATE_DATE = CURRENT_DATE,
+       	 	UPDATE_MEMBER = #{UPDATE_MEM}
+    WHERE GODETAIL_ID = #{GODETAIL_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
 
 
-
-
-
-
-
+<!-- DELETE (데이터 삭제) -->
+    <delete id="deleteDetail" parameterType="map">
+        DELETE FROM GO_DETAIL 
+        	WHERE GODETAIL_ID = #{GODETAIL_ID}
+    </delete>
 
 
 </mapper>

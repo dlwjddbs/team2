@@ -232,6 +232,7 @@
     // materialGrid는 구매발주 상세 그리드(이미 생성되어 있다고 가정)
     selectedMaterialList.forEach(function(data) {
     	delete data.rowKey; // 또는 data.rowKey = newUniqueKey();
+    	data.PO_STATUS =  '미결';
         grid2.appendRow(data, { at: 0 });
         console.info(data);
     });

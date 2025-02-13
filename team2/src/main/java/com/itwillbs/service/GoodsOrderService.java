@@ -54,4 +54,29 @@ public class GoodsOrderService {
 		return goodsOrderMapper.getGoodsDetail(map);
 	}
 
+	public int updateDetail(List<Map<String, Object>> updateList) {
+		int count = 0;
+		 
+        for (Map<String, Object> data : updateList) {
+            count += goodsOrderMapper.updateDetail(data);
+        }
+        return count;
+	}
+
+	public int deleteDetail(List<Map<String, Object>> deleteList) {
+		int count = 0;
+        for (Map<String, Object> data : deleteList) {
+            count += goodsOrderMapper.deletePurchase(data);
+        }
+        return count;
+	}
+
+	public int insertGoDetail(List<Map<String, Object>> insertList) {
+		int count = 0;
+        for (Map<String, Object> data : insertList) {
+            count += goodsOrderMapper.insertGoDetail(data);
+        }
+        return count;
+	}
+
 }

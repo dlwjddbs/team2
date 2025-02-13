@@ -571,11 +571,19 @@
 				// 메시지
 				function showSuccess(message, reload = false) {
 					Notiflix.Notify.success('저장 성공!');
+					
+					if (reload) {
+				        setTimeout(() => {
+				            location.reload();
+				        }, 1000); // 1초 후 새로고침 (원하는 시간으로 조절 가능)
+				    }
 				}
 
 				function showError(message) {
 					Notiflix.Notify.failure('저장 실패!');
 				}
+				
+				
 
 		
 		$("#material-modal-btn").on("click", function() {

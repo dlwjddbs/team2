@@ -65,6 +65,16 @@ public class PurchaseController {
 		        String rowType = (String) data.get("rowType");
 		        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
 
+		        String status = String.valueOf(data.get("PO_STATUS")).trim(); // 발주 상태
+		        // 파라미터로 가져오는 상태값에 따라 공통코드에 맞춰서 PO_STATUS 값 변경
+		        if(status.equals("미결")) { // 미결
+		        	data.put("PO_STATUS", "N");
+		        } else if(status.equals("진행중")) { // 진행중
+		        	data.put("PO_STATUS", "I");
+		        } else { // 마감
+		        	data.put("PO_STATUS", "Y");
+		        }
+		        
 		        if ("insert".equals(rowType)) {
 		            insertList.add(data);
 		        } else if ("update".equals(rowType)) {
@@ -114,6 +124,16 @@ public class PurchaseController {
 		        String rowType = (String) data.get("rowType");
 		        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
 
+		        String status = String.valueOf(data.get("PO_STATUS")).trim(); // 발주 상태
+		        // 파라미터로 가져오는 상태값에 따라 공통코드에 맞춰서 PO_STATUS 값 변경
+		        if(status.equals("미결")) { // 미결
+		        	data.put("PO_STATUS", "N");
+		        } else if(status.equals("진행중")) { // 진행중
+		        	data.put("PO_STATUS", "I");
+		        } else { // 마감
+		        	data.put("PO_STATUS", "Y");
+		        }
+		        
 		        if ("insert".equals(rowType)) {
 		            insertList.add(data);
 		        } else if ("update".equals(rowType)) {
