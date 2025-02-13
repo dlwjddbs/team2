@@ -49,7 +49,7 @@ SELECT
     #{PO_STATUS},
     'ORD-' || TO_CHAR(SYSDATE, 'MMDD-HH24MISS')
 FROM CLIENT
-WHERE CLIENT_ID = #{cltId}
+WHERE CLIENT_ID = #{CLIENT_ID}
 	</insert>
 	
 <!--	발주 수정-->
@@ -93,7 +93,7 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
  </select>
 
 <!-- 발주 상세 등록    -->
-    <insert id="insertDetail" parameterType="map">
+   <insert id="insertDetail" parameterType="map">
     INSERT INTO PO_DETAIL (
         PODETAIL_ID,
         PO_ID,
@@ -132,32 +132,32 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
 	</update>
 
 
-<update id="updatePurchaseStatus" parameterType="map">
-    <![CDATA[
-  UPDATE PURCHASE_ORDER
-  SET PO_STATUS = (
-    SELECT 
-      CASE 
-        WHEN MIN(PD.PO_STATUS) = '미결' AND MAX(PD.PO_STATUS) = '미결' THEN '미결'
-        WHEN MIN(PD.PO_STATUS) = '마감' AND MAX(PD.PO_STATUS) = '마감' THEN '마감'
-        ELSE '진행중'
-      END
-    FROM PO_DETAIL PD
-    WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID
-  )
-  WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}
-    AND PO_STATUS <> (
-      SELECT 
-        CASE 
-          WHEN MIN(PD.PO_STATUS) = '미결' AND MAX(PD.PO_STATUS) = '미결' THEN '미결'
-          WHEN MIN(PD.PO_STATUS) = '마감' AND MAX(PD.PO_STATUS) = '마감' THEN '마감'
-          ELSE '진행중'
-        END
-      FROM PO_DETAIL PD
-      WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID
-    )
-]]>
-</update>
+<!--<update id="updatePurchaseStatus" parameterType="map">-->
+<!--    <![CDATA[-->
+<!--  UPDATE PURCHASE_ORDER-->
+<!--  SET PO_STATUS = (-->
+<!--    SELECT -->
+<!--      CASE -->
+<!--        WHEN MIN(PD.PO_STATUS) = 'N' AND MAX(PD.PO_STATUS) = 'N' THEN 'N'-->
+<!--        WHEN MIN(PD.PO_STATUS) = 'Y' AND MAX(PD.PO_STATUS) = 'Y' THEN 'Y'-->
+<!--        ELSE 'I'-->
+<!--      END-->
+<!--    FROM PO_DETAIL PD-->
+<!--    WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID-->
+<!--  )-->
+<!--  WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}-->
+<!--    AND PO_STATUS <> (-->
+<!--      SELECT -->
+<!--        CASE -->
+<!--          WHEN MIN(PD.PO_STATUS) = 'N' AND MAX(PD.PO_STATUS) = 'N' THEN 'N'-->
+<!--          WHEN MIN(PD.PO_STATUS) = 'Y' AND MAX(PD.PO_STATUS) = 'Y' THEN 'Y'-->
+<!--          ELSE 'I'-->
+<!--        END-->
+<!--      FROM PO_DETAIL PD-->
+<!--      WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID-->
+<!--    )-->
+<!--]]>-->
+<!--</update>-->
 
 
 

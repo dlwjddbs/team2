@@ -152,9 +152,11 @@
 
 
 			<style>
-.selected-row {
-	background-color: #d1ffd6;
-}
+
+	.selected-row {
+			background-color: #e3f2fd;
+			transition: background-color 0.3s ease-in-out;
+		}
 
 .deselected-row {
 	background-color: #ffd1d1;
@@ -279,6 +281,13 @@
 						poId = selectedRow.PO_ID;
 						if (!selectedRow) return;
 						rowIdx = ev.rowKey;
+						
+					grid1.getData().forEach(row => {
+					   grid1.removeRowClassName(row.rowKey, 'selected-row');
+					 });
+
+					 // 선택한 행에 클래스 추가 (초록색 하이라이트)
+					 grid1.addRowClassName(ev.rowKey, 'selected-row');
 						
 						$("#detail_section").fadeIn(300).removeClass("hidden").addClass("visible");
 						$("#divider").fadeIn(300).removeClass("hidden").addClass("visible");

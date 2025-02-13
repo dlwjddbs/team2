@@ -26,4 +26,10 @@ public interface GoodsOrderMapper {
 
 	int insertGoDetail(Map<String, Object> data);
 
+	int updatePoDetail(Map<String, Object> data);
+
+	int updatePurchaseOrderStatus(Map<String, Object> data);
+
+	int updateGoodsOrderStatus(Map<String, Object> data);
+
 }

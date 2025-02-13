@@ -97,29 +97,42 @@ ORDER BY GO.CREATE_DATE DESC
         	WHERE GO_ID = #{GO_ID}
     </delete>
 
-	<select id="getGoodsDetail" resultType="map" parameterType="map">
-	SELECT
-    ROW_NUMBER() OVER (ORDER BY TO_NUMBER(gd.GODETAIL_ID)) AS SEQ,
-    gd.GODETAIL_ID,
-    go.PO_ID,              -- GOODS_ORDER 테이블의 PO_ID
-    pd.PODETAIL_ID,
-    m.MATERIAL_ID,
-    m.MATERIAL_NAME,
-    pd.PO_COUNT AS GO_COUNT,
-    TO_CHAR(pd.PO_PRICE, 'FM9,999,999') || '원' AS GO_PRICE,
-    TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
-    gd.UPDATE_DATE,
-    gd.UPDATE_MEMBER,
-     (SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = pd.PO_STATUS AND MAIN_ID = 'STATUS') AS GO_STATUS
-FROM GOODS_ORDER go
-LEFT JOIN GO_DETAIL gd
-    ON gd.GO_ID = go.GO_ID
-LEFT JOIN PO_DETAIL pd
-    ON go.PO_ID = pd.PO_ID   -- GOODS_ORDER의 PO_ID를 기준으로 조인
-LEFT JOIN MATERIAL m
-    ON pd.MATERIAL_ID = m.MATERIAL_ID
-WHERE go.GO_ID = #{GO_ID}
-	</select>
+<!--입고 상세 리스트-->
+<select id="getGoodsDetail" resultType="map" parameterType="map">
+     SELECT
+        ROW_NUMBER() OVER (ORDER BY TO_NUMBER(pd.PODETAIL_ID)) AS SEQ,  
+        pd.PODETAIL_ID,
+        go.PO_ID,               
+        m.MATERIAL_ID,
+        m.MATERIAL_NAME,
+        pd.PO_COUNT AS GO_COUNT,  
+        TO_CHAR(pd.PO_PRICE, 'FM9,999,999') || '원' AS GO_PRICE,
+        TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
+        pd.UPDATE_DATE,
+        pd.UPDATE_MEMBER,
+        mc.SUB_NAME AS GO_STATUS  -- MES_COMMON 테이블에서 상태명 가져오기
+    FROM 
+     (SELECT 
+            PODETAIL_ID,
+            PO_ID,
+            MATERIAL_ID,
+            SUM(PO_COUNT) AS PO_COUNT,
+            SUM(PO_PRICE) AS PO_PRICE,
+            SUM(TOTAL_PRICE) AS TOTAL_PRICE,
+            MAX(UPDATE_DATE) AS UPDATE_DATE,
+            MAX(UPDATE_MEMBER) AS UPDATE_MEMBER,
+            MIN(PO_STATUS) AS PO_STATUS
+        FROM PO_DETAIL
+        GROUP BY PODETAIL_ID, PO_ID, MATERIAL_ID
+    ) pd 
+    LEFT JOIN GOODS_ORDER go
+    ON go.PO_ID = pd.PO_ID  -- 입고와 발주 연결
+    LEFT JOIN GO_DETAIL gd ON go.GO_ID = gd.GO_ID
+    LEFT JOIN MATERIAL m ON pd.MATERIAL_ID = m.MATERIAL_ID  -- 품목 정보 조인
+    LEFT JOIN MES_COMMON mc ON pd.PO_STATUS = mc.SUB_ID AND mc.MAIN_ID = 'STATUS' -- 상태명 조회
+
+    WHERE go.GO_ID = #{GO_ID}
+</select>
 
 <!-- 발주 상세 수정 -->
 <update id="updateDetail" parameterType="map">
@@ -139,5 +152,89 @@ WHERE go.GO_ID = #{GO_ID}
         	WHERE GODETAIL_ID = #{GODETAIL_ID}
     </delete>
 
+
+<insert id="insertGoDetail" parameterType="map">
+	<![CDATA[
+        INSERT INTO GO_DETAIL (
+            GODETAIL_ID,
+            GO_ID,
+            PODETAIL_ID,
+            MATERIAL_ID,
+            CREATE_DATE,
+            GO_COUNT,
+            GO_PRICE,
+            TOTAL_PRICE,
+            GO_STATUS
+        )
+        SELECT 
+            SEQ_GODETAIL.NEXTVAL,
+            go.GO_ID,
+            pd.PODETAIL_ID,
+            m.MATERIAL_ID,
+            CURRENT_DATE,
+            pd.PO_COUNT,
+            pd.PO_PRICE,
+            pd.TOTAL_PRICE,
+            'Y'
+        FROM PO_DETAIL pd
+        JOIN GOODS_ORDER go ON pd.PO_ID = go.PO_ID
+        JOIN MATERIAL m ON pd.MATERIAL_ID = m.MATERIAL_ID
+        WHERE pd.PODETAIL_ID = #{PODETAIL_ID}
+    ]]>
+</insert>
+
+<update id="updatePoDetail" parameterType="map">
+    <![CDATA[
+        UPDATE PO_DETAIL
+        SET PO_STATUS = 'Y'
+        WHERE PODETAIL_ID = #{PODETAIL_ID}
+    ]]>
+</update>
+
+<update id="updatePurchaseOrderStatus" parameterType="map">
+    <![CDATA[
+        UPDATE PURCHASE_ORDER
+        SET PO_STATUS = (
+            SELECT 
+                CASE 
+                    WHEN SUM(CASE WHEN PO_STATUS = 'N' THEN 1 ELSE 0 END) > 0 
+                         AND SUM(CASE WHEN PO_STATUS = 'Y' THEN 1 ELSE 0 END) = 0 
+                    THEN 'N'
+                    WHEN SUM(CASE WHEN PO_STATUS = 'N' THEN 1 ELSE 0 END) > 0 
+                         AND SUM(CASE WHEN PO_STATUS = 'Y' THEN 1 ELSE 0 END) > 0 
+                    THEN 'I'
+                    WHEN SUM(CASE WHEN PO_STATUS = 'N' THEN 1 ELSE 0 END) = 0 
+                         AND SUM(CASE WHEN PO_STATUS = 'Y' THEN 1 ELSE 0 END) > 0 
+                    THEN 'Y'
+                END
+            FROM PO_DETAIL
+            WHERE PO_ID = (SELECT PO_ID FROM PO_DETAIL WHERE PODETAIL_ID = #{PODETAIL_ID})
+        )
+        WHERE PO_ID = (SELECT PO_ID FROM PO_DETAIL WHERE PODETAIL_ID = #{PODETAIL_ID})
+    ]]>
+</update>
+
+<update id="updateGoodsOrderStatus" parameterType="map">
+    <![CDATA[
+        UPDATE GOODS_ORDER
+        SET GO_STATUS = (
+            SELECT 
+                CASE 
+                    WHEN SUM(CASE WHEN GO_STATUS = 'N' THEN 1 ELSE 0 END) > 0 
+                         AND SUM(CASE WHEN GO_STATUS = 'Y' THEN 1 ELSE 0 END) = 0 
+                    THEN 'N'
+                    WHEN SUM(CASE WHEN GO_STATUS = 'N' THEN 1 ELSE 0 END) > 0 
+                         AND SUM(CASE WHEN GO_STATUS = 'Y' THEN 1 ELSE 0 END) > 0 
+                    THEN 'I'
+                    WHEN SUM(CASE WHEN GO_STATUS = 'N' THEN 1 ELSE 0 END) = 0 
+                         AND SUM(CASE WHEN GO_STATUS = 'Y' THEN 1 ELSE 0 END) > 0 
+                    THEN 'Y'
+                END
+            FROM GO_DETAIL
+            WHERE GO_ID = #{goId}
+        )
+        WHERE GO_ID = #{goId}
+    ]]>
+</update>
 
 </mapper>

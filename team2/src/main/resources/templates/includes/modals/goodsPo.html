@@ -127,6 +127,7 @@
       const rowKey = ev.rowKey;
       const rowData = purchaseModalGrid.getRow(rowKey);
       const poId = rowData.PO_ID;
+	  
       if (purchaseModalGrid.getRowClassName(rowKey).includes('selected-row')) {
         purchaseModalGrid.removeRowClassName(rowKey, 'selected-row');
         selectedPurchaseList = selectedPurchaseList.filter(item => item.PO_ID !== poId);

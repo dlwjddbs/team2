@@ -70,7 +70,8 @@ public class GoodsOrderService {
         }
         return count;
 	}
-
+	
+	// 1 입고 상세 상태 변경
 	public int insertGoDetail(List<Map<String, Object>> insertList) {
 		int count = 0;
         for (Map<String, Object> data : insertList) {
@@ -78,5 +79,33 @@ public class GoodsOrderService {
         }
         return count;
 	}
+	
+	// 2️ 발주 상세 상태 변경
+    public int updatePoDetail(List<Map<String, Object>> updateList) {
+        int count = 0;
+        for (Map<String, Object> data : updateList) {
+            count += goodsOrderMapper.updatePoDetail(data);
+        }
+        return count;
+    }
 
+    // 3️ 발주 상태변경
+    public int updatePurchaseOrderStatus(List<Map<String, Object>> updateList) {
+        int count = 0;
+        for (Map<String, Object> data : updateList) {
+            count += goodsOrderMapper.updatePurchaseOrderStatus(data);
+        }
+        return count;
+    }
+    
+    // 4 입고  상태 변경
+	public int updateGoodsOrderStatus(List<Map<String, Object>> updateList) {
+		int count = 0;
+        for (Map<String, Object> data : updateList) {
+            count += goodsOrderMapper.updateGoodsOrderStatus(data);
+        }
+        return count;
+	}
+	
+	
 }
