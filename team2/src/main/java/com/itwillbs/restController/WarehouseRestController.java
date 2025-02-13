@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,9 +45,30 @@ public class WarehouseRestController {
 	public Map<String, Object> deleteWarehouse(@RequestHeader("X-Delete-IDs") String encodedIds) {
 		// 한글ID 넘어올 시 변환
 	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
+	    List<String> warehouseIds = Arrays.asList(decodedIds.split(","));
         
-        return warehouseService.deleteWarehouse(equipmentIds);
+        return warehouseService.deleteWarehouse(warehouseIds);
+	}
+	
+	@GetMapping(location_url)
+	public Map<String, Object> getLocation(@RequestParam Map<String, Object> requestData) {
+		return warehouseService.selectLocation(requestData);
+	}
+	
+	@PostMapping(location_url)
+	public Map<String, Object> addLocation(@RequestBody Map<String, Object> requestData) {
+	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+		
+        return warehouseService.addLocation(createdRows);
+	}
+	
+	@DeleteMapping(location_url)
+	public Map<String, Object> deleteLocation(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> locationIds = Arrays.asList(decodedIds.split(","));
+	    
+        return warehouseService.deleteLocation(locationIds);
 	}	
 	
 }

@@ -37,6 +37,9 @@
 		<!-- 창고 코드 중복처리 검증 모달 -->		
 		<nav th:replace="~{includes/modals/whseCodeAdd :: whseCodeAdd}"></nav>
 		
+		<!-- 위치 코드 중복처리 검증 모달 -->		
+		<nav th:replace="~{includes/modals/locationCodeAdd :: locationCodeAdd}"></nav>
+		
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
@@ -295,6 +298,7 @@
 					}
 			    });
 			}
+
 			
 		    this.el = container;
 		    this.input = el;
@@ -336,6 +340,69 @@
 		$(function () {
 			whseInit();
 		});
+		
+		const TextInputBtnRenderer2 = function(props) {
+		    const container = document.createElement('div');
+		    container.style.display = 'flex';
+		    container.style.alignItems = 'center';
+		    container.style.gap = '5px';
+		    
+		    const el = document.createElement('input');
+		    el.type = 'text';
+		    el.style.width = 'calc(100% - 10px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.color = 'solid 1px #ddd';
+		    el.style.marginLeft = '1px';
+		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+			container.appendChild(el);
+
+					// LOCATION_ID 기존값은 수정 불가 조건
+			if (!(props.columnInfo.name == 'LOCATION_ID'
+				&& locationGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+			    button.textContent = '🔍';
+			    button.style.border = 'solid 1px #007BFF';
+			    button.style.background = 'white';
+			    button.style.color = 'white';
+			    button.style.padding = '6px 10px';
+			    button.style.cursor = 'pointer';
+			    button.style.borderRadius = '4px';
+			    button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = locationGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'LOCATION_ID':
+							$("#locationCode").val(value);
+							$("#locationRow").val(row);
+							$("#locationColumn").val(column);
+							
+							$('#locationCodeAdd').modal();
+							break;
+					}
+			    });
+			}
+			
+			this.el = container;
+			    this.input = el;
+			    this.render(props);
+			}
+
+			TextInputBtnRenderer2.prototype.getElement = function () {
+			    return this.el;
+			}
+
+			TextInputBtnRenderer2.prototype.render = function (props) {
+			    this.input.value = props.value;
+			}
 		
 		// 창고 정보
 		function whseInit() {
@@ -580,34 +647,31 @@
 		        {focus: true}
 		    );
 			
-					    whseIsEditModeEnabled = !whseIsEditModeEnabled; // 수정 모드 상태 토글
-					    
-					    if (whseIsEditModeEnabled) {
-					        locationGrid.setColumns([
-					        	{header: '위치 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-					            {header: '위치명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-					            {header: '자재명', name: 'MATERIAL_ID', align: 'center', renderer: { type: TextInputRenderer }},
-					            {header: '정렬', name: 'LOCATION_ORDER', align: 'center', renderer: { type: TextInputRenderer }},
-					            {header: '수량', name: 'CURRENT_QUANTITY', align: 'center', renderer: { type: TextInputRenderer }},
-					            {header: '정렬', name: 'USE_YN', align: 'center', renderer: { type: TextInputRenderer }},
-					            {header: '정렬', name: 'DESCRIPTION', align: 'center', renderer: { type: TextInputRenderer }},
-					        ]);
-					    } else {
-					        locationGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
-					        locationGrid.setColumns(location_columns);
-					    }
-					});
+		    whseIsEditModeEnabled = !whseIsEditModeEnabled; // 수정 모드 상태 토글
+		    
+		    if (whseIsEditModeEnabled) {
+		        locationGrid.setColumns([
+		        	{header: '구역 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
+		            {header: '구역명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '자재명', name: 'MATERIAL_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+					{
+				        header: '사용여부 *',
+				        name: 'USE_YN',
+				        align: 'center',
+				        formatter: function({value}) {
+				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+				        },
+				        renderer: { type: CheckboxRenderer }},
+		            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		        ]);
+		    } else {
+		        locationGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        locationGrid.setColumns(location_columns);
+		    }
+		});
 
-
-
-		// $("#btn_location_add").on("click", function() {
-		//	locationGrid.request('createData');
-		//	locationGrid.reloadData();  // 실패시 테이블 리로드
-	//	});
-
-	//	$("#btn_location_modal").on("click", function() {
-		//	$("#whseLocationAdd").modal();
-	//	});
 
 		$("#btn_location_delete").on("click", function() {
 			locationGrid.removeCheckedRows();

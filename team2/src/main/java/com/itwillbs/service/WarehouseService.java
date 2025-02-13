@@ -94,7 +94,8 @@ public class WarehouseService {
 		
 		return resultMap;
 	}
-
+	
+	// 창고 코드 중복검사
 	public Map<String, Object> checkDuplicateWhseCode(Map<String, Object> map) {
 		log.info("============= checkDuplicateWhseCode(Service) =============");
 		Map<String, Object> message = new HashMap<>();
@@ -118,5 +119,91 @@ public class WarehouseService {
 		
 		return message;
 	}
+	
+	// 위치 코드 중복검사
+	public Map<String, Object> checkDuplicateLocationCode(Map<String, Object> map) {
+		log.info("============= checkDuplicateLocationCode(Service) =============");
+		Map<String, Object> message2 = new HashMap<>();
+		
+		String result = "중복된 코드입니다.";
+		String resultCode = "0";
+		
+		try {
+			int resultCnt = warehouseMapper.checkDuplicateLocationCode(map);
+			if (resultCnt == 0) {
+				result = "사용가능한 코드입니다.";
+				resultCode = "1";
+			}
+		} catch (Exception e) {
+			result = "조회 실패. 재시도 하세요.";
+			resultCode = "0";
+		}
+		
+		message2.put("result", result);
+		message2.put("resultCode", resultCode);
+		
+		return message2;
+	}
+
+	public Map<String, Object> selectLocation(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectEquipment 성공";
+		
+		try {
+			List<Map<String, Object>> locationList = warehouseMapper.selectLocation(requestData);
+			content.put("contents", locationList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> addLocation(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Boolean result = true;
+		String message = "addLocation 성공";
+		
+		try {
+			warehouseMapper.addLocation(createdRows);
+		} catch (Exception e) {
+			result = false;
+			message = "addLocation 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> deleteLocation(List<String> locationIds) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteLocation 성공";
+		
+		try {
+			if (locationIds.size() > 0) {
+				warehouseMapper.deleteLocation(locationIds);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteLocation 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}	
 
 }

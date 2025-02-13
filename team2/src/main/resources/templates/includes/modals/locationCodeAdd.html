@@ -1,0 +1,129 @@
+<!-- 모달창 -->
+<div class="modal fade" id="locationCodeAdd" th:fragment="locationCodeAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">코드 중복 확인</h4>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="locationRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="locationColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<label>창고 코드</label>
+							<div class="input-group">
+								<input type="text" id="locationCode" class="form-control"
+									placeholder="코드를 입력하세요">
+								<div class="input-group-append">
+									<button class="btn btn-primary" id="checkDuplicateCodeBtn"
+										type="button">중복확인</button>
+									<button class="btn btn-primary" id="modifyCodeBtn"
+										type="button" style="display: none;">수정</button>
+								</div>
+							</div>
+							<span id="validationlocationCodeMessage" class="form-text mt-1"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					<button type="submit" class="btn btn-primary" id="saveCode"
+						disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="locationCodeAdd" th:inline="javascript">
+	const dangerText = "form-text text-danger mt-1";
+	
+	$("#checkDuplicateCodeBtn").on("click", function() {
+		const locationCode = $("#locationCode").val().trim();
+		
+		if (locationCode == null || locationCode == '') {
+			validationlocationCodeMessage.textContent = "코드를 입력하세요.";
+			validationlocationCodeMessage.className = dangerText
+			
+			return;
+		}
+		
+		const filteredValues = locationGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row['LOCATION_ID']);
+
+		if (filteredValues.includes(locationCode)) {
+			validationlocationCodeMessage.textContent = '신규 행에서의 중복입니다.';
+			validationlocationCodeMessage.className = dangerText
+			$("#saveCode").attr("disabled", true);
+			
+			return;
+		}
+		
+		$.ajax({
+            type : "POST",
+            url : "/warehouse/checkDuplicatelocationCode",
+            data : {
+            	LOCATION_ID : locationCode
+			},
+            success : function(res){
+				if (res.resultCode == 1) {
+					validationlocationCodeMessage.textContent = res.result;
+					validationlocationCodeMessage.className = "form-text text-success mt-1";
+					$("#locationCode").attr("disabled", true);
+					$("#saveCode").attr("disabled", false);
+					
+					$("#checkDuplicateCodeBtn").hide();
+					$("#modifyCodeBtn").show();
+				} else {
+					validationlocationCodeMessage.textContent = res.result;
+					validationlocationCodeMessage.className = dangerText
+					$("#saveCode").attr("disabled", true);
+				}
+            },
+            error : function(e){
+                console.log("checkDuplicatelocationCode() ajax 실패");
+            }
+        });
+	});
+	
+	$("#saveCode").on("click", function() {
+		const locationRow = $("#locationRow").val();
+		const locationColumn = $("#locationColumn").val();
+		const locationCode = $("#locationCode").val();
+		
+		locationGrid.setValue(locationRow, locationColumn, locationCode);
+		$('#locationCodeAdd').modal('hide');
+		
+		validationlocationCodeMessage.textContent = '';
+		$("#saveCode").attr("disabled", true);
+	});
+	
+	$("#modifyCodeBtn").on("click", function() {
+		$("#checkDuplicateCodeBtn").show();
+		$("#modifyCodeBtn").hide();
+		$("#saveCode").attr("disabled", true);
+		$("#locationCode").attr("disabled", false);
+	});
+</script>

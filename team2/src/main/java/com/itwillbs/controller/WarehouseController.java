@@ -36,6 +36,17 @@ public class WarehouseController {
 		return message;
 		
 	}
+
+	@PostMapping("/warehouse/checkDuplicateLocationCode")
+	@ResponseBody
+	public Map<String, Object> checkDuplicateLocationCode(@RequestParam Map<String, Object> map) {
+		log.info("============= checkDuplicateLocationCode =============");
+		
+		Map<String, Object> message2 = warehouseService.checkDuplicateLocationCode(map);
+		
+		return message2;
+		
+	}
 	
 	@GetMapping("/whseLocation")
 	public String process() {

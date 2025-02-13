@@ -61,4 +61,47 @@
 		 WHERE WAREHOUSE_ID = #{WAREHOUSE_ID}
     </select> 
     
+    <select id="checkDuplicateLocationCode">
+    	SELECT count(*) AS COUNT
+		  FROM ITEM_LOCATION
+		 WHERE LOCATION_ID = #{LOCATION_ID}
+    </select> 
+    
+    <select id="selectLocation" resultType="map">
+		SELECT 
+			   LOCATION_ID
+			 , LOCATION_NAME
+			 , MATERIAL_ID
+			 , LOCATION_ORDER
+			 , TO_CHAR(CURRENT_QUANTITY, 'FM999,999,999,999') AS CURRENT_QUANTITY
+			 , USE_YN
+		  FROM ITEM_LOCATION
+		 WHERE
+		 	   1 = 1
+		<choose>
+			<when test='warehouse_id != null and warehouse_id != ""'>
+				AND WAREHOUSE_ID = #{warehouse_id}
+			</when>
+			<otherwise>
+				AND WAREHOUSE_ID IS NULL
+			</otherwise>
+		</choose>
+    </select>
+    
+    <update id="addEquipment">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE ITEM_LOCATION 
+			   SET WAREHOUSE_ID = #{item.WAREHOUSE_ID}
+			 WHERE EQUIPMENT_ID = #{item.EQUIPMENT_ID}
+		</foreach>
+    </update>
+    
+	<update id="deleteEquipment">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE EQUIPMENT 
+			   SET WORKCENTER_ID = NULL
+			 WHERE EQUIPMENT_ID = #{item}
+		</foreach>
+    </update>
+    
 </mapper>
