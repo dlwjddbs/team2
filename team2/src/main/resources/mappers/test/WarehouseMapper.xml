@@ -88,15 +88,20 @@
 		</choose>
     </select>
     
-    <update id="addEquipment">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE ITEM_LOCATION 
-			   SET WAREHOUSE_ID = #{item.WAREHOUSE_ID}
-			 WHERE EQUIPMENT_ID = #{item.EQUIPMENT_ID}
-		</foreach>
-    </update>
+  <update id="addLocation">
+    <foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+        UPDATE ITEM_LOCATION
+        SET LOCATION_NAME = #{item.LOCATION_NAME}
+          , MATERIAL_ID = #{item.MATERIAL_ID}
+          , LOCATION_ORDER = #{item.LOCATION_ORDER}
+          , CURRENT_QUANTITY = TO_NUMBER(#{item.CURRENT_QUANTITY})  <!-- 숫자로 변환 -->
+          , USE_YN = #{item.USE_YN}
+        WHERE LOCATION_ID = #{item.LOCATION_ID}  <!-- LOCATION_ID 추가 -->
+          AND WAREHOUSE_ID = #{item.WAREHOUSE_ID};
+    </foreach>
+</update>
     
-	<update id="deleteEquipment">
+	<update id="deleteLocation">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
 		    UPDATE EQUIPMENT 
 			   SET WORKCENTER_ID = NULL

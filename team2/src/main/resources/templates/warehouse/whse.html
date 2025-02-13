@@ -175,10 +175,10 @@
 			contentType: 'application/json',
 		};
 		let locationCurrentSelectedRowKey = null;
+		let locationIsAddModeEnabled = false;
 		const location_columns = [
-		    {header: '위치 코드', name: 'LOCATION_ID', align: 'center', editor: null},
-		    {header: '위치명', name: 'LOCATION_NAME', align: 'left', editor: null},
-		    {header: '자재코드', name: 'MATERIAL_ID', align: 'left', editor: null},
+		    {header: '구역 코드', name: 'LOCATION_ID', align: 'center', editor: null},
+		    {header: '구역명', name: 'LOCATION_NAME', align: 'left', editor: null},
 		    {header: '정렬', name: 'LOCATION_ORDER', align: 'left', editor: null},
 		    {header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'left', editor: null},
 			{
@@ -632,45 +632,50 @@
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
+		
 		$("#btn_location_add_row").on("click", function () {
+		    // 버튼 숨기기
+		    $(this).hide();
+
 		    const newRowKey = locationGrid.appendRow(
 		        {
-		        	"LOCATION_ID": '',
-		        	"LOCATION_NAME": '',
-		        	"MATERIAL_ID": '',
-		        	"LOCATION_ORDER": '',
-		        	"CURRENT_QUANTITY": '',
-		        	"USE_YN": 'Y',
-		        	"DESCRIPTION": '',
+		            "LOCATION_ID": '',
+		            "LOCATION_NAME": '',
+		            "MATERIAL_ID": '',
+		            "LOCATION_ORDER": '',
+		            "CURRENT_QUANTITY": '',
+		            "USE_YN": 'Y',
+		            "DESCRIPTION": '',
 		            isNew: true
 		        },
-		        {focus: true}
+		        { focus: true }
 		    );
-			
-		    whseIsEditModeEnabled = !whseIsEditModeEnabled; // 수정 모드 상태 토글
-		    
-		    if (whseIsEditModeEnabled) {
+
+		    locationIsAddModeEnabled = !locationIsAddModeEnabled; // 추가 모드 상태 토글
+
+		    if (locationIsAddModeEnabled) {
 		        locationGrid.setColumns([
-		        	{header: '구역 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
-		            {header: '구역명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '자재명', name: 'MATERIAL_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-					{
-				        header: '사용여부 *',
-				        name: 'USE_YN',
-				        align: 'center',
-				        formatter: function({value}) {
-				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
-				        },
-				        renderer: { type: CheckboxRenderer }},
-		            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '구역 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
+		            { header: '구역명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {
+		                header: '사용여부 *',
+		                name: 'USE_YN',
+		                align: 'center',
+		                formatter: function({ value }) {
+		                    return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+		                },
+		                renderer: { type: CheckboxRenderer }
+		            },
+		            { header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		        ]);
 		    } else {
-		        locationGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        locationGrid.finishEditing(); // 현재 편집 중인 셀 종료
 		        locationGrid.setColumns(location_columns);
 		    }
 		});
+
 
 
 		$("#btn_location_delete").on("click", function() {
