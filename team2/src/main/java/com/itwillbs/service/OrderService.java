@@ -29,13 +29,18 @@ public class OrderService {
         return response;
     }
 
+	public void insertOrder(Map<String, Object> orderData) {
+		orderMapper.insertOrder(orderData);
+	}
+	
+	public void updateOrder(Map<String, Object> orderData) {
+		orderMapper.updateOrder(orderData);
+	}
+	
     public void deleteOrder(List<String> orderIds) {
         orderMapper.deleteOrder(orderIds);
     }
 
-	public void updateOrder(Map<String, Object> orderData) {
-		orderMapper.updateOrder(orderData);
-	}
 
 	public List<Map<String, Object>> getItemList(Map<String, Object> map) {
 		return orderMapper.getItemList(map);

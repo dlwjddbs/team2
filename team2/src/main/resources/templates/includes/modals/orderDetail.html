@@ -3,7 +3,7 @@
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
 			<div class="modal-header">
-				<h4 class="modal-title">수주 상세정보</h4>
+				<h4 class="modal-title"></h4>
 				<button type="button" class="close" data-dismiss="modal"
 					aria-label="Close">
 					<span aria-hidden="true">&times;</span>
@@ -16,7 +16,7 @@
 				<div class="modal-body">
 					<div class="d-flex justify-content-between align-items-center mb-1">
 						<div class="custom-text d-flex">
-							수주번호 :
+							
 							<div id="orderId" class="ml-1"></div>
 						</div>
 						<div class="custom-text d-flex align-items-center">
@@ -81,17 +81,19 @@
 									class="form-control editable" readonly></td>
 							</tr>
 						</tbody>
-					</table>
+					</table>					
 					<div  class="custom-text d-flex justify-content-end"> 등록자 : 
-					<div id="registBy" class="ml-1"></div>
+					<span id="registBy" class="ml-1"></span>
 					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">닫기</button>
 					<button type="button" class="btn btn-primary" id="btn_edit">수정</button>
+					<button type="button" class="btn btn-success" id="btn_update"
+						style="display: none;">저장</button>			
 					<button type="button" class="btn btn-success" id="btn_save"
-						style="display: none;">저장</button>
+						style="display: none;">저장</button>						
 				</div>
 			</form>
 		</div>

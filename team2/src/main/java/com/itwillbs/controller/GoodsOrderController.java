@@ -62,7 +62,17 @@ public class GoodsOrderController {
 	    	data.put("UPDATE_MEM", id);
 	        String rowType = (String) data.get("rowType");
 	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
-
+	        
+	        String status = String.valueOf(data.get("GO_STATUS")).trim(); // 발주 상태
+	        // 파라미터로 가져오는 상태값에 따라 공통코드에 맞춰서 PO_STATUS 값 변경
+	        if(status.equals("미결")) { // 미결
+	        	data.put("GO_STATUS", "N");
+	        } else if(status.equals("진행중")) { // 진행중
+	        	data.put("GO_STATUS", "I");
+	        } else { // 마감
+	        	data.put("GO_STATUS", "Y");
+	        }
+	        System.out.println(data.get("GO_STATUS") + " 85888888");
 	        if ("insert".equals(rowType)) {
 	            insertList.add(data);
 	        } else if ("update".equals(rowType)) {
@@ -104,21 +114,20 @@ public class GoodsOrderController {
 		return goodsDetail;
 	}
 	
-//	@PostMapping("/saveGoodsDetail")
-//	@ResponseBody
-//	public ResponseEntity<Map<String, Object>> saveGoodsDetail(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {
-//	    int result = 0;
-//	    String id = user.getUsername();
-//	    
-//	    List<Map<String, Object>> insertList = new ArrayList<>();
-//	    List<Map<String, Object>> updateList = new ArrayList<>();
-//	    List<Map<String, Object>> deleteList = new ArrayList<>();
-//
-//	    for (Map<String, Object> data : dataList) {
-//	    	data.put("UPDATE_MEM", id);
-//	        String rowType = (String) data.get("rowType");
-//	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
-//
+	@PostMapping("/saveGoodsDetail")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> saveGoodsDetail(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {
+	    int result = 0;
+	    String id = user.getUsername();
+	    
+	    List<Map<String, Object>> updateList = new ArrayList<>();
+	    List<Map<String, Object>> deleteList = new ArrayList<>();
+
+	    for (Map<String, Object> data : dataList) {
+	    	data.put("UPDATE_MEM", id);
+	        String rowType = (String) data.get("rowType");
+	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
+
 //	        if ("insert".equals(rowType)) {
 //	            insertList.add(data);
 //	        } else if ("update".equals(rowType)) {
@@ -126,22 +135,70 @@ public class GoodsOrderController {
 //	        } else if ("delete".equals(rowType)) {
 //	            deleteList.add(data);
 //	        }
-//	    }
-//
-//	    result += purchaseService.insertDetail(insertList);
-////	    result += purchaseService.updateDetail(updateList);
-//	    result += purchaseService.updateDetailAndStatus(updateList);
-//	    result += purchaseService.deleteDetail(deleteList);
-//	    
-//	    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
-//	 // JSON 형태로 응답 반환 (undefined 방지)
-//	    Map<String, Object> responseMap = new HashMap<>();
-//	    responseMap.put("status", "success");
-//	    responseMap.put("message", "저장이 완료되었습니다!");
-//	    responseMap.put("affectedRows", result);
-//	    
-//	    return ResponseEntity.ok(responseMap);
-//	}
+	    }
+
+	    result += goodsOrderService.updateDetail(updateList);
+	    result += goodsOrderService.deleteDetail(deleteList);
+	    
+	    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
+	 // JSON 형태로 응답 반환 (undefined 방지)
+	    Map<String, Object> responseMap = new HashMap<>();
+	    responseMap.put("status", "success");
+	    responseMap.put("message", "저장이 완료되었습니다!");
+	    responseMap.put("affectedRows", result);
+	    
+	    return ResponseEntity.ok(responseMap);
+	}
+	
+	
+	
+	@PostMapping("/insertGoDetail")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> insertGoDetail(@AuthenticationPrincipal User user, @RequestBody List<Map<String, Object>> dataList) {	    
+	    int result = 0;
+	    
+	    List<Map<String, Object>> insertList = new ArrayList<>();
+	    
+	    // 각 Map에 필요한 추가 데이터 설정 (예: 현재 사용자 ID, 날짜 등)
+	    for (Map<String, Object> data : dataList) {
+	    	String rowType = (String) data.get("rowType");
+	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
+
+	        String status = String.valueOf(data.get("GO_STATUS")).trim(); // 발주 상태
+	        // 파라미터로 가져오는 상태값에 따라 공통코드에 맞춰서 PO_STATUS 값 변경
+	        if(status.equals("미결")) { // 미결
+	        	data.put("PO_STATUS", "N");
+	        } else if(status.equals("진행중")) { // 진행중
+	        	data.put("PO_STATUS", "I");
+	        } else { // 마감
+	        	data.put("PO_STATUS", "Y");
+	        }
+	        
+	        if ("insert".equals(rowType)) {
+	            insertList.add(data);
+	        }
+	    }
+	        
+	        // 필요한 경우, 기타 데이터 전처리 수행
+	        result += goodsOrderService.insertGoDetail(insertList);
+	        
+	    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
+	    
+	    Map<String, Object> responseMap = new HashMap<>();
+	    responseMap.put("status", "success");
+	    responseMap.put("affectedRows", result);
+	    
+	    return ResponseEntity.ok(responseMap);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 }

@@ -130,6 +130,7 @@
 					<div class="card-header">
 						<h5>입고 상세</h5>
 			<div class="card-tools">
+			<input	type="button" id="goodsInsert" class="btn btn-primary" value="입고">
 				<input	type="button" id="saveDetail" class="btn btn-primary" value="저장"> 
 				<input type="button" id="btn_delete2" class="btn btn-primary" 
 				onclick="deleteRows(this.id)" value="삭제">								
@@ -155,38 +156,6 @@
 		background-color: #ffd1d1;
 	}
 	
-	/* 기본 버튼 스타일 */
-	.modern-status-btn {
-	    font-size: 14px;
-	    padding: 4px 8px;
-	    border: 1px solid;
-	    border-radius: 4px;
-	    background-color: transparent;
-	    cursor: pointer;
-	    transition: all 0.2s ease;
-	    outline: none;
-	  }
-	  /* 미결 상태 (pending): 빨간 테두리, hover 시 배경 채워짐 */
-	  .modern-status-btn.pending {
-	    border-color: #e74c3c;
-	    color: #e74c3c;
-	  }
-	  .modern-status-btn.pending:hover:not(:disabled) {
-	    background-color: #e74c3c;
-	    color: #fff;
-	  }
-	  /* 마감 상태 (completed): 파란 테두리와 기본 채워진 배경, 버튼 비활성(disabled) */
-	  .modern-status-btn.completed {
-	    border-color: #3498db;
-	    background-color: #3498db;
-	    color: #fff;
-	    cursor: default;
-	  }
-	  /* disabled 상태인 버튼은 클릭 효과가 없도록 */
-	  .modern-status-btn:disabled {
-	    opacity: 0.85;
-	    pointer-events: none;
-	  }
 </style>
 				<!-- Page specific script -->
 				<script>
@@ -247,21 +216,10 @@
 				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
 				{header: '상태', name: 'GO_STATUS', align: 'center',
-				formatter: ({ value, rowKey }) => {
-					const status = value || '미결';
-					      let btnClass = '';
-					      let disabledAttr = '';					      
-					      // 상태에 따라 클래스와 disabled 속성 설정
-					      if (status === '미결') {
-					        btnClass = 'pending';
-					      } else if (status === '마감') {
-					        btnClass = 'completed';
-					        disabledAttr = 'disabled';
-					      }					      
-					      return `<button class="modern-status-btn ${btnClass}" data-row-key="${rowKey}" ${disabledAttr}>
-					                ${status}
-					              </button>`;
-				    }
+					formatter: ({value}) => {
+						const color = {"미결": "red", "마감": "blue"}[value] || "black";
+						return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
+					}
 				}
 				];
 
@@ -465,13 +423,14 @@
 				// 저장 함수
 				function detailSave() {
 					grid2.blur(); // 포커스 해제
-
+										
 					const modifiedRows2 = grid2.getModifiedRows();
-					const createdRows2 = modifiedRows2.createdRows.map(row => ({...row, rowType: "insert"}));
 					const updatedRows2 = modifiedRows2.updatedRows.map(row => ({...row, rowType: "update"}));
 					const deletedRows2 = modifiedRows2.deletedRows.map(row => ({...row, rowType: "delete"}));
 
-					const allData = [...createdRows2, ...updatedRows2, ...deletedRows2];
+					const allData = [...updatedRows2, ...deletedRows2];
+					
+					
 					
 					if (allData.length === 0) {
 						alert("변경된 데이터가 없습니다.");
@@ -498,10 +457,53 @@
 				}
 				
 				
+				
+				$("#insertGoDetail").on("click", function() {
+				    // grid2에서 체크된 행들을 가져옴
+				    const selectedRows = grid2.getCheckedRows();
+				    if (selectedRows.length === 0) {
+				        alert("입고할 행을 선택하세요.");
+				        return;
+				    }
+				    
+				    // 서버로 전송할 데이터 (PO_DETAIL 삽입에 필요한 값들)
+				    // 예: { PO_ID, PODETAIL_ID, MATERIAL_ID, MATERIAL_NAME, GO_COUNT, GO_PRICE, ... }
+				    // grid2에 저장된 필드명과 DTO의 필드명이 일치해야 합니다.
+				    $.ajax({
+				        url: "/insertGoDetail", // 매핑할 엔드포인트
+				        type: "POST",
+				        contentType: "application/json",
+				        data: JSON.stringify(selectedRows),
+				        beforeSend: (xhr) => xhr.setRequestHeader(header, token),
+				        success: (res) => {
+				            if (res.status === "success") {
+				                showSuccess("입고 처리 완료!", true);
+				            } else {
+				                showError("입고 처리 실패");
+				            }
+				        },
+				        error: () => showError("서버 오류 발생")
+				    });
+				});
+				
+				
+				
+				
+				
+				
+				
+				
+				
 
 				// 메시지
 				function showSuccess(message, reload = false) {
 					Notiflix.Notify.success('저장 성공!');
+					
+					if (reload) {
+				        setTimeout(() => {
+				            location.reload();
+				        }, 1000); // 1초 후 새로고침 (원하는 시간으로 조절 가능)
+				    }
 				}
 
 				function showError(message) {
