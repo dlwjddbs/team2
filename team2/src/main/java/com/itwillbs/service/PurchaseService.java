@@ -61,34 +61,6 @@ public class PurchaseService {
 	        return count;
 	}
 	
-	
-//	public int updateDetailAndStatus(List<Map<String, Object>> updateList) {
-//        int count = 0;
-//        // 1. PO_DETAIL 업데이트
-//        for (Map<String, Object> data : updateList) {
-//            count += purchaseMapper.updateDetail(data);
-//        }
-//        
-//        // 2. 해당 PO_ID의 PURCHASE_ORDER의 PO_STATUS 업데이트
-//        // updateList에서 PO_ID는 동일하다고 가정
-//        if (!updateList.isEmpty()) {
-//            Map<String, Object> data = updateList.get(0);
-//            // PO_ID 값을 추출해서 params에 담습니다.
-//            String poId = (String)data.get("poId");
-//            Map<String, Object> params = new HashMap<>();
-//            params.put("PO_ID", poId);
-//            
-//            purchaseMapper.updatePurchaseStatus(params);
-//        }
-//        
-//        return count;
-//    }
-
-	
-	
-	
-	
-	
 	public int deleteDetail(Map<String, Object> data) {
 		int count = purchaseMapper.deleteDetail(data);
         
@@ -118,13 +90,11 @@ public class PurchaseService {
 		return resultMap;
 	}	
 	
-	
 
 	public List<Map<String, Object>> getMaterialList(Map<String, Object> requestData) {	
 		List<Map<String, Object>> materialList = purchaseMapper.getMaterialList(requestData);
 				
 		return materialList;
 	}
-	
 	
 }

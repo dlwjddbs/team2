@@ -146,8 +146,8 @@
 		
 		let clientRow = $("#clientRow").val(); // 부모창에서 선택한 행 위치
 		console.info("로우 / " + clientRow + " // 컬럼 / " + clientColumn + " // 값 / " + selectedClientId);
-		grid1.setValue(clientRow, "CLIENT_ID", selectedClientId);
-		grid1.setValue(clientRow, "CLIENT_NAME", selectedClientName);
+		grid1.setValue(rowIdx, "CLIENT_ID", selectedClientId);
+		grid1.setValue(rowIdx, "CLIENT_NAME", selectedClientName);
 		cltId = selectedClientId;
 		
 		$('#purchaseClt').modal('hide');

@@ -83,7 +83,7 @@ ORDER BY GO.CREATE_DATE DESC
     UPDATE GOODS_ORDER
     	SET 
        	 	CREATE_DATE = CURRENT_DATE,
-       	 	GO_COUNT = #{GO_COUNT, jdbcType=VARCHAR},
+       	 	GO_COUNT = #{GO_COUNT, jdbcType=INTEGER},
        	 	UPDATE_DATE = CURRENT_DATE,
        	 	UPDATE_MEMBER = #{UPDATE_MEM},
        	 	GO_STATUS = #{GO_STATUS}
@@ -125,9 +125,8 @@ ORDER BY GO.CREATE_DATE DESC
         FROM PO_DETAIL
         GROUP BY PODETAIL_ID, PO_ID, MATERIAL_ID
     ) pd 
-    LEFT JOIN GOODS_ORDER go
-    ON go.PO_ID = pd.PO_ID  -- 입고와 발주 연결
-    LEFT JOIN GO_DETAIL gd ON go.GO_ID = gd.GO_ID
+    LEFT JOIN GOODS_ORDER go ON go.PO_ID = pd.PO_ID 
+	LEFT JOIN GO_DETAIL gd ON go.GO_ID = gd.GO_ID AND pd.PODETAIL_ID = gd.PODETAIL_ID
     LEFT JOIN MATERIAL m ON pd.MATERIAL_ID = m.MATERIAL_ID  -- 품목 정보 조인
     LEFT JOIN MES_COMMON mc ON pd.PO_STATUS = mc.SUB_ID AND mc.MAIN_ID = 'STATUS' -- 상태명 조회
 
@@ -153,6 +152,7 @@ ORDER BY GO.CREATE_DATE DESC
     </delete>
 
 
+<!-- 입고 상세 등록 -->
 <insert id="insertGoDetail" parameterType="map">
 	<![CDATA[
         INSERT INTO GO_DETAIL (
@@ -183,6 +183,7 @@ ORDER BY GO.CREATE_DATE DESC
     ]]>
 </insert>
 
+<!-- 발주 상세 상태 변경 -->
 <update id="updatePoDetail" parameterType="map">
     <![CDATA[
         UPDATE PO_DETAIL
@@ -191,6 +192,7 @@ ORDER BY GO.CREATE_DATE DESC
     ]]>
 </update>
 
+<!-- 발주 상태 변경 -->
 <update id="updatePurchaseOrderStatus" parameterType="map">
     <![CDATA[
         UPDATE PURCHASE_ORDER
@@ -214,6 +216,7 @@ ORDER BY GO.CREATE_DATE DESC
     ]]>
 </update>
 
+<!-- 입고 상태 변경 -->
 <update id="updateGoodsOrderStatus" parameterType="map">
     <![CDATA[
         UPDATE GOODS_ORDER
