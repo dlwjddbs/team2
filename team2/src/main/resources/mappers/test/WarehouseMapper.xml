@@ -80,6 +80,7 @@
 	    , TO_CHAR(IL.RESERVED_QUANTITY, 'FM999,999,999,999') AS RESERVED_QUANTITY
 	    , IL.USE_YN
 	    , IL.DESCRIPTION
+		, W.WAREHOUSE_ID 
 		  FROM ITEM_LOCATION IL
 		      INNER JOIN WAREHOUSE W 
 		            ON IL.WAREHOUSE_ID = W.WAREHOUSE_ID
@@ -95,62 +96,43 @@
 		</choose>
     </select>
     
-<!--	<update id="addLocation">-->
-<!--	   <foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">-->
-<!--		    UPDATE ITEM_LOCATION-->
-<!--		    SET LOCATION_ID = #{item.LOCATION_ID} -->
-<!--		      , LOCATION_NAME = #{item.LOCATION_NAME}-->
-<!--		      , PRODUCT_ID = (-->
-<!--			       	 SELECT CASE -->
-<!--			                   WHEN W.WAREHOUSE_TYPE = '원자재' THEN IL.MATERIAL_ID-->
-<!--			                   WHEN W.WAREHOUSE_TYPE IN ('반제품', '완제품') THEN IL.ITEM_ID-->
-<!--			                   ELSE NULL-->
-<!--			               END-->
-<!--				        FROM WAREHOUSE W-->
-<!--				        WHERE W.WAREHOUSE_ID = IL.WAREHOUSE_ID-->
-<!--   					 ),-->
-<!--		      , LOCATION_ORDER = #{item.LOCATION_ORDER}-->
-<!--		      , CURRENT_QUANTITY = TO_NUMBER(#{item.CURRENT_QUANTITY})  -->
-<!--		      , RESERVED_QUANTITY = TO_NUMBER(#{item.RESERVED_QUANTITY})  -->
-<!--		      , USE_YN = #{item.USE_YN}-->
-<!--		    WHERE WAREHOUSE_ID = #{item.WAREHOUSE_ID};-->
-<!--	    </foreach>-->
-<!--	</update>-->
-    
     <insert id="insertLocation">
-	    INSERT INTO ITEM_LOCATION (
-	        LOCATION_ID,
-	        LOCATION_NAME,
-	        MATERIAL_ID,
-	        ITEM_ID,
-	        LOCATION_ORDER,
-	        CURRENT_QUANTITY,
-	        RESERVED_QUANTITY,
-	        USE_YN,
-	        DESCRIPTION,
-	        WAREHOUSE_ID
-	    )
-	    VALUES (
-	        #{location_id},
-	        #{location_name},
-	        <choose>
-	            <when test="warehouse_type == '원자재'">
-	                #{product_id}, NULL
-	            </when>
-	            <when test="warehouse_type == '반제품' or warehouse_type == '완제품'">
-	                NULL, #{product_id}
-	            </when>
-	            <otherwise>
-	                NULL, NULL
-	            </otherwise>
-	        </choose>,
-	        #{location_order},
-	        #{current_quantity},
-	        #{reserved_quantity},
-	        #{use_yn},
-	        #{description},
-	        #{warehouse_id}
-	    )
+	   INSERT ALL
+		    <foreach collection="list" item="item">
+		        INTO ITEM_LOCATION (
+		            LOCATION_ID
+		            , LOCATION_NAME
+		            , MATERIAL_ID
+		            , ITEM_ID
+		            , LOCATION_ORDER
+		            , CURRENT_QUANTITY
+		            , RESERVED_QUANTITY
+		            , USE_YN
+		            , DESCRIPTION
+		            , WAREHOUSE_ID
+		        )
+		        VALUES (
+		            #{item.LOCATION_ID}
+		            , #{item.LOCATION_NAME}
+		           ,  CASE 
+		                WHEN (SELECT WAREHOUSE_TYPE FROM WAREHOUSE WHERE WAREHOUSE_ID = #{item.WAREHOUSE_ID}) = '원자재' 
+		                THEN #{item.PRODUCT_ID} 
+		                ELSE ''
+		            END
+		            , CASE 
+		                WHEN (SELECT WAREHOUSE_TYPE FROM WAREHOUSE WHERE WAREHOUSE_ID = #{item.WAREHOUSE_ID}) IN ('반제품', '완제품') 
+		                THEN #{item.PRODUCT_ID} 
+		                ELSE '' 
+		            END
+		            , #{item.LOCATION_ORDER}
+		            , #{item.CURRENT_QUANTITY}
+		            , #{item.RESERVED_QUANTITY}
+		            , #{item.USE_YN}
+		            , #{item.DESCRIPTION}
+		            , #{item.WAREHOUSE_ID}
+		        )
+		    </foreach>
+		SELECT * FROM DUAL
     </insert>
 	
 	<update id="deleteLocation">

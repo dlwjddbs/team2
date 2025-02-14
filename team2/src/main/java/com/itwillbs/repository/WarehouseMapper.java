@@ -26,7 +26,11 @@ public interface WarehouseMapper {
 
 	int insertLocation(List<Map<String, Object>> createdRows);
 
+	int updateLocation(List<Map<String, Object>> updatedRows);
+	
 	int deleteLocation(List<String> locationIds);
+
+
 
 
 }
