@@ -124,14 +124,14 @@
 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
 			    }
 			},
-			{
-			    header: '검사여부', 
-			    name: 'INSPECTION_YN', 
-			    align: 'center',
-			    formatter: function({value}) {
-			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
-			    }
-			},
+// 			{
+// 			    header: '검사여부', 
+// 			    name: 'INSPECTION_YN', 
+// 			    align: 'center',
+// 			    formatter: function({value}) {
+// 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 			    }
+// 			},
             {header: '비고', name: 'NOTE', align: 'left', editor: null},
         ];
 		
@@ -223,6 +223,10 @@
 		    el.type = 'checkbox';
 		    el.checked = (props.value === 'Y');  // 초기값 지정
 		
+		    if (props.grid.getValue(props.rowKey, 'USED_CNT') > 0) {
+		    	el.disabled = true;
+		    }
+		    
 			el.addEventListener('change', function() {
 		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
 		    });
@@ -258,7 +262,7 @@
 				editingEvent: 'click',
 		        columns: process_columns,
 		    });
-
+		    
 		    processGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
@@ -289,16 +293,17 @@
 				        },
 				        renderer: { type: CheckboxRenderer }
 				    },
-				    {
-				        header: '검사여부 *',
-				        name: 'INSPECTION_YN',
-				        align: 'center',
-				        formatter: function({value}) {
-				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
-				        },
-				        renderer: { type: CheckboxRenderer }
-				    },
+// 				    {
+// 				        header: '검사여부 *', 
+// 				        name: 'INSPECTION_YN',
+// 				        align: 'center',
+// 				        formatter: function({value}) {
+// 				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+// 				        },
+// 				        renderer: { type: CheckboxRenderer }
+// 				    },
 		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '공정 사용 개수', name: 'USED_CNT', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
 		        processGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림

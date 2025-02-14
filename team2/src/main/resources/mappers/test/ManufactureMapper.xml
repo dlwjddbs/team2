@@ -132,12 +132,13 @@
     
     <select id="selectProcess" resultType="map">
 	    SELECT
-			   PROCESS_ID 
-			 , NAME 
-			 , USE_YN 
-			 , INSPECTION_YN 
-			 , NOTE 
-		  FROM PROCESS
+			   p.PROCESS_ID 
+			 , p.NAME 
+			 , p.USE_YN 
+			 , p.INSPECTION_YN 
+			 , p.NOTE 
+			 , (SELECT count(*) FROM PROCESS_ROUTING_MAPPING WHERE PROCESS_ID = p.PROCESS_ID) AS used_cnt
+		  FROM PROCESS p
 		 WHERE
 			   1 = 1
    		<if test='inspection_yn != null and inspection_yn != ""'>
@@ -169,7 +170,7 @@
 				  #{item.PROCESS_ID, jdbcType=VARCHAR}
 				, #{item.NAME}
 				, #{item.USE_YN}
-				, #{item.INSPECTION_YN}
+				, 'N'
 				, #{item.NOTE, jdbcType=VARCHAR}
 			)
 		</foreach>
