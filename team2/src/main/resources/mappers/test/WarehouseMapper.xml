@@ -76,8 +76,10 @@
 	           WHEN W.WAREHOUSE_TYPE IN('반제품', '완제품') THEN IL.ITEM_ID
 	         END AS PRODUCT_ID
 	    , IL.LOCATION_ORDER
-	    , TO_CHAR(IL.CURRENT_QUANTITY, 'FM999,999,999,999') AS CURRENT_QUANTITY
-	    , TO_CHAR(IL.RESERVED_QUANTITY, 'FM999,999,999,999') AS RESERVED_QUANTITY
+<!--	    , TO_CHAR(IL.CURRENT_QUANTITY, 'FM999,999,999,999') AS CURRENT_QUANTITY-->
+<!--	    , TO_CHAR(IL.RESERVED_QUANTITY, 'FM999,999,999,999') AS RESERVED_QUANTITY-->
+	    , IL.CURRENT_QUANTITY
+	    , IL.RESERVED_QUANTITY
 	    , IL.USE_YN
 	    , IL.DESCRIPTION
 		, W.WAREHOUSE_ID 
@@ -134,6 +136,31 @@
 		    </foreach>
 		SELECT * FROM DUAL
     </insert>
+    
+<!--	<update id="updateLocation">-->
+<!--		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">-->
+<!--		    UPDATE ITEM_LOCATION IL-->
+<!--		    SET -->
+<!--		        LOCATION_NAME = #{row.LOCATION_NAME},-->
+<!--		        MATERIAL_ID = (SELECT CASE -->
+<!--		                                WHEN W.WAREHOUSE_TYPE = '원자재' THEN #{row.PRODUCT_ID} -->
+<!--		                                ELSE IL.MATERIAL_ID -->
+<!--		                             END -->
+<!--		                       FROM WAREHOUSE W -->
+<!--		                       WHERE W.WAREHOUSE_ID = IL.WAREHOUSE_ID),-->
+<!--		        ITEM_ID = (SELECT CASE -->
+<!--		                            WHEN W.WAREHOUSE_TYPE IN ('반제품', '완제품') THEN #{row.PRODUCT_ID} -->
+<!--		                            ELSE IL.ITEM_ID -->
+<!--		                         END -->
+<!--		                   FROM WAREHOUSE W -->
+<!--		                   WHERE W.WAREHOUSE_ID = IL.WAREHOUSE_ID),-->
+<!--		        LOCATION_ORDER = #{row.LOCATION_ORDER},-->
+<!--		        CURRENT_QUANTITY = #{row.CURRENT_QUANTITY},-->
+<!--		        USE_YN = #{row.USE_YN}-->
+<!--		    WHERE WAREHOUSE_ID = #{row.WAREHOUSE_ID}-->
+<!--		</foreach>    -->
+<!--	</update>-->
+
 	
 	<update id="deleteLocation">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
