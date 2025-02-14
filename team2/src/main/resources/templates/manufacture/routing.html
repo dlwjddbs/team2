@@ -178,14 +178,14 @@
 		    {header: '순서', name: 'SORT_ORDER', align: 'center', editor: null},
 		    {header: '공정코드', name: 'PROCESS_ID', align: 'left', editor: null},
 		    {header: '공정명', name: 'NAME', align: 'left', editor: null},
-			{
-			    header: '검사여부', 
-			    name: 'INSPECTION_YN', 
-			    align: 'center',
-			    formatter: function({value}) {
-			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
-			    }
-			},
+// 			{
+// 			    header: '검사여부', 
+// 			    name: 'INSPECTION_YN', 
+// 			    align: 'center',
+// 			    formatter: function({value}) {
+// 			        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 			    }
+// 			},
 			{
 			    header: '최종여부', 
 			    name: 'IS_LAST_ORDER', 
@@ -295,6 +295,10 @@
 		    const el = document.createElement('input');
 		    el.type = 'checkbox';
 		    el.checked = (props.value === 'Y');  // 초기값 지정
+		    
+		    if (props.grid.getValue(props.rowKey, 'USED_CNT') > 0) {
+		    	el.disabled = true;
+		    }
 		
 			el.addEventListener('change', function() {
 		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트

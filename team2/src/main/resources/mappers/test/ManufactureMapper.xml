@@ -144,6 +144,9 @@
    		<if test='inspection_yn != null and inspection_yn != ""'>
 			AND INSPECTION_YN = #{inspection_yn}
 		</if>
+   		<if test='use_yn != null and use_yn != ""'>
+			AND USE_YN = #{use_yn}
+		</if>
 		<if test='searchKeyword != null and searchKeyword != ""'>
 			AND (PROCESS_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
 					OR NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
@@ -206,6 +209,7 @@
 			 , i.ITEM_NAME 			AS ITEM_NAME
 			 , r.NOTE				AS NOTE
 			 , r.PROCESS_QUANTITY	AS PROCESS_QUANTITY
+			 , (SELECT COUNT(*) FROM WORKCENTER WHERE ROUTING_ID = r.ROUTING_ID) AS USED_CNT
 		  FROM ROUTING r
 			   INNER JOIN ITEM i
 					   ON r.ITEM_ID = i.ITEM_ID 
@@ -218,7 +222,10 @@
 			 , ITEM_TYPE
 			 , USE_YN
 		  FROM ITEM
-		 WHERE ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+		 WHERE 
+			   1 = 1
+		   AND ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+		   AND USE_YN = 'Y'
     </select>
     
     <insert id="insertRouting">
