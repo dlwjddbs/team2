@@ -152,11 +152,10 @@
 
 
 			<style>
-
-	.selected-row {
-			background-color: #e3f2fd;
-			transition: background-color 0.3s ease-in-out;
-		}
+.selected-row {
+	background-color: #e3f2fd;
+	transition: background-color 0.3s ease-in-out;
+}
 
 .deselected-row {
 	background-color: #ffd1d1;
@@ -228,7 +227,7 @@
 				{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
 				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
-				{header: '상태', name: 'PO_STATUS', align: 'center', editor: 'text',
+				{header: '상태', name: 'PO_STATUS', align: 'center',
 					formatter: ({value}) => {
 						const color = {"미결": "red", "마감": "blue"}[value] || "black";
 						return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
@@ -316,30 +315,9 @@
 						$("#divider").fadeOut(300).removeClass("visible").addClass("hidden");
 						grid2.resetData([]);
 					});
-
-// 					-----------------
-// 					function dtlGrid(data) {
-// 						if (!grid2) {
-// 							grid2 = new tui.Grid({
-// 							el: document.getElementById('toast_single2'),
-// 							data: [],
-// 							scrollX: true,
-// 							scrollY: true,
-// 							rowHeaders: ['checkbox'],
-// 							editingEvent: 'click',
-// 							pageOptions: {
-// 					        useClient: true,  // 서버에서 페이징 처리
-// 					        perPage: 10        // 페이지당 10개
-// 					        },
-// 							columns: columns2,
-// 						});
-// 						} 
 						
 					function dtlGrid(data) {
-				    // API 요청을 위한 파라미터 설정
-// 				   dataSource.api.readData.initParams.po_id = po_id;
-				
-				
+				   
 				    // 기존 그리드가 없을 때만 새로 생성
 				   if (!grid2) {
 					   grid2 = new tui.Grid({
@@ -357,39 +335,17 @@
 				        columns: columns2,
 				    });
 
-   } 			
-						
+   } 								
    grid2.resetData(data);					
 		
-						
-// function dtlGrid(po_id) {
-// 			// 파라미터 설정
-// 			materialDataSource.api.readData.initParams.po_id = po_id;
-			
-// 			if (materialGrid) {
-// 				materialGrid.destroy(); // 기존 그리드 제거
-// 				materialGrid = null;
-// 			}
-			
-// 			materialGrid = new tui.Grid({
-// 		        el: document.getElementById('toast_single2'),
-// 		        data: materialDataSource,
-// 		        scrollX: true,
-// 		        scrollY: true,
-// 		        bodyHeight: 250,
-// 		        rowHeaders: ['checkbox'],
-// 		        pageOptions: {
-// 			        useClient: true,  // 서버에서 페이징 처리
-// 			        perPage: 10        // 페이지당 10개
-// 			        },
-// 		        columns: material_columns,
-// 		    });
+   data.forEach((row, rowKey) => {
+       if (row.PO_STATUS !== '미결') {
+           grid2.disableCell(rowKey, 'PO_COUNT'); // 편집 불가능
+       } else {
+           grid2.enableCell(rowKey, 'PO_COUNT'); // 편집 가능
+       }
+   });					
 
-
-
-// 						grid2.resetData(data);
-						
-	
 						// grid2 값 변경 시 자동 계산 (총금액 업데이트)
 					    grid2.on('afterChange', (event) => {
 					        event.changes.forEach(({ rowKey, columnName, value }) => {
@@ -454,8 +410,16 @@
 					}
 
 				}
-
 				$("#btn_add_row").on("click", function () {
+					
+					const rowKeysToDelete = grid1.getData()
+			        .filter(row => row.isNew) // `isNew` 속성이 있는 행만 필터링
+			        .map(row => row.rowKey); // 삭제할 rowKey 추출
+
+			    rowKeysToDelete.forEach(function (key) {
+			        grid1.removeRow(key);
+			    });
+					
 					let today = new Date();
 					let year = today.getFullYear(); // 년도
 					let month = String(today.getMonth() + 1).padStart(2, "0");  // 월
@@ -466,15 +430,16 @@
 							"PO_STATUS": '미결',
 						},
 						{	
-							focus: true
+							at: 0, focus: true
 						}
 					);
+					
+			    
 				});
 
 				// 저장 버튼 이벤트
 				save.addEventListener('mousedown', handleSave);
 				saveDetail.addEventListener('mousedown', detailSave);
-				
 				
 				//삭제
 				let delRows = [];
@@ -492,7 +457,7 @@
 					const checkedRows = gridNm.getCheckedRows(); // 체크된 행 가져오기
 
 					if (checkedRows.length === 0) {
-						alert("삭제할 행을 선택하세요.");
+						showError("삭제할 행을 선택해주세요.", "warning");
 						return;
 					}
 
@@ -502,8 +467,6 @@
 					});
 
 				}
-
-
 
 				// 저장 함수
 				function handleSave() {
@@ -517,10 +480,17 @@
 					const allData = [...createdRows, ...updatedRows, ...deletedRows];
 
 					if (allData.length === 0) {
-						alert("변경된 데이터가 없습니다.");
+						showError("변경된 데이터가 없습니다.", "warning");
 						return;
 					}
+					
+					const invalidClientRows = allData.filter(row => row.rowType !== "delete" && (!row.CLIENT_ID || row.CLIENT_ID.trim() === ""));
 
+				    if (invalidClientRows.length > 0) {
+				        showError("거래처를 선택해주세요.", "warning");  // Notiflix 경고 메시지
+				        return;
+				    }
+					
 
 					$.ajax({
 						url: "/savePurchase",
@@ -552,11 +522,21 @@
 					const allData = [...createdRows2, ...updatedRows2, ...deletedRows2];
 					
 					if (allData.length === 0) {
-						alert("변경된 데이터가 없습니다.");
-						return;
-					}
+				        showError("변경된 데이터가 없습니다.", "warning"); // 변경된 데이터 없음
+				        return;
+				    }
 
 
+					const invalidRows = allData.filter(row => 
+			        row.rowType !== "delete" && (!row.PO_COUNT || row.PO_COUNT <= 0 || row.PO_COUNT.trim() === "")
+			    );
+
+			    if (invalidRows.length > 0) {
+			        showError("수량을 입력해주세요.", "warning");  // Notiflix 경고 메시지
+			        return;
+			    }
+					
+					
 					$.ajax({
 						url: "/saveDetail",
 						type: 'POST',
@@ -587,30 +567,29 @@
 				        }, 1000); // 1초 후 새로고침 (원하는 시간으로 조절 가능)
 				    }
 				}
-
-				function showError(message) {
-					Notiflix.Notify.failure('저장 실패!');
+				
+				function showError(message, type = "failure") {
+				    if (type === "failure") {
+				        Notiflix.Notify.failure('저장 실패!'); 
+				    } else if (type === "warning") {
+				        Notiflix.Notify.warning(message);
+				    }
 				}
 				
-				
 
-		
 		$("#material-modal-btn").on("click", function() {
 			$("#purchaseMtl").modal("show");
 		});
 
 					$(document).on("click", ".client-modal-btn", function (props) {
-						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
+						// rowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
 						 const rowKey = $(this).data("row-key");
-				    // 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
 				    $("#clientRow").val(rowKey);
 						
 						$("#purchaseClt").modal("show");
-							       // loadClientList(); // 거래처 리스트 불러오기
 							    });							
 
-				
-			</script>
+</script>
 </body>
 
 </html>

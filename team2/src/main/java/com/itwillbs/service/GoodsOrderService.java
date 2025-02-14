@@ -14,17 +14,20 @@ import lombok.RequiredArgsConstructor;
 public class GoodsOrderService {
 	
 	private final GoodsOrderMapper goodsOrderMapper;
-
+	
+	// 입고 리스트
 	public List<Map<String, Object>> getGoodsList(Map<String, Object> map) {
 		return goodsOrderMapper.getGoodsList(map);
 	}
-
+	
+	// 입고 신규버튼 발주 리스트
 	public List<Map<String, Object>> getGoodsPoList(Map<String, Object> requestData) {
 		List<Map<String, Object>> goodsPoList = goodsOrderMapper.getGoodsPoList(requestData);
 		
 		return goodsPoList;
 	}
 
+	// 입고 저장
 	public int insertGoods(List<Map<String, Object>> insertList) {
 		int count = 0;
         for (Map<String, Object> data : insertList) {
@@ -32,7 +35,8 @@ public class GoodsOrderService {
         }
         return count;
 	}
-
+	
+	//입고 수정
 	public int updateGoods(List<Map<String, Object>> updateList) {
 		int count = 0;
 		 
@@ -41,7 +45,8 @@ public class GoodsOrderService {
         }
         return count;
 	}
-
+	
+	//입고 삭제
 	public int deleteGoods(List<Map<String, Object>> deleteList) {
 		int count = 0;
         for (Map<String, Object> data : deleteList) {
@@ -49,7 +54,8 @@ public class GoodsOrderService {
         }
         return count;
 	}
-
+	
+	//입고 상세 리스트
 	public List<Map<String, Object>> getGoodsDetail(Map<String, Object> map) {
 		return goodsOrderMapper.getGoodsDetail(map);
 	}
@@ -62,7 +68,8 @@ public class GoodsOrderService {
         }
         return count;
 	}
-
+	
+	// 입고상세 삭제
 	public int deleteDetail(List<Map<String, Object>> deleteList) {
 		int count = 0;
         for (Map<String, Object> data : deleteList) {

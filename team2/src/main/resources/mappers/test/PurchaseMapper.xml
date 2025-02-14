@@ -132,36 +132,6 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
 	</update>
 
 
-<!--<update id="updatePurchaseStatus" parameterType="map">-->
-<!--    <![CDATA[-->
-<!--  UPDATE PURCHASE_ORDER-->
-<!--  SET PO_STATUS = (-->
-<!--    SELECT -->
-<!--      CASE -->
-<!--        WHEN MIN(PD.PO_STATUS) = 'N' AND MAX(PD.PO_STATUS) = 'N' THEN 'N'-->
-<!--        WHEN MIN(PD.PO_STATUS) = 'Y' AND MAX(PD.PO_STATUS) = 'Y' THEN 'Y'-->
-<!--        ELSE 'I'-->
-<!--      END-->
-<!--    FROM PO_DETAIL PD-->
-<!--    WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID-->
-<!--  )-->
-<!--  WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}-->
-<!--    AND PO_STATUS <> (-->
-<!--      SELECT -->
-<!--        CASE -->
-<!--          WHEN MIN(PD.PO_STATUS) = 'N' AND MAX(PD.PO_STATUS) = 'N' THEN 'N'-->
-<!--          WHEN MIN(PD.PO_STATUS) = 'Y' AND MAX(PD.PO_STATUS) = 'Y' THEN 'Y'-->
-<!--          ELSE 'I'-->
-<!--        END-->
-<!--      FROM PO_DETAIL PD-->
-<!--      WHERE PD.PO_ID = PURCHASE_ORDER.PO_ID-->
-<!--    )-->
-<!--]]>-->
-<!--</update>-->
-
-
-
-
 <!-- DELETE (데이터 삭제) -->
     <delete id="deleteDetail" parameterType="map">
         DELETE FROM PO_DETAIL 
@@ -196,7 +166,6 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
 		   AND MATERIAL_NAME LIKE '%' || #{material_name} || '%'
 		</if>
     </select>
-
 
 </mapper>
 

@@ -198,7 +198,7 @@
 						{header: '발주상세번호', name: 'PODETAIL_ID', hidden: true},
 						{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},
 						{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},
-						{header: '수량', name: 'GO_COUNT', align: 'center', editor: 'text'},
+						{header: '수량', name: 'GO_COUNT', align: 'center'},
 						{header: '단가', name: 'GO_PRICE', align: 'center'},
 						{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
 						{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
@@ -293,8 +293,7 @@
 							$("#divider").fadeOut(300).removeClass("visible").addClass("hidden");
 							grid2.resetData([]);
 						});
-
-
+		
 
 						function dtlGrid(data) {
 
@@ -316,7 +315,17 @@
 								});
 							}
 							grid2.resetData(data);
-
+						
+							
+							
+							// '마감' 상태 행의 체크박스 비활성화 처리
+						    data.forEach((row, index) => {
+						        if (row.GO_STATUS === '마감') {
+						            grid2.disableRowCheck(index); // 체크박스 비활성화
+						        }
+						    });
+							
+							
 							// 체크박스가 활성화된 행의 index를 배열에 저장
 							grid2.on('check', (ev) => {
 								delRows.push(ev.rowKey);
@@ -362,7 +371,7 @@
 						const checkedRows = gridNm.getCheckedRows(); // 체크된 행 가져오기
 
 						if (checkedRows.length === 0) {
-							alert("삭제할 행을 선택하세요.");
+							showError("삭제할 행을 선택하세요.", "warning");
 							return;
 						}
 
@@ -372,7 +381,6 @@
 						});
 
 					}
-
 
 
 					// 저장 함수
@@ -387,13 +395,13 @@
 						const allData = [...createdRows, ...updatedRows, ...deletedRows];
 
 						if (allData.length === 0) {
-							alert("변경된 데이터가 없습니다.");
+							showError("변경된 데이터가 없습니다.", "warning");
 							return;
 						}
 
 						for (let row of createdRows) {
 							if (!row.PO_ID) {
-								alert("새로운 입고 행에 P/O번호가 누락되었습니다.");
+								showError("새로운 입고 행에 P/O번호가 누락되었습니다.", "warning");
 								return;
 							}
 						}
@@ -429,7 +437,7 @@
 
 
 						if (allData.length === 0) {
-							alert("변경된 데이터가 없습니다.");
+							showError("변경된 데이터가 없습니다.", "warning");
 							return;
 						}
 
@@ -458,7 +466,7 @@
 						// grid2에서 체크된 행들을 가져옴
 						const selectedRows = grid2.getCheckedRows();
 						if (selectedRows.length === 0) {
-							alert("입고할 행을 선택하세요.");
+							showError("입고할 행을 선택하세요.", "warning");
 							return;
 						}
 
@@ -484,9 +492,6 @@
 					});
 
 
-
-
-
 					// 메시지
 					function showSuccess(message, reload = false) {
 						Notiflix.Notify.success('저장 성공!');
@@ -498,11 +503,13 @@
 						}
 					}
 
-					function showError(message) {
-						Notiflix.Notify.failure('저장 실패!');
+					function showError(message, type = "failure") {
+					    if (type === "failure") {
+					        Notiflix.Notify.failure('저장 실패!'); 
+					    } else if (type === "warning") {
+					        Notiflix.Notify.warning(message);
+					    }
 					}
-
-
 
 
 					$("#goods-modal-btn").on("click", function () {
@@ -511,24 +518,7 @@
 
 
 
-
-
-					$("#material-modal-btn").on("click", function () {
-						$("#purchaseMtl").modal("show");
-					});
-
-					$(document).on("click", ".client-modal-btn", function (props) {
-						// selectedRowKey = $(this).data("row-key"); // 선택한 grid2의 행 key 저장
-						const rowKey = $(this).data("row-key");
-						// 업데이트할 컬럼 이름 지정 (예: "CLIENT_ID")
-						$("#clientRow").val(rowKey);
-
-						$("#purchaseClt").modal("show");
-						// loadClientList(); // 거래처 리스트 불러오기
-					});
-
-
-				</script>
+</script>
 </body>
 
 </html>

@@ -128,13 +128,6 @@ public class GoodsOrderController {
 	        String rowType = (String) data.get("rowType");
 	        System.out.println("처리할 데이터: " + rowType + " → " + data); // rowType 출력
 
-//	        if ("insert".equals(rowType)) {
-//	            insertList.add(data);
-//	        } else if ("update".equals(rowType)) {
-//	            updateList.add(data);
-//	        } else if ("delete".equals(rowType)) {
-//	            deleteList.add(data);
-//	        }
 	    }
 
 	    result += goodsOrderService.updateDetail(updateList);
@@ -149,7 +142,6 @@ public class GoodsOrderController {
 	    
 	    return ResponseEntity.ok(responseMap);
 	}
-	
 	
 	
 	@PostMapping("/insertGoDetail")
@@ -198,15 +190,6 @@ public class GoodsOrderController {
 	    
 	    return ResponseEntity.ok(responseMap);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 }

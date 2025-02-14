@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itwillbs.repository.MaterialMapper">
+
+<select id="getMaterialList" resultType="map" parameterType="map">
+	SELECT
+		MATERIAL_ID,
+		MATERIAL_NAME,
+		MATERIAL_PRICE,
+		GROUP_CODE,
+		COMMON_CODE,
+		UNIT
+	FROM
+		MATERIAL
+</select>
+
+<insert id="insertMaterial" parameterType="map">
+    INSERT INTO MATERIAL (
+        MATERIAL_ID,
+        MATERIAL_NAME,
+        MATERIAL_PRICE,
+        GROUP_CODE,
+        COMMON_CODE,
+        UNIT
+    ) VALUES (
+        LPAD(MATERIAL_SEQ.NEXTVAL, 3, '0'),
+        #{MATERIAL_NAME},
+        #{MATERIAL_PRICE},
+        #{GROUP_CODE},
+        #{COMMON_CODE},
+        #{UNIT}
+    )
+</insert>
+
+
+
+
+</mapper>
