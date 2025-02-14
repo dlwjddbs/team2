@@ -29,6 +29,7 @@ public class BomRestController {
 	
 	private final String bom_url = "/manufacture/bom";
 	private final String bomDetail_url = "/manufacture/bomDetail";
+	private final String item_url = "/manufacture/bomDetail_Item";
 	
 	@GetMapping(bom_url)
 	public Map<String, Object> getBom() {
@@ -50,24 +51,29 @@ public class BomRestController {
 	}
 	
 	@GetMapping(bomDetail_url)
-	public Map<String, Object> getEquipment(@RequestParam Map<String, Object> requestData) {
+	public Map<String, Object> getBomDetail(@RequestParam Map<String, Object> requestData) {
 		return bomService.selectBomDetail(requestData);
 	}
 	
 	@PostMapping(bomDetail_url)
-	public Map<String, Object> addEquipment(@RequestBody Map<String, Object> requestData) {
+	public Map<String, Object> addBomDetail(@RequestBody Map<String, Object> requestData) {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
         return bomService.addBomDetail(createdRows);
 	}
 	
 	@DeleteMapping(bomDetail_url)
-	public Map<String, Object> deletEquipment(@RequestHeader("X-Delete-IDs") String encodedIds) {
+	public Map<String, Object> deletBomDetail(@RequestHeader("X-Delete-IDs") String encodedIds) {
 		// 한글ID 넘어올 시 변환
 	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
 	    List<String> bomDetailIds = Arrays.asList(decodedIds.split(","));
 	    
         return bomService.deleteBomDetail(bomDetailIds);
+	}
+	
+	@GetMapping(item_url)
+	public Map<String, Object> getItem(@RequestParam Map<String, Object> requestData) {
+		return bomService.selectItemInfo(requestData);
 	}
 }
 

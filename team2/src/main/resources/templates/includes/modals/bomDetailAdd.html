@@ -40,15 +40,15 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-md-8">
-								<span style="padding-left: 20px;">BOM 상세 목록</span>
-								<div class="card-body" id="bomDetailModalGrid" style="padding-top: 10px;">
+							<div class="col-md-6">
+								<span style="padding-left: 20px;">품목 목록</span>
+								<div class="card-body" id="itemModalGrid" style="padding-top: 10px;">
 									<!-- Toast Grid Ajax -->
 								</div>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-6">
 								<span style="padding-left: 20px;">선택 목록</span>
-								<div class="card-body" id="bomDetailModalSelectedGrid" style="padding-top: 10px;">
+								<div class="card-body" id="itemModalSelectedGrid" style="padding-top: 10px;">
 									 <!-- Toast Grid Ajax -->
 								</div>
 							</div>
@@ -60,8 +60,8 @@
 			<!-- 모달창 푸터-->
 			<div>
 				<div class="modal-footer justify-content-between">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-primary" id="savebomDetail">적용</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					<button type="submit" class="btn btn-primary" id="saveBomDetail">적용</button>
 				</div>
 			</div>
 			<!-- /.모달창 푸터-->
@@ -71,75 +71,97 @@
 <!-- /.모달창 -->
 
 <script th:fragment="bomDetailAdd" th:inline="javascript">
-	let bomDetailModalGrid = null;
-	let selectedBomDetailList = [];
-	let bomDetailModalSelectedGrid = null;
-	const bomDetailSelected_columns = [
-	    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null},
-	    {header: '설비명', name: 'EQUIPMENT_NAME', align: 'left', editor: null},
+
+	// 품목 (BOM 상세 추가용)
+	let itemGrid = null;
+	const itemUrl = '/manufacture/bomDetail_Item';
+	const itemDataSource = {
+		api: {
+		    readData: {url: itemUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	let itemCurrentSelectedRowKey = null;
+	const item_columns = [
+	    {header: '품목 코드', name: 'ID', align: 'center', editor: null},
+	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
+	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
+	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: null, hidden: true},
 	];
-	let bomDetailParam = {searchKeyword: ''};
+
+	let itemModalGrid = null;
+	let selectedItemList = [];
+	let itemModalSelectedGrid = null;
+	
+	const itemSelected_columns = [
+	    {header: '품목 코드', name: 'ID', align: 'center', editor: null},
+	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
+	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
+	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: 'text'},
+	];
+	let itemParam = {searchKeyword: ''};
 	
 	$('#bomDetailAdd').on('shown.bs.modal', function () {
-		selectedBomDetailList.length = 0;
-		bomDetailParam.searchKeyword = '';
+		selectedItemList.length = 0;
+		itemParam.searchKeyword = '';
         
-		bomDetailModalInit();
+		itemModalInit();
 	});
 	
-	function bomDetailModalInit() {
+	function itemModalInit() {
 		// 파라미터 설정
-		bomDetailDataSource.api.readData.initParams.bom_id = '';
+		itemDataSource.api.readData;
 		
-		if (bomDetailModalGrid) {
-			bomDetailModalGrid.destroy(); // 기존 그리드 제거
-			bomDetailModalGrid = null;
+		if (itemModalGrid) {
+			itemModalGrid.destroy(); // 기존 그리드 제거
+			itemModalGrid = null;
 		}
 		
-		bomDetailModalGrid = new tui.Grid({
-	        el: document.getElementById('bomDetailModalGrid'),
-	        data: bomDetailDataSource,
+		itemModalGrid = new tui.Grid({
+	        el: document.getElementById('itemModalGrid'),
+	        data: itemDataSource,
 	        scrollX: true,
 	        scrollY: true,
 	        bodyHeight: 250,
-	        columns: bomDetail_columns,
+	        columns: item_columns,
 	    });
 		
-	    bomDetailModalGrid.on('failResponse', function(ev) {
+	    itemModalGrid.on('failResponse', function(ev) {
 	        alert(JSON.parse(ev.xhr.responseText).message);
 	    });
 	    
 	    // 테이블 데이터 렌더링 완료후에 실행 (테이블 출력이 끝나는 정확한 타이밍을 못잡아서 onGridMounted로 잡고 후처리)
-	    bomDetailModalGrid.on('onGridMounted', () => {
+	    itemModalGrid.on('onGridMounted', () => {
 		    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
 		    const checkGridRendered = () => {
 		        setTimeout(() => {
-		            if (bomDetailModalGrid.getData().length > 0) {
+		            if (itemModalGrid.getData().length > 0) {
 		    	    	const bomDetailGridNewRows = bomDetailGrid.getData().filter(row => row.isNew);
-		    		    const selectedRowKeys = bomDetailModalGrid.getData()
-		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.BOM_DETAIL_ID == row.BOM_DETAIL_ID))
+		    		    const selectedRowKeys = itemModalGrid.getData()
+		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.ID == row.ID))
 		    			    .map(row => row.rowKey);
 		    		    
-		    		    // BOM 상세 그리드에서 새로 추가된 행 가져와서 BOM 상세 모달에 선택값 그대로 적용함.
+		    		    // BOM 상세 그리드에서 새로 추가된 행 가져와서 품목 모달에 선택값 그대로 적용함.
 		    		    selectedRowKeys.forEach(function(key) {
-			    		    bomDetailModalGrid.addRowClassName(key, 'selected-row');
+		    		    	itemModalGrid.addRowClassName(key, 'selected-row');
 		    		    });
 		    		    
-		    		    // BOM 상세 그리드에서 새로 추가된 행 selectedBomDetailList 초기값 설정
+		    		    // BOM 상세 그리드에서 새로 추가된 행 selectedItemList 초기값 설정
 		    		    bomDetailGridNewRows.forEach(function(row) {
 		    		    	const mapRowData = {
-		    		        	"BOM_DETAIL_ID": row.BOM_DETAIL_ID,
-		    		        	"ITEM_ID": row.ITEM_ID,
+		    		        	"ID": row.ID,
+		    		        	"NAME": row.NAME,
+		    		        	"UNIT": row.UNIT,
 		    		        	"REQUIRED_AMOUNT": row.REQUIRED_AMOUNT,
-		    		        	"BOM_ID": bomCurrentSelectedID,
 		    		            isNew: true
 		    			    };
 		    		    	
-		    		    	selectedBomDetailList.push(mapRowData);
+		    		    	selectedItemList.push(mapRowData);
+
 		    		    });
-						
-						// selectedBomDetailList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
-						bomDetailModalSelectedInit();
+		    		    
+						// selectedItemList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
+						itemModalSelectedInit();
 		            } else {
 		                checkGridRendered(); // 데이터가 없으면 다시 체크
 		            }
@@ -149,96 +171,131 @@
 		    checkGridRendered(); // 실행
 	    });
 	    
-	    bomDetailModalGrid.on('click', (ev) => {
+	    itemModalGrid.on('click', (ev) => {
 		    if (ev.targetType != "cell") {
 				return;
 			}
 			
 		    const newRowKey = ev.rowKey;
-		    const isSelectedRow = bomDetailModalGrid.getRowClassName(newRowKey).includes('selected-row');
-		    const rowData = bomDetailModalGrid.getRow(newRowKey);
-		    const bomDetail_id = rowData.BOM_DETAIL_ID;
+		    const isSelectedRow = itemModalGrid.getRowClassName(newRowKey).includes('selected-row');
+		    const rowData = itemModalGrid.getRow(newRowKey);
+		    const item_id = rowData.ID;
 		    
 		    if (isSelectedRow) {
-		    	bomDetailModalGrid.removeRowClassName(newRowKey, 'selected-row');
-		    	selectedBomDetailList = selectedBomDetailList.filter(item => item.BOM_DETAIL_ID != bomDetail_id);
+		    	itemModalGrid.removeRowClassName(newRowKey, 'selected-row');
+		    	selectedItemList = selectedItemList.filter(item => item.ID != item_id);
 				
-				bomDetailModalSelectedGrid.getData().forEach(row => {
-				    if (bomDetail_id == row.BOM_DETAIL_ID) {
-						bomDetailModalSelectedGrid.removeRow(row.rowKey)
+				itemModalSelectedGrid.getData().forEach(row => {
+				    if (item_id == row.ID) {
+						itemModalSelectedGrid.removeRow(row.rowKey)
 				    }
 				});
 		    } else {
 		    	const mapRowData = {
-		        	"BOM_DETAIL_ID": bomDetail_id,
-		        	"ITEM_ID": rowData.ITEM_ID,
+		        	"ID": item_id,
+		        	"NAME": rowData.NAME,
+		        	"UNIT": rowData.UNIT,
 		        	"REQUIRED_AMOUNT": rowData.REQUIRED_AMOUNT,
-		        	"BOM_ID": bomCurrentSelectedID,
 		            isNew: true
 			    };
 		    	
-		    	selectedBomDetailList.push(mapRowData);
-		    	bomDetailModalGrid.addRowClassName(newRowKey, 'selected-row');
+		    	selectedItemList.push(mapRowData);
+
+		    	itemModalGrid.addRowClassName(newRowKey, 'selected-row');
 				
-				bomDetailModalSelectedGrid.appendRow(mapRowData);
+				itemModalSelectedGrid.appendRow(mapRowData);
 		    }
 		});
 	}
 	
-	$("#savebomDetail").on('click', function() {
+	$("#saveBomDetail").on('click', function() {
 		const rowKeysToDelete = bomDetailGrid.getData()
 		    .filter(row => row.isNew)
 		    .map(row => row.rowKey);
 		
-		// BOM 상세 그리드 기존의 새로 추가된 행 삭제
+		// BOM 상세 그리드에 기존의 새로 추가된 행 삭제
 		rowKeysToDelete.forEach(function(key) {
 			bomDetailGrid.removeRow(key);
 		});
 		
-		// 새로 선택된 값  BOM 상세 그리드 행 추가
-		selectedBomDetailList.forEach(function(data) {
+/* 		// 새로 선택된 값을 BOM 상세 그리드 행에 추가
+		selectedItemList.forEach(function(data) {
 			bomDetailGrid.appendRow(data);
-		});
+		}); */
+		
+	    // 새로 선택된 값을 BOM 상세 그리드 행에 추가 (ID → ITEM_ID로 변환)
+		// 250214 TODO : 굳이 변환하지 말고 BOM 상세 테이블의 ITEM_ID 컬럼을 수정하기
+	    selectedItemList.forEach(function(data) {
+	        if (data.ID) {
+	            const transformedData = { 
+	                ...data, // 기존 데이터 유지
+	                ITEM_ID: data.ID // ID를 ITEM_ID로 변경
+	            };
+	            delete transformedData.ID; // 기존 ID 제거 (선택 사항)
+
+	            bomDetailGrid.appendRow(transformedData);
+	        }
+	    });
 		
 		$("#bomDetailAdd").modal('hide');
 	});
 	
-	function bomDetailModalSelectedInit() {
-		if (bomDetailModalSelectedGrid) {
-			bomDetailModalSelectedGrid.destroy(); // 기존 그리드 제거
-			bomDetailModalSelectedGrid = null;
+	function itemModalSelectedInit() {
+		if (itemModalSelectedGrid) {
+			itemModalSelectedGrid.destroy(); // 기존 그리드 제거
+			itemModalSelectedGrid = null;
 		}
 		
-		bomDetailModalSelectedGrid = new tui.Grid({
-	        el: document.getElementById('bomDetailModalSelectedGrid'),
-			data: selectedBomDetailList,
+		itemModalSelectedGrid = new tui.Grid({
+	        el: document.getElementById('itemModalSelectedGrid'),
+			data: selectedItemList,
 	        scrollX: true,
 	        scrollY: true,
 	        bodyHeight: 250,
-	        columns: bomDetailSelected_columns,
+	        columns: itemSelected_columns,
 	    });
-		//setBomDetailModalSelectedGridColor();
+		//setItemModalSelectedGridColor();
 		
-		bomDetailModalSelectedGrid.on('click', (ev) => {
+		itemModalSelectedGrid.on('click', (ev) => {
 			if (ev.targetType != "cell") {
 				return;
 			}
 			
+			if (ev.columnName === 'REQUIRED_AMOUNT') {
+				return;
+			}
+	        
 			const newRowKey = ev.rowKey;
-			const rowData = bomDetailModalSelectedGrid.getRow(newRowKey);
-			const allData = bomDetailModalSelectedGrid.getData();
+			const rowData = itemModalSelectedGrid.getRow(newRowKey);
+			const allData = itemModalSelectedGrid.getData();
 			
-			const bomDetail_id = rowData.BOM_DETAIL_ID;
-			selectedBomDetailList = selectedBomDetailList.filter(item => item.BOM_DETAIL_ID != BomDetail_id);
+			const item_id = rowData.ID;
 			
-			bomDetailModalSelectedGrid.removeRow(newRowKey);
+			selectedItemList = selectedItemList.filter(item => item.ID != item_id);
 			
-			bomDetailModalGrid.getData().forEach(row => {
-			    if (bomDetail_id == row.BOM_DETAIL_ID) {
-			        bomDetailModalGrid.removeRowClassName(row.rowKey, 'selected-row');
+			itemModalSelectedGrid.removeRow(newRowKey);
+			
+			itemModalGrid.getData().forEach(row => {
+			    if (item_id == row.ID) {
+			        itemModalGrid.removeRowClassName(row.rowKey, 'selected-row');
 			    }
 			});
 		});
+		
+	    // 소요량 입력값 반영
+	    itemModalSelectedGrid.on('afterChange', (ev) => {
+	        ev.changes.forEach(change => {
+	            if (change.columnName === 'REQUIRED_AMOUNT') {
+	                const rowData = itemModalSelectedGrid.getRow(change.rowKey);
+	                const index = selectedItemList.findIndex(item => item.ID === rowData.ID);
+
+	                if (index > -1) {
+	                    selectedItemList[index].REQUIRED_AMOUNT = change.value;
+	                    console.log(`소요량 업데이트: ${rowData.ID} → ${change.value}`);
+	                }
+	            }
+	        });
+	    });
     };
 	
 	$("#btnBomDetailSearch").on("click", function() {
@@ -260,9 +317,9 @@
 		});
 	});
 	
-	function setBomDetailModalSelectedGridColor() {
-		bomDetailModalSelectedGrid.getData().forEach((row, index) => {
-		    bomDetailModalSelectedGrid.addRowClassName(index, 'selected-row');
+	function setItemModalSelectedGridColor() {
+		itemModalSelectedGrid.getData().forEach((row, index) => {
+		    itemModalSelectedGrid.addRowClassName(index, 'selected-row');
 		});
 	}
 </script>

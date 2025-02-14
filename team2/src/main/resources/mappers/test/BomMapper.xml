@@ -11,6 +11,7 @@
 			   BOM_ID
 			 , ITEM_ID
 			 , PARENT_ID
+			 , BOM_QUANTITY
           FROM BOM
     </select>
     
@@ -21,11 +22,13 @@
 				  BOM_ID
 				, ITEM_ID
 				, PARENT_ID
+				, BOM_QUANTITY
 			)
 			VALUES (
 				  #{item.BOM_ID}
 				, #{item.ITEM_ID, jdbcType=VARCHAR}
 				, #{item.PARENT_ID, jdbcType=VARCHAR}
+				, 0
 			)
 		</foreach>
 		SELECT * FROM DUAL
@@ -52,10 +55,11 @@
     
     <select id="selectBomDetail" resultType="map">
 		SELECT 
-			   BOM_DETAIL_ID 					AS BOM_DETAIL_ID
-			 , ITEM_ID							AS ITEM_ID
-			 , REQUIRED_AMOUNT 					AS REQUIRED_AMOUNT
-			 , BOM_ID							AS BOM_ID
+			   BOM_DETAIL_ID 		AS BOM_DETAIL_ID
+			 , ITEM_ID				AS ITEM_ID
+			 , UNIT					AS UNIT
+			 , REQUIRED_AMOUNT 		AS REQUIRED_AMOUNT
+			 , BOM_ID				AS BOM_ID
 		  FROM BOM_DETAIL
 		 WHERE
 		 	   1 = 1
@@ -73,7 +77,66 @@
 		</if>
     </select>
     
-    <update id="addBomDetail">
+<!--     <select id="selectItemInfo" resultType="map">
+		SELECT
+			  ITEM_ID
+			, ITEM_NAME
+		FROM ITEM
+    </select> -->
+    
+	<select id="selectItemInfo" resultType="map">
+<!-- 	<select id="selectItemAndMaterial" resultType="map"> -->
+		SELECT 
+		       ITEM_ID 			AS ID
+		     , ITEM_NAME 		AS NAME
+		     , ITEM_UNIT 		AS UNIT
+		     , 'ITEM' 			AS TYPE
+		FROM ITEM
+		UNION ALL
+		SELECT 
+		       MATERIAL_ID 		AS ID
+		     , MATERIAL_NAME 	AS NAME
+		     , UNIT 			AS UNIT
+		     , 'MATERIAL' 		AS TYPE
+		FROM MATERIAL
+	</select>
+    
+    <insert id="addBomDetail">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO BOM_DETAIL (
+				  BOM_ID
+				, ITEM_ID
+				, UNIT
+				, REQUIRED_AMOUNT
+			)
+			VALUES (
+				  #{item.BOM_ID}
+				, #{item.ITEM_ID}
+				, #{item.UNIT}
+				, #{item.REQUIRED_AMOUNT}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+	<update id="deleteBomDetail">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE BOM_DETAIL 
+			   SET BOM_ID = NULL
+			 WHERE BOM_DETAIL_ID = #{item}
+		</foreach>
+    </update>
+    
+	<update id="deleteBomDetailByBomId">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+		    UPDATE BOM_DETAIL 
+			   SET BOM_ID = NULL
+			 WHERE BOM_ID = #{item}
+		</foreach>
+    </update>
+    
+<!--     <update id="addBomDetail">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
 		    UPDATE BOM_DETAIL 
 			   SET BOM_ID = #{item.BOM_ID}
@@ -95,5 +158,5 @@
 			   SET BOM_ID = NULL
 			 WHERE BOM_ID = #{item}
 		</foreach>
-    </update>
+    </update> -->
 </mapper>

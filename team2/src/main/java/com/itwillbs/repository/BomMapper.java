@@ -18,6 +18,10 @@ public interface BomMapper {
 	
 	List<Map<String, Object>> selectBomDetail(Map<String, Object> requestData);
 	
+	List<Map<String, Object>> selectBomDetailByItem(Map<String, Object> requestData);
+	
+	List<Map<String, Object>> selectItemInfo(Map<String, Object> requestData);
+	
 	int addBomDetail(List<Map<String, Object>> createdRows);
 
 	int deleteBomDetail(List<String> equipmentIds);

@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.itwillbs.repository.BomMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 
 @Service
 @RequiredArgsConstructor
+@Log
 public class BomService {
 	
 	private final BomMapper bomMapper;
@@ -98,12 +100,34 @@ public class BomService {
 		String message = "selectBomDetail 성공";
 		
 		try {
-			List<Map<String, Object>> bomList = bomMapper.selectBomDetail(requestData);
-			content.put("contents", bomList);
+			List<Map<String, Object>> bomDetailList = bomMapper.selectBomDetail(requestData);
+			content.put("contents", bomDetailList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
 			result = false;
 			message = "selectBomDetail 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	public Map<String, Object> selectItemInfo(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectItemInfo 성공";
+		
+		try {
+			List<Map<String, Object>> ItemInfoList = bomMapper.selectItemInfo(requestData);
+			content.put("contents", ItemInfoList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectItemInfo 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -116,6 +140,8 @@ public class BomService {
 		Map<String, Object> resultMap = new HashMap<>();
 		Boolean result = true;
 		String message = "addBomDetail 성공";
+		
+		log.info(createdRows.toString());
 		
 		try {
 			bomMapper.addBomDetail(createdRows);

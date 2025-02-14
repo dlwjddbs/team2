@@ -150,6 +150,7 @@
             {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null},
             {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
             {header: '상위 코드', name: 'PARENT_ID', align: 'center', editor: null},
+            {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center', editor: null},
         ];
 		
 		// BOM 상세
@@ -165,8 +166,9 @@
 		};
 		let bomDetailCurrentSelectedRowKey = null;
 		const bomDetail_columns = [
-		    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null},
+		    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null, hidden: true},
             {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
+            {header: '기준단위', name: 'UNIT', align: 'center', editor: null},
             {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'center', editor: null},
 		    {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null, hidden: true},
 		];
@@ -344,12 +346,10 @@
 					// BOM 상세 그리드 생성
 					const bomID = bomGrid.getRow(newRowKey).BOM_ID;
 					// BOM 개수 (테이블에 추가 필요)
-					//const bomCount = bomGrid.getRow(newRowKey).BOM_COUNT;
-					const bomCount = bomGrid.getRow(newRowKey)?.BOM_COUNT || 0;
-
+					const bomCount = bomGrid.getRow(newRowKey).BOM_QUANTITY;
 					bomDetailInit(bomID, bomCount);
 					bomCurrentSelectedID = bomID;
-					$("#btn_group_bomDetail").show();
+					//$("#btn_group_bomDetail").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        bomCurrentSelectedRowKey = null;
@@ -376,6 +376,7 @@
 		        	{header: 'BOM 코드 *', name: 'BOM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '상위 코드', name: 'PARENT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center'}
 		        ]);
 		    } else {
 		        bomGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
@@ -389,6 +390,7 @@
 		        	"BOM_ID": '',
 		        	"ITEM_ID": '',
 		        	"PARENT_ID": '',
+		        	"BOM_QUANTITY": '',
 		            isNew: true
 		        },
 		        {focus: true}
@@ -497,20 +499,28 @@
 			} else {
 				$("#btn_group_bomDetail").show();
 			}
-
+			
 		    bomDetailGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
 		
 		$("#btn_bomDetail_add").on("click", function() {
-			console.log("BOM 상세 저장 버튼 클릭!")
+			console.log("BOM 상세 저장 버튼 클릭!");
+			
+		    // 저장하기 전에 BOM_ID 추가
+			// 250214 TODO : 저장할 때 클릭한 행의 BOM_ID도 같이 넘기는 작업 필요
+/* 		    const newData = bomDetailGrid.getData().map(row => ({
+		        ...row,
+		        BOM_ID: 
+		    })); */
+			
 			bomDetailGrid.request('createData');
 			bomDetailGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
 		$("#btn_bomDetail_modal").on("click", function() {
-			console.log("BOM 상세 모달 열림!")
+			console.log("BOM 상세 모달 열림!");
 			$("#bomDetailAdd").modal();
 		});
 		
