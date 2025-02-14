@@ -77,34 +77,34 @@
 	const processSelected_columns = [
 	    {header: '공정 코드', name: 'PROCESS_ID', align: 'center', editor: null},
 	    {header: '공정명', name: 'NAME', align: 'left', editor: null},
-		{
-		    header: '검사여부', 
-		    name: 'INSPECTION_YN', 
-		    align: 'center',
-		    formatter: function({value}) {
-		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
-		    }
-		},
+// 		{
+// 		    header: '검사여부', 
+// 		    name: 'INSPECTION_YN', 
+// 		    align: 'center',
+// 		    formatter: function({value}) {
+// 		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 		    }
+// 		},
 	];
-	let processParam = {inspection_yn: '', searchKeyword: ''};
+	let processParam = {use_yn: 'Y', inspection_yn: '', searchKeyword: ''};
 	const processUrl = '/manufacture/process';
 	const processDataSource = {
 		api: {
-		    readData: {url: processUrl, method: 'GET'},
+		    readData: {url: processUrl, method: 'GET', initParams: {use_yn: 'Y'}},
 		},
 		contentType: 'application/json',
     };
 	const process_columns = [
 	    {header: '공정코드', name: 'PROCESS_ID', align: 'center', editor: null},
 	    {header: '공정명', name: 'NAME', align: 'left', editor: null},
-		{
-		    header: '검사여부', 
-		    name: 'INSPECTION_YN', 
-		    align: 'center',
-		    formatter: function({value}) {
-		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
-		    }
-		},
+// 		{
+// 		    header: '검사여부', 
+// 		    name: 'INSPECTION_YN', 
+// 		    align: 'center',
+// 		    formatter: function({value}) {
+// 		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 		    }
+// 		},
 	];
 	$('#routingSequenceAdd').on('shown.bs.modal', function () {
 		selectedProcessList.length = 0;

@@ -132,16 +132,20 @@
     
     <select id="selectProcess" resultType="map">
 	    SELECT
-			   PROCESS_ID 
-			 , NAME 
-			 , USE_YN 
-			 , INSPECTION_YN 
-			 , NOTE 
-		  FROM PROCESS
+			   p.PROCESS_ID 
+			 , p.NAME 
+			 , p.USE_YN 
+			 , p.INSPECTION_YN 
+			 , p.NOTE 
+			 , (SELECT count(*) FROM PROCESS_ROUTING_MAPPING WHERE PROCESS_ID = p.PROCESS_ID) AS used_cnt
+		  FROM PROCESS p
 		 WHERE
 			   1 = 1
    		<if test='inspection_yn != null and inspection_yn != ""'>
 			AND INSPECTION_YN = #{inspection_yn}
+		</if>
+   		<if test='use_yn != null and use_yn != ""'>
+			AND USE_YN = #{use_yn}
 		</if>
 		<if test='searchKeyword != null and searchKeyword != ""'>
 			AND (PROCESS_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
@@ -169,7 +173,7 @@
 				  #{item.PROCESS_ID, jdbcType=VARCHAR}
 				, #{item.NAME}
 				, #{item.USE_YN}
-				, #{item.INSPECTION_YN}
+				, 'N'
 				, #{item.NOTE, jdbcType=VARCHAR}
 			)
 		</foreach>
@@ -205,6 +209,7 @@
 			 , i.ITEM_NAME 			AS ITEM_NAME
 			 , r.NOTE				AS NOTE
 			 , r.PROCESS_QUANTITY	AS PROCESS_QUANTITY
+			 , (SELECT COUNT(*) FROM WORKCENTER WHERE ROUTING_ID = r.ROUTING_ID) AS USED_CNT
 		  FROM ROUTING r
 			   INNER JOIN ITEM i
 					   ON r.ITEM_ID = i.ITEM_ID 
@@ -217,7 +222,10 @@
 			 , ITEM_TYPE
 			 , USE_YN
 		  FROM ITEM
-		 WHERE ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+		 WHERE 
+			   1 = 1
+		   AND ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
+		   AND USE_YN = 'Y'
     </select>
     
     <insert id="insertRouting">

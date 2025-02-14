@@ -167,49 +167,39 @@ public class WarehouseService {
 		return resultMap;
 	}
 
-//	public Map<String, Object> addLocation(List<Map<String, Object>> createdRows) {
-//		Map<String, Object> resultMap = new HashMap<>();
-//		Boolean result = true;
-//		String message = "addLocation 성공";
-//		
-//		try {
-//			warehouseMapper.addLocation(createdRows);
-//		} catch (Exception e) {
-//			result = false;
-//			message = "addLocation 실패";
-//		}
-//		
-//		resultMap.put("result", result);
-//		resultMap.put("message", message);
-//		
-//		return resultMap;
-//	}
-	
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> addLocation(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-
 		Map<String, Object> resultMap = new HashMap<>();
 		
+		log.info("requestData : " + requestData);
+		log.info("updatedRows : " + updatedRows);
+		log.info("createdRows : " + createdRows);
+		
 		Boolean result = true;
-		String message = "modifyToastTest 성공";
+		String message = "modifyitemLocation 성공";
 		
 		try {
 			if (createdRows.size() > 0) {
 				warehouseMapper.insertLocation(createdRows);
 			}
 			
+			if (updatedRows.size() > 0) {
+				warehouseMapper.updateLocation(updatedRows);
+			}
 		} catch (Exception e) {
 			result = false;
-			message = "modifyToastTest 실패";
+			message = "modifyitemLocation 실패";		    
+					e.printStackTrace();  // 콘솔에 오류 출력 (로그 추가 가능)
 		}
 		
 		resultMap.put("result", result);
 		resultMap.put("message", message);
 		
 		return resultMap;
-	}
-
+	}	
+	
 	public Map<String, Object> deleteLocation(List<String> locationIds) {
 		Map<String, Object> resultMap = new HashMap<>();
 		

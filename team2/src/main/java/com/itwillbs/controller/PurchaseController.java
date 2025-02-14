@@ -142,11 +142,6 @@ public class PurchaseController {
 		        	result += purchaseService.deleteDetail(data);
 		        }
 		    }
-
-		    
-		    
-//		    result += purchaseService.updateDetailAndStatus(updateList);
-		    
 		    
 		    System.out.println("최종 저장된 데이터 개수: " + result); // 처리된 개수 출력
 		 // JSON 형태로 응답 반환 (undefined 방지)
@@ -171,10 +166,5 @@ public class PurchaseController {
 			System.out.println("자재리스트" + requestData.toString());
 			List<Map<String, Object>> getMaterialList = purchaseService.getMaterialList(requestData);
 			return getMaterialList;
-		}
-		
-		
-		
-		
-				
+		}	
 }

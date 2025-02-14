@@ -84,14 +84,14 @@
         {header: '품목코드', name: 'ITEM_ID', align: 'center'},
         {header: '품목명', name: 'ITEM_NAME', align: 'left'},
         {header: '품목유형', name: 'ITEM_TYPE', align: 'left'},
-		{
-		    header: '사용여부', 
-		    name: 'USE_YN', 
-		    align: 'center',
-		    formatter: function({value}) {
-		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
-		    }
-		},
+// 		{
+// 		    header: '사용여부', 
+// 		    name: 'USE_YN', 
+// 		    align: 'center',
+// 		    formatter: function({value}) {
+// 		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} />`;
+// 		    }
+// 		},
     ];
 
 	$(function() {
