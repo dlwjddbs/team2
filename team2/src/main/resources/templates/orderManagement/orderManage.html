@@ -66,7 +66,12 @@
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
 				<div class="container-fluid">
-
+					<div class="info">
+						<a style="display:none;"><span id="userName"
+							th:text="${userInfo.NAME}"></span>
+							<span id="userId"
+							th:text="${userInfo.MEMBER_ID}"></span></a>
+					</div>
 					<div class="row">
 						<div class="col-12">
 							<div class="card mx-3 condition">
@@ -359,7 +364,7 @@
 			document.getElementById('btn_save').style.display = 'none'; // 저장 버튼 표시
 		});
 
-		// 저장 버튼 클릭 시 서버에 수정된 데이터 전송
+		// update 버튼 클릭 시 서버에 수정된 데이터 전송
 		document.getElementById('btn_update').addEventListener('click', function () {
 		    const orderData = {
 		        orderDate: document.getElementById('orderDate').value,
@@ -390,6 +395,8 @@
 		                document.getElementById('btn_edit').style.display = 'inline';
 		                document.getElementById('btn_update').style.display = 'none';
 		                document.getElementById('btn_save').style.display = 'none';
+		                $('#orderDetailModal').modal('hide');
+			            loadGridData();
 		            } else {
 		                alert('저장 실패');
 		            }
@@ -682,23 +689,49 @@
 		
 		// save btn
 		document.getElementById('btn_save').addEventListener('click', () => {
+		    // 입력값 가져오기
+		    const orderQty = document.getElementById('orderQty').value.trim();
+		    const customerId = document.getElementById('customerId').value.trim();
+		    const salesRepId = document.getElementById('salesRepId').value.trim();
+		    const deliveryDate = document.getElementById('deliveryDate').value.trim();
+		    const orderDate = document.getElementById('orderDate').value.trim();
+		    const itemId = document.getElementById('itemId').value.trim();
+		    const remarks = document.getElementById('remarks').value.trim();
+		    const registBy = document.getElementById('userId').textContent;
+		    
+		    // 유효성 검사
+		    // 필수 입력 항목이 비어 있는지 확인 (remarks 제외)
+		    if (!orderQty || !customerId || !salesRepId || !deliveryDate || !orderDate || !itemId) {
+		        alert('모든 항목을 입력해 주세요.');
+		        return; 
+		    }
+		
+		    // deliveryDate가 orderDate 이후인지 확인
+		    const orderDateObj = new Date(orderDate);
+		    const deliveryDateObj = new Date(deliveryDate);
+		
+		    if (deliveryDateObj <= orderDateObj) {
+		        alert('납품 예정일은 수주날짜 이후여야 합니다.');
+		        return;
+		    }
+		
 		    // orderData 객체 정의
 		    const orderData = {
-		        orderDate: document.getElementById('orderDate').value,
-		        orderId: document.getElementById('orderId').textContent,  // 새로운 수주 ID가 생성되어야 합니다.
-		        customerId: document.getElementById('customerId').value,
-		        salesRepId: document.getElementById('salesRepId').value,
-		        deliveryDate: document.getElementById('deliveryDate').value,
-		        itemId: document.getElementById('itemId').value,
-		        orderQty: document.getElementById('orderQty').value,
+		        orderDate: orderDate,
+		        customerId: customerId,
+		        salesRepId: salesRepId,
+		        deliveryDate: deliveryDate,
+		        itemId: itemId,
+		        orderQty: orderQty,
 		        orderPr: document.getElementById('orderSum').value.replace(/[^0-9.-]+/g, ''),
-		        remarks: document.getElementById('remarks').value,
-		        remarks: document.getElementById('registBy').textContent,
+		        remarks: remarks,
+		        registBy: registBy,
 		    };
-
+		
 		    // 전송할 데이터 확인
-		    console.log(orderData); 
-
+		    console.log(orderData);
+		
+		    // 서버로 데이터 전송
 		    fetch(`${url}/insert`, {
 		        method: 'POST',
 		        headers: {
@@ -713,6 +746,8 @@
 		            document.getElementById('btn_edit').style.display = 'inline';
 		            document.getElementById('btn_save').style.display = 'none';
 		            document.getElementById('btn_update').style.display = 'none';
+		            $('#orderDetailModal').modal('hide');
+		            loadGridData();
 		        } else {
 		            alert('저장 실패');
 		        }
@@ -722,6 +757,7 @@
 		        alert('서버와의 통신에 실패했습니다.');
 		    });
 		});
+
 
 
 		// delete btn

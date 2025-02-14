@@ -129,12 +129,12 @@
 	<insert id="insertOrder">
 	    INSERT INTO ORDERS (
 	        ORDER_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
-	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, CREATE_DATE, UPDATE_DATE
+	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, REGIST_BY, CREATE_DATE, UPDATE_DATE
 	    )
 	    VALUES (
 	        TO_DATE(#{orderDate}, 'YYYY-MM-DD'), #{customerId}, 
 	        #{salesRepId}, TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'), 
-	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, SYSDATE, SYSDATE
+	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, #{registBy}, SYSDATE, SYSDATE
 	    )
 	</insert>
     

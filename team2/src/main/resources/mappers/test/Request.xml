@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.RequestMapper">
+
+	<!-- SEARCH -->
+	<select id="getRequest" resultType="map">
+	    WITH ReqDetails AS (
+	        SELECT
+	            REQ.REQUEST_ID,
+	            REQ.ORDER_ID,
+	            REQ.COMPLETE_DATE,
+	            REQ.REQUEST_QTY,
+	            REQ.SHIP_STATUS,
+	            TO_CHAR(REQ.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+	            TO_CHAR(REQ.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+	            M2.NAME AS UPDATE_BY,
+	            REQ.REMARKS,
+	            O.ORDER_DATE
+	            M.NAME AS REGIST_BY,
+	            C.CLIENT_NAME AS CUSTOMER_NAME,
+	            I.ITEM_NAME,
+	            I.ITEM_COST,
+	            TO_CHAR(O.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+	            I.ITEM_COST AS ITEM_PRICE,
+	            O.ORDER_QTY,
+	            TO_CHAR(O.DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
+	            I.ITEM_UNIT,
+	            C.RESP_NAME AS SALES_REP_ID,
+	            M.NAME AS DETAIL_REGIST_BY,
+	            O.REMARKS AS DETAIL_REMARKS
+	        FROM REQUEST REQ
+	        LEFT JOIN ORDERS O ON O.ORDER_ID = REQ.ORDER_ID
+	        LEFT JOIN ITEM I ON I.ITEM_ID = O.ITEM_ID
+	        LEFT JOIN CLIENT C ON C.CLIENT_ID = O.CUSTOMER_ID  
+	        LEFT JOIN MEMBER M ON M.MEMBER_ID = O.REGIST_BY
+	        LEFT JOIN MEMBER M2 ON M2.MEMBER_ID = REQ.UPDATE_BY
+	        WHERE #{requestId, jdbcType=VARCHAR} IS NULL OR REQUEST_ID = #{requestId, jdbcType=VARCHAR}
+	    )
+	    SELECT
+	       REQUEST_ID,
+	        ORDER_ID,
+	        COMPLETE_DATE,
+	        ITEM_NAME,
+	        CUSTOMER_NAME,
+	        REQUEST_QTY,
+	        SHIP_STATUS,
+	        CREATE_DATE,
+	        UPDATE_DATE,
+	        UPDATE_BY,
+	        REMARKS,
+	        ORDER_DATE
+	        REGIST_BY,
+	        ITEM_PRICE * ORDER_QTY AS ORDER_PR,
+	        (ITEM_PRICE * ORDER_QTY) * 0.1 AS TAX,
+	        (ITEM_PRICE * ORDER_QTY) + ((ITEM_PRICE * ORDER_QTY) * 0.1) AS ORDER_SUM,
+	        DELIVERY_DATE,
+	        ITEM_UNIT AS UNIT,
+	        SALES_REP_ID,
+	        ORDER_QTY,
+	        ORDER_QTY AS SHIPPED_QTY,
+	        ORDER_QTY AS BACKLOG,
+	        DETAIL_REGIST_BY,
+	        DETAIL_REMARKS
+	    FROM ReqDetails
+	    ORDER BY REQUEST_ID DESC
+	</select>
+    
+    <!-- 필터링 출하 요청 조회 -->
+	<select id="selectFilteredRequest" resultType="map">
+	    WITH ReqDetails AS (
+	        SELECT
+	            REQ.REQUEST_ID,
+	            REQ.ORDER_ID,
+	            REQ.COMPLETE_DATE,
+	            REQ.REQUEST_QTY,
+	            REQ.SHIP_STATUS,
+	            TO_CHAR(REQ.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+	            TO_CHAR(REQ.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+	            M2.NAME AS UPDATE_BY,
+	            REQ.REMARKS,
+	            M.NAME AS REGIST_BY,
+	            C.CLIENT_NAME AS CUSTOMER_NAME,
+	            I.ITEM_NAME,
+	            I.ITEM_COST,
+	            TO_CHAR(O.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+	            I.ITEM_COST AS ITEM_PRICE,
+	            O.ORDER_QTY,
+	            TO_CHAR(O.DELIVERY_DATE, 'YYYY-MM-DD') AS DELIVERY_DATE,
+	            I.ITEM_UNIT,
+	            C.RESP_NAME AS SALES_REP_ID,
+	            M.NAME AS DETAIL_REGIST_BY,
+	            O.REMARKS AS DETAIL_REMARKS
+	        FROM REQUEST REQ
+	        LEFT JOIN ORDERS O ON O.ORDER_ID = REQ.ORDER_ID
+	        LEFT JOIN ITEM I ON I.ITEM_ID = O.ITEM_ID
+	        LEFT JOIN CLIENT C ON C.CLIENT_ID = O.CUSTOMER_ID  
+	        LEFT JOIN MEMBER M ON M.MEMBER_ID = O.REGIST_BY
+	        LEFT JOIN MEMBER M2 ON M2.MEMBER_ID = REQ.UPDATE_BY
+	        <where>
+	            <!-- 주문 날짜 범위 필터링 -->
+	            <if test="startDate != null">
+	                AND O.ORDER_DATE &gt;= #{startDate}
+	            </if>
+	            <if test="endDate != null">
+	                AND TRUNC(O.ORDER_DATE) &lt;= #{endDate}
+	            </if>
+	
+	            <!-- 거래처 필터링 -->
+	            <if test="customerId != null and customerId != 'all'">
+	                AND REQ.CUSTOMER_ID = #{customerId}
+	            </if>
+	
+	            <!-- 품목 필터링 -->
+	            <if test="itemId != null and itemId != 'all'">
+	                AND O.ITEM_ID = #{itemId}
+	            </if>
+	
+	            <!-- 수주번호 필터링 -->
+	            <if test="orderId != null">
+	                AND REQ.REQUEST_ID LIKE '%' || #{orderId} || '%'
+	            </if>
+	
+	            <!-- 진행상태 필터링 -->
+	            <if test="orderStatus != null">
+	                AND REQ.SHIP_STATUS = #{orderStatus}
+	            </if>
+	        </where>
+	    )
+	    SELECT
+	        REQUEST_ID,
+	        ORDER_ID,
+	        COMPLETE_DATE,
+	        ITEM_NAME,
+	        CUSTOMER_NAME,
+	        REQUEST_QTY,
+	        SHIP_STATUS,
+	        CREATE_DATE,
+	        UPDATE_DATE,
+	        UPDATE_BY,
+	        REMARKS,
+	        REGIST_BY,
+	        ITEM_PRICE * ORDER_QTY AS ORDER_PR,
+	        (ITEM_PRICE * ORDER_QTY) * 0.1 AS TAX,
+	        (ITEM_PRICE * ORDER_QTY) + ((ITEM_PRICE * ORDER_QTY) * 0.1) AS ORDER_SUM,
+	        DELIVERY_DATE,
+	        ITEM_UNIT AS UNIT,
+	        SALES_REP_ID,
+	        ORDER_QTY,
+	        ORDER_QTY AS SHIPPED_QTY,
+	        ORDER_QTY AS BACKLOG,
+	        DETAIL_REGIST_BY,
+	        DETAIL_REMARKS
+	    FROM ReqDetails
+	    ORDER BY REQUEST_ID DESC
+	</select>
+
+    <!-- INSERT -->
+	<insert id="insertRequest">
+	    INSERT INTO REQUEST (
+	        SHIPMENT_ID, ORDER_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
+	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, REGIST_BY, CREATE_DATE, UPDATE_DATE
+	    )
+	    VALUES (
+	        'SHI-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
+	        TO_DATE(#{orderDate}, 'YYYY-MM-DD'), #{customerId}, 
+	        #{salesRepId}, TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'), 
+	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, #{registBy}, SYSDATE, SYSDATE
+	    )
+	</insert>
+    
+    <!-- UPDATE -->
+    <update id="updateRequest">
+        UPDATE ORDERS
+        SET
+        	ORDER_DATE = TO_DATE(#{orderDate}, 'YYYY-MM-DD'),
+            CUSTOMER_ID = #{customerId},
+            SALES_REP_ID = #{salesRepId},
+            DELIVERY_DATE = TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'),
+            ORDER_QTY = #{orderQty},
+            ITEM_ID = #{itemId},
+            ORDER_PR = #{orderPr},
+            REMARKS = #{remarks},
+            UPDATE_DATE = SYSDATE
+        WHERE ORDER_ID = #{orderId}
+    </update>
+    
+   	<!-- DELETE -->
+      <delete id="deleteRequest">
+        DELETE FROM ORDERS
+        WHERE ORDER_ID IN
+        <foreach item="orderId" collection="list" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+    
+</mapper>
