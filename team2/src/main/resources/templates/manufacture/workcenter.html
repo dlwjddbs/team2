@@ -229,7 +229,7 @@
 			container.appendChild(el);
 			
 			// WORKCENTER_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'WORKCENTER_ID'
+			if (!((props.columnInfo.name == 'WORKCENTER_ID' || props.columnInfo.name == 'ROUTING_ID')
 				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';

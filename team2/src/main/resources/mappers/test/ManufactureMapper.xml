@@ -262,6 +262,15 @@
 		  FROM ROUTING r
 			   INNER JOIN ITEM i
 					   ON r.ITEM_ID = i.ITEM_ID
+		 WHERE 
+			   1 = 1
+		<if test='use_yn != null and use_yn != ""'>
+			AND r.USE_YN = 'Y'
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (r.ROUTING_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
+					OR r.NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+		</if>
     </select>
     
     <select id="selectItem" resultType="map">

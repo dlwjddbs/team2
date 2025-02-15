@@ -19,11 +19,11 @@
 						<div class="d-flex ml-4">
 							<!-- Date range -->
 							<label for="" class="col-form-label mr-3" style="min-width: 120px;">라우팅 코드/명</label>
-							<input type="text" class="form-control float-right" id="routingName">
+							<input type="text" class="form-control float-right" id="routingSearchKeyword">
 						</div>
 					</div>
 					<div class="d-flex">
-						<button type="button" class="btn btn-primary" id="btnMemberSearch">조회</button>
+						<button type="button" class="btn btn-primary" id="btnRoutingSearch">조회</button>
 					</div>
 				</div>
 			
@@ -65,24 +65,23 @@
 	let routingGrid = null;
 	let routingCurrentSelectedRowKey = null;
 	let selectedRoutingId = '';
-	let routingParam = {searchKeyword : ''};
-	const routingUrl = '/manufacture/workcenterRouting';
+	let routingParam = {searchKeyword : '', use_yn: 'Y'};
+	const routingUrl = '/manufacture/routing';
 	const routingDataSource = {
 		api: {
-		    readData: {url: routingUrl, method: 'GET'},
+		    readData: {url: routingUrl, method: 'GET', initParams: {use_yn: 'Y'}},
 		},
 		contentType: 'application/json',
 	};
 	const routing_columns = [
-        {header: '라우팅코드', name: 'MEMBER_ID', align: 'center'},
-        {header: '라우팅명', name: 'DEPT', align: 'left'},
-        {header: '품목명', name: 'NAME', align: 'center'},
+        {header: '라우팅코드', name: 'ROUTING_ID', align: 'center'},
+        {header: '라우팅명', name: 'NAME', align: 'left'},
+        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
     ];
 	
 	$('#workcenterRoutingAdd').on('shown.bs.modal', function () {
 		routingParam.searchKeyword = '';
 		selectedRoutingId = '';
-		$("#DEP").val('');
 		$("#routingName").val('');
 		$("#saveRouting").attr("disabled", true);
 		
@@ -120,7 +119,7 @@
 		    	routingGrid.addRowClassName(newRowKey, 'selected-row');
 		        routingCurrentSelectedRowKey = newRowKey;
 		        
-		        selectedRoutingId = routingGrid.getRow(newRowKey).MEMBER_ID;
+		        selectedRoutingId = routingGrid.getRow(newRowKey).ROUTING_ID;
 		        $("#saveRouting").attr("disabled", false);
 		    } else {
 		        // 같은 행을 클릭한 경우 선택 해제
@@ -131,24 +130,23 @@
 		});
 	}
 	
-// 	$("#saveRouting").on('click', function() {
-// 		const workcenterRow = $("#workcenterRow").val();
-// 		const workcenterColumn = $("#workcenterColumn").val();
-// 		const workcenterCode = $("#workcenterCode").val();
+ 	$("#saveRouting").on('click', function() {
+ 		const workcenterRow = $("#workcenterRow").val();
+ 		const workcenterColumn = $("#workcenterColumn").val();
+ 		const workcenterCode = $("#workcenterCode").val();
 		
-// 		let routingRow = $("#routingRow").val();
-// 		let routingColumn = $("#routingColumn").val();
-// 		workcenterGrid.setValue(routingRow, routingColumn, selectedRoutingId);
+ 		let routingRow = $("#routingRow").val();
+ 		let routingColumn = $("#routingColumn").val();
+ 		workcenterGrid.setValue(routingRow, routingColumn, selectedRoutingId);
 		
-// 		$('#workcenterRoutingAdd').modal('hide');
-// 	});
+ 		$('#workcenterRoutingAdd').modal('hide');
+ 	});
 	
-// 	$("#btnMemberSearch").on("click", function() {
-// 		routingParam.dept_id = $("#DEP").val();
-// 		routingParam.member_name = $("#routingName").val();
-// 		selectedRoutingId = '';
-// 		$("#saveRouting").attr("disabled", true);
+ 	$("#btnRoutingSearch").on("click", function() {
+ 		routingParam.searchKeyword = $("#routingSearchKeyword").val();
+ 		selectedRoutingId = '';
+ 		$("#saveRouting").attr("disabled", true);
 		
-// 		routingGrid.readData(1, routingParam, true);
-// 	});
+ 		routingGrid.readData(1, routingParam, true);
+ 	});
 </script>
