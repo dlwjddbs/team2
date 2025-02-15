@@ -91,7 +91,7 @@
 	$('#workcenterEquipmentAdd').on('shown.bs.modal', function () {
 		selectedEquipmentList.length = 0;
 		$("#use_yn").val("").attr("selected", "selected");
-		equipmentParam.use_yn = '';
+		equipmentParam.use_yn = 'Y';
 		equipmentParam.searchKeyword = '';
         
 		equipmentModalInit();
@@ -254,7 +254,8 @@
     };
 	
 	$("#btnEquipmentSearch").on("click", function() {
-		equipmentParam.use_yn = $("#use_yn").val();
+//		equipmentParam.use_yn = $("#use_yn").val();
+		equipmentParam.use_yn = 'Y';
 		equipmentParam.searchKeyword = $("#equipmentSearchKeyword").val();
 		
 		const selectedEquipmentIds = selectedEquipmentList.map(row => row.EQUIPMENT_ID);

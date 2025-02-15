@@ -296,7 +296,8 @@
 		    el.type = 'checkbox';
 		    el.checked = (props.value === 'Y');  // 초기값 지정
 		    
-		    if (props.grid.getValue(props.rowKey, 'USED_CNT') > 0) {
+		    if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0
+				|| props.grid.getValue(props.rowKey, 'USED_N_CNT') > 0) {
 		    	el.disabled = true;
 		    }
 		
@@ -408,6 +409,8 @@
 		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '품목명', name: 'ITEM_NAME', align: 'center', editor: null},
 		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+					{header: '라우팅 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
+					{header: '설비 미사용 개수', name: 'USED_N_CNT', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
 		        routingGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
@@ -492,11 +495,6 @@
 			$("#btn_routing_remove_row").hide();
 		});
 		
-		// TODO
-		// 나중에 라우팅 절차 매핑테이블도 함께 삭제 해줘함.
-		// 그 외
-		// 설비가 워크센터에 등록되어 있으면 워크센터에서 먼저 할당해제하고 설비에서 삭제할 수 있게 해야함.
-		// 공정이 라우팅에 등록되어 있으면 라우팅 먼저 삭제 후 공정 삭제 가능하게 해야함.
         $("#btn_routing_delete").on("click", function() {
 			routingGrid.removeCheckedRows();
 			
