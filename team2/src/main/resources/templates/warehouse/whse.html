@@ -216,6 +216,28 @@
 		TextInputRenderer.prototype.render = function (props) {
 			this.el.value = props.value;
 		}
+		
+		const TextInputRenderer2 = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+			el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+		  	
+		  	this.el = el;
+		  	this.render(props);
+		}
+
+		TextInputRenderer2.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer2.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
 
 		const SelectBoxRenderer = function (props) {
 		    const el = document.createElement('select'); // select 요소 생성
@@ -515,7 +537,7 @@
 						    }
 							  },
 						  renderer: { type: SelectBoxRenderer }}, 
-		            {header: '구역 수', name: 'LOCATION_COUNT', align: 'center', renderer: { type: TextInputRenderer }},
+		            {header: '구역 수', name: 'LOCATION_COUNT', align: 'center', renderer: { type: TextInputRenderer2 }},
 				    {
 				        header: '운영상태 *',
 				        name: 'WAREHOUSE_STATUS',
@@ -674,7 +696,7 @@
 		            { header: '자재 코드 *', name: 'PRODUCT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', renderer: { type: TextInputRenderer2 }},
 		            {
 		                header: '사용여부 *',
 		                name: 'USE_YN',

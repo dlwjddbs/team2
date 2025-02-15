@@ -16,30 +16,7 @@
 				<div class="modal-body">
 					<div class="card-body">
 						<div class="row">
- 							<div class="col-md-6"> 
-								<div class="form-group">
-									<label for="exampleInputEmail1">회사명</label>
-									<select class="form-control select" id="CLIENT_NAME">
-										<option selected="selected" disabled>회사 선택</option>
-									</select>
-								</div>
- 							</div>
-							<div class="col-md-3">
-								<label>사용여부</label><br> 
-								<input type="radio" name="use_status" value="Y" checked> 사용 &nbsp;
-			                    <input type="radio" name="use_status" value="N"> 미사용
-							</div>
-							<div class="col-md-3">
-								<div class="form-group">
-									<label>기준단위</label>
-									<select class="form-control select" id="ITEM_UNIT" name="ITEM_UNIT">
-										<option selected="selected" disabled>단위 선택</option>												
-									</select>
-								</div>
-							</div>
-						</div> 
-						<div class="row">
-							<div class="col-md-6">
+							<div class="col-md-5">
 									<label>품목 코드</label>
 									<div class="input-group">
 										<input type="text" id="itemCode" name="ITEM_CODE" class="form-control"
@@ -53,13 +30,15 @@
 									</div>
 									<span id="validationItemCodeMessage" class="form-text mt-1"></span>
 				            </div>
+						</div>
+						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
 					              <label>품목명</label>
 				                    <input type="text" class="form-control" id="ITEM_NAME" name="ITEM_NAME" placeholder="품목명을 입력하세요.">
 					            </div>
 				            </div>
-						 </div>
+						</div>	
  						<div class="row"> 
  							<div class="col-md-4"> 
 								<div class="form-group">
@@ -69,22 +48,18 @@
 									</select>
 								</div>
  							</div> 
-							<div class="col-md-8">
-							    <div class="form-group">
-							        <label for="exampleInputEmail1">품목그룹</label>
-							        <div class="row">
-							            <div class="col-md-6">
-							                <select class="form-control select" id="MAIN_NAME" name="MAIN_NAME">
-							                    <option selected="selected" disabled>대분류</option>
-							                </select>
-							            </div>
-							            <div class="col-md-6">
-							                <select class="form-control select" id="SUB_NAME" name="SUB_NAME">
-							                    <option selected="selected" disabled>소분류</option>                                                
-							                </select>
-							            </div>
-							        </div>
-							    </div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>기준단위</label>
+									<select class="form-control select" id="ITEM_UNIT" name="ITEM_UNIT">
+										<option selected="selected" disabled>단위 선택</option>												
+									</select>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<label>사용여부</label><br> 
+								<input type="radio" name="use_status" value="Y" checked> 사용 &nbsp;
+			                    <input type="radio" name="use_status" value="N"> 미사용
 							</div>
  						</div> 
 						<div class="row">
@@ -96,14 +71,14 @@
 									<option value="MG">반제품 창고</option>												
 								</select>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-3">
 								<label>입고검사</label>
 								<select class="form-control select" id="INB_INSP">
 									<option selected="selected" value="AS">Y</option>												
 									<option value="MG">N</option>												
 								</select>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-5">
 								<div class="form-group">
 									<label>단가</label>
 									<input type="text" id="ITEM_COST" class="form-control">
