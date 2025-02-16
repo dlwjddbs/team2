@@ -54,4 +54,8 @@ public interface ManufactureMapper {
 
 	int deleteRoutingSequence(List<String> processIds);
 
+	List<Map<String, Object>> selectProductionOrder(Map<String, Object> requestData);
+
+	List<Map<String, Object>> selectProductionOrderDetail(Map<String, Object> requestData);
+
 }

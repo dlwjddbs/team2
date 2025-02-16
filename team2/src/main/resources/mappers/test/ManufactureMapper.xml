@@ -388,4 +388,41 @@
     	   SET PROCESS_QUANTITY = #{createdRowsCnt}
     	 WHERE ROUTING_ID = #{ROUTING_ID}
     </update>
+    
+	<select id="selectProductionOrder" resultType="map">
+		SELECT
+			   pr.PRODUCTION_ORDER_ID 
+			 , pr.CREATE_DATE || ' ' || pr.CREATE_TIME AS CREATE_DATETIME
+			 , pr.AMOUNT 
+			 , pr.STATUS 
+			 , pr.ITEM_ID 
+			 , mc.SUB_NAME 
+			 , i.ITEM_NAME 
+			 , i.ITEM_UNIT 
+		  FROM PRODUCTION_ORDER pr
+			   INNER JOIN MES_COMMON mc
+					   ON pr.STATUS = mc.CLASSIFICATION_ID
+			   INNER JOIN ITEM i 
+					   ON pr.ITEM_ID = i.ITEM_ID 
+    </select>
+    
+	<select id="selectProductionOrderDetail" resultType="map">
+		SELECT
+			   pod.PRODUCTION_ORDER_DETAIL_ID 	AS PRODUCTION_ORDER_DETAIL_ID
+			 , pod.ITEM_ID 						AS ITEM_ID
+			 , pod.AMOUNT 						AS AMOUNT
+			 , pod.STATUS 						AS STATUS
+			 , POD.WORKCENTER_ID 				AS WORKCENTER_ID
+			 , MC.SUB_NAME 						AS STATUS_NAME
+			 , W.NAME 							AS WORKCENTER_NAME
+			 , i.ITEM_NAME 						AS ITEM_NAME
+		  FROM PRODUCTION_ORDER_DETAIL pod
+			   INNER JOIN MES_COMMON mc 
+					   ON pod.STATUS = mc.CLASSIFICATION_ID 
+			   INNER JOIN WORKCENTER w 
+					   ON pod.WORKCENTER_ID = w.WORKCENTER_ID 
+			   INNER JOIN ITEM i 
+					   ON pod.ITEM_ID = i.ITEM_ID 
+		 WHERE PRODUCTION_ORDER_ID = #{productionOrder_id}
+    </select>
 </mapper>

@@ -36,6 +36,8 @@ public class ManufactureRestController {
 	private final String routing_url = "/manufacture/routing";
 	private final String item_url = "/manufacture/routingItem";
 	private final String routing_sequence_url = "/manufacture/sequence";
+	private final String production_order_url = "/manufacture/productionOrder";
+	private final String production_order_detail_url = "/manufacture/productionOrderDetail";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -135,6 +137,16 @@ public class ManufactureRestController {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
 		
         return manufactureService.insertRoutingSequence(createdRows);
+	}
+	
+	@GetMapping(production_order_url)
+	public Map<String, Object> getProductionOrder(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProductionOrder(requestData);
+	}
+	
+	@GetMapping(production_order_detail_url)
+	public Map<String, Object> getProductionOrderDetail(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProductionOrderDetail(requestData);
 	}
 	
 }

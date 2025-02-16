@@ -45,6 +45,11 @@ public class ManufactureController {
 		return "/manufacture/routing";
 	}
 	
+	@GetMapping("/productionOrder")
+	public String productionOrder() {
+		return "/manufacture/productionOrder";
+	}
+	
 }
 
 

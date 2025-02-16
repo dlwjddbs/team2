@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+
+		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
+		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
+		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
+		<nav th:replace="~{includes/modals/workcenterRoutingAdd :: workcenterRoutingAdd}"></nav>
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-6">
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">작업지시</p>
+										</div>
+										<div class="col-6">
+											<div class="card-tools" style="text-align: right;">
+												<input type="button" id="btn_productionOrder_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_productionOrder_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_productionOrder_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_productionOrder_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_productionOrder_delete" class="btn btn-primary" value="삭제">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body" id="productionOrderGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<div class="row">
+									<div class="col-6">
+										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">작업지시상세</p>
+									</div>
+									<div class="col-6">
+										<div class="card-tools" id="btn_group_productionOrderDetail" style="text-align: right; display: none;">
+											<input type="button" id="btn_productionOrderDetail_modal" class="btn btn-primary" value="추가">
+											<input type="button" id="btn_productionOrderDetail_add" class="btn btn-primary" value="저장">
+											<input type="button" id="btn_productionOrderDetail_delete" class="btn btn-primary" value="제거">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body" id="productionOrderDetailGrid">
+								<!-- Toast Grid Ajax -->
+							</div>
+						<!-- /.card-body -->
+						</div>
+					<!-- /.card -->
+					</div>
+				</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	
+	<style>
+	    .selected-row {
+	        background-color: #d1ffd6;
+	    }
+	    .deselected-row {
+	        background-color: #ffd1d1;
+	    }
+		.modal-custom-size {
+			max-width: 1300px;
+		}
+	</style>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		// 작업지시
+		let productionOrderGrid = null;
+		const productionOrderUrl = '/manufacture/productionOrder';
+		const productionOrderDataSource = {
+			api: {
+			    readData: {url: productionOrderUrl, method: 'GET'},
+				modifyData: { url: productionOrderUrl, method: 'PUT' },
+				deleteData: {url: productionOrderUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+	    };
+		let productionOrderCurrentSelectedRowKey = null;
+		let productionOrderCurrentSelectedID = null;
+		let productionOrderIsEditModeEnabled = false; 
+		const productionOrder_columns = [
+            {header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', editor: null},
+            {header: '생성일시', name: 'CREATE_DATETIME', align: 'center', editor: null},
+            {header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
+            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+            {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
+            {header: '지시량', name: 'AMOUNT', align: 'center', editor: null},
+            {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
+            {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
+        ];
+		
+		// 작업지시상세
+		let productionOrderDetailGrid = null;
+		const productionOrderDetailUrl = '/manufacture/productionOrderDetail';
+		const productionOrderDetailDataSource = {
+			api: {
+				createData: {url: productionOrderDetailUrl, method: 'POST'},
+			    readData: {url: productionOrderDetailUrl, method: 'GET', initParams: { productionOrder_id: ''}},
+			    deleteData: {url: productionOrderDetailUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+		};
+		let productionOrderDetailCurrentSelectedRowKey = null;
+		const productionOrderDetail_columns = [
+		    {header: '작업지시상세 번호', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center', editor: null},
+		    {header: '품목코드', name: 'ITEM_ID', align: 'left', editor: null},
+		    {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+		    {header: '워크센터코드', name: 'WORKCENTER_ID', align: 'left', editor: null},
+		    {header: '워크센터명', name: 'WORKCENTER_NAME', align: 'left', editor: null},
+		    {header: '생산량', name: 'AMOUNT', align: 'left', editor: null},
+		    {header: '상태', name: 'STATUS_NAME', align: 'left', editor: null},
+		    {header: '상태코드', name: 'STATUS', align: 'left', editor: null, hidden: true},
+		];
+		
+		/*
+		TODO
+		작업지시 등록에선 재고량 상관없이 일단 지시 등록
+		작업지시 등록시에 생산 품목 삭제 가능 8pm참고
+		작업지시상세 작업시작시에 자재 투입
+		
+		라우팅 공정 1개 이상인것만 워크센터에 등록할 수 있게 수정해야됨
+		라우팅 화면처럼 작업지시 헤더 일괄 등록하고
+		하단 그리드에서 상세 하나씩 등록
+		작업지시에 작업지시상세가 1개 이상이면 POP에 노출
+		*/
+		
+		const TextInputRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+		 	el.style.width = 'calc(100% - 10px)';
+		 	el.style.padding = '6px 7px';
+		  	el.style.border = 'solid 1px #ddd';
+		  	el.style.margin = 'auto 5px';
+		  	
+		  	this.el = el;
+		  	this.render(props);
+		}
+
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+		
+		const TextInputBtnRenderer = function(props) {
+		    const container = document.createElement('div');
+		    container.style.display = 'flex';
+		    container.style.alignItems = 'center';
+		    container.style.gap = '5px';
+		    
+		    const el = document.createElement('input');
+		    el.type = 'text';
+		    el.style.width = 'calc(100% - 10px)';
+		    el.style.padding = '6px 7px';
+		    el.style.border = 'solid 1px #ddd';
+		    el.style.color = 'solid 1px #ddd';
+		    el.style.marginLeft = '1px';
+		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+			container.appendChild(el);
+			
+			// PRODUCTION_ORDER_ID 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'PRODUCTION_ORDER_ID' || props.columnInfo.name == 'ROUTING_ID')
+				&& orderGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+			    button.textContent = '🔍';
+			    button.style.border = 'solid 1px #007BFF';
+			    button.style.background = 'white';
+			    button.style.color = 'white';
+			    button.style.padding = '6px 10px';
+			    button.style.cursor = 'pointer';
+			    button.style.borderRadius = '4px';
+			    button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = orderGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'PRODUCTION_ORDER_ID':
+							$("#inputCodeText").val(value);
+							$("#gridCheckedRow").val(row);
+							$("#gridCheckedColumn").val(column);
+
+							tableName = "PRODUCTION_ORDER";
+							tableCodeId = "PRODUCTION_ORDER_ID";
+							copyGrid = orderGrid;
+							
+							$('#mesCodeValidate').modal();
+							
+							break;
+						case 'MANAGER_ID':
+							$("#managerRow").val(row);
+							$("#managerColumn").val(column);
+							
+							$('#productionOrderManagerAdd').modal(); 
+							
+							break;
+						case 'ROUTING_ID': 
+							$("#routingRow").val(row);
+							$("#routingColumn").val(column);
+							
+							$('#productionOrderRoutingAdd').modal(); 
+							
+							break;
+					}
+			    });
+			}
+			
+		    this.el = container;
+		    this.input = el;
+		    this.render(props);
+		}
+
+		TextInputBtnRenderer.prototype.getElement = function () {
+		    return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+		    this.input.value = props.value;
+		}
+		
+		const CheckboxRenderer = function(props) {
+		    const el = document.createElement('input');
+		    el.type = 'checkbox';
+		    el.checked = (props.value === 'Y');  // 초기값 지정
+			
+			// 워크센터 비가동 중이거나 앞으로의 작업 대기열 없을 때만 사용여부 수정 가능.
+			if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0
+				|| props.grid.getValue(props.rowKey, 'USED_N_CNT')) {
+				el.disabled = true;
+			}
+		
+			el.addEventListener('change', function() {
+		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+		    });
+		    		
+		    this.el = el;
+		};
+
+		CheckboxRenderer.prototype.getElement = function() {
+		    return this.el;
+		};
+
+		CheckboxRenderer.prototype.getValue = function() {
+		    return this.el.checked ? 'Y' : 'N';
+		};
+
+		CheckboxRenderer.prototype.mounted = function() {
+		    this.el.focus();
+		};
+
+		$(function () {
+			productionOrderInit();
+		});
+		
+		// 작업지시
+		function productionOrderInit() {
+			productionOrderGrid = new tui.Grid({
+		        el: document.getElementById('productionOrderGrid'),
+		        data: productionOrderDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+				editingEvent: 'click',
+		        columns: productionOrder_columns,
+		    });
+
+		    productionOrderGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+			
+			productionOrderGrid.on('editingStart', function(ev) {
+			    const {rowKey, columnName, value} = ev;
+			    const rowData = productionOrderGrid.getRow(rowKey);
+				
+				// PK 수정 불가 && 새로 추가된 행은 작성 가능
+// 				if (columnName == 'PRODUCTION_ORDER_ID' && !rowData.isNew) {
+// 				if (columnName == 'MANAGER_ID') {
+// 					$('#categoryAdd').modal();
+// 					ev.stop();
+// 				}
+			});
+			
+			productionOrderGrid.on('click', (ev) => {
+			    if (ev.targetType != "cell" || productionOrderIsEditModeEnabled) {
+					return;
+				}
+
+			    const newRowKey = ev.rowKey;
+				
+				// 새로 추가된 행은 클릭 안되도록.
+				if (productionOrderGrid.getRow(newRowKey).isNew) {
+					return;
+				}
+
+			    if (productionOrderCurrentSelectedRowKey != null) {
+			        productionOrderGrid.removeRowClassName(productionOrderCurrentSelectedRowKey, 'selected-row');
+			    }
+
+				if (productionOrderDetailGrid) {
+					productionOrderDetailGrid.destroy(); // 작업지시상세 그리드 제거
+					productionOrderDetailGrid = null;
+				}
+				
+			    if (productionOrderCurrentSelectedRowKey != newRowKey) {
+			        productionOrderGrid.addRowClassName(newRowKey, 'selected-row');
+			        productionOrderCurrentSelectedRowKey = newRowKey;
+					
+					// 작업지시상세 그리드 생성
+					const productionOrderID = productionOrderGrid.getRow(newRowKey).PRODUCTION_ORDER_ID;
+					productionOrderDetailInit(productionOrderID);
+					productionOrderCurrentSelectedID = productionOrderID;
+					$("#btn_group_productionOrderDetail").show();
+			    } else {
+			        // 같은 행을 클릭한 경우 선택 해제
+			        productionOrderCurrentSelectedRowKey = null;
+					productionOrderCurrentSelectedID = null;
+					$("#btn_group_productionOrderDetail").hide();
+			    }
+			});
+		}
+		
+		// 수정 모드 토글 버튼 이벤트
+		$("#btn_productionOrder_toggleEditMode").on("click", function () {
+		    productionOrderIsEditModeEnabled = !productionOrderIsEditModeEnabled; // 수정 모드 상태 토글
+		    
+		    if (productionOrderIsEditModeEnabled) {
+				$("#btn_productionOrder_add_row").show();
+				$("#btn_productionOrder_remove_row").show();
+		    } else {
+		    	$("#btn_productionOrder_add_row").hide();
+				$("#btn_productionOrder_remove_row").hide();
+		    }
+		    
+		    if (productionOrderIsEditModeEnabled) {
+		        productionOrderGrid.setColumns([
+		        	{header: '워크센터 코드 *', name: 'PRODUCTION_ORDER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '워크센터명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+				    {
+				        header: '사용여부 *',
+				        name: 'USE_YN',
+				        align: 'center',
+				        formatter: function({value}) {
+				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
+				        },
+				        renderer: { type: CheckboxRenderer }
+				    },
+		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '담당자', name: 'MANAGER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+					{header: '워크센터 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
+					{header: '라우팅 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
+		        ]);
+		    } else {
+		        productionOrderGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+		        productionOrderGrid.setColumns(productionOrder_columns);
+		    }
+		});
+
+		$("#btn_productionOrder_add_row").on("click", function () {
+		    const newRowKey = productionOrderGrid.appendRow(
+		        {
+		        	"PRODUCTION_ORDER_ID": '',
+		        	"NAME": '',
+		        	"USE_YN": 'N',
+		        	"NOTE": '',
+		        	"MANAGER_ID": '',
+		        	"ROUTING_ID": '',
+		            isNew: true
+		        },
+		        {focus: true}
+		    );
+		});
+		
+		$("#btn_productionOrder_remove_row").on("click", function () {
+		    const rowCount = productionOrderGrid.getRowCount(); // 현재 행 개수 가져오기
+		    
+		    const allRows = productionOrderGrid.getData(); // 전체 데이터 가져오기
+		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
+		    
+		    if (newRows.length === 0) {
+		        alert("삭제할 수 있는 신규 행이 없습니다.");
+		        return;
+		    }
+
+		    const lastRowKey = productionOrderGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+		    productionOrderGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		});
+
+		$("#btn_productionOrder_modify").on("click", function() {
+			productionOrderGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+			
+		    let createdRows = productionOrderGrid.getModifiedRows().createdRows;
+		    let updatedRows = productionOrderGrid.getModifiedRows().updatedRows;
+		    
+		    // 필수 입력 컬럼
+		    const requiredFields = ["PRODUCTION_ORDER_ID", "NAME", "USE_YN"];
+
+		    let validCreatedRows = createdRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    let validUpdatedRows = updatedRows.filter(row =>
+		        requiredFields.every(field => 
+		        	row[field] && row[field].trim() !== ''
+		        )
+		    );
+		    
+		    if (createdRows.length == 0 && updatedRows.length == 0) {
+		    	alert("수정된 데이터가 없습니다.");
+		        return;
+		    }
+
+			if (createdRows.length > 0) {
+				if ((validCreatedRows.length == 0)
+					|| (validCreatedRows.length != createdRows.length)) {
+					alert("필수값을 모두 입력해주세요.");
+			        return;
+				}
+			}
+				
+			if (updatedRows.length > 0 && validUpdatedRows.length == 0) {
+				alert("필수값을 모두 입력해주세요.");
+		        return;
+			}
+			
+			productionOrderGrid.request('modifyData');
+			productionOrderGrid.readData(1, null, true);  // 그리드 새로고침 
+			productionOrderGrid.setColumns(productionOrder_columns);  // 수정모드 해제 (새로 렌더링)
+			
+			productionOrderIsEditModeEnabled = false;
+	    	$("#btn_productionOrder_add_row").hide();
+			$("#btn_productionOrder_remove_row").hide();
+		});
+		
+        $("#btn_productionOrder_delete").on("click", function() {
+			productionOrderGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = productionOrderGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.PRODUCTION_ORDER_ID))  // 한글 변환
+				.join(',');
+			productionOrderDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+		    productionOrderGrid.request('deleteData');
+			productionOrderGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		// 작업지시상세
+		function productionOrderDetailInit(productionOrder_id) {
+			// 파라미터 설정
+			productionOrderDetailDataSource.api.readData.initParams.productionOrder_id = productionOrder_id;
+			
+			if (productionOrderDetailGrid) {
+				productionOrderDetailGrid.destroy(); // 기존 그리드 제거
+				productionOrderDetailGrid = null;
+			}
+			
+			productionOrderDetailGrid = new tui.Grid({
+		        el: document.getElementById('productionOrderDetailGrid'),
+		        data: productionOrderDetailDataSource,
+		        scrollX: true,
+		        scrollY: true,
+		        bodyHeight: 250,
+		        rowHeaders: ['checkbox'],
+		        columns: productionOrderDetail_columns,
+		    });
+			
+			$("#btn_group_productionOrderDetail").show();
+
+		    productionOrderDetailGrid.on('failResponse', function(ev) {
+		        alert(JSON.parse(ev.xhr.responseText).message);
+		    });
+		}
+		
+		$("#btn_productionOrderDetail_add").on("click", function() {
+			productionOrderDetailGrid.request('createData');
+			productionOrderDetailGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		$("#btn_productionOrderDetail_modal").on("click", function() {
+			$("#productionOrderEquipmentAdd").modal();
+		});
+		
+		$("#btn_productionOrderDetail_delete").on("click", function() {
+			productionOrderDetailGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = productionOrderDetailGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.EQUIPMENT_ID))  // 한글 변환
+				.join(',');
+			productionOrderDetailDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+			productionOrderDetailGrid.request('deleteData');
+			productionOrderDetailGrid.reloadData();  // 실패시 테이블 리로드
+		});
+	</script>
+</body>
+</html>
