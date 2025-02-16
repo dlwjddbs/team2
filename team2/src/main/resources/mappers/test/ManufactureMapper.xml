@@ -7,14 +7,37 @@
 <mapper namespace="com.itwillbs.repository.ManufactureMapper">
 
     <select id="selectWorkcenter" resultType="map">
-        SELECT
-			   WORKCENTER_ID
-			 , NAME
-			 , USE_YN
-			 , NOTE
-			 , MANAGER_ID
-			 , ROUTING_ID
-          FROM WORKCENTER
+		SELECT
+			   w.WORKCENTER_ID
+			 , w.NAME
+			 , w.USE_YN
+			 , w.NOTE
+			 , w.MANAGER_ID
+			 , w.ROUTING_ID
+			 , (  -- 워크센터 비가동 중이거나 앞으로의 작업 대기열 없을 때
+				SELECT (
+					SELECT COUNT(*) 
+					  FROM PRODUCTION_ORDER_DETAIL
+					 WHERE 
+						   1 = 1
+					   AND WORKCENTER_ID = w.WORKCENTER_ID
+					   AND STATUS IN('ST-001', 'ST-002')  -- 대기중, 진행중
+				) + (
+					SELECT COUNT(*) 
+					  FROM WORKCENTER_LOG
+					 WHERE WORKCENTER_ID = w.WORKCENTER_ID
+				)
+				FROM DUAL
+			 ) AS USING_CNT
+			 , (  -- 워크센터 사용 Y하려면 등록된 라우팅이 먼저 Y가 되야됨.
+				SELECT COUNT(*) 
+				  FROM ROUTING r
+				 WHERE 
+					   1 = 1
+				   AND USE_YN = 'N'
+				   AND ROUTING_ID = w.ROUTING_ID
+			 ) AS USED_N_CNT
+		  FROM WORKCENTER w
     </select>
     
     <insert id="insertWorkcenter">
@@ -131,13 +154,22 @@
     </update>
     
     <select id="selectProcess" resultType="map">
-	    SELECT
+		SELECT
 			   p.PROCESS_ID 
 			 , p.NAME 
 			 , p.USE_YN 
 			 , p.INSPECTION_YN 
 			 , p.NOTE 
-			 , (SELECT count(*) FROM PROCESS_ROUTING_MAPPING WHERE PROCESS_ID = p.PROCESS_ID) AS used_cnt
+			 , (
+				SELECT COUNT(*) 
+				  FROM PROCESS_ROUTING_MAPPING prm
+					   INNER JOIN ROUTING r 
+							   ON prm.ROUTING_ID = r.ROUTING_ID 
+				 WHERE 
+					   1 = 1
+				   AND prm.PROCESS_ID = p.PROCESS_ID
+				   AND r.USE_YN = 'Y'
+			 ) AS using_cnt
 		  FROM PROCESS p
 		 WHERE
 			   1 = 1
@@ -201,7 +233,7 @@
     </delete>
     
     <select id="selectRouting" resultType="map">
-		SELECT 
+		SELECT DISTINCT 
 			   r.ROUTING_ID			AS ROUTING_ID
 			 , r.NAME				AS  NAME
 			 , r.USE_YN				AS USE_YN
@@ -209,10 +241,36 @@
 			 , i.ITEM_NAME 			AS ITEM_NAME
 			 , r.NOTE				AS NOTE
 			 , r.PROCESS_QUANTITY	AS PROCESS_QUANTITY
-			 , (SELECT COUNT(*) FROM WORKCENTER WHERE ROUTING_ID = r.ROUTING_ID) AS USED_CNT
+			 , (  -- 워크센터에서 해당 라우팅 사용 중일시 라우팅 사용여부 N 불가
+				SELECT COUNT(*) 
+				  FROM WORKCENTER 
+				 WHERE 
+					   1 = 1
+				   AND ROUTING_ID = r.ROUTING_ID
+				   AND USE_YN = 'Y'
+			 ) AS USING_CNT
+			 , (  -- 해당 라우팅에 할당된 공정이 미사용 상태일시 라우팅 사용여부 Y 불가
+				SELECT COUNT(*) 
+				  FROM PROCESS_ROUTING_MAPPING prm
+					   INNER JOIN PROCESS p 
+							   ON prm.PROCESS_ID = p.PROCESS_ID 
+				 WHERE 
+					   1 = 1
+				   AND prm.PROCESS_ID IN(SELECT PROCESS_ID FROM PROCESS_ROUTING_MAPPING WHERE ROUTING_ID = r.ROUTING_ID)
+				   AND p.USE_YN = 'N'
+			 ) AS USED_N_CNT
 		  FROM ROUTING r
 			   INNER JOIN ITEM i
-					   ON r.ITEM_ID = i.ITEM_ID 
+					   ON r.ITEM_ID = i.ITEM_ID
+		 WHERE 
+			   1 = 1
+		<if test='use_yn != null and use_yn != ""'>
+			AND r.USE_YN = 'Y'
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (r.ROUTING_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
+					OR r.NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
+		</if>
     </select>
     
     <select id="selectItem" resultType="map">

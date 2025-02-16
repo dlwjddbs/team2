@@ -170,7 +170,7 @@
 		const equipmentDataSource = {
 			api: {
 				createData: {url: equipmentUrl, method: 'POST'},
-			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '' }},
+			    readData: {url: equipmentUrl, method: 'GET', initParams: { workcenter_id: '', use_yn: 'Y' }},
 			    deleteData: {url: equipmentUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
@@ -229,7 +229,7 @@
 			container.appendChild(el);
 			
 			// WORKCENTER_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'WORKCENTER_ID'
+			if (!((props.columnInfo.name == 'WORKCENTER_ID' || props.columnInfo.name == 'ROUTING_ID')
 				&& workcenterGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
@@ -297,6 +297,12 @@
 		    const el = document.createElement('input');
 		    el.type = 'checkbox';
 		    el.checked = (props.value === 'Y');  // 초기값 지정
+			
+			// 워크센터 비가동 중이거나 앞으로의 작업 대기열 없을 때만 사용여부 수정 가능.
+			if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0
+				|| props.grid.getValue(props.rowKey, 'USED_N_CNT')) {
+				el.disabled = true;
+			}
 		
 			el.addEventListener('change', function() {
 		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
@@ -417,6 +423,8 @@
 		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '담당자', name: 'MANAGER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+					{header: '워크센터 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
+					{header: '라우팅 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
 		        workcenterGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
