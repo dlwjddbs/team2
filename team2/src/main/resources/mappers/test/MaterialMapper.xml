@@ -8,12 +8,13 @@
 	SELECT
 		MATERIAL_ID,
 		MATERIAL_NAME,
-		MATERIAL_PRICE,
+		TO_CHAR(MATERIAL_PRICE, 'FM9,999,999') || '원' AS MATERIAL_PRICE,
 		GROUP_CODE,
 		COMMON_CODE,
 		UNIT
 	FROM
 		MATERIAL
+	ORDER BY MATERIAL_ID
 </select>
 
 <insert id="insertMaterial" parameterType="map">
@@ -34,7 +35,35 @@
     )
 </insert>
 
+<update id="updateMaterial" parameterType="map">
+	UPDATE MATERIAL
+		SET
+			MATERIAL_NAME = #{MATERIAL_NAME},
+			MATERIAL_PRICE = #{MATERIAL_PRICE},
+			GROUP_CODE = #{GROUP_CODE},
+			COMMON_CODE = #{COMMON_CODE},
+			UNIT = #{UNIT}
+	WHERE MATERIAL_ID = #{MATERIAL_ID}
+</update>
 
-
+<delete id="deleteMaterial" parameterType="map">
+        DELETE FROM MATERIAL 
+        	WHERE MATERIAL_ID = #{MATERIAL_ID}
+    </delete>
+    
+<select id="searchMaterial" parameterType="map">
+SELECT * 
+FROM MATERIAL
+<where>
+      <if test="query != null and query != ''">
+        AND (
+          MATERIAL_NAME LIKE '%' || #{query} || '%'
+          OR COMMON_CODE LIKE '%' || #{query} || '%'
+          OR GROUP_CODE LIKE '%' || #{query} || '%'
+        )
+      </if>
+    </where>
+    ORDER BY MATERIAL_ID
+  </select>
 
 </mapper>

@@ -68,6 +68,7 @@
 	let clientGrid = null;
 	let clientCurrentSelectedRowKey = null;
 	let selectedClientId = '';
+	let selectedRespName = '';
 	let param = {client_name: ''};
 	const clientUrl = '/purchase/purchaseClt';
 	const clientDataSource = {
@@ -79,12 +80,14 @@
 	const client_columns = [
         {header: '거래처코드', name: 'CLIENT_ID', align: 'center'},
         {header: '거래처명', name: 'CLIENT_NAME', align: 'center'},
+		{header: '담당자명', name: 'RESP_NAME', align: 'center'},
     ];
 
 	
 	$('#purchaseClt').on('shown.bs.modal', function () {
 		param.client_id = '';
 		param.client_name = '';
+		param.resp_name = '';
 		selectedClientId = '';
 		$("#CLT").val('');
 		$("#clientName").val('');
@@ -126,6 +129,7 @@
 		        
 		        selectedClientId = clientGrid.getRow(newRowKey).CLIENT_ID;
 		        selectedClientName = clientGrid.getRow(newRowKey).CLIENT_NAME;
+				selectedRespName = clientGrid.getRow(newRowKey).RESP_NAME;
 		        $("#saveClient").attr("disabled", false);
 		    } else {
 		        // 같은 행을 클릭한 경우 선택 해제
@@ -133,9 +137,11 @@
 		        $("#saveClient").attr("disabled", true);
 		        selectedClientId = '';
 		        selectedClientName = '';
+				selectedRespName = '';
 		    }
 		    
-		    console.info("선택한 거래처코드:", selectedClientId, "선택한 거래처명:", selectedClientName);});
+		    console.info("선택한 거래처코드:", selectedClientId, "선택한 거래처명:", selectedClientName
+			, "선택한 담당자명:", selectedRespName);});
 	}
 	
 	$("#saveClient").on('click', function() {
@@ -148,6 +154,7 @@
 		console.info("로우 / " + clientRow + " // 컬럼 / " + clientColumn + " // 값 / " + selectedClientId);
 		grid1.setValue(rowIdx, "CLIENT_ID", selectedClientId);
 		grid1.setValue(rowIdx, "CLIENT_NAME", selectedClientName);
+		grid1.setValue(rowIdx, "RESP_NAME", selectedRespName);
 		cltId = selectedClientId;
 		
 		$('#purchaseClt').modal('hide');
@@ -156,6 +163,7 @@
 	$("#btnClientSearch").on("click", function() {
 		param.client_id = $("#CLT").val();
 		param.client_name = $("#clientName").val();
+		param.resp_name = $("#respName").val();
 		selectedClientId = '';
 		$("#saveClient").attr("disabled", true);
 		

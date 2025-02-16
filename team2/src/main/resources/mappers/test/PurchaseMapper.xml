@@ -14,7 +14,8 @@
     NVL(SUM(PD.PO_COUNT), 0) AS PO_COUNT,
     TO_CHAR(NVL(SUM(PD.TOTAL_PRICE), 0), 'FM9,999,999') || '원' AS PO_PRICE,
     TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
-    M1.NAME AS MEMBER_NAME,
+    C.RESP_NAME,
+<!--    M1.NAME AS MEMBER_NAME,-->
     PO.CLIENT_ID,
     C.CLIENT_NAME,
     (SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = PO.PO_STATUS AND MAIN_ID = 'STATUS') AS PO_STATUS,
@@ -26,7 +27,7 @@ LEFT JOIN MEMBER M1 ON PO.MEMBER_ID = M1.MEMBER_ID  -- 주문 생성자 조인
 LEFT JOIN CLIENT C ON PO.CLIENT_ID = C.CLIENT_ID  -- 거래처 조인
 LEFT JOIN MEMBER M2 ON PO.UPDATE_MEMBER = M2.MEMBER_ID  -- 수정한 사람 조인
 GROUP BY 
-    PO.PO_ID, PO.PO_NUM, PO.CREATE_DATE, M1.NAME, PO.CLIENT_ID, 
+    PO.PO_ID, PO.PO_NUM, PO.CREATE_DATE, C.RESP_NAME, PO.CLIENT_ID, 
     C.CLIENT_NAME, PO.PO_STATUS, PO.UPDATE_DATE, M2.NAME
 ORDER BY PO.CREATE_DATE DESC
 	</select>
@@ -44,7 +45,7 @@ ORDER BY PO.CREATE_DATE DESC
 SELECT
     'PO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
     CURRENT_DATE, 
-    #{INSERT_MEM},
+    RESP_NAME,
     CLIENT_ID,
     #{PO_STATUS},
     'ORD-' || TO_CHAR(SYSDATE, 'MMDD-HH24MISS')
@@ -61,7 +62,7 @@ WHERE CLIENT_ID = #{CLIENT_ID}
        	 	UPDATE_DATE = CURRENT_DATE,
        	 	UPDATE_MEMBER = #{UPDATE_MEM},
        	 	PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
-    WHERE PO_ID = #{PO_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+    WHERE PO_ID = #{PO_ID}  <!-- PO_ID를 기준으로 업데이트 -->
 	</update>
 	
 	<!-- DELETE (데이터 삭제) -->
@@ -75,12 +76,14 @@ WHERE CLIENT_ID = #{CLIENT_ID}
     ROW_NUMBER() OVER (ORDER BY TO_NUMBER(pd.PODETAIL_ID)) AS SEQ,  -- 숫자 변환 후 정렬
     pd.PODETAIL_ID,
     pd.MATERIAL_ID,
+    TO_CHAR(pd.TOTAL_PRICE * 0.1, 'FM9,999,999') || '원' AS VAT,
     TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
     pd.PO_COUNT,
     pd.TOTAL_PRICE,
     pd.UPDATE_DATE,
     pd.UPDATE_MEMBER,
     m.MATERIAL_NAME,
+    m.UNIT,
     TO_CHAR(m.MATERIAL_PRICE, 'FM9,999,999') || '원' AS MATERIAL_PRICE,
     (SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = pd.PO_STATUS AND MAIN_ID = 'STATUS') AS PO_STATUS
 FROM PO_DETAIL pd
@@ -110,7 +113,7 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
         #{MATERIAL_ID},
         #{PO_COUNT},
         m.MATERIAL_PRICE, 
-        (#{PO_COUNT} * m.MATERIAL_PRICE),
+        (#{PO_COUNT} * m.MATERIAL_PRICE) * 1.1,
         CURRENT_DATE,
         #{PO_STATUS}
     FROM PURCHASE_ORDER po
@@ -140,7 +143,7 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
         
 <!-- 거래처 목록 -->
     <select id="getClientList" resultType="map" parameterType="map">
-    	SELECT CLIENT_ID, CLIENT_NAME
+    	SELECT CLIENT_ID, CLIENT_NAME, RESP_NAME
     	FROM CLIENT
     	 WHERE 
 		 	   1 = 1
@@ -150,12 +153,15 @@ ORDER BY TO_NUMBER(pd.PODETAIL_ID)
 		<if test='client_name != null and client_name != ""'>
 		   AND CLIENT_NAME = #{client_name}
 		</if>
+		<if test='resp_name != null and resp_name != ""'>
+		   AND RESP_NAME = #{resp_name}
+		</if>
     </select>
 
 
 <!-- 모달창 재료 목록 -->
 	<select id="getMaterialList" resultType="map" parameterType="map">
-    	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE
+    	SELECT MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE, UNIT
     	FROM MATERIAL
     	WHERE 
 		 	   1 = 1

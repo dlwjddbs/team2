@@ -173,13 +173,13 @@
 						{header: '입고번호', name: 'GO_ID', align: 'center'},
 						{header: 'P/O번호', name: 'PO_ID', hidden: true},
 						{header: '입고일자', name: 'CREATE_DATE', align: 'center'},
-						{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
+						{header: '담당자', name: 'RESP_NAME', align: 'center'},
 						{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
 						{header: '거래처', name: 'CLIENT_NAME', align: 'center'},
 						{header: '품목(수)', name: 'GO_COUNT', align: 'center'},
 						{header: '총금액', name: 'GO_PRICE', align: 'center'},
 						{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
-						{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
+						//{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
 						{
 							header: '상태', name: 'GO_STATUS', align: 'center', hidden: true,
 							formatter: ({value}) => {
@@ -198,11 +198,13 @@
 						{header: '발주상세번호', name: 'PODETAIL_ID', hidden: true},
 						{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},
 						{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},
+						{header: '단위', name: 'UNIT', align: 'center'},
 						{header: '수량', name: 'GO_COUNT', align: 'center'},
 						{header: '단가', name: 'GO_PRICE', align: 'center'},
+						{header: '부가세', name: 'VAT', align: 'center'},
 						{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
-						{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
-						{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
+						{header: '수정일', name: 'UPDATE_DATE', hidden: true},
+						{header: '수정자', name: 'UPDATE_MEMBER', hidden: true},
 						{
 							header: '상태', name: 'GO_STATUS', align: 'center',
 							formatter: ({value}) => {

@@ -81,13 +81,14 @@
 
   // 그리드 컬럼 정의
   const materialColumns = [
-    { header: '품목 코드', name: 'MATERIAL_ID', align: 'center', editor: null },
-    { header: '품목명', name: 'MATERIAL_NAME', align: 'center', editor: null },
-    { header: '단가', name: 'MATERIAL_PRICE', align: 'center', editor: null }
+    { header: '품목 코드', name: 'MATERIAL_ID', align: 'center'},
+    { header: '품목명', name: 'MATERIAL_NAME', align: 'center'},
+	{ header: '단위', name: 'UNIT', align: 'center'},
+    { header: '단가', name: 'MATERIAL_PRICE', align: 'center'}
   ];
   const selectedMaterialColumns = [
-    { header: '품목코드', name: 'MATERIAL_ID', align: 'center', editor: null },
-    { header: '품목명', name: 'MATERIAL_NAME', align: 'center', editor: null }
+    { header: '품목코드', name: 'MATERIAL_ID', align: 'center'},
+    { header: '품목명', name: 'MATERIAL_NAME', align: 'center'}
   ];
 
   // 모달 그리드 초기화 함수 (자재 목록)
@@ -134,6 +135,7 @@
           MATERIAL_ID: materialId,
           MATERIAL_NAME: rowData.MATERIAL_NAME,
           MATERIAL_PRICE: rowData.MATERIAL_PRICE,
+		  UNIT: rowData.UNIT,
           isNew: true
         });
         materialModalGrid.addRowClassName(rowKey, 'selected-row');

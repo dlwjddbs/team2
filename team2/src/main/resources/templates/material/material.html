@@ -101,14 +101,20 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<h5>자재</h5>
-									<br>
-        <select id="pageSize" class="custom-select">
+									<h5>자재
+        <select id="pageSize" class="custom-select" style="margin-left: 15px;">
             <option value="10">10개</option>
             <option value="25">25개</option>
             <option value="50">50개</option>
             <option value="100">100개</option>
+			<option value="all">전체</option>
         </select>
+		</h5>
+		<div class="card-header d-flex align-items-center">
+		    <!-- 검색창을 왼쪽 끝에 배치 -->
+		    <input type="text" id="searchInput" class="form-control me-auto" 
+		        placeholder="자재 검색" style="width: 200px;">
+				
 									<div class="card-tools">
 										<input type="button" id="btn_add_row" class="btn btn-primary"
 											value="신규"> <input type="button" id="save"
@@ -150,9 +156,7 @@
 				const header = $("meta[name='_csrf_header']").attr("content");
 				const name = $("#userName").val();
 				
-				$(function () {
-					initGrids();
-				});
+				
 
 				let grid1, fullData = [];
 			    let pageSize = 10; // 기본 페이지 크기
@@ -179,6 +183,10 @@
 					{header: '단위', name: 'UNIT', align: 'center', editor: 'text'},
 				];
 				
+				$(function () {
+				initGrids();
+				initSearch();
+			});
 				
 				let rowIdx;
 				function initGrids() {
@@ -198,7 +206,11 @@
 
 				    // 페이지 개수 변경 이벤트
 				    document.getElementById("pageSize").addEventListener("change", function () {
-				        pageSize = parseInt(this.value, 10); // 선택된 값을 숫자로 변환
+						if (this.value === "all") {
+						        pageSize = fullData.length; // 전체 데이터 개수로 설정
+						    } else {
+						        pageSize = parseInt(this.value, 10); // 선택된 값을 숫자로 변환
+						    } // 선택된 값을 숫자로 변환
 				        grid1.setPerPage(pageSize); // 페이지 개수 적용
 				        updateGrid(); // 적용된 데이터를 다시 렌더링
 				    });
@@ -223,11 +235,50 @@
 				}
 				
 				
-				function updateGrid() {
-			        grid1.resetData(fullData); // 전체 데이터 적용
+				function updateGrid(data = fullData) {
+	          const dataWithRowNum = data.map((item, index) => ({ ...item, rowNum: index + 1 }));
+	          grid1.resetData(dataWithRowNum);
 			        grid1.setPerPage(pageSize); // 사용자가 선택한 개수 적용
 			    }
 
+				// 검색 기능 초기화
+				        function initSearch() {
+				          const searchInput = document.getElementById("searchInput");
+				          if (!searchInput) return;
+
+				          searchInput.addEventListener("input", async function () {
+				            const keyword = this.value.trim();
+				            if (keyword === "") {
+				              // 검색어가 없으면 원본 데이터로 복원
+				              updateGrid(fullData);
+				              return;
+				            }
+				            try {
+				              const filteredData = await fetchSearchResults(keyword);
+				              updateGrid(filteredData);
+				            } catch (error) {
+				              console.error("검색 실패:", error);
+				            }
+				          });
+				        }
+
+				        // 서버에서 검색 결과 가져오기
+				        async function fetchSearchResults(keyword) {
+				          const response = await fetch("/searchMaterial", {
+				            method: "POST",
+				            headers: {
+				              "Content-Type": "application/json",
+				              [header]: token,
+				            },
+				            body: JSON.stringify({ query: keyword }),
+				          });
+				          if (!response.ok) {
+				            throw new Error("서버 응답 오류");
+				          }
+				          return await response.json();
+				        }
+				
+				
 			    // 페이지 개수 변경 이벤트
 			    // 신규 행 추가 시 자동으로 No 증가 및 자재번호 자동 생성
 document.getElementById("btn_add_row").addEventListener("click", function () {
@@ -318,7 +369,7 @@ function handleSave() {
     );
 
     if (emptyRows.length > 0) {
-        showError("모든 행을 등록해주세요.", "warning");
+        showError("모든 행을 입력해주세요.", "warning");
         return;
     }
 	

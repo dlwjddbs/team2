@@ -81,10 +81,11 @@
 
   // 그리드 컬럼 정의
   const purchaseColumns = [
-    { header: '발주코드', name: 'PO_ID', align: 'center', editor: null },
-    { header: '발주일자', name: 'CREATE_DATE', align: 'center', editor: null },
+    { header: '발주코드', name: 'PO_ID', align: 'center'},
+    { header: '발주일자', name: 'CREATE_DATE', align: 'center'},
     { header: '거래처코드', name: 'CLIENT_ID', hidden: true},
-	{ header: '거래처', name: 'CLIENT_NAME', align: 'center', editor: null },
+	{ header: '담당자', name: 'RESP_NAME', align: 'center'},
+	{ header: '거래처', name: 'CLIENT_NAME', align: 'center'}
   ];
   const selectedPurchaseColumns = [
     { header: '발주코드', name: 'PO_ID', align: 'center', editor: null },
@@ -136,6 +137,7 @@
         	PO_ID: poId,
           CREATE_DATE: rowData.CREATE_DATE,
           CLIENT_NAME: rowData.CLIENT_NAME,
+		  RESP_NAME: rowData.RESP_NAME,
           isNew: true
         });
         purchaseModalGrid.addRowClassName(rowKey, 'selected-row');

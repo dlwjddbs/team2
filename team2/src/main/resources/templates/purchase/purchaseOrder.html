@@ -189,7 +189,7 @@
 				const columns = [
 					{header: 'P/O번호', name: 'PO_ID', align: 'center' },
 					{header: 'P/O일자', name: 'CREATE_DATE', align: 'center'},
-					{header: '담당자', name: 'MEMBER_NAME', align: 'center'},
+					{header: '담당자', name: 'RESP_NAME', align: 'center'},
 					{header: '거래처코드', name: 'CLIENT_ID', hidden: true},
 					{header: '거래처', name: 'CLIENT_NAME', align: 'center', 	formatter: function({ value, row }) {
 						return `
@@ -221,9 +221,11 @@
 				const columns2 = [
 				{header: '상세번호', name: 'PODETAIL_ID', align: 'center'},
 				{header: '품목코드', name: 'MATERIAL_ID', align: 'center'},					            
-				{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},					            
+				{header: '품목명', name: 'MATERIAL_NAME', align: 'center'},
+				{header: '단위', name: 'UNIT', align: 'center'},			            
 				{header: '수량', name: 'PO_COUNT', align: 'center', editor: 'text'},
 				{header: '단가', name: 'MATERIAL_PRICE', align: 'center'},
+				{header: '부가세', name: 'VAT', align: 'center'},
 				{header: '총금액', name: 'TOTAL_PRICE', align: 'center'},
 				{header: '수정일', name: 'UPDATE_DATE', align: 'center'},
 				{header: '수정자', name: 'UPDATE_MEMBER', align: 'center'},
@@ -353,60 +355,83 @@
 					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
 
 					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트
-					            if (newValue !== previousValue) {
-					                if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
-					                    const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
-					                    const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
-					                    const totalPrice = count * price; // 총금액 계산
+						if (newValue !== previousValue) {
+						        if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
+						             const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
+						             const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
+						             const totalWithoutVat = count * price; // 총금액 (부가세 미포함)
+						             const vat = totalWithoutVat * 0.1; // 부가세 10%
+						             const totalPrice = totalWithoutVat + vat; // 부가세 포함 총금액 (TOTAL_PRICE)
 
-					                    grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice);
-					                }
-					            }
-					        });
-					    });
-						
-						
-						// 체크박스가 활성화된 행의 index를 배열에 저장
-						grid2.on('check', (ev) => {
-							delRows.push(ev.rowKey);
+						             grid2.setValue(rowKey, "TOTAL_PRICE", totalPrice); // 부가세 포함 금액 저장
+						             grid2.setValue(rowKey, "VAT", vat); // 부가세 저장
+						             grid2.setValue(rowKey, "TOTAL_WITHOUT_VAT", totalWithoutVat); // 부가세 미포함 금액 저장
+						            }
+						        }
+						    });
 						});
 						
-						let totalItemCount = 0;
-					    let totalItemPrice = 0;
-					    const previousCellValues = {}; // 변경 전 셀 값을 저장하는 객체
-
-					    // 변경 전 값 저장 (beforeChange 이벤트)
-					    grid2.on('beforeChange', (event) => {
-					        event.changes.forEach(({ rowKey, columnName }) => {
-					            if (!previousCellValues[rowKey]) {
-					                previousCellValues[rowKey] = {};
-					            }
-					            // 변경 전 값을 grid2에서 가져와 저장 (DB에서 불러온 기존 값 포함)
-					            const previousValue = Number(grid2.getValue(rowKey, columnName)) || 0;
-					            previousCellValues[rowKey][columnName] = previousValue;
-					        });
-					    });
 						
-					    
-					    // 값 변경 시 총합 업데이트 (이전 값 반영)
-					    grid2.on('afterChange', (event) => {
-					        event.changes.forEach(({ rowKey, columnName, value }) => {
-					            const newValue = Number(value) || 0;
-					            // 이전 값이 존재하지 않는 경우 0으로 처리
-					            const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
+						
+						
+						let totalItemCount = 0;
+						let totalItemPrice = 0;
+						const previousCellValues = {}; // 변경 전 셀 값을 저장하는 객체
+						const vatRate = 0.1; // 부가세율 (10%)
 
-					            // 이전 값과 새로운 값이 다를 때만 총합 업데이트 (중복 방지)
-					            if (newValue !== previousValue) {
-					                if (columnName === "PO_COUNT") {
-					                    totalItemCount = totalItemCount - previousValue + newValue;
-					                    grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
-					                } else if (columnName === "PO_PRICE") {
-					                    totalItemPrice = totalItemPrice - previousValue + newValue;
-					                    grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
-					                }
-					            }
-					        });
-					    });
+						// 변경 전 값 저장 (beforeChange 이벤트)
+						grid2.on('beforeChange', (event) => {
+						    event.changes.forEach(({ rowKey, columnName }) => {
+						        if (!previousCellValues[rowKey]) {
+						            previousCellValues[rowKey] = {};
+						        }
+						        // 변경 전 값을 grid2에서 가져와 저장 (DB에서 불러온 기존 값 포함)
+						        previousCellValues[rowKey][columnName] = Number(grid2.getValue(rowKey, columnName)) || 0;
+
+						        // 기존의 TOTAL_PRICE와 VAT도 저장하여 값이 사라지지 않도록 함
+						        previousCellValues[rowKey]["TOTAL_WITHOUT_VAT"] = Number(grid2.getValue(rowKey, "TOTAL_WITHOUT_VAT")) || 0;
+						        previousCellValues[rowKey]["TOTAL_PRICE"] = Number(grid2.getValue(rowKey, "TOTAL_PRICE")) || 0;
+						        previousCellValues[rowKey]["VAT"] = Number(grid2.getValue(rowKey, "VAT")) || 0;
+						    });
+						});
+
+						// grid2 값 변경 시 자동 계산 (총금액, 부가세 업데이트)
+						grid2.on('afterChange', (event) => {
+						    event.changes.forEach(({ rowKey, columnName, value }) => {
+						        const newValue = Number(value) || 0;
+						        const previousValue = previousCellValues[rowKey]?.[columnName] ?? 0;
+
+						        // 값이 변경되었을 때만 업데이트
+						        if (newValue !== previousValue) {
+						            if (columnName === "PO_COUNT" || columnName === "MATERIAL_PRICE") {
+						                const count = Number(grid2.getValue(rowKey, "PO_COUNT")) || 0;
+						                const price = Number(grid2.getValue(rowKey, "MATERIAL_PRICE")) || 0;
+
+						                // 부가세 및 총금액 계산
+						                const totalWithoutVat = count * price; // 부가세 미포함 금액
+						                const vat = totalWithoutVat * vatRate; // 부가세 10%
+						                const totalWithVat = totalWithoutVat + vat; // 부가세 포함 총금액 (TOTAL_PRICE)
+
+						                // 업데이트된 값 설정
+						                grid2.setValue(rowKey, "TOTAL_WITHOUT_VAT", totalWithoutVat); // 부가세 미포함 금액
+						                grid2.setValue(rowKey, "VAT", vat); // 부가세 값 저장
+						                grid2.setValue(rowKey, "TOTAL_PRICE", totalWithVat); // 부가세 포함 가격 저장
+
+						                // 전체 합계 업데이트 (grid1 반영)
+						                totalItemCount = totalItemCount - previousValue + newValue;
+						                grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
+
+						                totalItemPrice = totalItemPrice - previousValue + newValue;
+						                grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
+						            }
+						        }
+						    });
+						});
+						
+						// 체크박스가 활성화된 행의 index를 배열에 저장
+												grid2.on('check', (ev) => {
+													delRows.push(ev.rowKey);
+												});
 					}
 
 				}

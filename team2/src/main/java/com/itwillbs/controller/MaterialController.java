@@ -76,6 +76,11 @@ public class MaterialController {
 	    return ResponseEntity.ok(responseMap);
 	}
 	
-	
+	@PostMapping("/searchMaterial")
+    public ResponseEntity<List<Map<String, Object>>> searchMaterial(@RequestBody Map<String, String> params) {
+        String query = params.get("query");
+        List<Map<String, Object>> result = materialService.searchMaterial(query);
+        return ResponseEntity.ok(result);
+    }
 	
 }

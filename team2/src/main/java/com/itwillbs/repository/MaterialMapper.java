@@ -16,4 +16,6 @@ public interface MaterialMapper {
 
 	int deleteMaterial(Map<String, Object> data);
 
+	List<Map<String, Object>> searchMaterial(String query);
+
 }

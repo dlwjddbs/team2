@@ -36,5 +36,9 @@ public class MaterialService {
         
         return count;
 	}
+
+	public List<Map<String, Object>> searchMaterial(String query) {
+		return materialMapper.searchMaterial(query);
+	}
 	
 }
