@@ -56,7 +56,7 @@
     <select id="selectBomDetail" resultType="map">
 		SELECT 
 			   BOM_DETAIL_ID 		AS BOM_DETAIL_ID
-			 , ITEM_ID				AS ITEM_ID
+			 , COMPONENT_ID			AS COMPONENT_ID
 			 , UNIT					AS UNIT
 			 , REQUIRED_AMOUNT 		AS REQUIRED_AMOUNT
 			 , BOM_ID				AS BOM_ID
@@ -87,14 +87,14 @@
 	<select id="selectItemInfo" resultType="map">
 <!-- 	<select id="selectItemAndMaterial" resultType="map"> -->
 		SELECT 
-		       ITEM_ID 			AS ID
+		       ITEM_ID 			AS COMPONENT_ID
 		     , ITEM_NAME 		AS NAME
 		     , ITEM_UNIT 		AS UNIT
 		     , 'ITEM' 			AS TYPE
 		FROM ITEM
 		UNION ALL
 		SELECT 
-		       MATERIAL_ID 		AS ID
+		       MATERIAL_ID 		AS COMPONENT_ID
 		     , MATERIAL_NAME 	AS NAME
 		     , UNIT 			AS UNIT
 		     , 'MATERIAL' 		AS TYPE
@@ -106,13 +106,13 @@
 		<foreach collection="list" item="item">
 			INTO BOM_DETAIL (
 				  BOM_ID
-				, ITEM_ID
+				, COMPONENT_ID
 				, UNIT
 				, REQUIRED_AMOUNT
 			)
 			VALUES (
 				  #{item.BOM_ID}
-				, #{item.ITEM_ID}
+				, #{item.COMPONENT_ID}
 				, #{item.UNIT}
 				, #{item.REQUIRED_AMOUNT}
 			)
@@ -120,21 +120,19 @@
 		SELECT * FROM DUAL
     </insert>
     
-	<update id="deleteBomDetail">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE BOM_DETAIL 
-			   SET BOM_ID = NULL
-			 WHERE BOM_DETAIL_ID = #{item}
-		</foreach>
+    <update id="updateBomQuantity">
+    	UPDATE BOM
+    	   SET BOM_QUANTITY = #{createdRowsCnt}
+    	 WHERE BOM_ID = #{BOM_ID}
     </update>
     
-	<update id="deleteBomDetailByBomId">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE BOM_DETAIL 
-			   SET BOM_ID = NULL
-			 WHERE BOM_ID = #{item}
-		</foreach>
-    </update>
+	<delete id="deleteBomDetail">
+		 DELETE FROM BOM_DETAIL
+	     WHERE BOM_DETAIL_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
     
 <!--     <update id="addBomDetail">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">

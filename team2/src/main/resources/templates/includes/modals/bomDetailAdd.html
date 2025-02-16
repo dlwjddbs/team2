@@ -83,7 +83,7 @@
 	};
 	let itemCurrentSelectedRowKey = null;
 	const item_columns = [
-	    {header: '품목 코드', name: 'ID', align: 'center', editor: null},
+	    {header: '품목 코드', name: 'COMPONENT_ID', align: 'center', editor: null},
 	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
 	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
 	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: null, hidden: true},
@@ -94,7 +94,7 @@
 	let itemModalSelectedGrid = null;
 	
 	const itemSelected_columns = [
-	    {header: '품목 코드', name: 'ID', align: 'center', editor: null},
+	    {header: '품목 코드', name: 'COMPONENT_ID', align: 'center', editor: null},
 	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
 	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
 	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: 'text'},
@@ -138,7 +138,7 @@
 		            if (itemModalGrid.getData().length > 0) {
 		    	    	const bomDetailGridNewRows = bomDetailGrid.getData().filter(row => row.isNew);
 		    		    const selectedRowKeys = itemModalGrid.getData()
-		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.ID == row.ID))
+		    			    .filter(row => bomDetailGridNewRows.some(newRow => newRow.COMPONENT_ID == row.COMPONENT_ID))
 		    			    .map(row => row.rowKey);
 		    		    
 		    		    // BOM 상세 그리드에서 새로 추가된 행 가져와서 품목 모달에 선택값 그대로 적용함.
@@ -149,7 +149,7 @@
 		    		    // BOM 상세 그리드에서 새로 추가된 행 selectedItemList 초기값 설정
 		    		    bomDetailGridNewRows.forEach(function(row) {
 		    		    	const mapRowData = {
-		    		        	"ID": row.ID,
+		    		        	"COMPONENT_ID": row.COMPONENT_ID,
 		    		        	"NAME": row.NAME,
 		    		        	"UNIT": row.UNIT,
 		    		        	"REQUIRED_AMOUNT": row.REQUIRED_AMOUNT,
@@ -179,20 +179,20 @@
 		    const newRowKey = ev.rowKey;
 		    const isSelectedRow = itemModalGrid.getRowClassName(newRowKey).includes('selected-row');
 		    const rowData = itemModalGrid.getRow(newRowKey);
-		    const item_id = rowData.ID;
+		    const item_id = rowData.COMPONENT_ID;
 		    
 		    if (isSelectedRow) {
 		    	itemModalGrid.removeRowClassName(newRowKey, 'selected-row');
-		    	selectedItemList = selectedItemList.filter(item => item.ID != item_id);
+		    	selectedItemList = selectedItemList.filter(item => item.COMPONENT_ID != item_id);
 				
 				itemModalSelectedGrid.getData().forEach(row => {
-				    if (item_id == row.ID) {
+				    if (item_id == row.COMPONENT_ID) {
 						itemModalSelectedGrid.removeRow(row.rowKey)
 				    }
 				});
 		    } else {
 		    	const mapRowData = {
-		        	"ID": item_id,
+		        	"COMPONENT_ID": item_id,
 		        	"NAME": rowData.NAME,
 		        	"UNIT": rowData.UNIT,
 		        	"REQUIRED_AMOUNT": rowData.REQUIRED_AMOUNT,
@@ -218,24 +218,10 @@
 			bomDetailGrid.removeRow(key);
 		});
 		
-/* 		// 새로 선택된 값을 BOM 상세 그리드 행에 추가
+		// 새로 선택된 값을 BOM 상세 그리드 행에 추가
 		selectedItemList.forEach(function(data) {
 			bomDetailGrid.appendRow(data);
-		}); */
-		
-	    // 새로 선택된 값을 BOM 상세 그리드 행에 추가 (ID → ITEM_ID로 변환)
-		// 250214 TODO : 굳이 변환하지 말고 BOM 상세 테이블의 ITEM_ID 컬럼을 수정하기
-	    selectedItemList.forEach(function(data) {
-	        if (data.ID) {
-	            const transformedData = { 
-	                ...data, // 기존 데이터 유지
-	                ITEM_ID: data.ID // ID를 ITEM_ID로 변경
-	            };
-	            delete transformedData.ID; // 기존 ID 제거 (선택 사항)
-
-	            bomDetailGrid.appendRow(transformedData);
-	        }
-	    });
+		});
 		
 		$("#bomDetailAdd").modal('hide');
 	});
@@ -269,14 +255,14 @@
 			const rowData = itemModalSelectedGrid.getRow(newRowKey);
 			const allData = itemModalSelectedGrid.getData();
 			
-			const item_id = rowData.ID;
+			const item_id = rowData.COMPONENT_ID;
 			
-			selectedItemList = selectedItemList.filter(item => item.ID != item_id);
+			selectedItemList = selectedItemList.filter(item => item.COMPONENT_ID != item_id);
 			
 			itemModalSelectedGrid.removeRow(newRowKey);
 			
 			itemModalGrid.getData().forEach(row => {
-			    if (item_id == row.ID) {
+			    if (item_id == row.COMPONENT_ID) {
 			        itemModalGrid.removeRowClassName(row.rowKey, 'selected-row');
 			    }
 			});
@@ -287,7 +273,7 @@
 	        ev.changes.forEach(change => {
 	            if (change.columnName === 'REQUIRED_AMOUNT') {
 	                const rowData = itemModalSelectedGrid.getRow(change.rowKey);
-	                const index = selectedItemList.findIndex(item => item.ID === rowData.ID);
+	                const index = selectedItemList.findIndex(item => item.COMPONENT_ID === rowData.COMPONENT_ID);
 
 	                if (index > -1) {
 	                    selectedItemList[index].REQUIRED_AMOUNT = change.value;

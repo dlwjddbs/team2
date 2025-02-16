@@ -144,7 +144,14 @@ public class BomService {
 		log.info(createdRows.toString());
 		
 		try {
-			bomMapper.addBomDetail(createdRows);
+			if (createdRows.size() > 0) {
+				bomMapper.addBomDetail(createdRows);
+			
+				Map<String, Object> map = createdRows.get(0);
+				map.put("createdRowsCnt", createdRows.size());
+				bomMapper.updateBomQuantity(map);
+			}
+			
 		} catch (Exception e) {
 			result = false;
 			message = "addBomDetail 실패";
