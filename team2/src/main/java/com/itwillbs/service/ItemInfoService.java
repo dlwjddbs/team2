@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.itwillbs.repository.ItemInfoMapper;
 
@@ -69,17 +70,28 @@ public class ItemInfoService {
 		List<Map<String, Object>> data = itemInfoMapper.selectMesCommonCode(); 
 		return data;
 	}
-
-	public Map<String, Object> addItemInfo(List<Map<String, Object>> createdRows) {
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> modifyItemInfo(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+		log.info("createdRows" + createdRows);
 		Map<String, Object> resultMap = new HashMap<>();
+		
 		Boolean result = true;
-		String message = "addItemInfo 성공";
+		String message = "modifyItemInfo 성공";
 		
 		try {
-			itemInfoMapper.addItemInfo(createdRows);
+			if (createdRows.size() > 0) {
+				itemInfoMapper.insertItemInfo(createdRows);
+			}
+			
+			if (updatedRows.size() > 0) {
+				itemInfoMapper.updateItemInfo(updatedRows);
+			}
 		} catch (Exception e) {
 			result = false;
-			message = "addItemInfo 실패";
+			message = "modifyItemInfo 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -87,5 +99,27 @@ public class ItemInfoService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> deleteItemInfo(List<String> idList) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteItemInfo 성공";
+		
+		try {
+			if (idList.size() > 0) {
+				itemInfoMapper.deleteItemInfo(idList);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteItemInfo 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
 	
 }

@@ -75,9 +75,9 @@
     </delete>
     
     <select id="checkDuplicateClientCode">
-    	SELECT count(*) AS COUNT
-		  FROM CLIENT
-		 WHERE CLIENT_ID = #{CLIENT_ID}
+	    SELECT count(*) AS COUNT
+			FROM CLIENT
+		WHERE CLIENT_ID = #{CLIENT_ID}
     </select>
         
 </mapper>

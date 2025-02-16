@@ -10,17 +10,8 @@
 			  I.ITEM_ID
 			, I.ITEM_NAME
 			, I.ITEM_TYPE
-			, (SELECT MAIN_NAME
-				FROM MES_COMMON_GROUP MCG 
-				WHERE I.MAIN_ID = MCG.MAIN_ID ) AS MAIN_NAME
-			, (SELECT SUB_NAME
-				FROM MES_COMMON MC
-				WHERE I.SUB_ID = MC.SUB_ID) AS SUB_NAME
 			, I.USE_YN 
 			, I.ITEM_UNIT
-		    , (SELECT CLIENT_NAME
-				FROM CLIENT c 
-				WHERE I.CLIENT_ID = C.CLIENT_ID) AS CLIENT_NAME
 		    , I.ITEM_COST
 		    , I.INB_INSP
 		    , I.DESCRIPTION
@@ -29,6 +20,7 @@
 		    	WHERE I.WAREHOUSE_ID = W.WAREHOUSE_ID) AS WAREHOUSE_NAME
 		    , I.SAFETY_INVENTORY
 		FROM ITEM I
+		ORDER BY ITEM_ID ASC
     </select>
     
     <select id="selectMesCommonCode" resultType="map">
@@ -39,16 +31,23 @@
 		FROM MES_COMMON
 		WHERE MAIN_ID IN ('MATL', 'UNIT') 
 		AND USE_STATUS = 'Y'
+		AND (MAIN_ID != 'MATL' OR SUB_ID IN ('FP', 'SF'))
+	    ORDER BY 
+		  CASE 
+		    WHEN MAIN_ID = 'MATL' AND SUB_ID = 'SF' THEN 1  -- 반제품(SF) 우선 정렬
+		    WHEN MAIN_ID = 'MATL' AND SUB_ID = 'FP' THEN 2  -- 완제품(FP) 다음 정렬
+		    ELSE 3  -- 그 외 (UNIT 포함)
+		  END,
+		  MAIN_ID, SUB_ID  -- 동일한 우선순위 내에서 추가 정렬
     </select>
     
-    <insert id="addItemInfo">
-	    INSERT INTO ITEM (
+    <insert id="insertItemInfo">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO ITEM (
 			  ITEM_ID
-			, CLIENT_ID
 			, ITEM_NAME
 			, ITEM_TYPE
-			, MAIN_ID
-			, SUB_ID
 			, USE_YN
 			, ITEM_UNIT
 			, ITEM_COST
@@ -56,20 +55,52 @@
 			, WAREHOUSE_ID
 			, SAFETY_INVENTORY
 			, DESCRIPTION
-		) VALUES (
-			  #{ITEM_ID}
-			, #{CLIENT_ID}
-			, #{ITEM_NAME}			
-			, #{ITEM_TYPE}
-			, #{MAIN_ID}
-			, #{SUB_ID}
-			, #{USE_YN}
-			, #{ITEM_UNIT}
-			, #{ITEM_COST}
-			, #{INB_INSP}
-			, #{WAREHOUSE_ID}
-			, #{SAFETY_INVENTORY}
-			, #{DESCRIPTION}
 		)
+		VALUES (
+			  #{item.ITEM_ID}
+			, #{item.ITEM_NAME}			
+			, #{item.ITEM_TYPE}
+			, #{item.USE_YN}
+			, #{item.ITEM_UNIT}
+			, #{item.ITEM_COST}
+			, #{item.INB_INSP}
+			, #{item.WAREHOUSE_ID}
+			, #{item.SAFETY_INVENTORY}
+			, #{item.DESCRIPTION, jdbcType=VARCHAR}
+		)
+		</foreach>
+		SELECT * FROM DUAL
     </insert>
+    
+    <update id="updateItemInfo">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE ITEM
+	           SET 
+	               ITEM_ID = #{row.ITEM_ID}
+	             , ITEM_NAME = #{row.ITEM_NAME}
+	             , ITEM_TYPE = #{row.ITEM_TYPE}
+	             , USE_YN = #{row.USE_YN}
+	             , ITEM_UNIT = #{row.ITEM_UNIT}
+	             , ITEM_COST = #{row.ITEM_COST}
+	             , INB_INSP = #{row.INB_INSP}
+	             , WAREHOUSE_ID = #{row.WAREHOUSE_ID}
+	             , SAFETY_INVENTORY = #{row.SAFETY_INVENTORY}
+	             , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
+	         WHERE ITEM_ID = #{row.ITEM_ID}
+	    </foreach>
+    </update>
+    
+    <select id="checkDuplicateItemCode">
+		SELECT count(*) AS COUNT
+			FROM ITEM
+		WHERE ITEM_ID = #{ITEM_ID}
+    </select>
+    
+    <delete id="deleteItemInfo">
+	    DELETE FROM ITEM
+	     WHERE ITEM_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
 </mapper>

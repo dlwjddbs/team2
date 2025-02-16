@@ -1,112 +1,57 @@
+<!-- 모달창 -->
 <div class="modal fade" id="itemCodeAdd" th:fragment="itemCodeAdd">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
 			<div class="modal-header">
-				<h4 class="modal-title">품목 정보 등록</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<h4 class="modal-title">코드 중복 확인</h4>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<!-- /.모달창 헤더 -->
-			
-			<!-- form -->
-			<form th:action="@{/item}" method="post" id="itemCodeAddForm">
-				<!-- 모달창 바디 -->
-				<div class="modal-body">
-					<div class="card-body">
-						<div class="row">
-							<div class="col-md-5">
-									<label>품목 코드</label>
-									<div class="input-group">
-										<input type="text" id="itemCode" name="ITEM_CODE" class="form-control"
-											placeholder="코드를 입력하세요">
-										<div class="input-group-append">
-											<button class="btn btn-primary" id="checkDuplicateCodeBtn"
-												type="button">중복확인</button>
-											<button class="btn btn-primary" id="modifyCodeBtn"
-												type="button" style="display: none;">수정</button>
-										</div>
-									</div>
-									<span id="validationItemCodeMessage" class="form-text mt-1"></span>
-				            </div>
-						</div>
+
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
 						<div class="row">
 							<div class="col-md-6">
-								<div class="form-group">
-					              <label>품목명</label>
-				                    <input type="text" class="form-control" id="ITEM_NAME" name="ITEM_NAME" placeholder="품목명을 입력하세요.">
-					            </div>
-				            </div>
-						</div>	
- 						<div class="row"> 
- 							<div class="col-md-4"> 
-								<div class="form-group">
-									<label for="exampleInputEmail1">품목 유형</label>
-									<select class="form-control select" id="ITEM_TYPE" name="ITEM_TYPE">
-										<option selected="selected" disabled>유형 선택</option>
-									</select>
-								</div>
- 							</div> 
-							<div class="col-md-4">
-								<div class="form-group">
-									<label>기준단위</label>
-									<select class="form-control select" id="ITEM_UNIT" name="ITEM_UNIT">
-										<option selected="selected" disabled>단위 선택</option>												
-									</select>
-								</div>
+								<input type="hidden" id="itemRow" class="form-control">
 							</div>
-							<div class="col-md-4">
-								<label>사용여부</label><br> 
-								<input type="radio" name="use_status" value="Y" checked> 사용 &nbsp;
-			                    <input type="radio" name="use_status" value="N"> 미사용
-							</div>
- 						</div> 
-						<div class="row">
-							<div class="col-md-4">
-								<label>창고명</label>
-								<select class="form-control select" id="WAREHOUSE_NAME">
-									<option selected="selected" disabled>창고 선택</option>												
-									<option value="AS">원자재 창고</option>												
-									<option value="MG">반제품 창고</option>												
-								</select>
-							</div>
-							<div class="col-md-3">
-								<label>입고검사</label>
-								<select class="form-control select" id="INB_INSP">
-									<option selected="selected" value="AS">Y</option>												
-									<option value="MG">N</option>												
-								</select>
-							</div>
-							<div class="col-md-5">
-								<div class="form-group">
-									<label>단가</label>
-									<input type="text" id="ITEM_COST" class="form-control">
-								</div>
+							<div class="col-md-6">
+								<input type="hidden" id="itemColumn" class="form-control">
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-md-12">
-								<label>비고</label>
-								<textarea id="DESCRIPTION" class="form-control" maxlength="200"></textarea>
+							<label>품목 코드</label>
+							<div class="input-group">
+								<input type="text" id="itemCode" class="form-control"
+									placeholder="코드를 입력하세요">
+								<div class="input-group-append">
+									<button class="btn btn-primary" id="checkDuplicateCodeBtn" type="button">중복확인</button>
+									<button class="btn btn-primary" id="modifyCodeBtn" type="button" style="display: none;">수정</button>
+								</div>
 							</div>
+							<span id="validationItemCodeMessage" class="form-text mt-1"></span>
 						</div>
 					</div>
 				</div>
-				<!-- /.모달창 바디 -->
-				<!-- 모달창 푸터-->
-				<div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal">닫기</button>
-						<button type="button" id="submitBtn2" class="btn btn-primary">등록</button>
-					</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					<button type="submit" class="btn btn-primary" id="saveCode" disabled>입력</button>
 				</div>
-				<!-- /.모달창 푸터-->
-			</form>
-			<!-- /.form -->
+			</div>
+			<!-- /.모달창 푸터-->
 		</div>
 	</div>
 </div>
+<!-- /.모달창 -->
 
 <script th:fragment="itemCodeAdd" th:inline="javascript">
 	const dangerText = "form-text text-danger mt-1";
@@ -135,7 +80,7 @@
 		
 		$.ajax({
             type : "POST",
-            url : "/item/checkDuplicateItemCode",
+            url : "/iteminfo/checkDuplicateItemCode",
             data : {
             	ITEM_ID : itemCode
 			},
@@ -146,7 +91,7 @@
 					$("#itemCode").attr("disabled", true);
 					$("#saveCode").attr("disabled", false);
 					
-					$("#checkDuplicateItemCode").hide();
+					$("#checkDuplicateCodeBtn").hide();
 					$("#modifyCodeBtn").show();
 				} else {
 					validationItemCodeMessage.textContent = res.result;
@@ -168,7 +113,7 @@
 		itemGrid.setValue(itemRow, itemColumn, itemCode);
 		$('#itemCodeAdd').modal('hide');
 		
-		validationItemCodeMessage.textContent = '';
+		validationitemCodeMessage.textContent = '';
 		$("#saveCode").attr("disabled", true);
 	});
 	

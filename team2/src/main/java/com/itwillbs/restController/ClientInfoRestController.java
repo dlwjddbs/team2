@@ -41,8 +41,8 @@ public class ClientInfoRestController {
 	public Map<String, Object> deleteClientInfo(@RequestHeader("X-Delete-IDs") String encodedIds) {
 		// 한글ID 넘어올 시 변환
 	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
+	    List<String> clientinfoIds = Arrays.asList(decodedIds.split(","));
         
-        return clientInfoService.deleteClientInfo(equipmentIds);
+        return clientInfoService.deleteClientInfo(clientinfoIds);
 	}	
 }
