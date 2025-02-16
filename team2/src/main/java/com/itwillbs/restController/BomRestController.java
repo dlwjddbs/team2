@@ -29,7 +29,7 @@ public class BomRestController {
 	
 	private final String bom_url = "/manufacture/bom";
 	private final String bomDetail_url = "/manufacture/bomDetail";
-	private final String item_url = "/manufacture/bomDetail_Item";
+	private final String component_url = "/manufacture/bomDetail_Component";
 	
 	@GetMapping(bom_url)
 	public Map<String, Object> getBom() {
@@ -71,9 +71,9 @@ public class BomRestController {
         return bomService.deleteBomDetail(bomDetailIds);
 	}
 	
-	@GetMapping(item_url)
-	public Map<String, Object> getItem(@RequestParam Map<String, Object> requestData) {
-		return bomService.selectItemInfo(requestData);
+	@GetMapping(component_url)
+	public Map<String, Object> getComponent(@RequestParam Map<String, Object> requestData) {
+		return bomService.selectItemAndMaterial(requestData);
 	}
 }
 

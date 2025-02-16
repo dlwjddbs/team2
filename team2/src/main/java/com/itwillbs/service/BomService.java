@@ -80,6 +80,7 @@ public class BomService {
 		try {
 			if (idList.size() > 0) {
 				bomMapper.deleteBom(idList);
+				bomMapper.deleteBomDetailById(idList);
 			}
 		} catch (Exception e) {
 			result = false;
@@ -114,7 +115,7 @@ public class BomService {
 		return resultMap;
 	}
 	
-	public Map<String, Object> selectItemInfo(Map<String, Object> requestData) {
+	public Map<String, Object> selectItemAndMaterial(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -122,7 +123,7 @@ public class BomService {
 		String message = "selectItemInfo 성공";
 		
 		try {
-			List<Map<String, Object>> ItemInfoList = bomMapper.selectItemInfo(requestData);
+			List<Map<String, Object>> ItemInfoList = bomMapper.selectItemAndMaterial(requestData);
 			content.put("contents", ItemInfoList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
@@ -136,6 +137,7 @@ public class BomService {
 		return resultMap;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> addBomDetail(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		Boolean result = true;
@@ -149,6 +151,7 @@ public class BomService {
 			
 				Map<String, Object> map = createdRows.get(0);
 				map.put("createdRowsCnt", createdRows.size());
+				
 				bomMapper.updateBomQuantity(map);
 			}
 			
@@ -162,7 +165,8 @@ public class BomService {
 		
 		return resultMap;
 	}
-
+	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> deleteBomDetail(List<String> bomDetailIds) {
 		Map<String, Object> resultMap = new HashMap<>();
 		

@@ -29,12 +29,20 @@
 								<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 									<div class="d-flex">
 										<div class="d-flex">
-											<label class="col-form-label mr-3" style="min-width: 150px;">BOM 코드 / 품목 코드</label> 
+											<label class="col-form-label mr-3">사용여부</label> 
+											<select class="appointGubun" id="type" name="appointGubun" style="min-width: 120px">
+												<option value="" selected>전체</option>
+												<option value="ITEM">완재품/반재품</option>
+												<option value="MATERIAL">원자재</option>
+											</select>
+										</div>
+										<div class="d-flex ml-4">
+											<label class="col-form-label mr-3" style="min-width: 150px;">품목코드 / 품목명</label> 
 											<input type="text" class="form-control float-right" id="bomDetailSearchKeyword">
 										</div>
 									</div>
 									<div class="d-flex">
-										<button type="button" class="btn btn-primary" id="btnBomDetailSearch">조회</button>
+										<button type="button" class="btn btn-primary" id="btnComponentSearch">조회</button>
 									</div>
 								</div>
 							</div>
@@ -74,7 +82,7 @@
 
 	// 품목 (BOM 상세 추가용)
 	let itemGrid = null;
-	const itemUrl = '/manufacture/bomDetail_Item';
+	const itemUrl = '/manufacture/bomDetail_Component';
 	const itemDataSource = {
 		api: {
 		    readData: {url: itemUrl, method: 'GET'},
@@ -86,6 +94,7 @@
 	    {header: '품목 코드', name: 'COMPONENT_ID', align: 'center', editor: null},
 	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
 	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
+	    {header: '종류', name: 'TYPE', align: 'left', editor: null, hidden: true},
 	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: null, hidden: true},
 	];
 
@@ -97,6 +106,7 @@
 	    {header: '품목 코드', name: 'COMPONENT_ID', align: 'center', editor: null},
 	    {header: '품목명', name: 'NAME', align: 'left', editor: null},
 	    {header: '기준단위', name: 'UNIT', align: 'left', editor: null},
+		{header: '종류', name: 'TYPE', align: 'left', editor: null, hidden: true},
 	    {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'left', editor: 'text'},
 	];
 	let itemParam = {searchKeyword: ''};
@@ -284,23 +294,41 @@
 	    });
     };
 	
-	$("#btnBomDetailSearch").on("click", function() {
-		bomDetailParam.searchKeyword = $("#bomDetailSearchKeyword").val();
-		
-		const selectedBomDetailIds = selectedBomDetailList.map(row => row.BOM_DETAIL_ID);
-		bomDetailModalGrid.readData(1, bomDetailParam, true);
+	$("#btnComponentSearch").on("click", function() {
+		// 검색 조건 객체 초기화
+		bomDetailParam = {};
 
-		bomDetailModalGrid.off('onGridUpdated');
-		bomDetailModalGrid.on('onGridUpdated', () => {
-		    const updatedRows = bomDetailModalGrid.getData();
-			
-		    // 기존 선택된 BOM 상세 ID가 있는 행에 'selected-row' 클래스 추가
-		    updatedRows.forEach(row => {
-		        if (selectedBomDetailIds.includes(row.BOM_DETAIL_ID)) {
-		            bomDetailModalGrid.addRowClassName(row.rowKey, 'selected-row');
-		        }
-		    });
-		});
+		// 검색어 추가 (입력값이 있을 때만)
+		const searchKeyword = $("#bomDetailSearchKeyword").val().trim();
+		if (searchKeyword) {
+		    bomDetailParam.searchKeyword = searchKeyword;
+		}
+
+		// TYPE 값 추가 (선택값이 있을 때만)
+		const selectedType = $("#type").val();
+		if (selectedType) {
+		    bomDetailParam.type = selectedType;
+		}
+
+	    // 기존 선택된 COMPONENT_ID 목록 저장
+	    const selectedComponentIds = selectedItemList.map(row => row.COMPONENT_ID);
+
+	    // 데이터 요청
+		// 서버에서 데이터를 다시 조회
+	    itemModalGrid.readData(1, bomDetailParam, true);
+
+	    // 기존 이벤트 리스너 제거 후 재등록
+	    itemModalGrid.off('onGridUpdated');
+	    itemModalGrid.on('onGridUpdated', () => {
+	        const updatedRows = itemModalGrid.getData();
+	        
+	        // 기존 선택된 BOM 상세 ID가 있는 행에 'selected-row' 클래스 추가
+	        updatedRows.forEach(row => {
+	            if (selectedComponentIds.includes(row.COMPONENT_ID)) {
+	                itemModalGrid.addRowClassName(row.rowKey, 'selected-row');
+	            }
+	        });
+	    });
 	});
 	
 	function setItemModalSelectedGridColor() {

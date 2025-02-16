@@ -42,6 +42,14 @@
 	    </foreach>
     </delete>
     
+    <delete id="deleteBomDetailById">
+		 DELETE FROM BOM_DETAIL
+	     WHERE BOM_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
     <update id="updateBom">
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE BOM
@@ -77,21 +85,23 @@
 		</if>
     </select>
     
-<!--     <select id="selectItemInfo" resultType="map">
-		SELECT
-			  ITEM_ID
-			, ITEM_NAME
-		FROM ITEM
-    </select> -->
     
-	<select id="selectItemInfo" resultType="map">
-<!-- 	<select id="selectItemAndMaterial" resultType="map"> -->
+	<select id="selectItemAndMaterial" resultType="map">
 		SELECT 
 		       ITEM_ID 			AS COMPONENT_ID
 		     , ITEM_NAME 		AS NAME
 		     , ITEM_UNIT 		AS UNIT
 		     , 'ITEM' 			AS TYPE
 		FROM ITEM
+		WHERE 
+			   1 = 1
+		<if test='type != null and type != ""'>
+			AND #{type} = 'ITEM'
+		</if>
+	    <if test='searchKeyword != null and searchKeyword != ""'>
+	        AND (ITEM_ID LIKE '%' || #{searchKeyword} || '%'
+	             OR ITEM_NAME LIKE '%' || #{searchKeyword} || '%')
+	    </if>
 		UNION ALL
 		SELECT 
 		       MATERIAL_ID 		AS COMPONENT_ID
@@ -99,6 +109,15 @@
 		     , UNIT 			AS UNIT
 		     , 'MATERIAL' 		AS TYPE
 		FROM MATERIAL
+		WHERE 
+			   1 = 1
+	    <if test='type != null and type != ""'>
+	        AND #{type} = 'MATERIAL'
+	    </if>
+	    <if test='searchKeyword != null and searchKeyword != ""'>
+	        AND (MATERIAL_ID LIKE '%' || #{searchKeyword} || '%'
+	             OR MATERIAL_NAME LIKE '%' || #{searchKeyword} || '%')
+	    </if>
 	</select>
     
     <insert id="addBomDetail">
@@ -134,27 +153,4 @@
 	    </foreach>
     </delete>
     
-<!--     <update id="addBomDetail">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE BOM_DETAIL 
-			   SET BOM_ID = #{item.BOM_ID}
-			 WHERE BOM_DETAIL_ID = #{item.BOM_DETAIL_ID}
-		</foreach>
-    </update>
-    
-	<update id="deleteBomDetail">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE BOM_DETAIL 
-			   SET BOM_ID = NULL
-			 WHERE BOM_DETAIL_ID = #{item}
-		</foreach>
-    </update>
-    
-	<update id="deleteBomDetailByBomId">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE BOM_DETAIL 
-			   SET BOM_ID = NULL
-			 WHERE BOM_ID = #{item}
-		</foreach>
-    </update> -->
 </mapper>

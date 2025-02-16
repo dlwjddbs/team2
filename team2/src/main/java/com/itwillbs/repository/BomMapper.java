@@ -16,18 +16,18 @@ public interface BomMapper {
 	
 	int deleteBom(List<String> idList);
 	
+	int deleteBomDetailById(List<String> idList);
+	
 	List<Map<String, Object>> selectBomDetail(Map<String, Object> requestData);
 	
 	List<Map<String, Object>> selectBomDetailByItem(Map<String, Object> requestData);
 	
-	List<Map<String, Object>> selectItemInfo(Map<String, Object> requestData);
+	List<Map<String, Object>> selectItemAndMaterial(Map<String, Object> requestData);
 	
 	int addBomDetail(List<Map<String, Object>> createdRows);
 	
 	int updateBomQuantity(Map<String, Object> map);
 
-	int deleteBomDetail(List<String> equipmentIds);
-
-	int deleteBomDetailByBomId(List<String> idList);
+	int deleteBomDetail(List<String> bomDetailIds);
 
 }
