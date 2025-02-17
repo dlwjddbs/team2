@@ -7,12 +7,15 @@
 <mapper namespace="com.itwillbs.repository.BomMapper">
 
     <select id="selectBom" resultType="map">
-        SELECT
-			   BOM_ID
-			 , ITEM_ID
-			 , PARENT_ID
-			 , BOM_QUANTITY
-          FROM BOM
+		SELECT 
+		    b.BOM_ID,
+		    b.ITEM_ID,
+		    i.ITEM_NAME,
+		    b.PARENT_ID,
+		    b.BOM_QUANTITY
+		FROM BOM b
+			 LEFT JOIN ITEM i 
+			 		ON b.ITEM_ID = i.ITEM_ID
     </select>
     
     <insert id="insertBom">
@@ -63,13 +66,18 @@
     
     <select id="selectBomDetail" resultType="map">
 		SELECT 
-			   BOM_DETAIL_ID 		AS BOM_DETAIL_ID
-			 , COMPONENT_ID			AS COMPONENT_ID
-			 , UNIT					AS UNIT
-			 , REQUIRED_AMOUNT 		AS REQUIRED_AMOUNT
-			 , BOM_ID				AS BOM_ID
-		  FROM BOM_DETAIL
-		 WHERE
+		       bd.BOM_DETAIL_ID
+		     , bd.COMPONENT_ID
+		     , COALESCE(i.ITEM_NAME, m.MATERIAL_NAME) AS COMPONENT_NAME
+		     , bd.UNIT
+		     , bd.REQUIRED_AMOUNT
+		     , bd.BOM_ID
+		FROM BOM_DETAIL bd
+			 LEFT JOIN ITEM i 
+			 		ON bd.COMPONENT_ID = i.ITEM_ID
+			 LEFT JOIN MATERIAL m 
+			 		ON bd.COMPONENT_ID = m.MATERIAL_ID
+		WHERE
 		 	   1 = 1
 		<choose>
 			<when test='bom_id != null and bom_id != ""'>
@@ -79,17 +87,12 @@
 				AND BOM_ID IS NULL
 			</otherwise>
 		</choose>
-		<if test='searchKeyword != null and searchKeyword != ""'>
-			AND (BOM_DETAIL_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
-					OR ITEM_ID LIKE concat('%', concat(#{searchKeyword}, '%')))
-		</if>
-    </select>
-    
+	</select>
     
 	<select id="selectItemAndMaterial" resultType="map">
 		SELECT 
 		       ITEM_ID 			AS COMPONENT_ID
-		     , ITEM_NAME 		AS NAME
+		     , ITEM_NAME 		AS COMPONENT_NAME
 		     , ITEM_UNIT 		AS UNIT
 		     , 'ITEM' 			AS TYPE
 		FROM ITEM
@@ -105,7 +108,7 @@
 		UNION ALL
 		SELECT 
 		       MATERIAL_ID 		AS COMPONENT_ID
-		     , MATERIAL_NAME 	AS NAME
+		     , MATERIAL_NAME 	AS COMPONENT_NAME
 		     , UNIT 			AS UNIT
 		     , 'MATERIAL' 		AS TYPE
 		FROM MATERIAL
