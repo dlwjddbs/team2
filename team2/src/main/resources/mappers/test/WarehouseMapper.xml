@@ -5,16 +5,22 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.WarehouseMapper">
-    <select id="selectWarehouse" resultType="map">
+	<select id="selectWarehouse" resultType="map">
 		SELECT
-			  WAREHOUSE_ID
-			, WAREHOUSE_NAME
-			, WAREHOUSE_TYPE
-			, LOCATION_COUNT
-			, WAREHOUSE_STATUS 
-		FROM WAREHOUSE
-		ORDER BY WAREHOUSE_ID ASC
-    </select>
+	          W.WAREHOUSE_ID
+	        , W.WAREHOUSE_NAME
+	        , W.WAREHOUSE_TYPE
+	        , COUNT(IL.LOCATION_ID) AS LOCATION_COUNT
+	        , W.WAREHOUSE_STATUS 
+	    FROM 
+	        WAREHOUSE W
+	    LEFT JOIN 
+	        ITEM_LOCATION IL ON W.WAREHOUSE_ID = IL.WAREHOUSE_ID
+	    GROUP BY 
+	        W.WAREHOUSE_ID, W.WAREHOUSE_NAME, W.WAREHOUSE_TYPE, W.WAREHOUSE_STATUS
+	    ORDER BY 
+	        W.WAREHOUSE_ID ASC
+	</select>
  
     <insert id="insertWarehouse">
 		INSERT ALL

@@ -11,7 +11,9 @@ import com.itwillbs.repository.WarehouseMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Log
@@ -121,28 +123,52 @@ public class WarehouseService {
 	}
 	
 	// 위치 코드 중복검사
+//	public Map<String, Object> checkDuplicateLocationCode(Map<String, Object> map) {
+//		log.info("============= checkDuplicateLocationCode(Service) =============");
+//		Map<String, Object> message2 = new HashMap<>();
+//		
+//		String result = "중복된 코드입니다.";
+//		String resultCode = "0";
+//		
+//		try {
+//			int resultCnt = warehouseMapper.checkDuplicateLocationCode(map);
+//			if (resultCnt == 0) {
+//				result = "사용가능한 코드입니다.";
+//				resultCode = "1";
+//			}
+//		} catch (Exception e) {
+//			result = "조회 실패. 재시도 하세요.";
+//			resultCode = "0";
+//		}
+//		
+//		message2.put("result", result);
+//		message2.put("resultCode", resultCode);
+//		
+//		return message2;
+//	}
 	public Map<String, Object> checkDuplicateLocationCode(Map<String, Object> map) {
-		log.info("============= checkDuplicateLocationCode(Service) =============");
-		Map<String, Object> message2 = new HashMap<>();
-		
-		String result = "중복된 코드입니다.";
-		String resultCode = "0";
-		
-		try {
-			int resultCnt = warehouseMapper.checkDuplicateLocationCode(map);
-			if (resultCnt == 0) {
-				result = "사용가능한 코드입니다.";
-				resultCode = "1";
-			}
-		} catch (Exception e) {
-			result = "조회 실패. 재시도 하세요.";
-			resultCode = "0";
-		}
-		
-		message2.put("result", result);
-		message2.put("resultCode", resultCode);
-		
-		return message2;
+	    log.info("============= checkDuplicateLocationCode(Service) =============");
+	    Map<String, Object> message2 = new HashMap<>();
+	    
+	    String result = "중복된 코드입니다.";
+	    String resultCode = "0";
+	    
+	    try {
+	        int resultCnt = warehouseMapper.checkDuplicateLocationCode(map);
+	        if (resultCnt == 0) {
+	            result = "사용가능한 코드입니다.";
+	            resultCode = "1";
+	        }
+	    } catch (Exception e) {
+	        log.error("checkDuplicateLocationCode 오류 발생: ", e);  // 오류 로그 추가
+	        result = "조회 실패. 재시도 하세요.";
+	        resultCode = "0";
+	    }
+	    
+	    message2.put("result", result);
+	    message2.put("resultCode", resultCode);
+	    
+	    return message2;
 	}
 
 	public Map<String, Object> selectLocation(Map<String, Object> requestData) {

@@ -117,14 +117,16 @@
 		let clientIsEditModeEnabled = false; 
 		const client_columns = [
             {header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null},
-            {header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
+            {header: '거래처명', name: 'CLIENT_NAME', align: 'left', editor: null},
             {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'center', editor: null},
             {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: null},
             {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
+            // {header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'left', editor: null},
             {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
-            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
+            // {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
+            // {header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: null},
             {header: '거래상태', name: 'CLIENT_STATUS', align: 'center', editor: null},
-            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
+            // {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
         ];
 		
 		const TextInputRenderer = function(props) {
