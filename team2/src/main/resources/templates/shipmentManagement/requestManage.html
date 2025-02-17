@@ -67,9 +67,8 @@
 			<section class="content">
 				<div class="container-fluid">
 					<div class="info">
-						<a style="display:none;"><span id="userName"
-							th:text="${userInfo.NAME}"></span>
-							<span id="userId"
+						<a style="display: none;"><span id="userName"
+							th:text="${userInfo.NAME}"></span> <span id="userId"
 							th:text="${userInfo.MEMBER_ID}"></span></a>
 					</div>
 					<div class="row">
@@ -158,6 +157,8 @@
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
@@ -176,6 +177,12 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 
+		// TODO
+// 		window.onload = function(){
+// 			loadModalContent('000'); 
+// 		}
+			
+	
 		let request_grid;
 		let detail_grid;
 
@@ -289,24 +296,15 @@
 		}
 
 		// 클릭한 요청번호로 상세 정보를 로드
-		document.getElementById('request_grid').addEventListener('click', function (event) {
-		    if (event.target && event.target.matches('a.edit-link')) {
-		        event.preventDefault();
-		        var id = event.target.id;
-		        console.log("클릭된 요청번호", id);
-		        loadModalContent(id); 
-		    }
-		});
+		const modal = new bootstrap.Modal(document.getElementById('requestDetailModal'));
 		
-// 		document.getElementById('requestDetailModal').addEventListener("shown.bs.modal", function(event){
-// 			debugger;
-// 			if (event.target && event.target.matches('a.edit-link')) {
-// 		        event.preventDefault();
-// 		        var id = event.target.id;
-// 		        console.log("클릭된 요청번호", id);
-// 		        loadModalContent(id); 
-// 		    }
-// 		});
+		// 수주번호 클릭 시 모달로 상세 내용 로드
+		document.getElementById('request_grid').addEventListener('click', function (e) {
+			const id = e.target.id;
+			console.log("클릭된 요청번호", id);
+			loadModalContent(id);
+			modal.show();
+		});
 
 		// 출하 요청 상세 정보 로드
 		function loadModalContent(id) {
@@ -321,42 +319,50 @@
 		            }
 		
 		            // 데이터가 로드되었으면 그리드에 표시
-		            if (!detail_grid) {
-		                detail_grid = new tui.Grid({
-		                    el: document.getElementById('detail_grid'),
-		                    data: data.reqs,  // 그리드에 데이터를 설정
-		                    scrollX: true,
-		                    scrollY: true,
-		                    rowHeaders: ['checkbox'],
-		                    evenRow: {
-		                        background: '#fee'
-		                    },
-		                    columnOptions: {
-		                        resizable: true,
-		                    },
-		                    columns: [
-		                        {header: '요청일자', name: 'CREATE_DATE', align: 'center'},
-		                        {header: '출고요청번호', name: 'REQUEST_ID', align: 'center'},
-		                        {header: '진행상태', name: 'SHIP_STATUS', align: 'center'},
-		                        {header: '거래처', name: 'CUSTOMER_NAME', align: 'left'},
-		                        {header: '요청자', name: 'REGIST_BY', align: 'center'},
-		                        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
-		                        {header: '납품예정일', name: 'DELIVERY_DATE', align: 'center'},
-		                        {header: '요청수량', name: 'REQUEST_QTY', align: 'right'},
-		                        {header: '출하수량', name: 'SHIPPED_QTY', align: 'right'},
-		                        {header: '요청잔량', name: 'BACKLOG', align: 'right'},
-		                        {header: '수정자', name: 'UPDATE_BY', align: 'center'},
-		                        {header: '마감일자', name: 'COMPLETE_DATE', align: 'center'},
-		                        {header: '비고', name: 'REMARKS', align: 'left'}
-		                    ]
-		                });
-		
-		                // 모달 창 표시
-		                $('#requestDetailModal').modal('show');
-		            } else {
-		                // 기존 그리드 데이터 업데이트
-		                detail_grid.resetData(data.reqs);
-		            }
+		             setTimeout(() => {
+		            	 console.log("그리드가 렌더링된 후 모달을 띄움.");                
+			            if (!detail_grid) {
+			            	
+			                detail_grid = new tui.Grid({
+			                    el: document.getElementById('detail_grid'),
+			                    data: data.reqs,  // 그리드에 데이터를 설정
+			                    scrollX: true,
+			                    scrollY: true,
+			                    rowHeaders: ['checkbox'],
+			                    evenRow: {
+			                        background: '#fee'
+			                    },
+			                    columnOptions: {
+			                        resizable: true,
+			                    },
+			                    columns: [
+			                        {header: '수주번호', name: 'ORDER_ID', align: 'center'},
+			                        {header: '진행상태', name: 'ORDER_STATUS', align: 'center', width: 80,
+										renderer: {
+											styles: {
+												fontWeight: 'bold',
+												color: (props) => props.value == '미결' ? '#ff6464' : '#999'
+											}
+										}},
+			                        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
+			                        {header: '납품예정일', name: 'DELIVERY_DATE', align: 'center'},
+			                        {header: '수량', name: 'ORDER_QTY', align: 'right'},
+			                        {header: '단가', name: 'ITEM_PRICE', align: 'right'},
+			                        {header: '공급가', name: 'ORDER_PR', align: 'right'},
+			                        {header: '부가세', name: 'TAX', align: 'center'},
+			                        {header: '합계', name: 'ORDER_SUM', align: 'center'},
+			                        {header: '비고', name: 'DETAIL_REMARKS', align: 'left'}
+			                    ]
+			                });
+	
+	          			     detail_grid.resetData(data.reqs);
+	          			     
+			            } else {
+			                // 기존 그리드 데이터 업데이트
+			                detail_grid.resetData(data.reqs);
+			            }  
+		            }, 100); 
+		            
 		        })
 		        .catch(error => {
 		            console.error("데이터 로딩 실패", error);

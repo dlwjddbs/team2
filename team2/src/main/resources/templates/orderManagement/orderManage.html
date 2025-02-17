@@ -158,6 +158,8 @@
 	<!-- jQuery -->
 	<script src="../../plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+	
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
@@ -280,15 +282,16 @@
 				});
 		}
 
+		const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+		
 		// 수주번호 클릭 시 모달로 상세 내용 로드
-		document.getElementById('ord_grid').addEventListener('click', function (event) {
-			if (event.target && event.target.matches('a.edit-link')) {
-				event.preventDefault();
-				var id = event.target.id;
-				console.log("클릭된 수주번호", id);
-				loadModalContent(id);
-			}
+		document.getElementById('ord_grid').addEventListener('click', function (e) {
+			const id = e.target.id;
+			console.log("클릭된 요청번호", id);
+			loadModalContent(id);
+			modal.show();
 		});
+
 
 		// 수주 상세 정보 로드
 		function loadModalContent(id) {
@@ -343,8 +346,7 @@
 						$('#customerId').selectpicker('refresh').selectpicker('option', 'noneSelectedText', '선택하세요'); 
 						$('#itemId').selectpicker('refresh').selectpicker('option', 'noneSelectedText', '선택하세요');
 
-						// 모달 창 표시
-						$('#orderDetailModal').modal('show');
+
 						setReadOnly(true);
 
 					} else {

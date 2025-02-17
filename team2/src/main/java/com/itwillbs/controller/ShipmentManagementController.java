@@ -28,13 +28,13 @@ public class ShipmentManagementController {
 
     private final String URL = "/ajax/req";
 
-    // 수주 관리 페이지
+    // 출하 관리 페이지
     @GetMapping("/reqManage")
     public String getRequestList() {
         return "shipmentManagement/requestManage";
     }
 
-    // 수주 정보 조회
+    // 출하 정보 조회
     @GetMapping(URL)
     @ResponseBody
     public Map<String, Object> getRequest(
