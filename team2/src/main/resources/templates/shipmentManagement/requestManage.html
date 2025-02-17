@@ -159,6 +159,7 @@
 	<!-- Bootstrap 4 -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
 	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="../../dist/js/adminlte.min.js"></script>
@@ -176,12 +177,6 @@
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-
-		// TODO
-// 		window.onload = function(){
-// 			loadModalContent('000'); 
-// 		}
-			
 	
 		let request_grid;
 		let detail_grid;
@@ -193,7 +188,6 @@
 			loadGridData();
 			loadClientList();
 			loadItemList();
-// 			loadDetailData();
 		});
 
 		// search btn
@@ -218,7 +212,7 @@
 				if (endDate) queryParams.append('endDate', endDate);
 				if (customerId && customerId !== 'all') queryParams.append('customerId', customerId);
 				if (itemId && itemId !== 'all') queryParams.append('itemId', itemId);
-				if (reqestId) queryParams.append('requestId', requestId);
+				if (requestId) queryParams.append('requestId', requestId);
 				if (shipStatus) queryParams.append('shipStatus', shipStatus);
 			}
 
@@ -300,10 +294,13 @@
 		
 		// 수주번호 클릭 시 모달로 상세 내용 로드
 		document.getElementById('request_grid').addEventListener('click', function (e) {
-			const id = e.target.id;
-			console.log("클릭된 요청번호", id);
-			loadModalContent(id);
-			modal.show();
+			if (e.target && e.target.matches('a.edit-link')) {
+				e.preventDefault();
+				var id = e.target.id;
+				console.log("클릭된 수주번호", id);
+				loadModalContent(id);
+				modal.show();
+			}
 		});
 
 		// 출하 요청 상세 정보 로드
@@ -346,11 +343,16 @@
 										}},
 			                        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
 			                        {header: '납품예정일', name: 'DELIVERY_DATE', align: 'center'},
-			                        {header: '수량', name: 'ORDER_QTY', align: 'right'},
-			                        {header: '단가', name: 'ITEM_PRICE', align: 'right'},
-			                        {header: '공급가', name: 'ORDER_PR', align: 'right'},
-			                        {header: '부가세', name: 'TAX', align: 'center'},
-			                        {header: '합계', name: 'ORDER_SUM', align: 'center'},
+			                        {header: '수량', name: 'ORDER_QTY', align: 'right',
+										formatter: function (value) {return Number(value.value).toLocaleString();}},
+			                        {header: '단가', name: 'ITEM_PRICE', align: 'right',
+										formatter: function (value) {return Number(value.value).toLocaleString() + ' 원';}},
+			                        {header: '공급가', name: 'ORDER_PR', align: 'right',
+										formatter: function (value) {return Number(value.value).toLocaleString() + ' 원';}},
+			                        {header: '부가세', name: 'TAX', align: 'center',
+										formatter: function (value) {return Number(value.value).toLocaleString() + ' 원';}},
+			                        {header: '합계', name: 'ORDER_SUM', align: 'center',
+										formatter: function (value) {return Number(value.value).toLocaleString() + ' 원';}},
 			                        {header: '비고', name: 'DETAIL_REMARKS', align: 'left'}
 			                    ]
 			                });
@@ -423,7 +425,7 @@
 
 			// 옵션 생성
 			const options = [
-				`<option value="all" ${!data.some(item => item.ORDER_ID) ? 'selected' : ''} disabled>전체</option>`,  // 전체 옵션 추가
+				`<option value="all" ${!data.some(item => item.ORDER_ID) ? 'selected' : ''} >전체</option>`,  // 전체 옵션 추가
 				...data.map(item => {
 					return `<option value="${item.CLIENT_ID || item.ITEM_ID}">${item.CLIENT_NAME || item.ITEM_NAME}</option>`;
 				})
@@ -441,23 +443,18 @@
 		//dateRange
 		const today = new Date();
 		const startOfYear = new Date(today.getFullYear(), 0, 1);
-		const DatePicker = tui.DatePicker;
 
 		// 날짜 범위 선택기 초기화
-		const rangePicker = DatePicker.createRangePicker({
+		const rangePicker = tui.DatePicker.createRangePicker({
 			startpicker: {
 				date: startOfYear,
 				input: '#startpicker-input',
 				container: '#startpicker-container',
-				// 클릭하기 전에는 캘린더를 숨기도록 설정
-				isVisible: false
 			},
 			endpicker: {
 				date: today,
 				input: '#endpicker-input',
 				container: '#endpicker-container',
-				// 클릭하기 전에는 캘린더를 숨기도록 설정
-				isVisible: false
 			},
 			selectableRanges: [
 				[startOfYear, today]
@@ -465,27 +462,13 @@
 			type: 'date',
 			format: 'YYYY-MM-dd'
 		});
+		
+		// add btn
+		document.getElementById('btn_add').addEventListener('click', () => {
 
-		// startpicker 클릭 시 캘린더를 열기
-		document.getElementById('startpicker-input').addEventListener('click', function () {
-			const startpicker = rangePicker._startpicker;
-			if (startpicker && startpicker._calendar) {
-				startpicker._calendar.open();  // startpicker의 캘린더 열기
-			} else {
-				console.error('startpicker의 캘린더를 열 수 없습니다.');
-			}
+		    // 모달 표시
+		    $('#addRequestModal').modal('show');
 		});
-
-		// endpicker 클릭 시 캘린더를 열기
-		document.getElementById('endpicker-input').addEventListener('click', function () {
-			const endpicker = rangePicker._endpicker;
-			if (endpicker && endpicker._calendar) {
-				endpicker._calendar.open();  // endpicker의 캘린더 열기
-			} else {
-				console.error('endpicker의 캘린더를 열 수 없습니다.');
-			}
-		});
-
 	
 		// delete btn
 		document.getElementById('btn_delete').addEventListener('click', () => {

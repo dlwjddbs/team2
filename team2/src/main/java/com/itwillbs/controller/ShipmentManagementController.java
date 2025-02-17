@@ -43,7 +43,7 @@ public class ShipmentManagementController {
             @RequestParam(name = "endDate", required = false) String endDate,
             @RequestParam(name = "customerId", required = false) String customerId,
             @RequestParam(name = "itemId", required = false) String itemId,
-            @RequestParam(name = "orderStatus", required = false) String orderStatus) {
+            @RequestParam(name = "shipStatus", required = false) String shipStatus) {
 
         // 필터 조건을 서비스로 전달
         Map<String, Object> filters = new HashMap<>();
@@ -52,7 +52,7 @@ public class ShipmentManagementController {
         filters.put("endDate", endDate);
         filters.put("customerId", customerId);
         filters.put("itemId", itemId);
-        filters.put("orderStatus", orderStatus);
+        filters.put("shipStatus", shipStatus);
 
         // 필터링된 수주 데이터 조회
         Map<String, Object> reqData = shipService.getFilteredRequest(filters);

@@ -104,15 +104,15 @@
 	        <where>
 	            <!-- 주문 날짜 범위 필터링 -->
 	            <if test="startDate != null">
-	                AND O.ORDER_DATE &gt;= #{startDate}
+	                AND REQ.CREATE_DATE &gt;= #{startDate}
 	            </if>
 	            <if test="endDate != null">
-	                AND TRUNC(O.ORDER_DATE) &lt;= #{endDate}
+	                AND TRUNC(REQ.CREATE_DATE) &lt;= #{endDate}
 	            </if>
 	
 	            <!-- 거래처 필터링 -->
 	            <if test="customerId != null and customerId != 'all'">
-	                AND REQ.CUSTOMER_ID = #{customerId}
+	                AND O.CUSTOMER_ID = #{customerId}
 	            </if>
 	
 	            <!-- 품목 필터링 -->
@@ -121,13 +121,13 @@
 	            </if>
 	
 	            <!-- 수주번호 필터링 -->
-	            <if test="orderId != null">
-	                AND REQ.REQUEST_ID LIKE '%' || #{orderId} || '%'
+	            <if test="requestId != null">
+	                AND REQ.REQUEST_ID LIKE '%' || #{requestId} || '%'
 	            </if>
 	
 	            <!-- 진행상태 필터링 -->
-	            <if test="orderStatus != null">
-	                AND REQ.SHIP_STATUS = #{orderStatus}
+	            <if test="shipStatus != null">
+	                AND REQ.SHIP_STATUS = #{shipStatus}
 	            </if>
 	        </where>
 	    )
@@ -165,12 +165,12 @@
     <!-- INSERT -->
 	<insert id="insertRequest">
 	    INSERT INTO REQUEST (
-	        SHIPMENT_ID, ORDER_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
+	        REQUEST_ID, CREATE_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
 	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, REGIST_BY, CREATE_DATE, UPDATE_DATE
 	    )
 	    VALUES (
-	        'SHI-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
-	        TO_DATE(#{orderDate}, 'YYYY-MM-DD'), #{customerId}, 
+	        'REQ-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
+	        TO_DATE(#{createDate}, 'YYYY-MM-DD'), #{customerId}, 
 	        #{salesRepId}, TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'), 
 	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, #{registBy}, SYSDATE, SYSDATE
 	    )
@@ -194,10 +194,10 @@
     
    	<!-- DELETE -->
       <delete id="deleteRequest">
-        DELETE FROM ORDERS
-        WHERE ORDER_ID IN
-        <foreach item="orderId" collection="list" open="(" separator="," close=")">
-            #{orderId}
+        DELETE FROM REQUEST
+        WHERE REQUEST_ID IN
+        <foreach item="requestId" collection="list" open="(" separator="," close=")">
+            #{requestId}
         </foreach>
     </delete>
     

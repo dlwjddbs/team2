@@ -286,10 +286,13 @@
 		
 		// 수주번호 클릭 시 모달로 상세 내용 로드
 		document.getElementById('ord_grid').addEventListener('click', function (e) {
-			const id = e.target.id;
-			console.log("클릭된 요청번호", id);
-			loadModalContent(id);
-			modal.show();
+			if (e.target && e.target.matches('a.edit-link')) {
+				e.preventDefault();
+				var id = e.target.id;
+				console.log("클릭된 수주번호", id);
+				loadModalContent(id);
+				modal.show();
+			}
 		});
 
 
@@ -574,7 +577,7 @@
 
 			// 옵션 생성
 			const options = [
-				`<option value="all" ${!data.some(item => item.ORDER_ID) ? 'selected' : ''} disabled>전체</option>`,  // 전체 옵션 추가
+				`<option value="all" ${!data.some(item => item.ORDER_ID) ? 'selected' : ''} >전체</option>`,  // 전체 옵션 추가
 				...data.map(item => {
 					return `<option value="${item.CLIENT_ID || item.ITEM_ID}">${item.CLIENT_NAME || item.ITEM_NAME}</option>`;
 				})
