@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	<title>AdminLTE 3 | DataTables</title>
+	
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast UI Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css"/>
+	<!-- daterange picker -->
+	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+	
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- InputMask -->
+	<script src="../../plugins/moment/moment.min.js"></script>
+	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+	<!-- date-range-picker -->
+	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+	<!-- ChartJS -->
+	<script src="../../plugins/chart.js/Chart.min.js"></script>
+	<!-- Toast UI Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	<!-- SheetJS (Excel 변환 라이브러리) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+	<style>
+	    .selected-row {
+	        background-color: #d1ffd6;
+	    }
+	    .deselected-row {
+	        background-color: #ffd1d1;
+	    }
+	</style>
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+		<!-- /.상단 메뉴 -->
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		<!-- /.좌측 메뉴 -->
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<!-- <nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> -->
+			
+		    <!-- 메인 콘텐츠 -->
+	        <section class="content">
+	        	<section class="content-header">
+		            <div class="container-fluid">
+		                <h1>MES 대시보드 (예시)</h1>
+		            </div>
+	        	</section>
+	        	
+	            <div class="container-fluid">
+	                <div class="row">
+	                    <!-- KPI 카드 -->
+	                    <div class="col-lg-4 col-6">
+	                        <div class="small-box bg-info">
+	                            <div class="inner">
+	                                <h3>95%</h3>
+	                                <p>생산 진행률</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="col-lg-4 col-6">
+	                        <div class="small-box bg-danger">
+	                            <div class="inner">
+	                                <h3>3%</h3>
+	                                <p>불량률</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="col-lg-4 col-6">
+	                        <div class="small-box bg-success">
+	                            <div class="inner">
+	                                <h3>85%</h3>
+	                                <p>설비 가동률</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	
+	                <!-- LOT 추적 & 공정 불량률 차트 -->
+	                <div class="row">
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">LOT 추적</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <table id="lotTrackingTable" class="table table-bordered">
+	                                    <thead>
+	                                        <tr>
+	                                            <th>LOT 번호</th>
+	                                            <th>공정</th>
+	                                            <th>상태</th>
+	                                        </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                        <tr><td>LOT001</td><td>조립</td><td>진행중</td></tr>
+	                                        <tr><td>LOT002</td><td>검사</td><td>완료</td></tr>
+	                                    </tbody>
+	                                </table>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">공정별 생산량 & 불량률</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="processChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	
+	                <!-- 설비 가동 현황 & 가동 이력 -->
+	                <div class="row">
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">설비 가동 현황</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="equipmentChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">설비 가동 이력</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="equipmentHistoryChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </section>
+		</div>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+	document.addEventListener("DOMContentLoaded", function() {
+	    new Chart(document.getElementById("processChart"), {
+	        type: "bar",
+	        data: {
+	            labels: ["절단", "조립", "검사"],
+	            datasets: [{ label: "생산량", data: [200, 180, 220], backgroundColor: "blue" },
+	                       { label: "불량률", data: [5, 3, 7], backgroundColor: "red" }]
+	        }
+	    });
+
+	    new Chart(document.getElementById("equipmentChart"), {
+	        type: "doughnut",
+	        data: {
+	            labels: ["사용중", "사용안함"],
+	            datasets: [{ data: [85, 15], backgroundColor: ["green", "gray"] }]
+	        }
+	    });
+
+	    new Chart(document.getElementById("equipmentHistoryChart"), {
+	        type: "line",
+	        data: {
+	            labels: ["08:00", "10:00", "12:00", "14:00"],
+	            datasets: [{ label: "가동률", data: [80, 85, 90, 87], borderColor: "blue", fill: false }]
+	        }
+	    });
+	});
+	</script>
+</body>
+</html>
