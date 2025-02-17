@@ -164,7 +164,7 @@
 		        , LOCATION_ORDER = #{row.LOCATION_ORDER}
 		        , CURRENT_QUANTITY = #{row.CURRENT_QUANTITY}
 		        , USE_YN = #{row.USE_YN}
-		        , DESCRIPTION = #{row.DESCRIPTION}
+		        , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
 		    WHERE WAREHOUSE_ID = #{row.WAREHOUSE_ID}
 		    AND LOCATION_ID = #{row.LOCATION_ID}
 		</foreach>    

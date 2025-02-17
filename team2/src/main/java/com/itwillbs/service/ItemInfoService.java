@@ -121,5 +121,27 @@ public class ItemInfoService {
 		return resultMap;
 	}
 
+	public Map<String, Object> selectWhse(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectWhse 성공";
+		
+		try {
+			List<Map<String, Object>> processList = itemInfoMapper.selectWhse(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectWhse 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
 	
 }

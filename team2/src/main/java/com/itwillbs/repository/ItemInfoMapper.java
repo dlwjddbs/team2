@@ -24,6 +24,8 @@ public interface ItemInfoMapper {
 
 	int deleteItemInfo(List<String> idList);
 
+	List<Map<String, Object>> selectWhse(Map<String, Object> requestData);
+
 
 
 }

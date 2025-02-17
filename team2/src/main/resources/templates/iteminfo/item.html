@@ -35,6 +35,7 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
 		<nav th:replace="~{includes/modals/itemCodeAdd :: itemCodeAdd}"></nav>
+		<nav th:replace="~{includes/modals/warehouseAdd :: warehouseAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -167,7 +168,8 @@
             {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
             {header: '단가', name: 'ITEM_COST', align: 'center', editor: null},
             {header: '입고검사', name: 'INB_INSP', align: 'center', editor: null},
-            {header: '창고', name: 'WAREHOUSE_ID', align: 'center', editor: null},
+            {header: '창고 코드', name: 'WAREHOUSE_ID', align: 'center', editor: null},
+            {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', editor: null},
             {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', editor: null},
             {header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
         ];
@@ -209,8 +211,8 @@
 			
 			container.appendChild(el);
 			
-			// ITEM_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'ITEM_ID'
+			// ITEM_ID, WAREHOUSE_ID 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'ITEM_ID' || props.columnInfo.name == 'WAREHOUSE_ID')
 				&& itemGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
@@ -244,6 +246,15 @@
 							
 							$('#itemCodeAdd').modal();
 						break;
+						
+						case 'WAREHOUSE_ID':
+							$("#whseRow").val(row);
+							$("#whseColumn").val(column);
+
+							$('#warehouseAdd').modal();
+							
+							break;
+						
 					}
 			    });
 			}
@@ -302,7 +313,9 @@
 		        { text: 'G', value: 'G' },
 		        { text: 'KG', value: 'KG' },
 		        { text: 'M', value: 'M' },
-		        { text: 'MM', value: 'MM' }
+		        { text: '', value: 'MM' },
+		        { text: '반제품 창고', value: '반제품 창고' },
+		        { text: '완제품 창고', value: '완제품 창고' }
 		    ];
 
 		    options.forEach(option => {
@@ -447,7 +460,8 @@
 							}
 							  }, 
 						renderer: { type: SelectBoxRenderer }},
-		            {header: '창고 *', name: 'WAREHOUSE_ID', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '창고 코드', name: 'WAREHOUSE_ID',	align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', editor: null},
 		            {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		        ]);

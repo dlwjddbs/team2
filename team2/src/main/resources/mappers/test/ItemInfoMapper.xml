@@ -14,11 +14,12 @@
 			, I.ITEM_UNIT
 		    , I.ITEM_COST
 		    , I.INB_INSP
-		    , I.DESCRIPTION
+		    , I.WAREHOUSE_ID
 		    , (SELECT WAREHOUSE_NAME
 		    	FROM WAREHOUSE w 
 		    	WHERE I.WAREHOUSE_ID = W.WAREHOUSE_ID) AS WAREHOUSE_NAME
 		    , I.SAFETY_INVENTORY
+		    , I.DESCRIPTION
 		FROM ITEM I
 		ORDER BY ITEM_ID ASC
     </select>
@@ -103,4 +104,18 @@
 	        #{id}
 	    </foreach>
     </delete>
+    
+    <select id="selectWhse" resultType="map">
+		SELECT
+		  	   WAREHOUSE_ID
+			 , WAREHOUSE_NAME
+			 , WAREHOUSE_TYPE
+			 , WAREHOUSE_STATUS
+		  FROM WAREHOUSE
+		 WHERE 
+			   1 = 1
+		   AND WAREHOUSE_ID NOT IN (SELECT WAREHOUSE_ID FROM ITEM)
+		   AND WAREHOUSE_STATUS = 'Y'
+		 ORDER BY WAREHOUSE_ID ASC
+    </select>
 </mapper>
