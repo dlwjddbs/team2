@@ -134,7 +134,7 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		// BOM
+		// BOM 그리드
 		let bomGrid = null;
 		const bomUrl = '/manufacture/bom';
 		const bomDataSource = {
@@ -156,7 +156,7 @@
             {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center', sortable: true, editor: null},
         ];
 		
-		// BOM 상세
+		// BOM 상세 그리드
 		let bomDetailGrid = null;
 		const bomDetailUrl = '/manufacture/bomDetail';
 		const bomDetailDataSource = {
@@ -321,12 +321,6 @@
 			    const {rowKey, columnName, value} = ev;
 			    const rowData = bomGrid.getRow(rowKey);
 				
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-// 				if (columnName == 'BOM_ID' && !rowData.isNew) {
-// 				if (columnName == 'MANAGER_ID') {
-// 					$('#categoryAdd').modal();
-// 					ev.stop();
-// 				}
 			});
 			
 			bomGrid.on('click', (ev) => {
@@ -360,7 +354,6 @@
 					const bomCount = bomGrid.getRow(newRowKey).BOM_QUANTITY;
 					bomDetailInit(bomID, bomCount);
 					bomCurrentSelectedID = bomID;
-					//$("#btn_group_bomDetail").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        bomCurrentSelectedRowKey = null;
@@ -506,7 +499,7 @@
 		        columns: bomDetail_columns
 		    });
 			
-			if (bomCount < 0) {
+			if (bomCount > 0) {
 				$("#btn_group_bomDetail").hide();
 			} else {
 				$("#btn_group_bomDetail").show();
