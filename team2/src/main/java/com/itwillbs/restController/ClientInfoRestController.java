@@ -44,6 +44,11 @@ public class ClientInfoRestController {
 		return clientInfoService.modifyClientInfo(requestData);
 	}	
 	
+	@PutMapping(clientdetail_url)
+	public Map<String, Object> updateClientDetail(@RequestBody Map<String, Object> requestData) {
+		return clientInfoService.updateClientDetail(requestData);
+	}	
+	
 	@DeleteMapping(clientinfo_url)
 	public Map<String, Object> deleteClientInfo(@RequestHeader("X-Delete-IDs") String encodedIds) {
 		// 한글ID 넘어올 시 변환
@@ -51,5 +56,14 @@ public class ClientInfoRestController {
 	    List<String> clientinfoIds = Arrays.asList(decodedIds.split(","));
         
         return clientInfoService.deleteClientInfo(clientinfoIds);
+	}	
+
+	@DeleteMapping(clientdetail_url)
+	public Map<String, Object> deleteClientDetail(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+		String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+		List<String> clientinfoIds = Arrays.asList(decodedIds.split(","));
+		
+		return clientInfoService.deleteClientDetail(clientinfoIds);
 	}	
 }

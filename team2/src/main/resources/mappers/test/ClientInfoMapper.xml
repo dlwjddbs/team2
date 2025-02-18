@@ -11,6 +11,7 @@
 			, CLIENT_NAME
 			, CLIENT_TYPE
 			, BUSINESS_NUMBER
+<!--			, CONCAT(SUBSTRING(BUSINESS_NUMBER, 1, 2), '-', SUBSTRING(BUSINESS_NUMBER, 3, 3), '-', SUBSTRING(BUSINESS_NUMBER, 6, 5)) AS BUSINESS_NUMBER-->
 			, CEO_NAME
 			, CLIENT_TEL
 			, CLIENT_STATUS
@@ -27,7 +28,7 @@
 			, DESCRIPTION
 			, CLIENT_ID
 		FROM CLIENT
-		WHERE CLIENT_ID = #{client_id}
+		WHERE CLIENT_ID = #{CLIENT_ID}
     </select>
 
     <insert id="insertClientInfo">
@@ -39,13 +40,8 @@
 				, CLIENT_TYPE
 				, BUSINESS_NUMBER
 				, CEO_NAME
-<!--				, ZIPCODE-->
-<!--				, CLIENT_ADDRESS-->
 				, CLIENT_TEL
-<!--				, RESP_NAME-->
-<!--				, RESP_EMAIL-->
 				, CLIENT_STATUS
-<!--				, DESCRIPTION-->
 			)
 			VALUES (
 				  #{item.CLIENT_ID}
@@ -53,13 +49,8 @@
 				, #{item.CLIENT_TYPE}
 				, #{item.BUSINESS_NUMBER, jdbcType=VARCHAR}
 				, #{item.CEO_NAME, jdbcType=VARCHAR}
-<!--				, #{item.ZIPCODE, jdbcType=VARCHAR}-->
-<!--				, #{item.CLIENT_ADDRESS, jdbcType=VARCHAR}-->
 				, #{item.CLIENT_TEL, jdbcType=VARCHAR}
-<!--				, #{item.RESP_NAME, jdbcType=VARCHAR}-->
-<!--				, #{item.RESP_EMAIL, jdbcType=VARCHAR}-->
 				, #{item.CLIENT_STATUS}
-<!--				, #{item.DESCRIPTION, jdbcType=VARCHAR}-->
 			)
 		</foreach>
 		SELECT * FROM DUAL
@@ -74,12 +65,20 @@
 	             , CLIENT_TYPE = #{row.CLIENT_TYPE}
 	             , BUSINESS_NUMBER = #{row.BUSINESS_NUMBER, jdbcType=VARCHAR}
 	             , CEO_NAME = #{row.CEO_NAME, jdbcType=VARCHAR}
-	             , ZIPCODE = #{row.ZIPCODE, jdbcType=VARCHAR}
-	             , CLIENT_ADDRESS = #{row.CLIENT_ADDRESS, jdbcType=VARCHAR}
 	             , CLIENT_TEL = #{row.CLIENT_TEL, jdbcType=VARCHAR}
-	             , RESP_NAME = #{row.RESP_NAME, jdbcType=VARCHAR}
-				 , RESP_EMAIL = #{row.REST_EMAIL, jdbcType=VARCHAR}
 	             , CLIENT_STATUS = #{row.CLIENT_STATUS}
+	         WHERE CLIENT_ID = #{row.CLIENT_ID}
+	    </foreach>
+    </update>
+
+    <update id="updateClientDetail">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE CLIENT
+	           SET 
+	               ZIPCODE = #{row.ZIPCODE, jdbcType=VARCHAR}
+	             , CLIENT_ADDRESS = #{row.CLIENT_ADDRESS, jdbcType=VARCHAR}
+	             , RESP_NAME = #{row.RESP_NAME, jdbcType=VARCHAR}
+				 , RESP_EMAIL = #{row.RESP_EMAIL, jdbcType=VARCHAR}
 	             , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
 	         WHERE CLIENT_ID = #{row.CLIENT_ID}
 	    </foreach>
@@ -92,6 +91,20 @@
 	        #{id}
 	    </foreach>
     </delete>
+
+    <update id="deleteClientDetail">
+	     UPDATE CLIENT
+    	 	SET 
+    	 		ZIPCODE = NULL
+    	 	  , CLIENT_ADDRESS = NULL
+    	 	  , RESP_NAME = NULL
+    	 	  , RESP_EMAIL = NULL
+    	 	  , DESCRIPTION = NULL
+   		 WHERE CLIENT_ID IN
+    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+    </update>
     
     <select id="checkDuplicateClientCode">
 	    SELECT count(*) AS COUNT

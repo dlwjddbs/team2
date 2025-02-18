@@ -68,7 +68,9 @@ public class ClientInfoService {
 	public Map<String, Object> modifyClientInfo(Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-
+		
+		log.info("updatedRows =" + updatedRows);
+		
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
@@ -80,11 +82,38 @@ public class ClientInfoService {
 			}
 			
 			if (updatedRows.size() > 0) {
+				
 				clientInfoMapper.updateClientInfo(updatedRows);
 			}
 		} catch (Exception e) {
 			result = false;
 			message = "modifyToastTest 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> updateClientDetail(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		log.info("updatedRows =" + updatedRows);
+		
+		Boolean result = true;
+		String message = "updateClientDetail 성공";
+		
+		try {
+			if (updatedRows.size() > 0) {
+				
+				clientInfoMapper.updateClientDetail(updatedRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "updateClientDetail 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -114,6 +143,27 @@ public class ClientInfoService {
 		return resultMap;
 	}
 
+	public Map<String, Object> deleteClientDetail(List<String> idList) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteClientDetail 성공";
+		
+		try {
+			if (idList.size() > 0) {
+				clientInfoMapper.deleteClientDetail(idList);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteClientDetail 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
 	public Map<String, Object> checkDuplicateClientCode(Map<String, Object> map) {
 		log.info("============= checkDuplicateClientCode(Service) =============");
 		Map<String, Object> message = new HashMap<>();

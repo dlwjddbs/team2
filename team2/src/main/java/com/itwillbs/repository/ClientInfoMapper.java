@@ -17,9 +17,14 @@ public interface ClientInfoMapper {
 
 		int updateClientInfo(List<Map<String, Object>> updatedRows);
 
+		int updateClientDetail(List<Map<String, Object>> updatedRows);
+
 		int deleteClientInfo(List<String> idList);
 
+		int deleteClientDetail(List<String> idList);
+		
 		int checkDuplicateClientCode(Map<String, Object> map);
+
 
 
 }
