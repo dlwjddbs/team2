@@ -399,6 +399,22 @@
 				
 				container.appendChild(button);
 					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = locationGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'LOCATION_ID':
+							$("#locationCode").val(value);
+							$("#locationRow").val(row);
+							$("#locationColumn").val(column);
+							
+							$('#locationCodeAdd').modal();
+						break;
+					}
+			    });
 			}
 			
 			this.el = container;
