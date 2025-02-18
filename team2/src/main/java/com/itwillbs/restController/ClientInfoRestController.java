@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itwillbs.service.ClientInfoService;
@@ -26,10 +27,16 @@ public class ClientInfoRestController {
 	private final ClientInfoService clientInfoService;
 	
 	private final String clientinfo_url = "/clientinfo/client";
+	private final String clientdetail_url = "/clientinfo/detail";
 	
 	@GetMapping(clientinfo_url)
 	public Map<String, Object> getClientInfo() {
 		return clientInfoService.selectClientInfo();
+	}	
+
+	@GetMapping(clientdetail_url)
+	public Map<String, Object> getClientInfoDetail(@RequestParam Map<String, Object> requestData) {
+		return clientInfoService.selectClientInfoDetail(requestData);
 	}	
 	
 	@PutMapping(clientinfo_url)
