@@ -13,11 +13,21 @@
 			, BUSINESS_NUMBER
 			, CEO_NAME
 			, CLIENT_TEL
-			, RESP_NAME
 			, CLIENT_STATUS
-			, DESCRIPTION
 		FROM CLIENT
 		ORDER BY CLIENT_ID ASC 
+    </select>
+    
+    <select id="selectClientInfoDetail" resultType="map">
+    	SELECT
+    		  ZIPCODE
+			, CLIENT_ADDRESS
+			, RESP_NAME
+			, RESP_EMAIL
+			, DESCRIPTION
+			, CLIENT_ID
+		FROM CLIENT
+		WHERE CLIENT_ID = #{CLIENT_ID}
     </select>
 
     <insert id="insertClientInfo">
@@ -29,8 +39,11 @@
 				, CLIENT_TYPE
 				, BUSINESS_NUMBER
 				, CEO_NAME
+				, ZIPCODE
+				, CLIENT_ADDRESS
 				, CLIENT_TEL
 				, RESP_NAME
+				, RESP_EMAIL
 				, CLIENT_STATUS
 				, DESCRIPTION
 			)
@@ -38,10 +51,13 @@
 				  #{item.CLIENT_ID}
 				, #{item.CLIENT_NAME}
 				, #{item.CLIENT_TYPE}
-				, #{item.BUSINESS_NUMBER}
-				, #{item.CEO_NAME}
+				, #{item.BUSINESS_NUMBER, jdbcType=VARCHAR}
+				, #{item.CEO_NAME, jdbcType=VARCHAR}
+				, #{item.ZIPCODE, jdbcType=VARCHAR}
+				, #{item.CLIENT_ADDRESS, jdbcType=VARCHAR}
 				, #{item.CLIENT_TEL}
-				, #{item.RESP_NAME}
+				, #{item.RESP_NAME, jdbcType=VARCHAR}
+				, #{item.RESP_EMAIL, jdbcType=VARCHAR}
 				, #{item.CLIENT_STATUS}
 				, #{item.DESCRIPTION, jdbcType=VARCHAR}
 			)

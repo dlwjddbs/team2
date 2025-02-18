@@ -24,6 +24,8 @@
 	<script src="../../dist/js/adminlte.min.js"></script>
 	<!-- Toast Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	<!-- Daum 우편번호 서비스 -->
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -91,7 +93,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="card-body" id="client2Grid">
+							<div class="card-body" id="clientDetailGrid">
 								<!-- Toast Grid Ajax -->
 							</div>
 						<!-- /.card-body -->
@@ -152,24 +154,25 @@
         ];
 		
 		// 거래처 상세
-		let client2Grid = null;
-		const client2Url = '/clientinfo/client';
-		const client2DataSource = {
+		let clientDetailGrid = null;
+		const clientDetailUrl = '/clientinfo/detail';
+		const clientDetailDataSource = {
 			api: {
-			    readData: {url: client2Url, method: 'GET'},
-				modifyData: { url: client2Url, method: 'PUT' },
-				deleteData: {url: client2Url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			    readData: {url: clientDetailUrl, method: 'GET'},
+				modifyData: { url: clientDetailUrl, method: 'PUT' },
+				deleteData: {url: clientDetailUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
-		let client2CurrentSelectedRowKey = null;
-		let client2IsEditModeEnabled = false; 
-		const client2_columns = [
-            {header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'left', editor: null},
-            {header: '담당자명', name: 'RESP_NAME', align: 'left', editor: null},
+		let clientDetailCurrentSelectedRowKey = null;
+		let clientDetailIsEditModeEnabled = false; 
+		const clientDetail_columns = [
+            {header: '우편번호', name: 'ZIPCODE', align: 'center', width: 150, editor: null},
+            {header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'left', width: 500, editor: null},
+            {header: '담당자명', name: 'RESP_NAME', align: 'center', width: 150, editor: null},
 			{header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: null},
 			{header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
-			{header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
+			{header: 'clientDetail', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
         ];
 		
 		const TextInputRenderer = function(props) {
@@ -245,10 +248,19 @@
 		    el.style.marginLeft = '1px';
 		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
 			
+			// 입력 필드와 버튼을 감싸는 컨테이너에 추가
 			container.appendChild(el);
 			
-			// CLIENT_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'CLIENT_ID'
+		TextInputBtnRenderer.prototype.getElement = function () {
+		    return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+		    this.input.value = props.value;
+		}
+		
+		// CLIENT_ID, ZIPCODE 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'CLIENT_ID' || props.columnInfo.name == 'ZIPCODE')
 				&& clientGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
@@ -273,15 +285,12 @@
 							$("#clientCode").val(value);
 							$("#clientRow").val(row);
 							$("#clientColumn").val(column);
-							
-							//$("#checkDuplicateCodeBtn").show();
-							//$("#modifyCodeBtn").hide();
-							//$("#saveCode").attr("disabled", true);
-							//$("#clientCode").attr("disabled", false);
-							//$("#validationClientCodeMessage").text('');
-							
 							$('#clientCodeAdd').modal();
 						break;
+						case 'CLIENT_ADDRESS':
+		                    // CLIENT_ADDRESS 클릭 시, 다음주소API 호출
+		                    openDaumPostcode(row, column);
+		                    break;
 					}
 			    });
 			}
@@ -290,13 +299,21 @@
 		    this.input = el;
 		    this.render(props);
 		}
+		
+		// 다음주소API 호출 함수
+		function openDaumPostcode(row, column) {
+		    new daum.Postcode({
+		        oncomplete: function(data) {
+		            // 우편번호
+		            const zipcode = data.zonecode;
+		            // 주소
+		            const address = data.roadAddress || data.jibunAddress;
 
-		TextInputBtnRenderer.prototype.getElement = function () {
-		    return this.el;
-		}
-
-		TextInputBtnRenderer.prototype.render = function (props) {
-		    this.input.value = props.value;
+		            // 우편번호와 주소를 그리드에 자동으로 채우기
+		            clientDetailGrid.setValue(row, 'ZIPCODE', zipcode);
+		            clientDetailGrid.setValue(row, 'CLIENT_ADDRESS', address);
+		        }
+		    }).open();
 		}
 		
 		$(function () {
@@ -341,9 +358,9 @@
 			        clientGrid.removeRowClassName(clientCurrentSelectedRowKey, 'selected-row');
 			    }
 				
-				if (client2Grid) {
-					client2Grid.destroy(); // 거래처 상세 그리드 제거
-					client2Grid = null;
+				if (clientDetailGrid) {
+					clientDetailGrid.destroy(); // 거래처 상세 그리드 제거
+					clientDetailGrid = null;
 				}
 
 			    if (clientCurrentSelectedRowKey != newRowKey) {
@@ -352,7 +369,7 @@
 				
 					// 거래처 상세 그리드 생성
 					/*const clientID = clientGrid.getRow(newRowKey).CLIENT_ID;
-					client2Init(clientID);
+					clientDetailInit(clientID);
 					clientCurrentSelectedID = clientID;	
 					$("#btn_group_client").show();
 			    } else {
@@ -365,7 +382,7 @@
 				    console.log("선택된 거래처 ID: ", clientID); // clientID가 제대로 가져와지는지 확인
 
 				    if (clientID) {
-				        client2Init(clientID); // clientID가 있을 경우에만 client2Init 호출
+				        clientDetailInit(clientID); // clientID가 있을 경우에만 clientDetailInit 호출
 				        clientCurrentSelectedID = clientID;
 				        $("#btn_group_client").show();
 				    }
@@ -408,10 +425,10 @@
 		    
 		    if (clientIsEditModeEnabled) {
 		        clientGrid.setColumns([
-		        	{header: '거래처 코드', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '거래처명', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		        	{header: 'clientDetail *', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		            {header: '거래처명 *', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {
-						header: '거래처 유형', 
+						header: '거래처 유형 *', 
 						name: 'CLIENT_TYPE', 
 						align: 'center', 
 						editor: {
@@ -428,7 +445,7 @@
 		            {header: '대표자', name: 'CEO_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {
-						header: '거래상태',
+						header: '거래상태 *',
 						name: 'CLIENT_STATUS', 
 						align: 'center', 
 						editor: {
@@ -472,7 +489,7 @@
 		    let updatedRows = clientGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["CLIENT_ID", "CLIENT_NAME", "CLIENT_STATUS"];
+		    const requiredFields = ["CLIENT_ID", "CLIENT_NAME", "CLIENT_TYPE", "CLIENT_STATUS"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
@@ -530,64 +547,65 @@
 		
 		
 		// 거래처 상세
-		function client2Init(client_id) {
-			// 파라미터 설정
-			client2DataSource.api.readData.initParams.client_id = client_id;
+		function clientDetailInit(client_id) {
 			
-			if (client2Grid) {
-				client2Grid.destroy(); // 기존 그리드 제거
-				client2Grid = null;
+			console.log(clientDetailDataSource.api.readData);
+	        console.log(clientDetailDataSource.api.readData.initParams);
+			
+			if (!clientDetailDataSource.api.readData.initParams) {
+			    clientDetailDataSource.api.readData.initParams = {}; // initParams 초기화
 			}
 			
-			client2Grid = new tui.Grid({
-		        el: document.getElementById('client2Grid'),
-		        data: client2DataSource,
+			// 파라미터 설정
+			clientDetailDataSource.api.readData.initParams.client_id = client_id;
+			
+			if (clientDetailGrid) {
+				clientDetailGrid.destroy(); // 기존 그리드 제거
+				clientDetailGrid = null;
+			}
+			
+			clientDetailGrid = new tui.Grid({
+		        el: document.getElementById('clientDetailGrid'),
+		        data: clientDetailDataSource,
 		        scrollX: true,
 		        scrollY: true,
 		        bodyHeight: 250,
 		        rowHeaders: ['checkbox'],
-		        columns: client2_columns,
+		        columns: clientDetail_columns,
 		    });
 			
 			$("#btn_group_client").show();
 
-		    client2Grid.on('failResponse', function(ev) {
+		    clientDetailGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
 		
 		// 수정 모드 토글 버튼 이벤트
 		$("#btn_client_edit").on("click", function () {
-		    client2IsEditModeEnabled = !client2IsEditModeEnabled; // 수정 모드 상태 토글
+		    clientIsEditModeEnabled = !clientIsEditModeEnabled; // 수정 모드 상태 토글
 		    
-		   /*  if (clientIsEditModeEnabled) {
-				$("#btn_location_add_row").show();
-				$("#btn_location_remove_row").show();
-		    } else {
-		    	$("#btn_location_add_row").hide();
-				$("#btn_location_remove_row").hide();
-		    } */
-		    
-		    if (client2IsEditModeEnabled) {
-		        client2Grid.setColumns([
-					{ header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
-		            { header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		    if (clientIsEditModeEnabled) {
+		        clientDetailGrid.setColumns([
+					{ header: '우편번호', name: 'ZIPCODE', align: 'center', width: 150, renderer: { type: TextInputBtnRenderer }},
+					{ header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'center', editor: 'text', width: 500, renderer: { type: TextInputBtnRenderer }},
+		            { header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', width: 150, renderer: { type: TextInputRenderer }},
 		            { header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 					{ header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
-		        client2Grid.finishEditing(); // 현재 편집 중인 셀 종료
-		        client2Grid.setColumns(client2_columns);
+		        clientDetailGrid.finishEditing(); // 현재 편집 중인 셀 종료
+		        clientDetailGrid.setColumns(clientDetail_columns);
 			    }
 		});
 
 
 		$("#btn_client_save").on("click", function() {
-			client2Grid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+			clientDetailGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
 			
-		    let createdRows = client2Grid.getModifiedRows().createdRows;
-		    let updatedRows = client2Grid.getModifiedRows().updatedRows;
+		    let createdRows = clientDetailGrid.getModifiedRows().createdRows;
+		    let updatedRows = clientDetailGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
 		    const requiredFields = ["RESP_NAME"];
@@ -622,10 +640,11 @@
 		        return;
 			}
 			
-			client2Grid.request('modifyData');
-			client2Grid.reloadData();  // 그리드 새로고침 
-			client2Grid.setColumns(client2_columns);  // 수정모드 해제 (새로 렌더링)
+			clientDetailGrid.request('modifyData');
+			clientDetailGrid.reloadData();  // 그리드 새로고침 
+			clientDetailGrid.setColumns(clientDetail_columns);  // 수정모드 해제 (새로 렌더링)
 		});
 	</script>
+
 </body>
 </html>

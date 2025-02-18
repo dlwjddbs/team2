@@ -41,6 +41,28 @@ public class ClientInfoService {
 		return resultMap;
 	}
 	
+	public Map<String, Object> selectClientInfoDetail(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectClientInfoDetail 성공";
+		
+		try {
+			List<Map<String, Object>> clientInfoList = clientInfoMapper.selectClientInfoDetail(requestData);
+			content.put("contents", clientInfoList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectClientInfoDetail 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}	
+	
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> modifyClientInfo(Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
@@ -113,6 +135,7 @@ public class ClientInfoService {
 		message.put("resultCode", resultCode);
 		
 		return message;
-	}	
+	}
+
 	
 }

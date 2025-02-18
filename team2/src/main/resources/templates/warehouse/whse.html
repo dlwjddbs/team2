@@ -744,12 +744,19 @@
 		        	row[field] && row[field].trim() !== ''
 		        )
 		    );
+			
+			updatedRows.forEach(row => {
+			    requiredFields.forEach(field => {
+			        console.log(`row[${field}] (${typeof row[field]}):`, row[field]);
+			    });
+			});
 		    
-		    let validUpdatedRows = updatedRows.filter(row =>
-		        requiredFields.every(field => 
-		        	row[field] && row[field].trim() !== ''
-		        )
-		    );
+			let validUpdatedRows = updatedRows.filter(row =>
+			    requiredFields.every(field => 
+			        row[field] !== undefined && row[field] !== null && 
+			        (typeof row[field] !== 'string' || row[field].trim() !== '')
+			    )
+			);
 		    
 		    if (createdRows.length == 0 && updatedRows.length == 0) {
 		    	alert("수정된 데이터가 없습니다.");

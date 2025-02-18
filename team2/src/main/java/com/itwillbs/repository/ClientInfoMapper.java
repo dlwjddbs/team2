@@ -11,6 +11,8 @@ public interface ClientInfoMapper {
 	
 		List<Map<String, Object>> selectClientInfo();
 
+		List<Map<String, Object>> selectClientInfoDetail(Map<String, Object> requestData);
+
 		int insertClientInfo(List<Map<String, Object>> createdRows);
 
 		int updateClientInfo(List<Map<String, Object>> updatedRows);
@@ -18,4 +20,6 @@ public interface ClientInfoMapper {
 		int deleteClientInfo(List<String> idList);
 
 		int checkDuplicateClientCode(Map<String, Object> map);
+
+
 }
