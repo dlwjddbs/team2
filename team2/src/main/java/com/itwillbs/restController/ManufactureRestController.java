@@ -39,6 +39,8 @@ public class ManufactureRestController {
 	private final String production_order_url = "/manufacture/productionOrder";
 	private final String production_order_detail_url = "/manufacture/productionOrderDetail";
 	private final String production_order_item_url = "/manufacture/productionOrderItem";
+	private final String production_order_bom_url = "/manufacture/productionOrderBOM";
+	private final String production_order_workcenter_url = "/manufacture/productionOrderWorkcenter";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {
@@ -158,6 +160,16 @@ public class ManufactureRestController {
 	@PutMapping(production_order_url)
 	public Map<String, Object> modifyProductionOrder(@RequestBody Map<String, Object> requestData) {
 		return manufactureService.modifyProductionOrder(requestData);
+	}
+	
+	@GetMapping(production_order_bom_url)
+	public Map<String, Object> getProductionOrderBOM(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProductionOrderBOM(requestData);
+	}
+	
+	@GetMapping(production_order_workcenter_url)
+	public Map<String, Object> getProductionOrderWorkcenter(@RequestParam Map<String, Object> requestData) {
+		return manufactureService.selectProductionOrderWorkcenter(requestData);
 	}
 	
 }

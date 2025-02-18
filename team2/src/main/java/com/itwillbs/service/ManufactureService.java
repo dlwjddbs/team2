@@ -502,5 +502,49 @@ public class ManufactureService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> selectProductionOrderBOM(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectProductionOrderBOM 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderBOM(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectProductionOrderBOM 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> selectProductionOrderWorkcenter(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectProductionOrderWorkcenter 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderWorkcenter(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectProductionOrderWorkcenter 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }

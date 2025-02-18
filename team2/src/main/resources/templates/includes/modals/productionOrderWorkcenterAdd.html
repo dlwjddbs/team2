@@ -1,0 +1,120 @@
+<!-- 모달창 -->
+<div class="modal fade" id="productionOrderWorkcenterAdd" th:fragment="productionOrderWorkcenterAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">워크센터 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="workcenterGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveWorkcenter">입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="productionOrderWorkcenterAdd" th:inline="javascript">
+	let selectedWorkcenterCell = {row : '', col : ''};
+	let selectedWorkcenterVal = {id : '', name : ''};
+	let workcenterGrid = null;
+	let workcenterCurrentSelectedRowKey = null;
+	const workcenterUrl = '/manufacture/productionOrderWorkcenter';
+	const workcenterDataSource = {
+		api: {
+		    readData: {url: workcenterUrl, method: 'GET', initParams: {item_id: ''}},
+		},
+		contentType: 'application/json',
+	};
+	const workcenter_columns = [
+        {header: '워크센터코드', name: 'WORKCENTER_ID', align: 'center'},
+        {header: '워크센터명', name: 'NAME', align: 'left'},
+    ];
+	
+	$('#productionOrderWorkcenterAdd').on('shown.bs.modal', function () {
+        selectedWorkcenterVal.id = '';
+        selectedWorkcenterVal.name = '';
+		$("#saveWorkcenter").attr("disabled", true);
+		
+		if (workcenterGrid) {
+			workcenterGrid.destroy();
+			workcenterGrid = null;
+		} 
+		
+        workcenterInit();
+	});
+	
+	function workcenterInit() {
+		workcenterGrid = new tui.Grid({
+	        el: document.getElementById('workcenterGrid'),
+	        data: workcenterDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: workcenter_columns,
+	    });
+		
+		workcenterGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    workcenterGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+		    const newRowKey = ev.rowKey;
+
+		    if (workcenterCurrentSelectedRowKey != null) {
+		    	workcenterGrid.removeRowClassName(workcenterCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (workcenterCurrentSelectedRowKey != newRowKey) {
+		    	workcenterGrid.addRowClassName(newRowKey, 'selected-row');
+		        workcenterCurrentSelectedRowKey = newRowKey;
+
+		        selectedWorkcenterVal.id = workcenterGrid.getRow(newRowKey).WORKCENTER_ID;
+		        selectedWorkcenterVal.name = workcenterGrid.getRow(newRowKey).NAME;
+
+		        $("#saveWorkcenter").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        workcenterCurrentSelectedRowKey = null;
+		        
+		        $("#saveWorkcenter").attr("disabled", true);
+		    }
+		});
+	}
+	
+	$("#saveWorkcenter").on('click', function() {
+		processModalSelectedGrid.setValue(selectedWorkcenterCell.row, selectedWorkcenterCell.col, selectedWorkcenterVal.id);
+		processModalSelectedGrid.setValue(selectedWorkcenterCell.row, 'WORKCENTER_NAME', selectedWorkcenterVal.name);
+		
+		$('#productionOrderWorkcenterAdd').modal('hide');
+	});
+</script>

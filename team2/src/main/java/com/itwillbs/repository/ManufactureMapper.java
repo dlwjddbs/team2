@@ -62,4 +62,8 @@ public interface ManufactureMapper {
 
 	int insertProductionOrder(List<Map<String, Object>> createdRows);
 
+	List<Map<String, Object>> selectProductionOrderBOM(Map<String, Object> requestData);
+
+	List<Map<String, Object>> selectProductionOrderWorkcenter(Map<String, Object> requestData);
+
 }

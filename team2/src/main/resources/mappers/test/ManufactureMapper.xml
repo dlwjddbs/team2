@@ -417,6 +417,7 @@
 			 , MC.SUB_NAME 						AS STATUS_NAME
 			 , W.NAME 							AS WORKCENTER_NAME
 			 , i.ITEM_NAME 						AS ITEM_NAME
+			 , i.ITEM_UNIT 						AS ITEM_UNIT
 		  FROM PRODUCTION_ORDER_DETAIL pod
 			   INNER JOIN MES_COMMON mc 
 					   ON pod.STATUS = mc.CLASSIFICATION_ID 
@@ -460,4 +461,47 @@
 		</foreach>
 		SELECT * FROM DUAL
     </insert>
+    
+    <select id="selectProductionOrderBOM" resultType="map">
+		WITH hierarchy_item AS
+		(
+			SELECT 
+				   LEVEL AS HIERARCHY_LEVEL
+			     , BOM_ID
+			     , ITEM_ID
+			  FROM BOM
+			 START WITH ITEM_ID = #{item_id}
+			CONNECT BY PRIOR ITEM_ID = PARENT_ID
+		)
+		SELECT
+			   BD.COMPONENT_ID 					AS ITEM_ID
+			 , I2.ITEM_NAME 					AS ITEM_NAME
+			 , BD.UNIT 							AS ITEM_UNIT
+			 , BD.REQUIRED_AMOUNT * ${amount}	AS AMOUNT
+		  FROM hierarchy_item hi
+			   INNER JOIN ITEM i
+					   ON hi.item_id = i.ITEM_ID 
+			   INNER JOIN BOM_DETAIL bd
+					   ON hi.bom_id = bd.BOM_ID
+			   INNER JOIN item i2
+					   ON bd.COMPONENT_ID = i2.ITEM_ID
+		 UNION ALL 
+		 SELECT
+			   i.ITEM_ID 		AS ITEM_ID
+			 , i.ITEM_NAME 		AS ITEM_NAME
+			 , i.ITEM_UNIT 		AS ITEM_UNIT
+			 , ${amount}		AS AMOUNT
+		  FROM ITEM i
+		 WHERE i.ITEM_ID = #{item_id}
+    </select>
+    
+    <select id="selectProductionOrderWorkcenter" resultType="map">
+    	SELECT 
+			   w.WORKCENTER_ID 
+			 , w.NAME 
+		  FROM WORKCENTER w
+			   INNER JOIN ROUTING r
+					   ON w.ROUTING_ID = r.ROUTING_ID 
+		 WHERE r.ITEM_ID = #{item_id}
+    </select>
 </mapper>
