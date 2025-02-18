@@ -22,11 +22,6 @@
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">닫기</button>
-					<button type="button" class="btn btn-primary" id="btn_edit">수정</button>
-					<button type="button" class="btn btn-success" id="btn_update"
-						style="display: none;">저장</button>
-					<button type="button" class="btn btn-success" id="btn_save"
-						style="display: none;">저장</button>
 				</div>
 			</div>
 		</div>
@@ -45,23 +40,11 @@
 				<!-- /.모달창 헤더 -->
 
 				<div class="modal-body">
-					<form method="post" id="orderDetailTable">
+					<form method="post" id="addRequestDetailTable">
 						<div
 							class="d-flex justify-content-between align-items-center mb-1">
 							<div class="custom-text d-flex">
-
-								<div id="orderId" class="ml-1"></div>
-							</div>
-							<div class="custom-text d-flex align-items-center">
-								수주날짜 :
-								<div
-									class="tui-datepicker-input tui-datetime-input tui-has-focus ml-1">
-									<input type="text" id="orderDate" class="editable"
-										aria-label="Date-Time"> <span class="tui-ico-date"></span>
-								</div>
-								<div id="orderDate-container" style="margin-top: -1px;"></div>
-
-
+								<!-- <div id="requestId" class="ml-1"></div> -->
 							</div>
 						</div>
 						<table class="table">
@@ -71,65 +54,38 @@
 									<td><select id="customerId" name="customerId"
 										class="selectpicker form-control editable"
 										data-live-search="true"></select></td>
-									<th>담당자</th>
-									<td><input type="text" id="salesRepId"
-										class="form-control" readonly></td>
-									<th>납품예정일</th>
+									<th>요청일</th>
 									<td>
 										<div
-											class="tui-datepicker-input tui-datetime-input tui-has-focus">
-											<input type="text" id="deliveryDate" class="editable"
-												aria-label="Date-Time" /> <span class="tui-ico-date"></span>
+											class="tui-datepicker-input tui-datetime-input tui-has-focus ml-1">
+											<input type="text" id="createDate" class="editable"
+												aria-label="Date-Time"> <span class="tui-ico-date"></span>
 										</div>
-										<div id="deliveryDate-container" style="margin-top: -1px;"></div>
+										<div id="createDate-container" style="margin-top: -1px;"></div>
 									</td>
-								</tr>
-
-								<tr>
-									<th>품목명</th>
-									<td><select id="itemId" name="itemId"
-										class="selectpicker form-control editable"
-										data-live-search="true"></select></td>
-									<th>단위</th>
-									<td><input type="text" id="unit" class="form-control"
-										readonly></td>
-									<th>수량</th>
-									<td><input type="number" id="orderQty"
-										class="form-control editable" readonly></td>
-								</tr>
-								<tr>
-									<th>공급가</th>
-									<td><input type="text" id="orderPrice"
-										class="form-control" readonly></td>
-									<th>부가세</th>
-									<td><input type="text" id="tax" class="form-control"
-										readonly></td>
-									<th>합계</th>
-									<td><input type="text" id="orderSum" class="form-control"
-										readonly></td>
 								</tr>
 								<tr>
 									<th>비고</th>
-									<td colspan="5"><input type="text" id="remarks"
-										class="form-control editable" readonly></td>
+									<td colspan="5"><input type="text" id="detailRemarks"
+										class="form-control editable"></td>
 								</tr>
 							</tbody>
 						</table>
-						<div class="custom-text d-flex justify-content-end">
-							등록자 : <span id="registBy" class="ml-1"></span>
-						</div>						
-					</form>
-					<div id="add_detail_grid"></div>
 
+						<div class="custom-text d-flex mb-1">
+							상세정보
+						</div>
+						<div id="add_detail_grid"></div>
+						<div class="custom-text d-flex justify-content-end">
+							요청자 : <span id="registBy" class="ml-1"></span>
+						</div>
+					</form>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">닫기</button>
-					<button type="button" class="btn btn-primary" id="btn_edit">수정</button>
-					<button type="button" class="btn btn-success" id="btn_update"
-						style="display: none;">저장</button>
 					<button type="button" class="btn btn-success" id="btn_save"
-						style="display: none;">저장</button>
+						>저장</button>
 				</div>
 			</div>
 		</div>

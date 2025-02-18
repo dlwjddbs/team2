@@ -54,8 +54,8 @@ public class OrderService {
 		String message = "selectClient 성공";
 		
 		try {
-			List<Map<String, Object>> purchaseList = orderMapper.getClientList(requestData);
-			content.put("contents", purchaseList);
+			List<Map<String, Object>> clientList = orderMapper.getClientList(requestData);
+			content.put("contents", clientList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
 			result = false;

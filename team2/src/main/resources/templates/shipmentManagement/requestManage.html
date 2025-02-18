@@ -180,6 +180,7 @@
 	
 		let request_grid;
 		let detail_grid;
+		let add_detail_grid;
 
 		const url = '/ajax/req';  // API URL
 
@@ -188,6 +189,7 @@
 			loadGridData();
 			loadClientList();
 			loadItemList();
+			loadClientListPopup();
 		});
 
 		// search btn
@@ -325,7 +327,7 @@
 			                    data: data.reqs,  // 그리드에 데이터를 설정
 			                    scrollX: true,
 			                    scrollY: true,
-			                    rowHeaders: ['checkbox'],
+			                    //rowHeaders: ['checkbox'],
 			                    evenRow: {
 			                        background: '#fee'
 			                    },
@@ -333,7 +335,7 @@
 			                        resizable: true,
 			                    },
 			                    columns: [
-			                        {header: '수주번호', name: 'ORDER_ID', align: 'center'},
+			                        {header: '수주번호', name: 'ORDER_ID', align: 'center', width: 160},
 			                        {header: '진행상태', name: 'ORDER_STATUS', align: 'center', width: 80,
 										renderer: {
 											styles: {
@@ -370,9 +372,8 @@
 		            console.error("데이터 로딩 실패", error);
 		        });
 		}
-
-
-		// 거래처 Select Box
+		
+		// 조회조건 거래처 Select Box
 		function loadClientList() {
 		    fetch('/getCltList')
 		        .then(response => response.json())
@@ -386,7 +387,48 @@
 		            }, {});
 		            
 		            updateSelectBox(data.data.contents, 'cusInput');  // 'cusInput' SelectBox 업데이트
+		        })
+		        .catch(error => {
+		            console.error("거래처 리스트를 불러오는 데 실패했습니다.", error);
+		        });
+		}
+		
+		// 출하 요청 등록 거래처 Select Box (팝업) 
+		function loadClientListPopup() {
+		    fetch('/ajax/order?orderStatus=미결') 
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("미결 거래처 리스트:", data);
+		            
+		            const customerIds = [...new Set(data.orders.map(order => order.CUSTOMER_ID))];
+		            console.log('customerIds', customerIds)
+		           
+                     // select 박스에 옵션 추가
+		            const selectBox = document.getElementById('customerId');  // 'customerId'는 select 박스의 ID
+		            selectBox.innerHTML = ''; // 기존 옵션 초기화
+		
+		            // '전체' 옵션 추가
+		            const allOption = document.createElement('option');
+		            allOption.value = 'all';  // 전체를 선택할 경우 빈 값
+		            allOption.textContent = '전체';  // '전체' 텍스트
+		            selectBox.appendChild(allOption);
 
+		            // customerIds를 select box에 추가
+		            customerIds.forEach(customerId => {
+		                const option = document.createElement('option');
+		                option.value = customerId;
+		                option.textContent = customerId;  // customerId를 option의 텍스트로 설정
+		                selectBox.appendChild(option);
+		            });
+		
+		            $(selectBox).selectpicker('refresh');
+		         
+		            // select box 값 변경 시 customerId에 맞는 그리드데이터 재 호출
+		            selectBox.addEventListener('change', function() {
+		                const selectedCustomerId = selectBox.value;  // 사용자가 선택한 customerId 값
+		                loadModalContentAdd(selectedCustomerId || all);  // 선택한 customerId로 fetch 요청 재호출
+		                console.log('selectedCustomerId', selectedCustomerId)
+		            });
 		        })
 		        .catch(error => {
 		            console.error("거래처 리스트를 불러오는 데 실패했습니다.", error);
@@ -440,6 +482,7 @@
 			
 		}
 
+
 		//dateRange
 		const today = new Date();
 		const startOfYear = new Date(today.getFullYear(), 0, 1);
@@ -461,14 +504,8 @@
 			],
 			type: 'date',
 			format: 'YYYY-MM-dd'
-		});
+		});	
 		
-		// add btn
-		document.getElementById('btn_add').addEventListener('click', () => {
-
-		    // 모달 표시
-		    $('#addRequestModal').modal('show');
-		});
 	
 		// delete btn
 		document.getElementById('btn_delete').addEventListener('click', () => {
@@ -508,7 +545,171 @@
 					alert('서버와의 통신에 실패했습니다.');
 				});
 		});
+		
+		// 요청일자
+		var datepicker = new tui.DatePicker('#createDate-container', {
+			date: new Date(),
+			input: {
+				element: '#createDate',
+				format: 'yyyy-MM-dd'
+			}
+		});
+		
+		
+		/* 출하 요청 등록 팝업 */
+		const addModal = new bootstrap.Modal(document.getElementById('addRequestModal'));
+		
+		// add btn
+		document.getElementById('btn_add').addEventListener('click', () => {
+			
+			// 요청자 = 로그인한 사용자
+			const userName = document.getElementById('userName').textContent;
+			document.getElementById('registBy').textContent = userName;
+			
+			loadModalContentAdd();
+		    // 모달 표시
+		    $('#addRequestModal').modal('show');
+		});
+		
 
+		// 출하요청 등록 수주목록 그리드
+		function loadModalContentAdd(customerId) {
+		    let url = '/ajax/order?orderStatus=미결';
+		    if (customerId) {
+		        url += `&customerId=${customerId}`;
+		    }
+
+		    fetch(url)
+		        .then(response => response.json())
+		        .then(data => {
+		            console.log("요청 가능한 수주 목록:", data);
+
+		            if (!data.orders || data.orders.length === 0) {
+		                alert('상세 정보를 불러오는 데 실패했습니다.');
+		                return;
+		            }
+
+		            // 데이터가 로드되었으면 그리드에 표시
+		            setTimeout(() => {
+		                console.log("그리드가 렌더링된 후 모달을 띄움."); 
+		                
+		                if (!add_detail_grid) {  // 만약 add_detail_grid가 없다면, 새로 생성
+		                    add_detail_grid = new tui.Grid({
+		                        el: document.getElementById('add_detail_grid'),
+		                        data: data.orders,  // 그리드에 데이터를 설정
+		                        scrollX: true,
+		                        scrollY: true,
+		                        rowHeaders: ['checkbox'],
+		                        evenRow: {
+		                            background: '#fee'
+		                        },
+		                        columnOptions: {
+		                            resizable: true,
+		                        },
+		                        columns: [
+		                            {header: '수주번호', name: 'ORDER_ID', align: 'center', width: 160},
+		                            {header: '진행상태', name: 'ORDER_STATUS', align: 'center', width: 80,
+		                                renderer: {
+		                                    styles: {
+		                                        fontWeight: 'bold',
+		                                        color: (props) => props.value == '미결' ? '#ff6464' : '#999'
+		                                    }
+		                                }},
+		                            {header: '품목명', name: 'ITEM_ID', align: 'left', width: 180},
+		                            {header: '납품예정일', name: 'DELIVERY_DATE', align: 'center'},
+		                            {header: '수량', name: 'ORDER_QTY', align: 'right', width: 50,
+		                                formatter: function (value) { return Number(value.value).toLocaleString(); }},
+		                            {header: '단가', name: 'ITEM_PR', align: 'right',
+		                                formatter: function (value) { return Number(value.value).toLocaleString() + ' 원'; }},
+		                            {header: '공급가', name: 'ORDER_PR', align: 'right',
+		                                formatter: function (value) { return Number(value.value).toLocaleString() + ' 원'; }},
+		                            {header: '부가세', name: 'TAX', align: 'center',
+		                                formatter: function (value) { return Number(value.value).toLocaleString() + ' 원'; }},
+		                            {header: '창고', name: 'WAREHOUSE_NAME', align: 'center'},
+		                            {header: '비고', name: 'DETAIL_REMARKS', align: 'left'}
+		                        ]
+		                    });
+		                } else {
+		                    // 기존 그리드 데이터 업데이트
+		                    add_detail_grid.resetData(data.orders);
+		                }
+
+		            }, 100);
+
+		        })
+		        .catch(error => {
+		            console.error("데이터 로딩 실패", error);
+		        });
+		}
+
+		
+		// save btn
+		document.getElementById('btn_save').addEventListener('click', () => {
+		    // 입력값 가져오기
+		    const customerId = document.getElementById('customerId').value.trim();
+		    console.log(customerId, 'customerId')
+		    const createDate = document.getElementById('createDate').value.trim();
+		    console.log(createDate, 'createDate')
+		    const remarks = document.getElementById('detailRemarks').value.trim();
+		    console.log(remarks, 'detailRemarks')
+		    
+			// 선택된 행의 orderId 값 가져오기
+			const selectedRowKeys = add_detail_grid.getCheckedRowKeys();
+			const orderIds = selectedRowKeys.map(rowKey => {
+				const rowData = add_detail_grid.getRow(rowKey);
+				return rowData.ORDER_ID;
+			});
+		 
+		 		    
+		    // 유효성 검사
+		    // 필수 입력 항목이 비어 있는지 확인 (remarks 제외)
+		    if (!customerId || !createDate || !orderIds) {
+		        alert('모든 항목을 입력해 주세요.');
+		        return; 
+		    }
+		
+// 		    // orderData 객체 정의
+// 		    const orderData = {
+// 		        orderDate: orderDate,
+// 		        customerId: customerId,
+// 		        salesRepId: salesRepId,
+// 		        deliveryDate: deliveryDate,
+// 		        itemId: itemId,
+// 		        orderQty: orderQty,
+// 		        orderPr: document.getElementById('orderSum').value.replace(/[^0-9.-]+/g, ''),
+// 		        remarks: remarks,
+// 		        registBy: registBy,
+// 		    };
+		
+// 		    // 전송할 데이터 확인
+// 		    console.log(orderData);
+		
+// 		    // 서버로 데이터 전송
+// 		    fetch(`${url}/insert`, {
+// 		        method: 'POST',
+// 		        headers: {
+// 		            'Content-Type': 'application/json',
+// 		        },
+// 		        body: JSON.stringify(orderData)
+// 		    })
+// 		    .then(response => {
+// 		        if (response.ok) {
+// 		            alert('수주정보가 저장되었습니다.');
+// 		            setReadOnly(true);
+// 		            document.getElementById('btn_edit').style.display = 'inline';
+// 		            document.getElementById('btn_save').style.display = 'none';
+// 		            document.getElementById('btn_update').style.display = 'none';
+// 		            $('#orderDetailModal').modal('hide');
+// 		            loadGridData();
+// 		        } else {
+// 		            alert('저장 실패');
+// 		        }
+// 		    })
+// 		    .catch(error => {
+// 		        console.error('Error:', error);
+// 		        alert('서버와의 통신에 실패했습니다.');
+// 		    });
+		});
 
 	</script>
 </body>

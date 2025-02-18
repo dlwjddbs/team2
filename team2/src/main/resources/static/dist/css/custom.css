@@ -117,7 +117,7 @@
 	
 }
 
-#orderDetailTable{
+#orderDetailTable, #addRequestDetailTable{
 	table {
 	font-size: 0.8rem;
 		th{
