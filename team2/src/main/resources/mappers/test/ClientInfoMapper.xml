@@ -27,7 +27,7 @@
 			, DESCRIPTION
 			, CLIENT_ID
 		FROM CLIENT
-		WHERE CLIENT_ID = #{CLIENT_ID}
+		WHERE CLIENT_ID = #{client_id}
     </select>
 
     <insert id="insertClientInfo">
@@ -39,13 +39,13 @@
 				, CLIENT_TYPE
 				, BUSINESS_NUMBER
 				, CEO_NAME
-				, ZIPCODE
-				, CLIENT_ADDRESS
+<!--				, ZIPCODE-->
+<!--				, CLIENT_ADDRESS-->
 				, CLIENT_TEL
-				, RESP_NAME
-				, RESP_EMAIL
+<!--				, RESP_NAME-->
+<!--				, RESP_EMAIL-->
 				, CLIENT_STATUS
-				, DESCRIPTION
+<!--				, DESCRIPTION-->
 			)
 			VALUES (
 				  #{item.CLIENT_ID}
@@ -53,13 +53,13 @@
 				, #{item.CLIENT_TYPE}
 				, #{item.BUSINESS_NUMBER, jdbcType=VARCHAR}
 				, #{item.CEO_NAME, jdbcType=VARCHAR}
-				, #{item.ZIPCODE, jdbcType=VARCHAR}
-				, #{item.CLIENT_ADDRESS, jdbcType=VARCHAR}
-				, #{item.CLIENT_TEL}
-				, #{item.RESP_NAME, jdbcType=VARCHAR}
-				, #{item.RESP_EMAIL, jdbcType=VARCHAR}
+<!--				, #{item.ZIPCODE, jdbcType=VARCHAR}-->
+<!--				, #{item.CLIENT_ADDRESS, jdbcType=VARCHAR}-->
+				, #{item.CLIENT_TEL, jdbcType=VARCHAR}
+<!--				, #{item.RESP_NAME, jdbcType=VARCHAR}-->
+<!--				, #{item.RESP_EMAIL, jdbcType=VARCHAR}-->
 				, #{item.CLIENT_STATUS}
-				, #{item.DESCRIPTION, jdbcType=VARCHAR}
+<!--				, #{item.DESCRIPTION, jdbcType=VARCHAR}-->
 			)
 		</foreach>
 		SELECT * FROM DUAL
@@ -73,9 +73,12 @@
 	             , CLIENT_NAME = #{row.CLIENT_NAME}
 	             , CLIENT_TYPE = #{row.CLIENT_TYPE}
 	             , BUSINESS_NUMBER = #{row.BUSINESS_NUMBER, jdbcType=VARCHAR}
-	             , CEO_NAME = #{row.CEO_NAME}
-	             , CLIENT_TEL = #{row.CLIENT_TEL}
-	             , RESP_NAME = #{row.RESP_NAME}
+	             , CEO_NAME = #{row.CEO_NAME, jdbcType=VARCHAR}
+	             , ZIPCODE = #{row.ZIPCODE, jdbcType=VARCHAR}
+	             , CLIENT_ADDRESS = #{row.CLIENT_ADDRESS, jdbcType=VARCHAR}
+	             , CLIENT_TEL = #{row.CLIENT_TEL, jdbcType=VARCHAR}
+	             , RESP_NAME = #{row.RESP_NAME, jdbcType=VARCHAR}
+				 , RESP_EMAIL = #{row.REST_EMAIL, jdbcType=VARCHAR}
 	             , CLIENT_STATUS = #{row.CLIENT_STATUS}
 	             , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
 	         WHERE CLIENT_ID = #{row.CLIENT_ID}

@@ -53,6 +53,7 @@ public class ClientInfoService {
 			content.put("contents", clientInfoList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
+			System.out.println(e);
 			result = false;
 			message = "selectClientInfoDetail 실패";
 		}
