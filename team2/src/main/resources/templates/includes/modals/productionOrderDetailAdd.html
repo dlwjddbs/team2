@@ -106,6 +106,7 @@
         { header: '단위', name: 'ITEM_UNIT', align: 'center', width: 90 },
         { header: '워크센터 코드 *', name: 'WORKCENTER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
         { header: '워크센터명', name: 'WORKCENTER_NAME', align: 'center'},
+        { header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', hidden: true},
 	];
 	let processParam = {use_yn: 'Y', inspection_yn: '', searchKeyword: ''};
 	const processUrl = '/manufacture/productionOrderBOM';
@@ -174,6 +175,7 @@
 		    		        	"ITEM_UNIT": row.ITEM_UNIT,
 		    		        	"WORKCENTER_ID": row.WORKCENTER_ID,
 		    		        	"WORKCENTER_NAME": row.WORKCENTER_NAME,
+		    		        	"PRODUCTION_ORDER_ID": productionOrderDetailDataSource.api.readData.initParams.productionOrder_id,
 		    		            isNew: true
 		    			    };
 		    		    	
@@ -216,6 +218,7 @@
 		        	"ITEM_NAME": rowData.ITEM_NAME,
 		        	"AMOUNT": rowData.AMOUNT,
 		        	"ITEM_UNIT": rowData.ITEM_UNIT,
+		        	"PRODUCTION_ORDER_ID": productionOrderDetailDataSource.api.readData.initParams.productionOrder_id,
 		            isNew: true
 			    };
 		    	
@@ -256,7 +259,7 @@
 		});
 		
 		// processModalSelectedGrid그리드에서 수정된 값 적용하기 위함.
-		const keysToKeep = ["ITEM_ID", "ITEM_NAME", "AMOUNT", "ITEM_UNIT", "WORKCENTER_ID", "WORKCENTER_NAME", "isNew"];
+		const keysToKeep = ["ITEM_ID", "ITEM_NAME", "AMOUNT", "ITEM_UNIT", "WORKCENTER_ID", "WORKCENTER_NAME", "PRODUCTION_ORDER_ID", "isNew"];
 		const filteredData = gridData.map(obj => 
 		    Object.fromEntries(Object.entries(obj).filter(([key]) => keysToKeep.includes(key)))
 		);

@@ -172,6 +172,13 @@ public class ManufactureRestController {
 		return manufactureService.selectProductionOrderWorkcenter(requestData);
 	}
 	
+	@PostMapping(production_order_detail_url)
+	public Map<String, Object> insertProductionOrderDetail(@RequestBody Map<String, Object> requestData) {
+	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+		
+        return manufactureService.insertProductionOrderDetail(createdRows);
+	}
+	
 }
 
 

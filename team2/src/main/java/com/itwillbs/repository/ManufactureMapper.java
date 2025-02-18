@@ -66,4 +66,10 @@ public interface ManufactureMapper {
 
 	List<Map<String, Object>> selectProductionOrderWorkcenter(Map<String, Object> requestData);
 
+	int insertProductionOrderDetail(List<Map<String, Object>> createdRows);
+
+	int selectTodayMaxProductionOrderDetailId();
+	
+	int selectTodayMaxProductionOrderId();
+
 }

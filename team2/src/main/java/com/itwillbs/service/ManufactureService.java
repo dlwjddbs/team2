@@ -1,5 +1,7 @@
 package com.itwillbs.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -489,10 +491,22 @@ public class ManufactureService {
 		
 		try {
 			if (createdRows.size() > 0) {
+	 			int max_id = manufactureMapper.selectTodayMaxProductionOrderId();
+
+	 			LocalDate now = LocalDate.now();
+	 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+	 			String formatedNow = now.format(formatter);
+	 			
+	 			for (Map<String, Object> row : createdRows) {
+	 				String productionOrderId = "PRO-" + formatedNow + "-" + String.format("%04d", max_id);
+	 				row.replace("PRODUCTION_ORDER_ID", productionOrderId);
+	 				
+	 				max_id++;
+	 			}
+				
 				manufactureMapper.insertProductionOrder(createdRows);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
 			result = false;
 			message = "modifyProductionOrder 실패";
 		}
@@ -539,6 +553,38 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "selectProductionOrderWorkcenter 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> insertProductionOrderDetail(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "insertProductionOrderDetail 성공";
+		
+ 		try {
+ 			int max_id = manufactureMapper.selectTodayMaxProductionOrderDetailId();
+
+ 			LocalDate now = LocalDate.now();
+ 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+ 			String formatedNow = now.format(formatter);
+ 			
+ 			for (Map<String, Object> row : createdRows) {
+ 				String productionOrderDetailId = "PROD-" + formatedNow + "-" + String.format("%04d", max_id);
+ 				row.replace("PRODUCTION_ORDER_DETAIL_ID", productionOrderDetailId);
+ 				
+ 				max_id++;
+ 			}
+ 			
+			manufactureMapper.insertProductionOrderDetail(createdRows);
+		} catch (Exception e) {
+			result = false;
+			message = "insertProductionOrderDetail 실패";
 		}
 		
 		resultMap.put("result", result);

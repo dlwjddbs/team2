@@ -399,6 +399,12 @@
 			 , mc.SUB_NAME 
 			 , i.ITEM_NAME 
 			 , i.ITEM_UNIT 
+			 , (SELECT COUNT(*) AS STARTED_PROCESS_CNT 
+				  FROM PRODUCTION_ORDER_DETAIL pod
+				 WHERE 
+				 	   1 = 1
+				   AND PRODUCTION_ORDER_ID = pr.PRODUCTION_ORDER_ID
+				   AND STATUS IN ('ST-002', 'ST-003')) 					AS DISABLE_CHECK_CNT
 		  FROM PRODUCTION_ORDER pr
 			   INNER JOIN MES_COMMON mc
 					   ON pr.STATUS = mc.CLASSIFICATION_ID
@@ -409,7 +415,8 @@
     
 	<select id="selectProductionOrderDetail" resultType="map">
 		SELECT
-			   pod.PRODUCTION_ORDER_DETAIL_ID 	AS PRODUCTION_ORDER_DETAIL_ID
+			   pod.PRODUCTION_ORDER_ID			AS PRODUCTION_ORDER_ID
+			 , pod.PRODUCTION_ORDER_DETAIL_ID 	AS PRODUCTION_ORDER_DETAIL_ID
 			 , pod.ITEM_ID 						AS ITEM_ID
 			 , pod.AMOUNT 						AS AMOUNT
 			 , pod.STATUS 						AS STATUS
@@ -503,5 +510,39 @@
 			   INNER JOIN ROUTING r
 					   ON w.ROUTING_ID = r.ROUTING_ID 
 		 WHERE r.ITEM_ID = #{item_id}
+    </select>
+    
+    <select id="selectTodayMaxProductionOrderDetailId" resultType="int">
+    	SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_DETAIL_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+		  FROM PRODUCTION_ORDER_DETAIL
+		 WHERE PRODUCTION_ORDER_DETAIL_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
+    </select>
+    
+    <insert id="insertProductionOrderDetail">
+   	    INSERT ALL
+		<foreach collection="list" item="item">
+		    INTO PRODUCTION_ORDER_DETAIL(
+				  PRODUCTION_ORDER_DETAIL_ID
+				, PRODUCTION_ORDER_ID
+				, ITEM_ID
+				, AMOUNT
+				, STATUS
+				, WORKCENTER_ID
+			) VALUES (
+			  	  #{item.PRODUCTION_ORDER_DETAIL_ID}
+				, #{item.PRODUCTION_ORDER_ID}
+				, #{item.ITEM_ID}
+				, #{item.AMOUNT}
+				, 'ST-001'
+				, #{item.WORKCENTER_ID}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <select id="selectTodayMaxProductionOrderId" resultType="int">
+    	SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+		  FROM PRODUCTION_ORDER
+		 WHERE PRODUCTION_ORDER_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
     </select>
 </mapper>
