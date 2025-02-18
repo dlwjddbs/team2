@@ -107,7 +107,7 @@ ORDER BY GO.CREATE_DATE DESC
         m.UNIT,
         pd.PO_COUNT AS GO_COUNT,
         TO_CHAR(pd.PO_PRICE, 'FM9,999,999') || '원' AS GO_PRICE,
-        TO_CHAR(pd.TOTAL_PRICE * 0.1, 'FM9,999,999') || '원' AS VAT,
+        TO_CHAR((pd.PO_COUNT * m.MATERIAL_PRICE) * 0.1, 'FM9,999,999') || '원' AS VAT,
         TO_CHAR(pd.TOTAL_PRICE, 'FM9,999,999') || '원' AS TOTAL_PRICE,
         pd.UPDATE_DATE,
         pd.UPDATE_MEMBER,
