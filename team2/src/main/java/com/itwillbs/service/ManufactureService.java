@@ -456,5 +456,51 @@ public class ManufactureService {
 		
 		return resultMap;
 	}
+
+	public Map<String, Object> selectProductionOrderItem(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectProductionOrderItem 성공";
+		
+		try {
+			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderItem(requestData);
+			content.put("contents", processList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectProductionOrderItem 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> modifyProductionOrder(Map<String, Object> requestData) {
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "modifyProductionOrder 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertProductionOrder(createdRows);
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			result = false;
+			message = "modifyProductionOrder 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
 	
 }

@@ -1,0 +1,289 @@
+<!-- 모달창 -->
+<div class="modal fade" id="productionOrderDetailAdd" th:fragment="productionOrderDetailAdd">
+	<div class="modal-dialog modal-custom-size">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">작업지시상세 추가</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-12">
+								<!-- 검색 필터 -->
+								<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+									<div class="d-flex">
+										<div class="d-flex">
+											<label class="col-form-label mr-3">검사여부</label> 
+											<select class="appointGubun" id="inspection_yn" name="appointGubun" style="min-width: 120px">
+												<option value="" selected>전체</option>
+												<option value="Y">사용</option>
+												<option value="N">미사용</option>
+											</select>
+										</div>
+										<div class="d-flex ml-4">
+											<label for="" class="col-form-label mr-3" style="min-width: 120px;">공정코드/공정명</label>
+											<input type="text" class="form-control float-right" id="processSearchKeyword">
+										</div>
+									</div>
+									<div class="d-flex">
+										<button type="button" class="btn btn-primary" id="btnProcessSearch">조회</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-8">
+								<span style="padding-left: 20px;">공정 목록</span>
+								<div class="card-body" id="processModalGrid" style="padding-top: 10px;">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+							<div class="col-md-4">
+								<span style="padding-left: 20px;">선택 목록</span>
+								<div class="card-body" id="processModalSelectedGrid" style="padding-top: 10px;">
+									 <!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveProcess">적용</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="productionOrderDetailAdd" th:inline="javascript">
+	let processModalGrid = null;
+	let selectedProcessList = [];
+	let processModalSelectedGrid = null;
+	const processSelected_columns = [
+	    {header: '공정 코드', name: 'PROCESS_ID', align: 'center', editor: null},
+	    {header: '공정명', name: 'NAME', align: 'left', editor: null},
+// 		{
+// 		    header: '검사여부', 
+// 		    name: 'INSPECTION_YN', 
+// 		    align: 'center',
+// 		    formatter: function({value}) {
+// 		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 		    }
+// 		},
+	];
+	let processParam = {use_yn: 'Y', inspection_yn: '', searchKeyword: ''};
+	const processUrl = '/manufacture/process';
+	const processDataSource = {
+		api: {
+		    readData: {url: processUrl, method: 'GET', initParams: {use_yn: 'Y'}},
+		},
+		contentType: 'application/json',
+    };
+	const process_columns = [
+	    {header: '공정코드', name: 'PROCESS_ID', align: 'center', editor: null},
+	    {header: '공정명', name: 'NAME', align: 'left', editor: null},
+// 		{
+// 		    header: '검사여부', 
+// 		    name: 'INSPECTION_YN', 
+// 		    align: 'center',
+// 		    formatter: function({value}) {
+// 		        return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+// 		    }
+// 		},
+	];
+	$('#productionOrderDetailAdd').on('shown.bs.modal', function () {
+		selectedProcessList.length = 0;
+		$("#inspection_yn").val("").attr("selected", "selected");
+		processParam.inspection_yn = '';
+		processParam.searchKeyword = '';
+        
+		processModalInit();
+	});
+	
+	function processModalInit() {
+		if (processModalGrid) {
+			processModalGrid.destroy(); // 기존 그리드 제거
+			processModalGrid = null;
+		}
+		
+		processModalGrid = new tui.Grid({
+	        el: document.getElementById('processModalGrid'),
+	        data: processDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: process_columns,
+	    });
+	    
+	    processModalGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+	    
+	 	// 테이블 데이터 렌더링 완료후에 실행 (테이블 출력이 끝나는 정확한 타이밍을 못잡아서 onGridMounted로 잡고 후처리)
+	    processModalGrid.on('onGridMounted', () => {
+		    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+		    const checkGridRendered = () => {
+		        setTimeout(() => {
+		            if (processModalGrid.getData().length > 0) {
+		    	    	const processGridNewRows = sequenceGrid.getData().filter(row => row.isNew);
+		    		    const selectedRowKeys = processModalGrid.getData()
+		    			    .filter(row => processGridNewRows.some(newRow => newRow.PROCESS_ID == row.PROCESS_ID))
+		    			    .map(row => row.rowKey);
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 가져와서 설비모달에 선택값 그대로 적용함.
+		    		    selectedRowKeys.forEach(function(key) {
+			    		    processModalGrid.addRowClassName(key, 'selected-row');
+		    		    });
+		    		    
+		    		    // 설비 그리드에서 새로 추가된 행 selectedProcessList 초기값 설정
+		    		    processGridNewRows.forEach(function(row) {
+		    		    	const mapRowData = {
+		    		        	"PROCESS_ID": row.PROCESS_ID,
+		    		        	"NAME": row.NAME,
+		    		        	"INSPECTION_YN": row.INSPECTION_YN,
+		    		            isNew: true
+		    			    };
+		    		    	
+		    		    	selectedProcessList.push(mapRowData);
+		    		    });
+						
+						// selectedProcessList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
+						processModalSelectedInit();
+		            } else {
+		                checkGridRendered(); // 데이터가 없으면 다시 체크
+		            }
+		        }, 100);
+		    };
+
+		    checkGridRendered(); // 실행
+	    });
+	    
+	    processModalGrid.on('click', (ev) => {
+		    if (ev.targetType != "cell") {
+				return;
+			}
+			
+		    const newRowKey = ev.rowKey;
+		    const isSelectedRow = processModalGrid.getRowClassName(newRowKey).includes('selected-row');
+		    const rowData = processModalGrid.getRow(newRowKey);
+		    const process_id = rowData.PROCESS_ID;
+		    
+		    if (isSelectedRow) {
+		    	processModalGrid.removeRowClassName(newRowKey, 'selected-row');
+		    	selectedProcessList = selectedProcessList.filter(item => item.PROCESS_ID != process_id);
+				
+				processModalSelectedGrid.getData().forEach(row => {
+				    if (process_id == row.PROCESS_ID) {
+						processModalSelectedGrid.removeRow(row.rowKey)
+				    }
+				});
+		    } else {
+		    	const mapRowData = {
+		        	"PROCESS_ID": process_id,
+		        	"NAME": rowData.NAME,
+		        	"INSPECTION_YN": rowData.INSPECTION_YN,
+		            isNew: true
+			    };
+		    	
+		    	selectedProcessList.push(mapRowData);
+		    	processModalGrid.addRowClassName(newRowKey, 'selected-row');
+				
+				processModalSelectedGrid.appendRow(mapRowData);
+		    }
+		});
+	}
+	
+	$("#saveProcess").on('click', function() {
+		const rowKeysToDelete = sequenceGrid.getData()
+		    .filter(row => row.isNew)
+		    .map(row => row.rowKey);
+		
+		// 라우팅 절차 그리드 기존의 새로 추가된 행 삭제
+		rowKeysToDelete.forEach(function(key) {
+			sequenceGrid.removeRow(key);
+		});
+		
+		// 새로 선택된 값 라우팅 절차 그리드 행 추가
+		selectedProcessList.forEach(function(data, index) {
+			data.SORT_ORDER = index + 1;
+			data.IS_LAST_ORDER = (index == selectedProcessList.length - 1) ? 'Y' : 'N';
+			data.ROUTING_ID = routingCurrentSelectedID;
+			
+			sequenceGrid.appendRow(data);
+		});
+		
+		$("#productionOrderDetailAdd").modal('hide');
+	});
+	
+	function processModalSelectedInit() {
+		if (processModalSelectedGrid) {
+			processModalSelectedGrid.destroy(); // 기존 그리드 제거
+			processModalSelectedGrid = null;
+		}
+		
+		processModalSelectedGrid = new tui.Grid({
+	        el: document.getElementById('processModalSelectedGrid'),
+			data: selectedProcessList,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: processSelected_columns,
+	    });
+		
+		processModalSelectedGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+			const newRowKey = ev.rowKey;
+			const rowData = processModalSelectedGrid.getRow(newRowKey);
+			const allData = processModalSelectedGrid.getData();
+			
+			const process_id = rowData.PROCESS_ID;
+			selectedProcessList = selectedProcessList.filter(item => item.PROCESS_ID != process_id);
+			
+			processModalSelectedGrid.removeRow(newRowKey);
+			
+			processModalGrid.getData().forEach(row => {
+			    if (process_id == row.PROCESS_ID) {
+			        processModalGrid.removeRowClassName(row.rowKey, 'selected-row');
+			    }
+			});
+		});
+    };
+	
+	$("#btnProcessSearch").on("click", function() {
+		processParam.inspection_yn = $("#inspection_yn").val();
+		processParam.searchKeyword = $("#processSearchKeyword").val();
+		
+		const selectedProcessIds = selectedProcessList.map(row => row.PROCESS_ID);
+		processModalGrid.readData(1, processParam, true);
+
+		processModalGrid.off('onGridUpdated');
+		processModalGrid.on('onGridUpdated', () => {
+		    const updatedRows = processModalGrid.getData();
+			
+		    // 기존 선택된 설비 ID가 있는 행에 'selected-row' 클래스 추가
+		    updatedRows.forEach(row => {
+		        if (selectedProcessIds.includes(row.PROCESS_ID)) {
+		            processModalGrid.addRowClassName(row.rowKey, 'selected-row');
+		        }
+		    });
+		});
+	});
+</script>

@@ -1,0 +1,187 @@
+<!-- 모달창 -->
+<div class="modal fade" id="bomItemAdd" th:fragment="bomItemAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">BOM 품목 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="itemRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="itemColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="itemGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveItem" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="bomItemAdd" th:inline="javascript">
+	let itemGrid = null;
+	let itemCurrentSelectedRowKey = null;
+	let selectedItemId = '';
+	let selectedItemName = '';
+	let param = {dept_id: '', member_name: ''};
+	const itemUrl = '/manufacture/routingItem';
+	const itemDataSource = {
+		api: {
+		    readData: {url: itemUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const item_columns = [
+        {header: '품목코드', name: 'ITEM_ID', align: 'center'},
+        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
+        {header: '품목유형', name: 'ITEM_TYPE', align: 'left'},
+    ];
+
+	$(function() {
+		selectBox("DEP");
+	});
+	
+	$('#bomItemAdd').on('shown.bs.modal', function () {
+		param.dept_id = '';
+		param.member_name = '';
+		selectedItemId = '';
+		selectedItemName = '';
+		$("#DEP").val('');
+		$("#itemName").val('');
+		$("#saveItem").attr("disabled", true);
+		
+		if (itemGrid == null) {
+	        itemInit();
+	        return;
+		}
+		
+		itemGrid.readData(1, param, true);
+		
+		itemGrid.on('onGridUpdated', () => {
+			const selectedIDs = bomGrid.getData()
+			    .filter(row => row.isNew)
+			    .map(row => row['ITEM_ID']);
+			
+			// 새로 추가된 행에 선택되어 들어가있는 값은 제거.
+			itemGrid.getData().forEach(row => {
+			    if (selectedIDs.includes(row.ITEM_ID)) {
+					itemGrid.removeRow(row.rowKey)
+			    }
+			});
+		});
+	});
+	
+	function itemInit() {
+		itemGrid = new tui.Grid({
+	        el: document.getElementById('itemGrid'),
+	        data: itemDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: item_columns,
+	    });
+		
+		itemGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    itemGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+		    const newRowKey = ev.rowKey;
+
+		    if (itemCurrentSelectedRowKey != null) {
+		    	itemGrid.removeRowClassName(itemCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (itemCurrentSelectedRowKey != newRowKey) {
+		    	itemGrid.addRowClassName(newRowKey, 'selected-row');
+		        itemCurrentSelectedRowKey = newRowKey;
+		        
+		        selectedItemId = itemGrid.getRow(newRowKey).ITEM_ID;
+		        selectedItemName = itemGrid.getRow(newRowKey).ITEM_NAME;
+		        $("#saveItem").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        itemCurrentSelectedRowKey = null;
+		        $("#saveItem").attr("disabled", true);
+		        selectedItemId = '';
+		        selectedItemName = '';
+		    }
+		});
+	}
+	
+	$("#saveItem").on('click', function() {
+		let itemRow = $("#itemRow").val();
+		let itemColumn = $("#itemColumn").val();
+		
+		bomGrid.setValue(itemRow, itemColumn, selectedItemId);
+		bomGrid.setValue(itemRow, 'ITEM_NAME', selectedItemName);
+		
+		$('#bomItemAdd').modal('hide');
+	});
+	
+	$("#btnMemberSearch").on("click", function() {
+		param.dept_id = $("#DEP").val();
+		param.member_name = $("#itemName").val();
+		selectedItemId = '';
+		selectedItemName = '';
+		$("#saveItem").attr("disabled", true);
+		
+		itemGrid.readData(1, param, true);
+	});
+
+	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+	function selectBox(type) {
+		$.ajax({
+            type : "POST",
+            url : "/attendance/selectBox",
+            data : {
+            	type : type
+            },
+            success : function(res){
+            	let str = '<option value="" selected="selected">전체</option>';
+            	
+            	res.forEach((el)=>{
+					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+           		})
+           		
+           		$("#" + type).html(str);
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown){
+                console.log("selectBox() ajax 실패");
+            }
+        });
+	}
+</script>

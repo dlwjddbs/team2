@@ -35,9 +35,8 @@
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 
 		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
-		<nav th:replace="~{includes/modals/workcenterManagerAdd :: workcenterManagerAdd}"></nav>
-		<nav th:replace="~{includes/modals/workcenterEquipmentAdd :: workcenterEquipmentAdd}"></nav>
-		<nav th:replace="~{includes/modals/workcenterRoutingAdd :: workcenterRoutingAdd}"></nav>
+		<nav th:replace="~{includes/modals/productionOrderItemAdd :: productionOrderItemAdd}"></nav>
+		<nav th:replace="~{includes/modals/productionOrderDetailAdd :: productionOrderDetailAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
@@ -153,7 +152,7 @@
             {header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
             {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
             {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
-            {header: '지시량', name: 'AMOUNT', align: 'center', editor: null},
+            {header: '생산량', name: 'AMOUNT', align: 'center', editor: null},
             {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
             {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
         ];
@@ -201,6 +200,12 @@
 		  	el.style.border = 'solid 1px #ddd';
 		  	el.style.margin = 'auto 5px';
 		  	
+		  	if (props.columnInfo.name == 'AMOUNT'
+		  		&& productionOrderGrid.getValue(props.rowKey, 'isNew') == null) {
+		  		el.disabled = true;
+		  		el.style.border = 'solid 1px white';
+		  	}
+		  	
 		  	this.el = el;
 		  	this.render(props);
 		}
@@ -231,8 +236,8 @@
 			container.appendChild(el);
 			
 			// PRODUCTION_ORDER_ID 기존값은 수정 불가 조건
-			if (!((props.columnInfo.name == 'PRODUCTION_ORDER_ID' || props.columnInfo.name == 'ROUTING_ID')
-				&& orderGrid.getValue(props.rowKey, 'isNew') == null)) {
+			if (!((props.columnInfo.name == 'ITEM_ID')
+				&& productionOrderGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
 			    button.style.border = 'solid 1px #007BFF';
@@ -249,33 +254,14 @@
 					const row = props.rowKey;
 					const column = props.columnInfo.name;
 					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = orderGrid.getValue(row, column);
+					const value = productionOrderGrid.getValue(row, column);
 					
 					switch (column) {
-						case 'PRODUCTION_ORDER_ID':
-							$("#inputCodeText").val(value);
-							$("#gridCheckedRow").val(row);
-							$("#gridCheckedColumn").val(column);
-
-							tableName = "PRODUCTION_ORDER";
-							tableCodeId = "PRODUCTION_ORDER_ID";
-							copyGrid = orderGrid;
-							
-							$('#mesCodeValidate').modal();
-							
-							break;
-						case 'MANAGER_ID':
-							$("#managerRow").val(row);
-							$("#managerColumn").val(column);
-							
-							$('#productionOrderManagerAdd').modal(); 
-							
-							break;
-						case 'ROUTING_ID': 
-							$("#routingRow").val(row);
-							$("#routingColumn").val(column);
-							
-							$('#productionOrderRoutingAdd').modal(); 
+						case 'ITEM_ID': 
+							$("#itemRow").val(row);
+							$("#itemColumn").val(column);
+						
+							$('#productionOrderItemAdd').modal();
 							
 							break;
 					}
@@ -411,38 +397,53 @@
 		    
 		    if (productionOrderIsEditModeEnabled) {
 		        productionOrderGrid.setColumns([
-		        	{header: '워크센터 코드 *', name: 'PRODUCTION_ORDER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '워크센터명 *', name: 'NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-				    {
-				        header: '사용여부 *',
-				        name: 'USE_YN',
-				        align: 'center',
-				        formatter: function({value}) {
-				            return `<input type="checkbox" ${value == 'Y' ? 'checked' : ''} />`;
-				        },
-				        renderer: { type: CheckboxRenderer }
-				    },
-		            {header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            {header: '담당자', name: 'MANAGER_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '라우팅 코드', name: 'ROUTING_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-					{header: '워크센터 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
-					{header: '라우팅 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
+		            {header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', editor: null},
+		            {header: '생성일시', name: 'CREATE_DATETIME', align: 'center', editor: null},
+		            {header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null, renderer: { type: TextInputBtnRenderer }},
+		            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+		            {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
+		            {header: '생산량', name: 'AMOUNT', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
+		            {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
 		        productionOrderGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
 		        productionOrderGrid.setColumns(productionOrder_columns);
 		    }
 		});
+		
+		function formatDate() {
+			let date = new Date();
+			let year = date.getFullYear();
+			let month = String(date.getMonth() + 1).padStart(2, '0');
+			let day = String(date.getDate()).padStart(2, '0');
+			
+			return `${year}${month}${day}`;
+		}
 
 		$("#btn_productionOrder_add_row").on("click", function () {
+			const ids = productionOrderGrid.getData()
+		    .map(row => row['PRODUCTION_ORDER_ID']);
+			
+			let maxSequence = 1;
+			ids.forEach(function(data) {
+				if (data.substring(4, 12) == formatDate()) {
+					maxSequence++;
+				}
+			});
+			
+			let pk = 'PRO-' + formatDate() + '-' + maxSequence.toString().padStart(4, '0');
+			
 		    const newRowKey = productionOrderGrid.appendRow(
 		        {
-		        	"PRODUCTION_ORDER_ID": '',
-		        	"NAME": '',
-		        	"USE_YN": 'N',
-		        	"NOTE": '',
-		        	"MANAGER_ID": '',
-		        	"ROUTING_ID": '',
+		        	"PRODUCTION_ORDER_ID": pk,
+		        	"CREATE_DATETIME": '',
+		        	"ITEM_ID": '',
+		        	"ITEM_NAME": '',
+		        	"ITEM_UNIT": '',
+		        	"AMOUNT": '',
+		        	"SUB_NAME": '',
+		        	"STATUS": '',
 		            isNew: true
 		        },
 		        {focus: true}
@@ -471,7 +472,7 @@
 		    let updatedRows = productionOrderGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["PRODUCTION_ORDER_ID", "NAME", "USE_YN"];
+		    const requiredFields = ["ITEM_ID", "AMOUNT"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 
@@ -559,7 +560,7 @@
 		});
 		
 		$("#btn_productionOrderDetail_modal").on("click", function() {
-			$("#productionOrderEquipmentAdd").modal();
+			$("#productionOrderDetailAdd").modal();
 		});
 		
 		$("#btn_productionOrderDetail_delete").on("click", function() {

@@ -1,0 +1,201 @@
+<!-- 모달창 -->
+<div class="modal fade" id="productionOrderItemAdd" th:fragment="productionOrderItemAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">작업지시 품목 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<!-- 검색 필터 -->
+<!--				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">-->
+<!--					<div class="d-flex">-->
+<!--						<div class="d-flex">-->
+<!--							<label class="col-form-label mr-3">부서구분</label> -->
+<!--							<select class="appointGubun" id="DEP" name="appointGubun" style="min-width: 120px">-->
+<!--								 ajax -->
+<!--							</select>-->
+<!--						</div>-->
+<!--						<div class="d-flex ml-4">-->
+<!--							 Date range -->
+<!--							<label for="" class="col-form-label mr-3" style="min-width: 70px;">담당자명</label>-->
+<!--							<input type="text" class="form-control float-right" id="itemName">-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="d-flex">-->
+<!--						<button type="button" class="btn btn-primary" id="btnMemberSearch">조회</button>-->
+<!--					</div>-->
+<!--				</div>-->
+			
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="itemRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="itemColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="itemGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveItem" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="productionOrderItemAdd" th:inline="javascript">
+	let itemGrid = null;
+	let itemCurrentSelectedRowKey = null;
+	let selectedItemId = '';
+	let selectedItemName = '';
+	let selectedItemUnit = '';
+	let param = {dept_id: '', member_name: ''};
+	const itemUrl = '/manufacture/productionOrderItem';
+	const itemDataSource = {
+		api: {
+		    readData: {url: itemUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const item_columns = [
+        {header: '품목코드', name: 'ITEM_ID', align: 'center'},
+        {header: '품목명', name: 'ITEM_NAME', align: 'left'},
+        {header: '기준단위', name: 'ITEM_UNIT', align: 'left'},
+        {header: '품목유형', name: 'ITEM_TYPE', align: 'left'},
+    ];
+
+	$(function() {
+		selectBox("DEP");
+	});
+	
+	$('#productionOrderItemAdd').on('shown.bs.modal', function () {
+		param.dept_id = '';
+		param.member_name = '';
+		selectedItemId = '';
+		selectedItemName = '';
+		selectedItemUnit = '';
+		$("#DEP").val('');
+		$("#itemName").val('');
+		$("#saveItem").attr("disabled", true);
+		
+		if (itemGrid == null) {
+	        itemInit();
+	        return;
+		}
+		
+		itemGrid.readData(1, param, true);
+	});
+	
+	function itemInit() {
+		itemGrid = new tui.Grid({
+	        el: document.getElementById('itemGrid'),
+	        data: itemDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: item_columns,
+	    });
+		
+		itemGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    itemGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+		    const newRowKey = ev.rowKey;
+
+		    if (itemCurrentSelectedRowKey != null) {
+		    	itemGrid.removeRowClassName(itemCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (itemCurrentSelectedRowKey != newRowKey) {
+		    	itemGrid.addRowClassName(newRowKey, 'selected-row');
+		        itemCurrentSelectedRowKey = newRowKey;
+		        
+		        selectedItemId = itemGrid.getRow(newRowKey).ITEM_ID;
+		        selectedItemName = itemGrid.getRow(newRowKey).ITEM_NAME;
+		        selectedItemUnit = itemGrid.getRow(newRowKey).ITEM_UNIT;
+		        $("#saveItem").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        itemCurrentSelectedRowKey = null;
+		        $("#saveItem").attr("disabled", true);
+		        selectedItemId = '';
+		        selectedItemName = '';
+		        selectedItemUnit = '';
+		    }
+		});
+	}
+	
+	$("#saveItem").on('click', function() {
+		let itemRow = $("#itemRow").val();
+		let itemColumn = $("#itemColumn").val();
+		
+		productionOrderGrid.setValue(itemRow, itemColumn, selectedItemId);
+		productionOrderGrid.setValue(itemRow, 'ITEM_NAME', selectedItemName);
+		productionOrderGrid.setValue(itemRow, 'ITEM_UNIT', selectedItemUnit);
+		
+		$('#productionOrderItemAdd').modal('hide');
+	});
+	
+	$("#btnMemberSearch").on("click", function() {
+		param.dept_id = $("#DEP").val();
+		param.member_name = $("#itemName").val();
+		selectedItemId = '';
+		selectedItemName = '';
+		selectedItemUnit = '';
+		$("#saveItem").attr("disabled", true);
+		
+		itemGrid.readData(1, param, true);
+	});
+
+	// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
+	function selectBox(type) {
+		$.ajax({
+            type : "POST",
+            url : "/attendance/selectBox",
+            data : {
+            	type : type
+            },
+            success : function(res){
+            	let str = '<option value="" selected="selected">전체</option>';
+            	
+            	res.forEach((el)=>{
+					str += '<option value="' + el.CODE + '">' + el.NAME + '</option>';
+           		})
+           		
+           		$("#" + type).html(str);
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown){
+                console.log("selectBox() ajax 실패");
+            }
+        });
+	}
+</script>

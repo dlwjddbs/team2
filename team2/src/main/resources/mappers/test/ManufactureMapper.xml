@@ -404,6 +404,7 @@
 					   ON pr.STATUS = mc.CLASSIFICATION_ID
 			   INNER JOIN ITEM i 
 					   ON pr.ITEM_ID = i.ITEM_ID 
+		 ORDER BY pr.PRODUCTION_ORDER_ID DESC
     </select>
     
 	<select id="selectProductionOrderDetail" resultType="map">
@@ -425,4 +426,38 @@
 					   ON pod.ITEM_ID = i.ITEM_ID 
 		 WHERE PRODUCTION_ORDER_ID = #{productionOrder_id}
     </select>
+    
+	<select id="selectProductionOrderItem" resultType="map">
+		SELECT
+		  	   ITEM_ID
+			 , ITEM_NAME
+			 , ITEM_TYPE
+			 , USE_YN
+			 , ITEM_UNIT 
+		  FROM ITEM
+		 WHERE USE_YN = 'Y'
+    </select>
+    
+    <insert id="insertProductionOrder">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+	    	INTO PRODUCTION_ORDER(
+	    		  PRODUCTION_ORDER_ID
+				, CREATE_DATE
+				, CREATE_TIME
+				, AMOUNT
+				, STATUS
+				, ITEM_ID
+			)
+			VALUES(
+				  #{item.PRODUCTION_ORDER_ID}
+				, TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+				, TO_CHAR(CURRENT_DATE, 'HH24:MI:SS')
+				, #{item.AMOUNT}
+				, 'ST-001'
+				, #{item.ITEM_ID}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
 </mapper>

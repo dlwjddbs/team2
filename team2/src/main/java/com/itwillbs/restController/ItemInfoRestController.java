@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itwillbs.service.EquipmentService;
@@ -28,6 +29,7 @@ public class ItemInfoRestController {
 	private final ItemInfoService itemInfoService;
 	
 	private final String iteminfo_url = "/iteminfo/item";
+	private final String whse_url = "/iteminfo/whse";
 	
 	@GetMapping(iteminfo_url)
 	public Map<String, Object> getItemInfo() {
@@ -46,5 +48,10 @@ public class ItemInfoRestController {
 	    List<String> iteminfoIds = Arrays.asList(decodedIds.split(","));
         
         return itemInfoService.deleteItemInfo(iteminfoIds);
-	}	
+	}
+	
+	@GetMapping(whse_url)
+	public Map<String, Object> getWhse(@RequestParam Map<String, Object> requestData) {
+		return itemInfoService.selectWhse(requestData);
+	}
 }

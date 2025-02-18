@@ -384,7 +384,7 @@
 			
 			container.appendChild(el);
 
-					// LOCATION_ID 기존값은 수정 불가 조건
+			// LOCATION_ID 기존값은 수정 불가 조건
 			if (!(props.columnInfo.name == 'LOCATION_ID'
 				&& locationGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
@@ -412,7 +412,7 @@
 							$("#locationColumn").val(column);
 							
 							$('#locationCodeAdd').modal();
-							break;
+						break;
 					}
 			    });
 			}
@@ -666,7 +666,7 @@
 		            "LOCATION_NAME": '',
 		            "PRODUCT_ID": '',
 		            "LOCATION_ORDER": '',
-		            "CURRENT_QUANTITY": '',
+		            "CURRENT_QUANTITY": '0',
 		            "RESERVED_QUANTITY": '',
 		            "USE_YN": 'Y',
 		            "DESCRIPTION": '',
@@ -694,7 +694,7 @@
 					{ header: '구역 코드 *', name: 'LOCATION_ID', align: 'center', renderer: { type: TextInputBtnRenderer2 }},
 		            { header: '구역명 *', name: 'LOCATION_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '자재 코드 *', name: 'PRODUCT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            { header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '정렬 *', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', renderer: { type: TextInputRenderer2 }},
 		            {
@@ -737,7 +737,7 @@
 		    let updatedRows = locationGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["LOCATION_ID", "LOCATION_NAME", "PRODUCT_ID", "USE_YN"];
+		    const requiredFields = ["LOCATION_ID", "LOCATION_NAME", "PRODUCT_ID", "USE_YN", "LOCATION_ORDER"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 

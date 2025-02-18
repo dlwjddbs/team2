@@ -36,6 +36,8 @@
 
 		<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
 		
+		<nav th:replace="~{includes/modals/bomItemAdd :: bomItemAdd}"></nav>
+		
 		<nav th:replace="~{includes/modals/bomDetailAdd :: bomDetailAdd}"></nav>
 
 		<!-- Content Wrapper. Contains page content -->
@@ -132,7 +134,7 @@
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		// BOM
+		// BOM 그리드
 		let bomGrid = null;
 		const bomUrl = '/manufacture/bom';
 		const bomDataSource = {
@@ -147,13 +149,14 @@
 		let bomCurrentSelectedID = null;
 		let bomIsEditModeEnabled = false; 
 		const bom_columns = [
-            {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null},
-            {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
-            {header: '상위 코드', name: 'PARENT_ID', align: 'center', editor: null},
-            {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center', editor: null},
+            {header: 'BOM 코드', name: 'BOM_ID', align: 'center', sortable: true, editor: null},
+            {header: '품목 코드', name: 'ITEM_ID', align: 'center', sortable: true, editor: null},
+            {header: '품목명', name: 'ITEM_NAME', align: 'center', editor: null},
+            {header: '상위 코드', name: 'PARENT_ID', align: 'center', sortable: true, editor: null},
+            {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center', sortable: true, editor: null},
         ];
 		
-		// BOM 상세
+		// BOM 상세 그리드
 		let bomDetailGrid = null;
 		const bomDetailUrl = '/manufacture/bomDetail';
 		const bomDetailDataSource = {
@@ -166,11 +169,12 @@
 		};
 		let bomDetailCurrentSelectedRowKey = null;
 		const bomDetail_columns = [
-		    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', editor: null, hidden: true},
-            {header: '구성 요소 코드', name: 'COMPONENT_ID', align: 'center', editor: null},
+		    {header: 'BOM 상세 코드', name: 'BOM_DETAIL_ID', align: 'center', sortable: true, editor: null, hidden: true},
+            {header: '구성 요소 코드', name: 'COMPONENT_ID', align: 'center', sortable: true, editor: null},
+            {header: '구성 요소명', name: 'COMPONENT_NAME', align: 'center', editor: null},
             {header: '기준단위', name: 'UNIT', align: 'center', editor: null},
-            {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'center', editor: null},
-		    {header: 'BOM 코드', name: 'BOM_ID', align: 'center', editor: null, hidden: true},
+            {header: '소요량', name: 'REQUIRED_AMOUNT', align: 'center', sortable: true, editor: null},
+		    {header: 'BOM 코드', name: 'BOM_ID', align: 'center', sortable: true, editor: null, hidden: true},
 		];
 		
 		const TextInputRenderer = function(props) {
@@ -210,8 +214,8 @@
 			
 			container.appendChild(el);
 			
-			// BOM_ID 기존값은 수정 불가 조건
-			if (!(props.columnInfo.name == 'BOM_ID'
+			// BOM_ID, ITEM_ID 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'BOM_ID' || props.columnInfo.name == 'ITEM_ID')
 				&& bomGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
 			    button.textContent = '🔍';
@@ -242,6 +246,13 @@
 							copyGrid = bomGrid;
 							
 							$('#mesCodeValidate').modal();
+							
+							break;
+						case 'ITEM_ID':
+							$("#itemRow").val(row);
+							$("#itemColumn").val(column);
+						
+							$('#bomItemAdd').modal();
 							
 							break;
 					}
@@ -310,12 +321,6 @@
 			    const {rowKey, columnName, value} = ev;
 			    const rowData = bomGrid.getRow(rowKey);
 				
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-// 				if (columnName == 'BOM_ID' && !rowData.isNew) {
-// 				if (columnName == 'MANAGER_ID') {
-// 					$('#categoryAdd').modal();
-// 					ev.stop();
-// 				}
 			});
 			
 			bomGrid.on('click', (ev) => {
@@ -349,7 +354,6 @@
 					const bomCount = bomGrid.getRow(newRowKey).BOM_QUANTITY;
 					bomDetailInit(bomID, bomCount);
 					bomCurrentSelectedID = bomID;
-					//$("#btn_group_bomDetail").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        bomCurrentSelectedRowKey = null;
@@ -374,7 +378,8 @@
 		    if (bomIsEditModeEnabled) {
 		        bomGrid.setColumns([
 		        	{header: 'BOM 코드 *', name: 'BOM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
-		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '품목 코드 *', name: 'ITEM_ID', align: 'left', renderer: { type: TextInputBtnRenderer }},
+		            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
 		            {header: '상위 코드', name: 'PARENT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: 'BOM 개수', name: 'BOM_QUANTITY', align: 'center'}
 		        ]);

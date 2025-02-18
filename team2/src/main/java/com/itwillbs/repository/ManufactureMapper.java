@@ -58,4 +58,8 @@ public interface ManufactureMapper {
 
 	List<Map<String, Object>> selectProductionOrderDetail(Map<String, Object> requestData);
 
+	List<Map<String, Object>> selectProductionOrderItem(Map<String, Object> requestData);
+
+	int insertProductionOrder(List<Map<String, Object>> createdRows);
+
 }

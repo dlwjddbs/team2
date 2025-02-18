@@ -59,10 +59,16 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
-			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			<!-- <nav th:replace="~{includes/pageHeader :: pageHeader}"></nav> -->
 			
 			<!-- 메인 콘텐츠 -->
 			<section class="content">
+				<section class="content-header">
+		            <div class="container-fluid">
+		                <h1>MES 대시보드 (테스트)</h1>
+		            </div>
+		        </section>
+		        
 				<!-- 검색 필터 -->
 				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
 					<div class="d-flex">
@@ -158,23 +164,25 @@
 			// dateRangePicker() 실행 후에 date 받아올 수 있음!!!
 			let date = $("#reservation").val().split(' ~ ');
 			let myDonutChart = '';
+
+			donutChart('donutChart', false);
+			stackedBarChart('stackedBarChart', false);
 			
-			donutChart('donutChart', date, false);
-			dataTable('example1', date, false);
-			stackedBarChart('stackedBarChart', date, false);
+			//dataTable('example1', date, false);
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
 			
-			dataTable('example1', date, true);
-			donutChart('donutChart', date, true);
-			stackedBarChart('stackedBarChart', date, true);
+			//dataTable('example1', date, true);
+			donutChart('donutChart', true);
+			stackedBarChart('stackedBarChart', true);
 		});
 		
 		function dateRangePicker() {
 			// date_picker 설정 및 페이지 최초 로딩시 조회 기간 설정 (DB데이터의 최대에서 최소일자)
-			let date = /*[[${commuteMinMaxDate}]]*/
+			/*
+ 			let date = [[${commuteMinMaxDate}]]
 			$('#reservation').daterangepicker({
 				locale: {
 					"separator": " ~ ",
@@ -190,81 +198,29 @@
 				minDate: date.COMMUTE_MIN_DATE,  // 선택 제한 값
 				maxDate: date.COMMUTE_MAX_DATE  // 선택 제한 값
 			});
-			$("#reservation").attr("readonly",true); 
+			$("#reservation").attr("readonly",true);
+			*/
 		}
 		
+		// 조건에 따른 결과를 dataTable에 출력
 		function dataTable(tableId, date, isUpdate) {
-			let deptCode = $("#DEP").val();
-			let rankCode = $("#RANK").val();
-			
-			// 기존 테이블 삭제
-			if (isUpdate) {
-				$("#" + tableId).DataTable().destroy();
-			}
-			
-			$("#" + tableId).DataTable({
-				aaSorting: [], // 초기 정렬 비활성화
-				// 버튼 위치 조절
-				dom :	"<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>"
-					  + "<'row'<'col-sm-12'tr>>"
-					  + "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-				language : {
-					search : "검색",
-					paginate: {
-		                "first" : "처음",
-		                "last" : "마지막",
-		                "next" : "다음",
-		                "previous" : "이전"
-		            },
-		            zeroRecords : "검색 결과 없음"
-				},
-				ajax : {
-					url : "/attendance/getAttendanceHistory",
-					type:"POST",
-					data : {
-						startDate : date[0],					
-						endDate : date[1],
-						deptCode : deptCode,
-						rankCode : rankCode
-					},
-					"dataSrc": function (res) {
-		                return res;
-		            }
-				},
-				columns : [
-					{data : "DATE_TIME", title : "일자", "defaultContent": ""},
-					{data : "MEMBER_ID", title : "회원ID", "defaultContent": ""},
-					{data : "MEMBER_NAME", title : "회원명", "defaultContent": ""},
-					{data : "DEPT_NAME", title : "부서", "defaultContent": ""},
-					{data : "GRADE_NAME", title : "직급", "defaultContent": ""},
-					{data : "CT_CHECK_IN_TIME", title : "출근기준", "defaultContent": ""},
-					{data : "CHECK_IN_TIME", title : "출근시각", "defaultContent": ""},
-					{data : "CT_CHECK_OUT_TIME", title : "퇴근기준", "defaultContent": ""},
-					{data : "CHECK_OUT_TIME", title : "퇴근시각", "defaultContent": ""},
-					{data : "ATTENDANCE_TEXT", title : "종류", "defaultContent": ""}
-				],
-				responsive : true, 
-				lengthChange : false, 
-				autoWidth : false,
-				buttons : ["copy", "csv", "excel", "pdf", "print", "colvis"]
-			}).buttons()
-			  .container()
-			  .appendTo('#example1_wrapper .col-md-6:eq(0)');
-		}
 
-		function donutChart(chartId, date, isUpdate) {
-			let deptCode = $("#DEP").val();
-			let rankCode = $("#RANK").val();
+		}
+		
+		// 도넛 차트
+		function donutChart(chartId, isUpdate) {
+			//let deptCode = $("#DEP").val();
+			//let rankCode = $("#RANK").val();
 			
 			$.ajax({
                 type : "POST",
-                url : "/attendance/getAttendanceHistoryDonutChart",
-                data : {
+                url : "/dashboard/getEquipmentDonutChart",
+/*                 data : {
 					startDate : date[0],					
 					endDate : date[1],
-					deptCode : deptCode,
-					rankCode : rankCode
-				},
+					//deptCode : deptCode,
+					//rankCode : rankCode
+				}, */
                 success : function(res){
 					let labels = [];
 					let data = [];
@@ -280,7 +236,8 @@
 						datasets: [
 							{
 								data: data,
-								backgroundColor: ['#f56954', '#f39c12', '#00a65a', '#00c0ef', '#3c8dbc', '#d2d6de'],
+								backgroundColor: ['#f56954', '#f39c12'],
+								//backgroundColor: ['#f56954', '#f39c12', '#00a65a', '#00c0ef', '#3c8dbc', '#d2d6de'],
 							}
 						]
 					}
@@ -302,24 +259,25 @@
 					});
                 },
                 error : function(XMLHttpRequest, textStatus, errorThrown){
-                    console.log("pieChart() ajax 실패");
+                    console.log("donutChart() ajax 실패");
                 }
             });
 		}
 		
-		function stackedBarChart(chartId, date, isUpdate) {
-			let deptCode = $("#DEP").val();
-			let rankCode = $("#RANK").val();
+		// 스택 차트 (막대기)
+		function stackedBarChart(chartId, isUpdate) {
+			//let deptCode = $("#DEP").val();
+			//let rankCode = $("#RANK").val();
 			
 			$.ajax({
                 type : "POST",
-                url : "/attendance/getAttendanceHistoryStackedBarChart",
-                data : {
+                url : "/dashboard/getEquipmentStackedBarChart",
+/*                 data : {
 					startDate : date[0],					
 					endDate : date[1],
-					deptCode : deptCode,
-					rankCode : rankCode
-				},
+					//deptCode : deptCode,
+					//rankCode : rankCode
+				}, */
                 success : function(res){
                 	let early_leave = [];
         			let late = [];
@@ -393,11 +351,12 @@
             });
 		}
 		
+		// selectBox에 값 넣기
 		// html selectBox id값 반드시 ajax에서 리턴되는 code값과 일치 시켜야 됨.
 		function selectBox(type) {
 			$.ajax({
                 type : "POST",
-                url : "/attendance/selectBox",
+                url : "/dashboard/selectBox",
                 data : {
                 	type : type
                 },
