@@ -384,7 +384,7 @@
 			
 			container.appendChild(el);
 
-					// LOCATION_ID 기존값은 수정 불가 조건
+			// LOCATION_ID 기존값은 수정 불가 조건
 			if (!(props.columnInfo.name == 'LOCATION_ID'
 				&& locationGrid.getValue(props.rowKey, 'isNew') == null)) {
 				const button = document.createElement('button');
@@ -399,22 +399,6 @@
 				
 				container.appendChild(button);
 					
-				button.addEventListener('click', function() {
-					const row = props.rowKey;
-					const column = props.columnInfo.name;
-					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = locationGrid.getValue(row, column);
-					
-					switch (column) {
-						case 'LOCATION_ID':
-							$("#locationCode").val(value);
-							$("#locationRow").val(row);
-							$("#locationColumn").val(column);
-							
-							$('#locationCodeAdd').modal();
-						break;
-					}
-			    });
 			}
 			
 			this.el = container;

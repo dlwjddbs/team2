@@ -156,9 +156,9 @@
 		const client2Url = '/clientinfo/client';
 		const client2DataSource = {
 			api: {
-			    readData: {url: clientUrl, method: 'GET'},
-				modifyData: { url: clientUrl, method: 'PUT' },
-				deleteData: {url: clientUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			    readData: {url: client2Url, method: 'GET'},
+				modifyData: { url: client2Url, method: 'PUT' },
+				deleteData: {url: client2Url, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 	    };
@@ -351,7 +351,7 @@
 			        clientCurrentSelectedRowKey = newRowKey;
 				
 					// 거래처 상세 그리드 생성
-					const clientID = clientGrid.getRow(newRowKey).CLIENT_ID;
+					/*const clientID = clientGrid.getRow(newRowKey).CLIENT_ID;
 					client2Init(clientID);
 					clientCurrentSelectedID = clientID;	
 					$("#btn_group_client").show();
@@ -360,7 +360,20 @@
 			        clientCurrentSelectedRowKey = null;
 					clientCurrentSelectedID = null;
 					$("#btn_group_client").hide();
-			    }
+			    }*/
+				   const clientID = clientGrid.getValue(newRowKey, 'CLIENT_ID');
+				    console.log("선택된 거래처 ID: ", clientID); // clientID가 제대로 가져와지는지 확인
+
+				    if (clientID) {
+				        client2Init(clientID); // clientID가 있을 경우에만 client2Init 호출
+				        clientCurrentSelectedID = clientID;
+				        $("#btn_group_client").show();
+				    }
+				} else {
+				    clientCurrentSelectedRowKey = null;
+				    clientCurrentSelectedID = null;
+				    $("#btn_group_client").hide();
+				}
 			});
 		}
 		
@@ -516,7 +529,7 @@
 		
 		
 		
-		// 제품 위치
+		// 거래처 상세
 		function client2Init(client_id) {
 			// 파라미터 설정
 			client2DataSource.api.readData.initParams.client_id = client_id;
