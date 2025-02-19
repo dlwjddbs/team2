@@ -6,7 +6,7 @@
 
 <mapper namespace="com.itwillbs.repository.ManufactureMapper">
 
-    <select id="selectWorkcenter" resultType="map">
+	<select id="selectWorkcenter" resultType="map">
 		SELECT
 			   w.WORKCENTER_ID
 			 , w.NAME
@@ -38,10 +38,10 @@
 				   AND ROUTING_ID = w.ROUTING_ID
 			 ) AS USED_N_CNT
 		  FROM WORKCENTER w
-    </select>
-    
-    <insert id="insertWorkcenter">
-	    INSERT ALL
+	</select>
+
+	<insert id="insertWorkcenter">
+		INSERT ALL
 		<foreach collection="list" item="item">
 			INTO WORKCENTER (
 				  MANAGER_ID
@@ -61,31 +61,31 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <delete id="deleteWorkcenter">
-	    DELETE FROM WORKCENTER
-	     WHERE WORKCENTER_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
-    <update id="updateWorkcenter">
+	</insert>
+
+	<delete id="deleteWorkcenter">
+		DELETE FROM WORKCENTER
+		 WHERE WORKCENTER_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<update id="updateWorkcenter">
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
-	        UPDATE WORKCENTER
-	           SET 
-	               NAME = #{row.NAME}
-	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
-	             , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
-	             , USE_YN = #{row.USE_YN}
+			UPDATE WORKCENTER
+			   SET 
+				   NAME = #{row.NAME}
+				 , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+				 , ROUTING_ID = #{row.ROUTING_ID, jdbcType=VARCHAR}
+				 , USE_YN = #{row.USE_YN}
 				 , MANAGER_ID = #{row.MANAGER_ID, jdbcType=VARCHAR}
-	         WHERE WORKCENTER_ID = #{row.WORKCENTER_ID}
-	    </foreach>
-    </update>
-    
-    <select id="selectMember" resultType="map">
-    	SELECT 
+			 WHERE WORKCENTER_ID = #{row.WORKCENTER_ID}
+		</foreach>
+	</update>
+
+	<select id="selectWorkcenterManager" resultType="map">
+		SELECT 
 			   m.MEMBER_ID 	AS MEMBER_ID
 			 , m.NAME 		AS NAME
 			 , cc.CODE_NAME AS DEPT
@@ -100,9 +100,9 @@
 		<if test='member_name != null and member_name != ""'>
 		   AND m.NAME = #{member_name}
 		</if>
-    </select>
-    
-    <select id="selectEquipment" resultType="map">
+	</select>
+
+	<select id="selectEquipment" resultType="map">
 		SELECT 
 			   EQUIPMENT_ID 	AS EQUIPMENT_ID
 			 , EQUIPMENT_NAME 	AS EQUIPMENT_NAME
@@ -127,33 +127,33 @@
 			AND (EQUIPMENT_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
 					OR EQUIPMENT_NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
 		</if>
-    </select>
-    
-    <update id="addEquipment">
+	</select>
+
+	<update id="insertEquipment">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE EQUIPMENT 
+			UPDATE EQUIPMENT 
 			   SET WORKCENTER_ID = #{item.WORKCENTER_ID}
 			 WHERE EQUIPMENT_ID = #{item.EQUIPMENT_ID}
 		</foreach>
-    </update>
-    
+	</update>
+
 	<update id="deleteEquipment">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE EQUIPMENT 
+			UPDATE EQUIPMENT 
 			   SET WORKCENTER_ID = NULL
 			 WHERE EQUIPMENT_ID = #{item}
 		</foreach>
-    </update>
-    
+	</update>
+
 	<update id="deleteEquipmentByWorkcenterId">
 		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE EQUIPMENT 
+			UPDATE EQUIPMENT 
 			   SET WORKCENTER_ID = NULL
 			 WHERE WORKCENTER_ID = #{item}
 		</foreach>
-    </update>
-    
-    <select id="selectProcess" resultType="map">
+	</update>
+
+	<select id="selectProcess" resultType="map">
 		SELECT
 			   p.PROCESS_ID 
 			 , p.NAME 
@@ -173,26 +173,26 @@
 		  FROM PROCESS p
 		 WHERE
 			   1 = 1
-   		<if test='inspection_yn != null and inspection_yn != ""'>
+		<if test='inspection_yn != null and inspection_yn != ""'>
 			AND INSPECTION_YN = #{inspection_yn}
 		</if>
-   		<if test='use_yn != null and use_yn != ""'>
+		<if test='use_yn != null and use_yn != ""'>
 			AND USE_YN = #{use_yn}
 		</if>
 		<if test='searchKeyword != null and searchKeyword != ""'>
 			AND (PROCESS_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
 					OR NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
 		</if>
-    </select>
-    
-    <select id="checkDuplicateCode">
-    	SELECT count(*) AS COUNT
+	</select>
+
+	<select id="checkDuplicateCode">
+		SELECT count(*) AS COUNT
 		  FROM ${tableName}
 		 WHERE ${tableCodeId} = #{codeVal}
-    </select>
-    
-    <insert id="insertProcess">
-	    INSERT ALL
+	</select>
+
+	<insert id="insertProcess">
+		INSERT ALL
 		<foreach collection="list" item="item">
 			INTO PROCESS (
 				  PROCESS_ID
@@ -210,29 +210,29 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <update id="updateProcess">
+	</insert>
+
+	<update id="updateProcess">
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
-	        UPDATE PROCESS
-	           SET 
-	               NAME = #{row.NAME}
-	             , USE_YN = #{row.USE_YN}
-	             , INSPECTION_YN = #{row.INSPECTION_YN}
-	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
-	         WHERE PROCESS_ID = #{row.PROCESS_ID}
-	    </foreach>
-    </update>
-    
-    <delete id="deleteProcess">
-	    DELETE FROM PROCESS
-	     WHERE PROCESS_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
-    <select id="selectRouting" resultType="map">
+			UPDATE PROCESS
+			   SET 
+				   NAME = #{row.NAME}
+				 , USE_YN = #{row.USE_YN}
+				 , INSPECTION_YN = #{row.INSPECTION_YN}
+				 , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+			 WHERE PROCESS_ID = #{row.PROCESS_ID}
+		</foreach>
+	</update>
+
+	<delete id="deleteProcess">
+		DELETE FROM PROCESS
+		 WHERE PROCESS_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="selectRouting" resultType="map">
 		SELECT DISTINCT 
 			   r.ROUTING_ID			AS ROUTING_ID
 			 , r.NAME				AS  NAME
@@ -271,11 +271,11 @@
 			AND (r.ROUTING_ID LIKE concat('%', concat(#{searchKeyword}, '%'))
 					OR r.NAME LIKE concat('%', concat(#{searchKeyword}, '%')))
 		</if>
-    </select>
-    
-    <select id="selectItem" resultType="map">
+	</select>
+
+	<select id="selectRoutingItem" resultType="map">
 		SELECT
-		  	   ITEM_ID
+			   ITEM_ID
 			 , ITEM_NAME
 			 , ITEM_TYPE
 			 , USE_YN
@@ -284,10 +284,10 @@
 			   1 = 1
 		   AND ITEM_ID NOT IN (SELECT ITEM_ID FROM ROUTING)
 		   AND USE_YN = 'Y'
-    </select>
-    
-    <insert id="insertRouting">
-	    INSERT ALL
+	</select>
+
+	<insert id="insertRouting">
+		INSERT ALL
 		<foreach collection="list" item="item">
 			INTO ROUTING (
 				  ROUTING_ID
@@ -307,35 +307,35 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <update id="updateRouting">
+	</insert>
+
+	<update id="updateRouting">
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
-	        UPDATE ROUTING
-	           SET 
-	               NAME = #{row.NAME}
-	             , USE_YN = #{row.USE_YN}
-	             , NOTE = #{row.NOTE, jdbcType=VARCHAR}
-	         WHERE ROUTING_ID = #{row.ROUTING_ID}
-	    </foreach>
-    </update>
-    
-    <delete id="deleteRouting">
-	    DELETE FROM ROUTING
-	     WHERE ROUTING_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
+			UPDATE ROUTING
+			   SET 
+				   NAME = #{row.NAME}
+				 , USE_YN = #{row.USE_YN}
+				 , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+			 WHERE ROUTING_ID = #{row.ROUTING_ID}
+		</foreach>
+	</update>
+
+	<delete id="deleteRouting">
+		DELETE FROM ROUTING
+		 WHERE ROUTING_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
 	<delete id="deleteRoutingSequence">
-	    DELETE FROM PROCESS_ROUTING_MAPPING
-	     WHERE ROUTING_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
+		DELETE FROM PROCESS_ROUTING_MAPPING
+		 WHERE ROUTING_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
 	<select id="selectRoutingSequence" resultType="map">
 		SELECT 
 			   prm.SORT_ORDER 		AS SORT_ORDER
@@ -344,28 +344,28 @@
 			 , p.INSPECTION_YN 		AS INSPECTION_YN
 			 , prm.IS_LAST_ORDER 	AS IS_LAST_ORDER
 		  FROM PROCESS_ROUTING_MAPPING prm
-		  	   INNER JOIN PROCESS p 
+			   INNER JOIN PROCESS p 
 					   ON prm.PROCESS_ID = p.PROCESS_ID 
 		 WHERE prm.ROUTING_ID = #{routing_id}
-    </select>
-    
-    <insert id="insertRoutingSequence">
+	</select>
+
+	<insert id="insertRoutingSequence">
 <!--     	트리거  -->
-    
+
 <!-- 	    CREATE SEQUENCE SEQ_PROCESS_ROUTING_MAPPING_ID -->
 <!-- 	    START WITH 1 -->
 <!-- 	    INCREMENT BY 1 -->
 <!-- 	    NOCACHE -->
 <!-- 	    NOCYCLE; -->
-    
+
 <!--     	CREATE OR REPLACE TRIGGER TRG_PROCESS_ROUTING_MAPPING_ID -->
 <!-- 		BEFORE INSERT ON PROCESS_ROUTING_MAPPING -->
 <!-- 		FOR EACH ROW -->
 <!-- 		BEGIN -->
 <!-- 		    :NEW.PROCESS_ROUTING_MAPPING_ID := 'PRM' || LPAD(SEQ_PROCESS_ROUTING_MAPPING_ID.NEXTVAL, 10, '0'); -->
 <!-- 		END; -->
-    
-	    INSERT ALL
+
+		INSERT ALL
 		<foreach collection="list" item="item">
 			INTO PROCESS_ROUTING_MAPPING (
 				  PROCESS_ID
@@ -381,14 +381,14 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <update id="updateRoutingProcessQuantity">
-    	UPDATE ROUTING
-    	   SET PROCESS_QUANTITY = #{createdRowsCnt}
-    	 WHERE ROUTING_ID = #{ROUTING_ID}
-    </update>
-    
+	</insert>
+
+	<update id="updateRoutingProcessQuantity">
+		UPDATE ROUTING
+		   SET PROCESS_QUANTITY = #{createdRowsCnt}
+		 WHERE ROUTING_ID = #{ROUTING_ID}
+	</update>
+
 	<select id="selectProductionOrder" resultType="map">
 		SELECT
 			   pr.PRODUCTION_ORDER_ID 
@@ -412,8 +412,8 @@
 			   INNER JOIN ITEM i 
 					   ON pr.ITEM_ID = i.ITEM_ID 
 		 ORDER BY pr.PRODUCTION_ORDER_ID DESC
-    </select>
-    
+	</select>
+
 	<select id="selectProductionOrderDetail" resultType="map">
 		SELECT
 			   pod.PRODUCTION_ORDER_ID			AS PRODUCTION_ORDER_ID
@@ -434,24 +434,24 @@
 			   INNER JOIN ITEM i 
 					   ON pod.ITEM_ID = i.ITEM_ID 
 		 WHERE PRODUCTION_ORDER_ID = #{productionOrder_id}
-    </select>
-    
+	</select>
+
 	<select id="selectProductionOrderItem" resultType="map">
 		SELECT
-		  	   ITEM_ID
+			   ITEM_ID
 			 , ITEM_NAME
 			 , ITEM_TYPE
 			 , USE_YN
 			 , ITEM_UNIT 
 		  FROM ITEM
 		 WHERE USE_YN = 'Y'
-    </select>
-    
-    <insert id="insertProductionOrder">
-	    INSERT ALL
+	</select>
+
+	<insert id="insertProductionOrder">
+		INSERT ALL
 		<foreach collection="list" item="item">
-	    	INTO PRODUCTION_ORDER(
-	    		  PRODUCTION_ORDER_ID
+			INTO PRODUCTION_ORDER(
+				  PRODUCTION_ORDER_ID
 				, CREATE_DATE
 				, CREATE_TIME
 				, AMOUNT
@@ -470,15 +470,15 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <select id="selectProductionOrderBOM" resultType="map">
+	</insert>
+
+	<select id="selectProductionOrderBOM" resultType="map">
 		WITH hierarchy_item AS
 		(
 			SELECT 
 				   LEVEL AS HIERARCHY_LEVEL
-			     , BOM_ID
-			     , ITEM_ID
+				 , BOM_ID
+				 , ITEM_ID
 			  FROM BOM
 			 START WITH ITEM_ID = #{item_id}
 			CONNECT BY PRIOR ITEM_ID = PARENT_ID
@@ -503,26 +503,26 @@
 			 , ${amount}		AS AMOUNT
 		  FROM ITEM i
 		 WHERE i.ITEM_ID = #{item_id}
-    </select>
-    
-    <select id="selectProductionOrderWorkcenter" resultType="map">
-    	SELECT 
+	</select>
+
+	<select id="selectProductionOrderWorkcenter" resultType="map">
+		SELECT 
 			   w.WORKCENTER_ID 
 			 , w.NAME 
 		  FROM WORKCENTER w
 			   INNER JOIN ROUTING r
 					   ON w.ROUTING_ID = r.ROUTING_ID 
 		 WHERE r.ITEM_ID = #{item_id}
-    </select>
-    
-    <select id="selectTodayMaxProductionOrderDetailId" resultType="int">
-    	SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_DETAIL_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+	</select>
+
+	<select id="selectTodayMaxProductionOrderDetailId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_DETAIL_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
 		  FROM PRODUCTION_ORDER_DETAIL
 		 WHERE PRODUCTION_ORDER_DETAIL_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
-    </select>
-    
-    <insert id="insertProductionOrderDetail">
-   	    INSERT ALL
+	</select>
+
+	<insert id="insertProductionOrderDetail">
+		INSERT ALL
 		<foreach collection="list" item="item">
 		    INTO PRODUCTION_ORDER_DETAIL(
 				  PRODUCTION_ORDER_DETAIL_ID
@@ -541,42 +541,42 @@
 			)
 		</foreach>
 		SELECT * FROM DUAL
-    </insert>
-    
-    <select id="selectTodayMaxProductionOrderId" resultType="int">
-    	SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+	</insert>
+
+	<select id="selectTodayMaxProductionOrderId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(PRODUCTION_ORDER_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
 		  FROM PRODUCTION_ORDER
 		 WHERE PRODUCTION_ORDER_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
-    </select>
-    
+	</select>
+
 	<select id="selectProductionOrderDetailBOM" resultType="map">
-	    SELECT
+		SELECT
 			   CASE 
-	            <foreach collection="list" item="item" separator=" ">
-	                WHEN b.ITEM_ID = #{item.ITEM_ID} THEN #{item.PRODUCTION_ORDER_DETAIL_ID}
-	            </foreach> 
+				<foreach collection="list" item="item" separator=" ">
+					WHEN b.ITEM_ID = #{item.ITEM_ID} THEN #{item.PRODUCTION_ORDER_DETAIL_ID}
+				</foreach> 
 			   END AS PRODUCTION_ORDER_DETAIL_ID
 			 , bd.COMPONENT_ID AS ITEM_ID
 			 , bd.REQUIRED_AMOUNT * 
 			   (CASE 
-	            <foreach collection="list" item="item" index="index" separator=" ">
-	                WHEN b.ITEM_ID = #{item.ITEM_ID} THEN ${item.AMOUNT}
-	            </foreach> 
+				<foreach collection="list" item="item" index="index" separator=" ">
+					WHEN b.ITEM_ID = #{item.ITEM_ID} THEN ${item.AMOUNT}
+				</foreach> 
 				END) AS AMOUNT
 		  FROM BOM b
 			   INNER JOIN BOM_DETAIL bd 
 					   ON b.BOM_ID = bd.BOM_ID
-	     WHERE b.ITEM_ID IN
-	    <foreach collection="list" item="item" open="(" separator="," close=")">
-	        #{item.ITEM_ID}
-	    </foreach>
-	     ORDER BY b.BOM_ID, b.ITEM_ID ASC
+		 WHERE b.ITEM_ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item.ITEM_ID}
+		</foreach>
+		 ORDER BY b.BOM_ID, b.ITEM_ID ASC
 	</select>
 	
 	<insert id="insertProductionOrderDetailBOM">
-   	    INSERT ALL
+		INSERT ALL
 		<foreach collection="list" item="item">
-		    INTO PUT_MATERIALS(
+			INTO PUT_MATERIALS(
 				  PUT_MATERIALS_ID
 				, PRODUCTION_ORDER_DETAIL_ID
 				, ITEM_ID
@@ -595,40 +595,40 @@
 		SELECT NVL(TO_NUMBER(SUBSTR(MAX(PUT_MATERIALS_ID), 3)), 0) + 1 AS MAX_NUMBER 
 		  FROM PUT_MATERIALS
 	</select>
-	
-    <delete id="deleteProductionOrder">
-	    DELETE FROM PRODUCTION_ORDER
-	     WHERE PRODUCTION_ORDER_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
-    <select id="selectProductionOrderDetailDeleteIds">
-    	SELECT PRODUCTION_ORDER_DETAIL_ID
+
+	<delete id="deleteProductionOrder">
+		DELETE FROM PRODUCTION_ORDER
+		 WHERE PRODUCTION_ORDER_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="selectProductionOrderDetailDeleteIds">
+		SELECT PRODUCTION_ORDER_DETAIL_ID
 		  FROM PRODUCTION_ORDER_DETAIL
 		 WHERE PRODUCTION_ORDER_ID IN
- 	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </select>
-    
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+
 	<delete id="deleteProductionOrderDetail">
-	    DELETE FROM PRODUCTION_ORDER_DETAIL
-	     WHERE PRODUCTION_ORDER_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
+		DELETE FROM PRODUCTION_ORDER_DETAIL
+		 WHERE PRODUCTION_ORDER_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
 	<delete id="deletePutMaterials">
-	    DELETE FROM PUT_MATERIALS
-	     WHERE PRODUCTION_ORDER_DETAIL_ID IN
-	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
-	        #{id}
-	    </foreach>
-    </delete>
-    
+		DELETE FROM PUT_MATERIALS
+		 WHERE PRODUCTION_ORDER_DETAIL_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
 	<update id="updateProductionOrderCnt">
 		UPDATE PRODUCTION_ORDER 
 		   SET ORDER_DETAIL_QUANTITY = (
@@ -637,5 +637,5 @@
 				 WHERE PRODUCTION_ORDER_ID = #{PRODUCTION_ORDER_ID}
 		   )
 		 WHERE PRODUCTION_ORDER_ID = #{PRODUCTION_ORDER_ID}
-    </update>
+	</update>
 </mapper>

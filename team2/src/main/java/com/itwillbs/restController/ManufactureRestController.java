@@ -4,190 +4,54 @@ package com.itwillbs.restController;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.itwillbs.service.ManufactureService;
+import com.itwillbs.util.DynamicMethodInvoker;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 
 @RequiredArgsConstructor
-@Log
+@RequestMapping(value = "/rest/manufacture")
 @RestController
 public class ManufactureRestController {
 	
-	private final ManufactureService manufactureService;
-	
-	private final String workcenter_url = "/rest/manufacture/workcenter";
-	private final String manager_url = "/rest/manufacture/workcenterManager";
-	private final String equipment_url = "/rest/manufacture/equipment";
-	private final String process_url = "/rest/manufacture/process";
-	private final String routing_url = "/rest/manufacture/routing";
-	private final String item_url = "/rest/manufacture/routingItem";
-	private final String routing_sequence_url = "/rest/manufacture/sequence";
-	private final String production_order_url = "/rest/manufacture/productionOrder";
-	private final String production_order_detail_url = "/rest/manufacture/productionOrderDetail";
-	private final String production_order_item_url = "/rest/manufacture/productionOrderItem";
-	private final String production_order_bom_url = "/rest/manufacture/productionOrderBOM";
-	private final String production_order_workcenter_url = "/rest/manufacture/productionOrderWorkcenter";
-	
-	@GetMapping(workcenter_url)
-	public Map<String, Object> getWorkcenter() {
-		return manufactureService.selectWorkcenter();
-	}	
-	
-	@PutMapping(workcenter_url)
-	public Map<String, Object> modifyWorkcenter(@RequestBody Map<String, Object> requestData) {
-		return manufactureService.modifyWorkcenter(requestData);
-	}	
-	
-	@DeleteMapping(workcenter_url)
-	public Map<String, Object> deletWorkcenter(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> workcenterIds = Arrays.asList(decodedIds.split(","));
-        
-        return manufactureService.deleteWorkcenter(workcenterIds);
+	private final DynamicMethodInvoker dynamicMethodInvoker;
+
+	@GetMapping("/{urlid}")
+	public Map<String, Object> invokeGetMethod(@PathVariable("urlid") String urlid, @RequestParam Map<String, Object> requestData) {
+		return dynamicMethodInvoker.invokeServiceMethod("select", urlid, Map.class, requestData);
 	}
-	
-	@GetMapping(manager_url)
-	public Map<String, Object> getMember(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectMember(requestData);
-	}	
-	
-	@GetMapping(equipment_url)
-	public Map<String, Object> getEquipment(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectEquipment(requestData);
+
+	@PutMapping("/{urlid}")
+	public Map<String, Object> invokePutMethod(@PathVariable("urlid") String urlid, @RequestBody Map<String, Object> requestData) {
+		return dynamicMethodInvoker.invokeServiceMethod("modify", urlid, Map.class, requestData);
 	}
-	
-	@PostMapping(equipment_url)
-	public Map<String, Object> addEquipment(@RequestBody Map<String, Object> requestData) {
-	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
-        return manufactureService.addEquipment(createdRows);
+
+	@PostMapping("/{urlid}")
+	public Map<String, Object> invokePostMethod(@PathVariable("urlid") String urlid, @RequestBody Map<String, Object> requestData) {
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>) requestData.get("createdRows");
+
+		return dynamicMethodInvoker.invokeServiceMethod("insert", urlid, List.class, createdRows);
 	}
-	
-	@DeleteMapping(equipment_url)
-	public Map<String, Object> deletEquipment(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> equipmentIds = Arrays.asList(decodedIds.split(","));
-	    
-        return manufactureService.deleteEquipment(equipmentIds);
-	}
-	
-	@GetMapping(process_url)
-	public Map<String, Object> getProcess(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProcess(requestData);
-	}
-	
-	@PutMapping(process_url)
-	public Map<String, Object> modifyProcess(@RequestBody Map<String, Object> requestData) {
-		return manufactureService.modifyProcess(requestData);
-	}
-	
-	@DeleteMapping(process_url)
-	public Map<String, Object> deleteProcess(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> processIds = Arrays.asList(decodedIds.split(","));
-	    
-        return manufactureService.deleteProcess(processIds);
-	}
-	
-	@GetMapping(routing_url)
-	public Map<String, Object> getRouting(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectRouting(requestData);
-	}
-	
-	@GetMapping(item_url)
-	public Map<String, Object> getItem(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectItem(requestData);
-	}
-	
-	@PutMapping(routing_url)
-	public Map<String, Object> modifyRouting(@RequestBody Map<String, Object> requestData) {
-		return manufactureService.modifyRouting(requestData);
-	}
-	
-	@DeleteMapping(routing_url)
-	public Map<String, Object> deleteRouting(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> processIds = Arrays.asList(decodedIds.split(","));
-	    
-        return manufactureService.deleteRouting(processIds);
-	}
-	
-	@GetMapping(routing_sequence_url)
-	public Map<String, Object> getRoutingSequence(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectRoutingSequence(requestData);
-	}
-	
-	@PostMapping(routing_sequence_url)
-	public Map<String, Object> insertRoutingSequence(@RequestBody Map<String, Object> requestData) {
-	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
-        return manufactureService.insertRoutingSequence(createdRows);
-	}
-	
-	@GetMapping(production_order_url)
-	public Map<String, Object> getProductionOrder(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProductionOrder(requestData);
-	}
-	
-	@GetMapping(production_order_detail_url)
-	public Map<String, Object> getProductionOrderDetail(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProductionOrderDetail(requestData);
-	}
-	
-	@GetMapping(production_order_item_url)
-	public Map<String, Object> getProductionOrderItem(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProductionOrderItem(requestData);
-	}
-	
-	@PutMapping(production_order_url)
-	public Map<String, Object> modifyProductionOrder(@RequestBody Map<String, Object> requestData) {
-		return manufactureService.modifyProductionOrder(requestData);
-	}
-	
-	@GetMapping(production_order_bom_url)
-	public Map<String, Object> getProductionOrderBOM(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProductionOrderBOM(requestData);
-	}
-	
-	@GetMapping(production_order_workcenter_url)
-	public Map<String, Object> getProductionOrderWorkcenter(@RequestParam Map<String, Object> requestData) {
-		return manufactureService.selectProductionOrderWorkcenter(requestData);
-	}
-	
-	@PostMapping(production_order_detail_url)
-	public Map<String, Object> insertProductionOrderDetail(@RequestBody Map<String, Object> requestData) {
-	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
-        return manufactureService.insertProductionOrderDetail(createdRows);
-	}
-	
-	@DeleteMapping(production_order_url)
-	public Map<String, Object> deleteProductionOrder(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> productionOrderIds = Arrays.asList(decodedIds.split(","));
-	    
-        return manufactureService.deleteProductionOrder(productionOrderIds);
+
+	@DeleteMapping("/{urlid}")
+	public Map<String, Object> invokeDeleteMethod(@PathVariable("urlid") String urlid, @RequestHeader("X-Delete-IDs") String encodedIds) {
+		String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);  // 한글 ID가 넘어올 경우 디코딩
+		List<String> idList = Arrays.asList(decodedIds.split(","));
+
+		return dynamicMethodInvoker.invokeServiceMethod("delete", urlid, List.class, idList);
 	}
 	
 }
-
-

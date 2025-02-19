@@ -19,7 +19,7 @@ public class ManufactureService {
 	
 	private final ManufactureMapper manufactureMapper;
 	
-	public Map<String, Object> selectWorkcenter() {
+	public Map<String, Object> selectWorkcenter(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -97,20 +97,20 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectMember(Map<String, Object> requestData) {
+	public Map<String, Object> selectWorkcenterManager(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "selectMember 성공";
+		String message = "selectWorkcenterManager 성공";
 		
 		try {
-			List<Map<String, Object>> workcenterList = manufactureMapper.selectMember(requestData);
+			List<Map<String, Object>> workcenterList = manufactureMapper.selectWorkcenterManager(requestData);
 			content.put("contents", workcenterList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
 			result = false;
-			message = "selectMember 실패";
+			message = "selectWorkcenterManager 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -141,16 +141,16 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> addEquipment(List<Map<String, Object>> createdRows) {
+	public Map<String, Object> insertEquipment(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		Boolean result = true;
-		String message = "addEquipment 성공";
+		String message = "insertEquipment 성공";
 		
 		try {
-			manufactureMapper.addEquipment(createdRows);
+			manufactureMapper.insertEquipment(createdRows);
 		} catch (Exception e) {
 			result = false;
-			message = "addEquipment 실패";
+			message = "insertEquipment 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -299,20 +299,20 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectItem(Map<String, Object> requestData) {
+	public Map<String, Object> selectRoutingItem(Map<String, Object> requestData) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		Boolean result = true;
-		String message = "selectItem 성공";
+		String message = "selectRoutingItem 성공";
 		
 		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectItem(requestData);
+			List<Map<String, Object>> processList = manufactureMapper.selectRoutingItem(requestData);
 			content.put("contents", processList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
 			result = false;
-			message = "selectItem 실패";
+			message = "selectRoutingItem 실패";
 		}
 		
 		resultMap.put("result", result);

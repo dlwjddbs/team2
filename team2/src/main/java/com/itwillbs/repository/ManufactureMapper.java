@@ -16,11 +16,11 @@ public interface ManufactureMapper {
 	
 	int deleteWorkcenter(List<String> idList);
 
-	List<Map<String, Object>> selectMember(Map<String, Object> requestData);
+	List<Map<String, Object>> selectWorkcenterManager(Map<String, Object> requestData);
 
 	List<Map<String, Object>> selectEquipment(Map<String, Object> requestData);
 
-	int addEquipment(List<Map<String, Object>> createdRows);
+	int insertEquipment(List<Map<String, Object>> createdRows);
 
 	int deleteEquipment(List<String> equipmentIds);
 
@@ -38,7 +38,7 @@ public interface ManufactureMapper {
 
 	List<Map<String, Object>> selectRouting(Map<String, Object> requestData);
 
-	List<Map<String, Object>> selectItem(Map<String, Object> requestData);
+	List<Map<String, Object>> selectRoutingItem(Map<String, Object> requestData);
 
 	int insertRouting(List<Map<String, Object>> createdRows);
 
