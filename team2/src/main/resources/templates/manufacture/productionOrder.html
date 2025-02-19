@@ -152,6 +152,7 @@
             {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
             {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
             {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
+            {header: '작업지시상세 개수', name: 'ORDER_DETAIL_QUANTITY', align: 'center', editor: null, hidden: true},
         ];
 		
 		// 작업지시상세
@@ -161,7 +162,6 @@
 			api: {
 				createData: {url: productionOrderDetailUrl, method: 'POST'},
 			    readData: {url: productionOrderDetailUrl, method: 'GET', initParams: { productionOrder_id: ''}},
-			    deleteData: {url: productionOrderDetailUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
 			},
 			contentType: 'application/json',
 		};
@@ -398,17 +398,21 @@
 					
 					// 작업지시상세 그리드 생성
 					const productionOrderID = productionOrderGrid.getRow(newRowKey).PRODUCTION_ORDER_ID;
-					productionOrderDetailInit(productionOrderID);
+					const orderDetailCount = productionOrderGrid.getRow(newRowKey).ORDER_DETAIL_QUANTITY;
+					productionOrderDetailInit(productionOrderID, orderDetailCount);
+					
 					productionOrderCurrentSelectedID = productionOrderID;
 					productionOrderCurrentSelectedAmount = productionOrderGrid.getRow(newRowKey).AMOUNT;
 					productionOrderCurrentSelectedItem = productionOrderGrid.getRow(newRowKey).ITEM_ID;
-					$("#btn_group_productionOrderDetail").show();
+					
+// 					$("#btn_group_productionOrderDetail").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        productionOrderCurrentSelectedRowKey = null;
 					productionOrderCurrentSelectedID = null;
 					productionOrderCurrentSelectedAmount = null;
 					productionOrderCurrentSelectedItem = null;
+					
 					$("#btn_group_productionOrderDetail").hide();
 			    }
 			});
@@ -556,11 +560,12 @@
 			productionOrderDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
 			
 		    productionOrderGrid.request('deleteData');
-			productionOrderGrid.reloadData();  // 실패시 테이블 리로드
+		    window.location.reload();
+// 			productionOrderGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
 		// 작업지시상세
-		function productionOrderDetailInit(productionOrder_id) {
+		function productionOrderDetailInit(productionOrder_id, orderDetailCount) {
 			// 파라미터 설정
 			productionOrderDetailDataSource.api.readData.initParams.productionOrder_id = productionOrder_id;
 			
@@ -579,7 +584,11 @@
 		        columns: productionOrderDetail_columns,
 		    });
 			
-			$("#btn_group_productionOrderDetail").show();
+			if (orderDetailCount > 0) {
+				$("#btn_group_productionOrderDetail").hide();
+			} else {
+				$("#btn_group_productionOrderDetail").show();
+			}
 
 		    productionOrderDetailGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);

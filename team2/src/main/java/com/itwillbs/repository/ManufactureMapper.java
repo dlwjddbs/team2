@@ -72,4 +72,20 @@ public interface ManufactureMapper {
 	
 	int selectTodayMaxProductionOrderId();
 
+	List<Map<String, String>> selectProductionOrderDetailBOM(List<Map<String, Object>> createdRows);
+
+	int insertProductionOrderDetailBOM(List<Map<String, String>> bomList);
+
+	int selectMaxPutMaterialsId();
+
+	int deleteProductionOrder(List<String> productionOrderIds);
+
+	List<String> selectProductionOrderDetailDeleteIds(List<String> productionOrderIds);
+
+	int deleteProductionOrderDetail(List<String> productionOrderIds);
+
+	int deletePutMaterials(List<String> productionOrderDetailIds);
+
+	int updateProductionOrderCnt(List<Map<String, Object>> createdRows);
+
 }

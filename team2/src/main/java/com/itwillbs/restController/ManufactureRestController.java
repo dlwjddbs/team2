@@ -179,6 +179,15 @@ public class ManufactureRestController {
         return manufactureService.insertProductionOrderDetail(createdRows);
 	}
 	
+	@DeleteMapping(production_order_url)
+	public Map<String, Object> deleteProductionOrder(@RequestHeader("X-Delete-IDs") String encodedIds) {
+		// 한글ID 넘어올 시 변환
+	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+	    List<String> productionOrderIds = Arrays.asList(decodedIds.split(","));
+	    
+        return manufactureService.deleteProductionOrder(productionOrderIds);
+	}
+	
 }
 
 

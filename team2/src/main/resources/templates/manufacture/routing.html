@@ -371,12 +371,12 @@
 					const processCount = routingGrid.getRow(newRowKey).PROCESS_QUANTITY;
 					sequenceInit(routingID, processCount);
 					routingCurrentSelectedID = routingID;
-					$("#btn_group_equipment").show();
+// 					$("#btn_group_sequence").show();
 			    } else {
 			        // 같은 행을 클릭한 경우 선택 해제
 			        routingCurrentSelectedRowKey = null;
 					routingCurrentSelectedID = null;
-					$("#btn_group_equipment").hide();
+					$("#btn_group_sequence").hide();
 			    }
 			});
 		}

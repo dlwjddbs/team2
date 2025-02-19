@@ -396,6 +396,7 @@
 			 , pr.AMOUNT 
 			 , pr.STATUS 
 			 , pr.ITEM_ID 
+			 , pr.ORDER_DETAIL_QUANTITY 
 			 , mc.SUB_NAME 
 			 , i.ITEM_NAME 
 			 , i.ITEM_UNIT 
@@ -456,6 +457,7 @@
 				, AMOUNT
 				, STATUS
 				, ITEM_ID
+				, ORDER_DETAIL_QUANTITY
 			)
 			VALUES(
 				  #{item.PRODUCTION_ORDER_ID}
@@ -464,6 +466,7 @@
 				, #{item.AMOUNT}
 				, 'ST-001'
 				, #{item.ITEM_ID}
+				, 0
 			)
 		</foreach>
 		SELECT * FROM DUAL
@@ -545,4 +548,96 @@
 		  FROM PRODUCTION_ORDER
 		 WHERE PRODUCTION_ORDER_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
     </select>
+    
+	<select id="selectProductionOrderDetailBOM" resultType="map">
+	    SELECT
+			   CASE 
+	            <foreach collection="list" item="item" separator=" ">
+	                WHEN b.ITEM_ID = #{item.ITEM_ID} THEN #{item.PRODUCTION_ORDER_DETAIL_ID}
+	            </foreach> 
+			   END AS PRODUCTION_ORDER_DETAIL_ID
+			 , bd.COMPONENT_ID AS ITEM_ID
+			 , bd.REQUIRED_AMOUNT * 
+			   (CASE 
+	            <foreach collection="list" item="item" index="index" separator=" ">
+	                WHEN b.ITEM_ID = #{item.ITEM_ID} THEN ${item.AMOUNT}
+	            </foreach> 
+				END) AS AMOUNT
+		  FROM BOM b
+			   INNER JOIN BOM_DETAIL bd 
+					   ON b.BOM_ID = bd.BOM_ID
+	     WHERE b.ITEM_ID IN
+	    <foreach collection="list" item="item" open="(" separator="," close=")">
+	        #{item.ITEM_ID}
+	    </foreach>
+	     ORDER BY b.BOM_ID, b.ITEM_ID ASC
+	</select>
+	
+	<insert id="insertProductionOrderDetailBOM">
+   	    INSERT ALL
+		<foreach collection="list" item="item">
+		    INTO PUT_MATERIALS(
+				  PUT_MATERIALS_ID
+				, PRODUCTION_ORDER_DETAIL_ID
+				, ITEM_ID
+				, AMOUNT
+			) VALUES (
+				  #{item.PUT_MATERIALS_ID}
+				, #{item.PRODUCTION_ORDER_DETAIL_ID}
+				, #{item.ITEM_ID}
+				, #{item.AMOUNT}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<select id="selectMaxPutMaterialsId" resultType="int">
+		SELECT NVL(TO_NUMBER(SUBSTR(MAX(PUT_MATERIALS_ID), 3)), 0) + 1 AS MAX_NUMBER 
+		  FROM PUT_MATERIALS
+	</select>
+	
+    <delete id="deleteProductionOrder">
+	    DELETE FROM PRODUCTION_ORDER
+	     WHERE PRODUCTION_ORDER_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <select id="selectProductionOrderDetailDeleteIds">
+    	SELECT PRODUCTION_ORDER_DETAIL_ID
+		  FROM PRODUCTION_ORDER_DETAIL
+		 WHERE PRODUCTION_ORDER_ID IN
+ 	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </select>
+    
+	<delete id="deleteProductionOrderDetail">
+	    DELETE FROM PRODUCTION_ORDER_DETAIL
+	     WHERE PRODUCTION_ORDER_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+	<delete id="deletePutMaterials">
+	    DELETE FROM PUT_MATERIALS
+	     WHERE PRODUCTION_ORDER_DETAIL_ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+	<update id="updateProductionOrderCnt">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE PRODUCTION_ORDER 
+			   SET ORDER_DETAIL_QUANTITY = (
+					SELECT COUNT(*) AS COUNT 
+					  FROM PRODUCTION_ORDER_DETAIL pod
+					 WHERE PRODUCTION_ORDER_ID = #{row.PRODUCTION_ORDER_ID}
+			   )
+			 WHERE PRODUCTION_ORDER_ID = #{row.PRODUCTION_ORDER_ID}
+	    </foreach>
+    </update>
 </mapper>

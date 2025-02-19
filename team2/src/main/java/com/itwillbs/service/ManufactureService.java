@@ -62,6 +62,8 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "modifyToastTest 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -85,6 +87,8 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "deleteWorkcenter 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -242,6 +246,8 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "modifyProcess 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -336,6 +342,8 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "modifyRouting 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -359,6 +367,8 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "deleteRouting 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -404,9 +414,10 @@ public class ManufactureService {
 				manufactureMapper.updateRoutingProcessQuantity(map);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
 			result = false;
 			message = "insertRoutingSequence 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -561,6 +572,7 @@ public class ManufactureService {
 		return resultMap;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertProductionOrderDetail(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -581,10 +593,57 @@ public class ManufactureService {
  				max_id++;
  			}
  			
+ 			List<Map<String, String>> bomList = manufactureMapper.selectProductionOrderDetailBOM(createdRows);
 			manufactureMapper.insertProductionOrderDetail(createdRows);
+			
+			manufactureMapper.updateProductionOrderCnt(createdRows);
+ 			
+ 			int put_materials_max_id = manufactureMapper.selectMaxPutMaterialsId();
+ 			
+ 			for (Map<String, String> row : bomList) {
+ 				String putMaterialsId = "PM" + String.format("%06d", put_materials_max_id);
+ 				row.put("PUT_MATERIALS_ID", putMaterialsId);
+ 				
+ 				put_materials_max_id++;
+ 			}
+			
+			manufactureMapper.insertProductionOrderDetailBOM(bomList);
 		} catch (Exception e) {
 			result = false;
 			message = "insertProductionOrderDetail 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> deleteProductionOrder(List<String> productionOrderIds) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteProductionOrder 성공";
+		
+		try {
+			if (productionOrderIds.size() > 0) {
+				manufactureMapper.deleteProductionOrder(productionOrderIds);
+				
+				List<String> productionOrderDetailIds = manufactureMapper.selectProductionOrderDetailDeleteIds(productionOrderIds);
+				manufactureMapper.deleteProductionOrderDetail(productionOrderIds);
+				
+				if (productionOrderDetailIds.size() > 0) {
+					manufactureMapper.deletePutMaterials(productionOrderDetailIds);
+				}
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteProductionOrder 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
