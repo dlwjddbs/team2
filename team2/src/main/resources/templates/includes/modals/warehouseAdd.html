@@ -80,13 +80,6 @@
 			const selectedIDs = itemGrid.getData()
 			    .filter(row => row.isNew)
 			    .map(row => row['WAREHOUSE_ID']);
-			
-			// 새로 추가된 행에 선택되어 들어가있는 값은 제거.
-			whseGrid.getData().forEach(row => {
-			    if (selectedIDs.includes(row.WAREHOUSE_ID)) {
-					whseGrid.removeRow(row.rowKey)
-			    }
-			});
 		});
 	});
 	

@@ -667,7 +667,7 @@
 		            "PRODUCT_ID": '',
 		            "LOCATION_ORDER": '',
 		            "CURRENT_QUANTITY": '0',
-		            "RESERVED_QUANTITY": '',
+		            "RESERVED_QUANTITY": '0',
 		            "USE_YN": 'Y',
 		            "DESCRIPTION": '',
 					"WAREHOUSE_ID": locationDataSource.api.readData.initParams.warehouse_id,
@@ -696,7 +696,7 @@
 		            { header: '자재 코드 *', name: 'PRODUCT_ID', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '정렬 *', name: 'LOCATION_ORDER', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            { header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
-		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', renderer: { type: TextInputRenderer2 }},
+		            { header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {
 		                header: '사용여부 *',
 		                name: 'USE_YN',
@@ -737,7 +737,7 @@
 		    let updatedRows = locationGrid.getModifiedRows().updatedRows;
 		    
 		    // 필수 입력 컬럼
-		    const requiredFields = ["LOCATION_ID", "LOCATION_NAME", "PRODUCT_ID", "USE_YN", "LOCATION_ORDER"];
+		    const requiredFields = ["LOCATION_ID", "LOCATION_NAME", "WAREHOUSE_ID", "PRODUCT_ID", "USE_YN", "LOCATION_ORDER"];
 
 		    let validCreatedRows = createdRows.filter(row =>
 		        requiredFields.every(field => 

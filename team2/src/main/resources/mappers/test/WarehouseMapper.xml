@@ -162,7 +162,8 @@
 		                   FROM WAREHOUSE W 
 		                   WHERE W.WAREHOUSE_ID = IL.WAREHOUSE_ID)
 		        , LOCATION_ORDER = #{row.LOCATION_ORDER}
-		        , CURRENT_QUANTITY = #{row.CURRENT_QUANTITY}
+		        , CURRENT_QUANTITY = #{row.CURRENT_QUANTITY, jdbcType=VARCHAR}
+		        , RESERVED_QUANTITY = #{row.RESERVED_QUANTITY, jdbcType=VARCHAR}
 		        , USE_YN = #{row.USE_YN}
 		        , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
 		    WHERE WAREHOUSE_ID = #{row.WAREHOUSE_ID}
@@ -171,12 +172,11 @@
 	</update>
 
 	
-	<update id="deleteLocation">
-		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
-		    UPDATE ITEM_LOCATION 
-			   SET WAREHOUSE_ID = NULL
-			 WHERE LOCATION_ID = #{item}
-		</foreach>
-    </update>
-    
+	<delete id="deleteLocation">
+		DELETE FROM ITEM_LOCATION
+		WHERE LOCATION_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
 </mapper>

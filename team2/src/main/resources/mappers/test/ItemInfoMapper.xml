@@ -72,7 +72,7 @@
 		</foreach>
 		SELECT * FROM DUAL
     </insert>
-    
+
     <update id="updateItemInfo">
 		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
 	        UPDATE ITEM

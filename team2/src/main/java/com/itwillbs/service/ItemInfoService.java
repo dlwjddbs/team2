@@ -11,7 +11,9 @@ import com.itwillbs.repository.ItemInfoMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Log
@@ -90,6 +92,7 @@ public class ItemInfoService {
 				itemInfoMapper.updateItemInfo(updatedRows);
 			}
 		} catch (Exception e) {
+			log.error(e.toString());
 			result = false;
 			message = "modifyItemInfo 실패";
 		}
