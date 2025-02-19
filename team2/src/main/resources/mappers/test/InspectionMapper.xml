@@ -5,6 +5,92 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.InspectionMapper">
+	
+	<select id="selectInboundList" resultType="map">
+		SELECT 
+			   PO_ID 
+			 , C.CLIENT_NAME 
+			 , TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
+		  FROM
+		  	   PURCHASE_ORDER PO
+     LEFT JOIN
+     		   CLIENT C					ON PO.CLIENT_ID = C.CLIENT_ID 
+		 WHERE
+		 	   PO.PO_STATUS = 'Y'
+	  ORDER BY
+	  		   PO.CREATE_DATE ASC
+    </select>
+    
+	<select id="selectInboundDetail" resultType="map">
+		SELECT
+			   PO.PO_ID
+			 , PO.CREATE_DATE
+			 , (
+				 SELECT MC.SUB_ID || '-' || MT.GROUP_CODE || '-' || PD.MATERIAL_ID
+			     FROM MATERIAL MT
+			     LEFT JOIN MATERIAL_CATEGORY MC ON MT.GROUP_CODE = MC.MATL_CTGR 
+			     WHERE MT.MATERIAL_ID = PD.MATERIAL_ID
+			   ) AS MATERIAL_ID
+			 , PD.PO_COUNT
+			 , PD.PODETAIL_ID
+			 , MT.MATERIAL_NAME 
+		  FROM
+		  	   PURCHASE_ORDER PO 
+	 LEFT JOIN
+	 		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+	 LEFT JOIN
+	 		   MATERIAL MT ON PD.MATERIAL_ID = MT.MATERIAL_ID 
+		 WHERE
+		 	   PO.PO_ID = #{po_id}
+    </select>
+    
+    <select id="selectInboundInspectionList" resultType="map">
+    	SELECT
+			   II.INSPECTION_ID
+			 , II.PO_ID
+			 , II.PODETAIL_ID
+			 , RC.REJECTION 
+			 , II.DEFECT_QUANTITY
+			 , II.REJECTION_CODE
+		  FROM
+		  	   INBOUND_INSPECTION II
+	 LEFT JOIN
+	 		   REJECTION_CODE RC ON II.REJECTION_CODE = RC.CODE_ID 
+		 WHERE
+		 	   PODETAIL_ID = #{podetail_id}
+    </select>
+    
+    <insert id="mergeInboundInspection">
+    	<foreach collection="mergeList" item="item" separator=";">
+			MERGE INTO INBOUND_INSPECTION target
+			USING (SELECT
+						  #{item.PODETAIL_ID} AS PODETAIL_ID, 
+						  #{item.REJECTION_CODE} AS REJECTION_CODE, 
+						  #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY 
+               		 FROM DUAL) source
+			   ON (target.PODETAIL_ID = source.PODETAIL_ID AND target.REJECTION_CODE = source.REJECTION_CODE)
+			 WHEN MATCHED THEN
+					UPDATE SET target.DEFECT_QUANTITY = source.DEFECT_QUANTITY
+			 WHEN NOT MATCHED THEN
+					INSERT (PODETAIL_ID, REJECTION_CODE, DEFECT_QUANTITY)
+					VALUES (source.PODETAIL_ID, source.REJECTION_CODE, source.DEFECT_QUANTITY)
+		</foreach>
+	</insert>
+	
+	<delete id="deleteMissingInboundInspections">
+		DELETE FROM INBOUND_INSPECTION target
+		WHERE target.PODETAIL_ID = #{poDetailId}
+		AND NOT EXISTS (
+			SELECT 1 FROM (
+				<foreach collection="deleteList" item="item" separator=" UNION ALL ">
+					SELECT #{item.REJECTION_CODE} AS REJECTION_CODE FROM DUAL
+				</foreach>
+			) temp
+			WHERE target.REJECTION_CODE = temp.REJECTION_CODE
+		)
+	</delete>
+
+	
 	<select id="selectRejectionCode" resultType="map">
 		SELECT
 			   CODE_ID
@@ -12,7 +98,26 @@
 			 , DESCRIPTION 
 		  FROM
 			   REJECTION_CODE
-		 WHERE
-		 	   USE_YN = 'Y'
-    </select>
+			   <!--user 추가-->
+	</select>
+    
+	<insert id="insertInboundinspection">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO INBOUND_INSPECTION (
+				  PO_ID
+				, PODETAIL_ID
+				, DEFECT_QUANTITY
+				, REJECTION_CODE	
+			)
+			VALUES (
+				  #{item.PO_ID}
+				, #{item.PODETAIL_ID}
+				, #{item.REJECTION_QUANTITY}
+				, #{item.REJECTION_CODE}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+    
 </mapper>

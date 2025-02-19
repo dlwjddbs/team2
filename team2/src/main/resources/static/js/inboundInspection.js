@@ -1,10 +1,12 @@
 $(document).on("shown.bs.modal", "#inboundInspection", function() {
-    let rejectionGrid = null;
-    let rejectionInputGrid = null;
+    
+    
     let rejectionQuantity = "";  // 넘버패드 입력값 저장
     let selectRejection = null;
+	let selectCode = null;
     let focusedRowKey = null;  // 현재 포커스된 rowKey 저장
-
+	
+	
     // ------------------- Modal Number Pad -------------------
     $(document).on("click", ".key", function() {
         rejectionQuantity += $(this).data("value");
@@ -22,27 +24,33 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
     });
 
     function updateRejectionQuantity() {
-        let numValue = parseInt(rejectionQuantity, 10) || 0;
-        console.log("Updated Rejection Quantity:", numValue);
+
+		$("#error").text("");
+		$("#save").prop("disabled", false);
+		
+		let numValue = parseInt(rejectionQuantity, 10) || 0;
 
         if (rejectionInputGrid && focusedRowKey !== null) {
-            rejectionInputGrid.setValue(focusedRowKey, 'REJECTION_QUANTITY', numValue);
+            rejectionInputGrid.setValue(focusedRowKey, 'DEFECT_QUANTITY', numValue);
             rejectionInputGrid.refreshLayout();  // UI 강제 업데이트
         }
     }
 
     // ------------------- Rejection Grid -------------------
     function initializeGrid() {
-        if (rejectionGrid) {
-            rejectionGrid.destroy();
+		if (rejectionGrid) {
+			rejectionGrid.destroy();
+			rejectionInputGrid.destroy();
+			rejectionInputGrid = null;
+			rejectionGrid = null;
         }
 
-        const url = '/inspection/inbound';
+        const url = '/inspection/rejectionCode';
         const rejectionDataSource = {
             api: { readData: { url: url, method: 'GET' } },
             contentType: 'application/json',
         };
-
+		
         rejectionGrid = new tui.Grid({
             el: document.getElementById('rejection_grid'),
             data: rejectionDataSource,
@@ -62,15 +70,15 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
             });
 
             selectRejection = rejectionGrid.getValue(ev.rowKey, "REJECTION");
-
+			selectCode = rejectionGrid.getValue(ev.rowKey, "CODE_ID");
             if (selectRejection && rejectionInputGrid) {
-                updateRejectionInputGrid(selectRejection);
+                updateRejectionInputGrid(selectRejection, po_id,);
             }
         });
-
+		
         initializeInputGrid();
     }
-
+	// ------------------- rejection Input Grid -------------------
     function initializeInputGrid() {
 		// Button 
 		class ButtonRenderer {
@@ -92,16 +100,26 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 			}
 		}
 		
+		const url = `/inspection/inboundInspection?podetail_id=${encodeURIComponent(po_detail_data.PODETAIL_ID)}`;
+        const rejectionInputGridDate = {
+            api: { readData: { url: url, method: 'GET' } },
+            contentType: 'application/json',
+        };
+		
+		console.log(rejectionInputGridDate);
+		
         rejectionInputGrid = new tui.Grid({
             el: document.getElementById('rejectioni_input_grid'),
-            data: [],
+            data: rejectionInputGridDate,
             scrollX: false,
             scrollY: false,
-            rowHeaders: ['rowNum'],
             columns: [
+                { header: 'LOT', name: 'INSPECTION_ID', align: 'center'},
+                { header: '주문번호', name: 'PO_ID', align: 'center'},
+                { header: '주문상세', name: 'PODETAIL_ID', align: 'center' },
+                { header: '불량코드', name: 'REJECTION_CODE', align: 'center' },
                 { header: '불량명', name: 'REJECTION', align: 'center' },
-                { header: '불량수량', name: 'REJECTION_QUANTITY', align: 'center' },
-                { header: 'LOT', name: 'LOT', align: 'center' },
+                { header: '불량수량', name: 'DEFECT_QUANTITY', align: 'center' },
                 { header: '불량취소', name: 'CANCEL', renderer: {type: ButtonRenderer}, align: 'center' },
             ],
         });
@@ -112,9 +130,9 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
                 start: [ev.rowKey, 0],
                 end: [ev.rowKey, rejectionInputGrid.getColumns().length]
             });
+			
             focusedRowKey = ev.rowKey;
-            rejectionQuantity = "";  // 포커스 변경될 때 입력값 초기화
-            console.log("포커스된 rowKey:", focusedRowKey, "rejectionQuantity 초기화됨");
+            rejectionQuantity = "";
         });
     }
 
@@ -124,7 +142,7 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 
         // 기존 데이터에서 해당 불량명이 있는지 확인
         for (let i = 0; i < data.length; i++) {
-            if (data[i].REJECTION === selectedRejection) {
+            if (data[i].REJECTION_CODE === selectCode) {
                 existingRowKey = i;
                 break;
             }
@@ -132,21 +150,66 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 
         if (existingRowKey !== null) {
             // 이미 존재하면 해당 행으로 포커스 이동
-            rejectionInputGrid.focus(existingRowKey, 'REJECTION_QUANTITY');
+            rejectionInputGrid.focus(existingRowKey, 'DEFECT_QUANTITY');
             focusedRowKey = existingRowKey;
         } else {
             // 존재하지 않으면 새로운 행 추가
             let newRowKey = rejectionInputGrid.getRowCount();
-            rejectionInputGrid.appendRow({ REJECTION: selectedRejection, REJECTION_QUANTITY: 0 });
-            rejectionInputGrid.focus(newRowKey, 'REJECTION_QUANTITY');
+            rejectionInputGrid.appendRow({ 
+				INSPECTION_ID: '',
+				PO_ID: po_id,
+				PODETAIL_ID: po_detail_data.PODETAIL_ID,
+				REJECTION_CODE: selectCode,
+				REJECTION: selectedRejection,
+				DEFECT_QUANTITY: 0
+			});
+            rejectionInputGrid.focus(newRowKey, 'DEFECT_QUANTITY');
             focusedRowKey = newRowKey;
         }
 
-        // 포커스 변경될 때 입력값 초기화
         rejectionQuantity = "";
     }
 
     $(function () {
         initializeGrid();
     });
+	
+// ------------------------------------------------- < 저장 버튼 >	
+	 $('#save').on('click', function () {
+
+		// 불량 수량 전체 합계
+		let total_count = rejectionInputGrid.getData()
+					        .map(row => parseInt(row.DEFECT_QUANTITY, 10) || 0)
+					        .reduce((acc, cur) => acc + cur, 0);
+				
+		if (total_count > po_detail_data.PO_COUNT) {
+		    $("#error").text("불량 수량이 검사 수량을 초과할 수 없습니다.");
+		    $("#save").prop("disabled", true);
+			return;
+		}
+		
+		if (total_count === 0) {
+			$("#error").text("불량 수량을 입력해주세요.");
+		    $("#save").prop("disabled", true);
+			return;
+		}
+		
+		let requestData = rejectionInputGrid.getData();
+		let filteredData = requestData.filter(item => item.DEFECT_QUANTITY !== 0);
+			
+		$.ajax({
+			url: '/ajax/saveInboundInspection',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(filteredData),
+			success: function () {
+				console.log("저장 성공");
+			},
+			error: function (xhr, status, error) {
+				console.error("모달 저장 실패", xhr, status, error);
+			}
+			
+		});
+		
+	});
 });

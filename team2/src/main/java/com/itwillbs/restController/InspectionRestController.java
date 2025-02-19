@@ -35,14 +35,65 @@ import lombok.extern.java.Log;
 @RestController
 public class InspectionRestController {
 	
-	private final String inbound_url = "/inspection/inbound";	//입고검수
-	
 	private final InspectionService inspectionService;
 	
-	@GetMapping(inbound_url)
+	@GetMapping("/inspection/inboundList")
+	public Map<String, Object> getInboundList() {
+		return inspectionService.selectInboundList();
+	}	
+	
+	@GetMapping("/inspection/inboundDetail")
+	public Map<String, Object> getInboundDetail(@RequestParam Map<String, Object> map) {
+		return inspectionService.selectInboundDetail(map); 
+	}
+	
+//======================================================================	
+	
+//	입고 검수 반려 코드
+	private final String rejection_url = "/toast/rejectionCode";
+	@GetMapping(rejection_url)
 	public Map<String, Object> getRejectionCode() {
 		return inspectionService.selectRejectionCode();
+	}
+	
+	@PostMapping(rejection_url)
+	public Map<String, Object> insertRejectionCode(@RequestBody Map<String, Object> requestData) {
+	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+		
+        return inspectionService.insertRejectionCode(createdRows);
 	}	
+	
+	@DeleteMapping(rejection_url)
+	public Map<String, Object> deleteRejectionCode(@RequestHeader("X-Delete-IDs") String ids) {
+        List<String> idList = Arrays.asList(ids.split(","));
+        
+        return inspectionService.deleteRejectionCode(idList);
+	}	
+	
+	@PutMapping(rejection_url)
+	public Map<String, Object> updateRejectionCode(@RequestBody Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		
+		return inspectionService.updateRejectionCode(updatedRows);
+	}	
+	
+	
+	//===================================================================
+	
+	@GetMapping("/inspection/inboundInspection")
+	public Map<String, Object> getInboundInspectionList(@RequestParam Map<String, Object> map) {
+		Map<String, Object> data = inspectionService.selectInboundInspectionList(map);
+		return data;
+	}
+	
+	//================= 02.15 =================
+	
+	
+	@GetMapping("/inspection/rejectionCode")
+	public Map<String, Object> getrejectionCode(@RequestParam Map<String, Object> map) {
+		return inspectionService.selectRejectionCode();
+	}
+	
 	
 }
 
