@@ -20,21 +20,7 @@ public interface DashboardMapper {
 
 	List<Map<String, Object>> getSelectBoxList(Map<String, Object> map);
 
-	double getWeekendTotalWorkHour(Map<String, Object> map);
-
 	List<Map<String, Object>> getMemberSelectBoxList(Map<String, Object> map);
-
-	List<Map<String, Object>> getUserInfo(Map<String, Object> map);
-	
-	List<Map<String, Object>> getWeekend(Map<String, Object> map);
-
-	List<Map<String, Object>> getHoliday(Map<String, Object> map);
-
-	Map<String, Object> getHolidayMinMaxDate(Map<String, Object> map);
-
-	Map<String, Object> getMyLeave(Map<String, Object> map);
-
-	List<Map<String, Object>> getLeaveType();
 	
 	// ====================================================================================
 

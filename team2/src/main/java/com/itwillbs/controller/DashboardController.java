@@ -21,16 +21,23 @@ public class DashboardController {
 	
 	private final DashboardService dashboardService;
 	
+	// 대시보드 테스트 페이지
 	// 설비 정보로 테스트
 	@GetMapping("/testView")
 	public String testView() {
 		return "/dashboard/testView";
 	}
 	
-	// 대시보드 예시 템플릿?
+	// 대시보드 예시 페이지 (전체 현황 예시
 	@GetMapping("/testView2")
 	public String testView2() {
 		return "/dashboard/testView2";
+	}
+	
+	// 대시보드 예시 페이지 (생산 현황 예시)
+	@GetMapping("/testView3")
+	public String testView3() {
+		return "/dashboard/testView3";
 	}
 	
 	@PostMapping("/dashboard/selectBox")
@@ -54,7 +61,6 @@ public class DashboardController {
 	@ResponseBody
 	public List<Map<String, Object>> getEquipmentDonutChart(@RequestParam Map<String, Object> map) {
 		
-		log.info(map.toString());
 		List<Map<String, Object>> attendanceHistoryDonut = dashboardService.getMyAttendanceHistoryDonutChart(map);
 		
 		return attendanceHistoryDonut;

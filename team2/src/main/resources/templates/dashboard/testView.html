@@ -143,12 +143,14 @@
 		<!-- /.content -->
 		</div>
 		<!-- /.content-wrapper -->
+		
 		<!-- 좌측 메뉴 -->
 		<footer th:replace="~{includes/footer :: footer}"></footer>
 		<!-- /.좌측 메뉴 -->
+		
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark">
-		<!-- Control sidebar content goes here -->
+			<!-- Control sidebar content goes here -->
 		</aside>
 	<!-- /.control-sidebar -->
 	</div>
@@ -167,14 +169,11 @@
 
 			donutChart('donutChart', false);
 			stackedBarChart('stackedBarChart', false);
-			
-			//dataTable('example1', date, false);
 		});
 		
 		$("#btnSearch").on("click", function() {
 			let date = $("#reservation").val().split(' ~ ');
 			
-			//dataTable('example1', date, true);
 			donutChart('donutChart', true);
 			stackedBarChart('stackedBarChart', true);
 		});
@@ -200,11 +199,6 @@
 			});
 			$("#reservation").attr("readonly",true);
 			*/
-		}
-		
-		// 조건에 따른 결과를 dataTable에 출력
-		function dataTable(tableId, date, isUpdate) {
-
 		}
 		
 		// 도넛 차트

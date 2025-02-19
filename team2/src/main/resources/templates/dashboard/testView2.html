@@ -47,7 +47,6 @@
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
-
 		<!-- 상단 메뉴 -->
 		<nav th:replace="~{includes/navbar :: navbar}"></nav>
 		<!-- /.상단 메뉴 -->
@@ -65,7 +64,7 @@
 	        <section class="content">
 	        	<section class="content-header">
 		            <div class="container-fluid">
-		                <h1>MES 대시보드 (예시)</h1>
+		                <h1>MES 대시보드 (예시) - 전체 현황</h1>
 		            </div>
 	        	</section>
 	        	
@@ -161,49 +160,50 @@
 	                </div>
 	            </div>
 	        </section>
-		</div>
-		<!-- /.content -->
+			<!-- /.content -->
 		</div>
 		<!-- /.content-wrapper -->
-		<!-- 좌측 메뉴 -->
+		
+		<!-- 하단 메뉴 -->
 		<footer th:replace="~{includes/footer :: footer}"></footer>
-		<!-- /.좌측 메뉴 -->
+		<!-- /.하단 메뉴 -->
+		
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark">
-		<!-- Control sidebar content goes here -->
+			<!-- Control sidebar content goes here -->
 		</aside>
-	<!-- /.control-sidebar -->
+		<!-- /.control-sidebar -->
 	</div>
 	<!-- ./wrapper -->
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-	document.addEventListener("DOMContentLoaded", function() {
-	    new Chart(document.getElementById("processChart"), {
-	        type: "bar",
-	        data: {
-	            labels: ["절단", "조립", "검사"],
-	            datasets: [{ label: "생산량", data: [200, 180, 220], backgroundColor: "blue" },
-	                       { label: "불량률", data: [5, 3, 7], backgroundColor: "red" }]
-	        }
-	    });
-
-	    new Chart(document.getElementById("equipmentChart"), {
-	        type: "doughnut",
-	        data: {
-	            labels: ["사용중", "사용안함"],
-	            datasets: [{ data: [85, 15], backgroundColor: ["green", "gray"] }]
-	        }
-	    });
-
-	    new Chart(document.getElementById("equipmentHistoryChart"), {
-	        type: "line",
-	        data: {
-	            labels: ["08:00", "10:00", "12:00", "14:00"],
-	            datasets: [{ label: "가동률", data: [80, 85, 90, 87], borderColor: "blue", fill: false }]
-	        }
-	    });
-	});
+		document.addEventListener("DOMContentLoaded", function() {
+		    new Chart(document.getElementById("processChart"), {
+		        type: "bar",
+		        data: {
+		            labels: ["절단", "조립", "검사"],
+		            datasets: [{ label: "생산량", data: [200, 180, 220], backgroundColor: "blue" },
+		                       { label: "불량률", data: [5, 3, 7], backgroundColor: "red" }]
+		        }
+		    });
+	
+		    new Chart(document.getElementById("equipmentChart"), {
+		        type: "doughnut",
+		        data: {
+		            labels: ["사용중", "사용안함"],
+		            datasets: [{ data: [85, 15], backgroundColor: ["green", "gray"] }]
+		        }
+		    });
+	
+		    new Chart(document.getElementById("equipmentHistoryChart"), {
+		        type: "line",
+		        data: {
+		            labels: ["08:00", "10:00", "12:00", "14:00"],
+		            datasets: [{ label: "가동률", data: [80, 85, 90, 87], borderColor: "blue", fill: false }]
+		        }
+		    });
+		});
 	</script>
 </body>
 </html>
