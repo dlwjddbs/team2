@@ -191,6 +191,35 @@
 		작업지시에 작업지시상세가 1개 이상이면 POP에 노출
 		*/
 		
+		class CustomNumberEditor {
+		    constructor(props) {
+		        const el = document.createElement('input');
+		        el.type = 'text'; // 숫자만 입력 가능하도록 처리
+		        el.style.width = '100%';
+		        el.style.textAlign = 'right';
+		        el.value = props.value || '';
+		
+		        this.el = el;
+		    }
+		
+		    getElement() {
+		        return this.el;
+		    }
+		
+		    getValue() {
+		        return this.el.value;
+		    }
+		
+		    mounted() {
+		        this.el.focus(); // 자동 포커스
+		
+		        // **입력할 때 숫자만 남기기**
+		        this.el.addEventListener('input', (event) => {
+		            event.target.value = event.target.value.replace(/[^0-9]/g, '');
+		        });
+		    }
+		}
+		
 		const TextInputRenderer = function(props) {
 			const el = document.createElement('input');
 			el.type = 'text';
@@ -436,7 +465,7 @@
 		            {header: '생성일시', name: 'CREATE_DATETIME', align: 'center', editor: null},
 		            {header: '품목코드 *', name: 'ITEM_ID', align: 'center', editor: null, renderer: { type: TextInputBtnRenderer }},
 		            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
-		            {header: '생산량 *', name: 'AMOUNT', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '생산량 *', name: 'AMOUNT', align: 'center', editor: { type: CustomNumberEditor }, renderer: { type: TextInputRenderer }},
 		            {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
 		            {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
 		            {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},

@@ -47,35 +47,6 @@
 <!-- /.모달창 -->
 
 <script th:fragment="productionOrderDetailAdd" th:inline="javascript">
-	class CustomNumberEditor {
-	    constructor(props) {
-	        const el = document.createElement('input');
-	        el.type = 'text'; // 숫자만 입력 가능하도록 처리
-	        el.style.width = '100%';
-	        el.style.textAlign = 'right';
-	        el.value = props.value || '';
-	
-	        this.el = el;
-	    }
-	
-	    getElement() {
-	        return this.el;
-	    }
-	
-	    getValue() {
-	        return this.el.value;
-	    }
-	
-	    mounted() {
-	        this.el.focus(); // 자동 포커스
-	
-	        // **입력할 때 숫자만 남기기**
-	        this.el.addEventListener('input', (event) => {
-	            event.target.value = event.target.value.replace(/[^0-9]/g, '');
-	        });
-	    }
-	}
-
 	const ModalTextInputRenderer = function(props) {
 		const el = document.createElement('input');
 		el.type = 'text';

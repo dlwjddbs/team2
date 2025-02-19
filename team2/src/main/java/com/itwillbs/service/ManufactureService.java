@@ -580,34 +580,37 @@ public class ManufactureService {
 		String message = "insertProductionOrderDetail 성공";
 		
  		try {
- 			int max_id = manufactureMapper.selectTodayMaxProductionOrderDetailId();
-
- 			LocalDate now = LocalDate.now();
- 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
- 			String formatedNow = now.format(formatter);
- 			
- 			for (Map<String, Object> row : createdRows) {
- 				String productionOrderDetailId = "PROD-" + formatedNow + "-" + String.format("%04d", max_id);
- 				row.replace("PRODUCTION_ORDER_DETAIL_ID", productionOrderDetailId);
- 				
- 				max_id++;
+ 			if (createdRows.size() > 0) {
+	 			int max_id = manufactureMapper.selectTodayMaxProductionOrderDetailId();
+	
+	 			LocalDate now = LocalDate.now();
+	 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+	 			String formatedNow = now.format(formatter);
+	 			
+	 			for (Map<String, Object> row : createdRows) {
+	 				String productionOrderDetailId = "PROD-" + formatedNow + "-" + String.format("%04d", max_id);
+	 				row.replace("PRODUCTION_ORDER_DETAIL_ID", productionOrderDetailId);
+	 				
+	 				max_id++;
+	 			}
+	 			
+	 			List<Map<String, String>> bomList = manufactureMapper.selectProductionOrderDetailBOM(createdRows);
+				manufactureMapper.insertProductionOrderDetail(createdRows);
+				
+				String productionOrderId = createdRows.getFirst().get("PRODUCTION_ORDER_ID").toString();
+				manufactureMapper.updateProductionOrderCnt(productionOrderId);
+	 			
+	 			int put_materials_max_id = manufactureMapper.selectMaxPutMaterialsId();
+	 			
+	 			for (Map<String, String> row : bomList) {
+	 				String putMaterialsId = "PM" + String.format("%06d", put_materials_max_id);
+	 				row.put("PUT_MATERIALS_ID", putMaterialsId);
+	 				
+	 				put_materials_max_id++;
+	 			}
+				
+				manufactureMapper.insertProductionOrderDetailBOM(bomList);
  			}
- 			
- 			List<Map<String, String>> bomList = manufactureMapper.selectProductionOrderDetailBOM(createdRows);
-			manufactureMapper.insertProductionOrderDetail(createdRows);
-			
-			manufactureMapper.updateProductionOrderCnt(createdRows);
- 			
- 			int put_materials_max_id = manufactureMapper.selectMaxPutMaterialsId();
- 			
- 			for (Map<String, String> row : bomList) {
- 				String putMaterialsId = "PM" + String.format("%06d", put_materials_max_id);
- 				row.put("PUT_MATERIALS_ID", putMaterialsId);
- 				
- 				put_materials_max_id++;
- 			}
-			
-			manufactureMapper.insertProductionOrderDetailBOM(bomList);
 		} catch (Exception e) {
 			result = false;
 			message = "insertProductionOrderDetail 실패";

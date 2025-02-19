@@ -86,6 +86,6 @@ public interface ManufactureMapper {
 
 	int deletePutMaterials(List<String> productionOrderDetailIds);
 
-	int updateProductionOrderCnt(List<Map<String, Object>> createdRows);
+	int updateProductionOrderCnt(String productionOrderId);
 
 }

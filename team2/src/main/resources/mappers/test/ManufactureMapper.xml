@@ -630,14 +630,12 @@
     </delete>
     
 	<update id="updateProductionOrderCnt">
-		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
-			UPDATE PRODUCTION_ORDER 
-			   SET ORDER_DETAIL_QUANTITY = (
-					SELECT COUNT(*) AS COUNT 
-					  FROM PRODUCTION_ORDER_DETAIL pod
-					 WHERE PRODUCTION_ORDER_ID = #{row.PRODUCTION_ORDER_ID}
-			   )
-			 WHERE PRODUCTION_ORDER_ID = #{row.PRODUCTION_ORDER_ID}
-	    </foreach>
+		UPDATE PRODUCTION_ORDER 
+		   SET ORDER_DETAIL_QUANTITY = (
+				SELECT COUNT(*) AS COUNT 
+				  FROM PRODUCTION_ORDER_DETAIL pod
+				 WHERE PRODUCTION_ORDER_ID = #{PRODUCTION_ORDER_ID}
+		   )
+		 WHERE PRODUCTION_ORDER_ID = #{PRODUCTION_ORDER_ID}
     </update>
 </mapper>
