@@ -19,12 +19,11 @@ public interface RequestMapper {
 	List<Map<String, Object>> selectFilteredRequest(Map<String, Object> filters);
     
 	// 출하 등록
-	void insertRequest(Map<String, Object> orderData);
+	void insertRequest(@Param("list") List<Map<String, Object>> list);
 
 	// 출하 수정
 	void updateRequest(Map<String, Object> orderData);
 
 	// 출하 삭제
     void deleteRequest(List<String> orderIds);
-
 }

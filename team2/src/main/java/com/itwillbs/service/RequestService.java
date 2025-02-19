@@ -1,5 +1,6 @@
 package com.itwillbs.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,39 @@ public class RequestService {
         return response;
     }
 
-	public void insertRequest(Map<String, Object> reqData) {
-		reqMapper.insertRequest(reqData);
-	}
+    public void insertRequest(List<Map<String, Object>> reqData) {
+        try {
+            List<Map<String, Object>> insertDataList = new ArrayList<>();
+
+            for (Map<String, Object> item : reqData) {
+                // 로그로 각 항목 출력
+                System.out.println("Processing item: " + item);
+
+                String createDate = (String) item.get("createDate");
+                String orderId = (String) item.get("orderId");
+                String remarks = (String) item.get("remarks");
+                String registBy = (String) item.get("registBy");
+
+                Map<String, Object> requestData = new HashMap<>();
+                requestData.put("CREATE_DATE", createDate);
+                requestData.put("ORDER_ID", orderId);
+                requestData.put("REMARKS", remarks);
+                requestData.put("REGIST_BY", registBy);
+
+                insertDataList.add(requestData);
+            }
+
+            // 리스트 출력
+            System.out.println("Data to be inserted: " + insertDataList);
+
+            reqMapper.insertRequest(insertDataList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("출하요청 등록 중 오류가 발생했습니다.", e);
+        }
+    }
+
 	
 	public void updateRequest(Map<String, Object> reqData) {
 		reqMapper.updateRequest(reqData);

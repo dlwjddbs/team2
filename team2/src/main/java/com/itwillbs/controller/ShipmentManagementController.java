@@ -63,19 +63,19 @@ public class ShipmentManagementController {
     }
     
     @PostMapping(URL + "/insert")
-    public ResponseEntity<Map<String, Object>> insertRequest(@RequestBody Map<String, Object> reqData) {
+    public ResponseEntity<Map<String, Object>> insertRequest(@RequestBody List<Map<String, Object>> reqData) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // insertOrder 메서드를 호출하여 새 수주 정보를 DB에 추가
-        	shipService.insertRequest(reqData);  
+            // 받은 데이터 처리
+            shipService.insertRequest(reqData);
             response.put("success", true);
-            response.put("message", "수주정보가 성공적으로 등록되었습니다.");
+            response.put("message", "출하요청이 성공적으로 등록되었습니다.");
             return ResponseEntity.ok(response);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.put("success", false);
-            response.put("message", "수주정보 등록 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
+            response.put("message", "출하요청 등록 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -86,12 +86,12 @@ public class ShipmentManagementController {
     	try {
     		shipService.updateRequest(reqData);
     		response.put("success", true);
-    		response.put("message", "수주정보가 성공적으로 수정되었습니다.");
+    		response.put("message", "출하요청이 성공적으로 수정되었습니다.");
     		return ResponseEntity.ok(response);
     	} catch(Exception e) {
     		e.printStackTrace();
     		response.put("success", false);
-            response.put("message", "수주정보 수정 중 오류가 발생했습니다.");
+            response.put("message", "출하요청 수정 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
     	}
     }
@@ -102,12 +102,12 @@ public class ShipmentManagementController {
         try {
         	shipService.deleteRequest(requestIds);  
             response.put("success", true);
-            response.put("message", "수주정보가 성공적으로 삭제되었습니다.");
+            response.put("message", "출하요청 정보가 성공적으로 삭제되었습니다.");
             return ResponseEntity.ok(response);  
         } catch (Exception e) {
             e.printStackTrace(); 
             response.put("success", false);
-            response.put("message", "수주정보 삭제 중 오류가 발생했습니다.");
+            response.put("message", "출하요청 삭제 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
         }
     }

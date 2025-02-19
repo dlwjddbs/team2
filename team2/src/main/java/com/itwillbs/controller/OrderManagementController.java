@@ -43,6 +43,7 @@ public class OrderManagementController {
             @RequestParam(name = "startDate", required = false) String startDate,
             @RequestParam(name = "endDate", required = false) String endDate,
             @RequestParam(name = "customerId", required = false) String customerId,
+            @RequestParam(name = "customerName", required = false) String customerName,
             @RequestParam(name = "itemId", required = false) String itemId,
             @RequestParam(name = "orderStatus", required = false) String orderStatus) {
 
@@ -52,6 +53,7 @@ public class OrderManagementController {
         filters.put("startDate", startDate);
         filters.put("endDate", endDate);
         filters.put("customerId", customerId);
+        filters.put("customerName", customerName);
         filters.put("itemId", itemId);
         filters.put("orderStatus", orderStatus);
 

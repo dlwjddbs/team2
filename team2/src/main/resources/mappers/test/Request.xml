@@ -163,18 +163,30 @@
 	</select>
 
     <!-- INSERT -->
-	<insert id="insertRequest">
+	<insert id="insertRequest" parameterType="java.util.List">
+	    INSERT INTO REQUEST (ORDER_ID, CREATE_DATE, REMARKS, REGIST_BY)
+	    VALUES 
+	    <foreach collection="list" item="item" separator=",">
+	        (
+	            #{item.ORDER_ID},
+	            TO_DATE(#{item.CREATE_DATE}, 'YYYY-MM-DD'),
+	            #{item.REMARKS},
+	            #{item.REGIST_BY}
+	        )
+	    </foreach>
+	</insert>
+
+<!-- 	<insert id="insertRequest">
 	    INSERT INTO REQUEST (
-	        REQUEST_ID, CREATE_DATE, CUSTOMER_ID, SALES_REP_ID, DELIVERY_DATE, 
-	        ORDER_QTY, ITEM_ID, ORDER_PR, REMARKS, REGIST_BY, CREATE_DATE, UPDATE_DATE
+	        REQUEST_ID, ORDER_ID, CREATE_DATE, REMARKS, REGIST_BY
 	    )
 	    VALUES (
 	        'REQ-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4, '0'),
-	        TO_DATE(#{createDate}, 'YYYY-MM-DD'), #{customerId}, 
-	        #{salesRepId}, TO_DATE(#{deliveryDate}, 'YYYY-MM-DD'), 
-	        #{orderQty}, #{itemId}, #{orderPr}, #{remarks}, #{registBy}, SYSDATE, SYSDATE
+	        #{orderId}, 
+	        TO_DATE(#{createDate}, 'YYYY-MM-DD'), 
+	        #{remarks}, #{registBy}
 	    )
-	</insert>
+	</insert> -->
     
     <!-- UPDATE -->
     <update id="updateRequest">

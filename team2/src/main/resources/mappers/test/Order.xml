@@ -94,7 +94,7 @@
 	                AND ORDR.CUSTOMER_ID = #{customerId}
 	            </if>
 	            
-	             <!-- 거래처 필터링 팝업-->
+	            <!-- 거래처 필터링 -->
 	            <if test="customerName != null and customerName != 'all'">
 	                AND C.CLIENT_NAME = #{customerName}
 	            </if>

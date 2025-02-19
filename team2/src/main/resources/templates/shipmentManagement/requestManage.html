@@ -426,7 +426,7 @@
 		            // select box 값 변경 시 customerId에 맞는 그리드데이터 재 호출
 		            selectBox.addEventListener('change', function() {
 		                const selectedCustomerId = selectBox.value;  // 사용자가 선택한 customerId 값
-		                loadModalContentAdd(selectedCustomerId || all);  // 선택한 customerId로 fetch 요청 재호출
+		                loadModalContentAdd(selectedCustomerId || 'all');  // 선택한 customerId로 fetch 요청 재호출
 		                console.log('selectedCustomerId', selectedCustomerId)
 		            });
 		        })
@@ -576,7 +576,7 @@
 		function loadModalContentAdd(customerId) {
 		    let url = '/ajax/order?orderStatus=미결';
 		    if (customerId) {
-		        url += `&customerId=${customerId}`;
+		        url += `&customerName=${customerId}`;
 		    }
 
 		    fetch(url)
@@ -644,72 +644,67 @@
 
 		
 		// save btn
-		document.getElementById('btn_save').addEventListener('click', () => {
+		document.getElementById('btn_save').addEventListener('click', async () => {
+		    console.log('btn SAVE');
+		
 		    // 입력값 가져오기
-		    const customerId = document.getElementById('customerId').value.trim();
-		    console.log(customerId, 'customerId')
 		    const createDate = document.getElementById('createDate').value.trim();
-		    console.log(createDate, 'createDate')
 		    const remarks = document.getElementById('detailRemarks').value.trim();
-		    console.log(remarks, 'detailRemarks')
+		    const registBy = document.getElementById('registBy').textContent;
 		    
-			// 선택된 행의 orderId 값 가져오기
-			const selectedRowKeys = add_detail_grid.getCheckedRowKeys();
-			const orderIds = selectedRowKeys.map(rowKey => {
-				const rowData = add_detail_grid.getRow(rowKey);
-				return rowData.ORDER_ID;
-			});
-		 
-		 		    
+		    // 선택된 행의 orderIds 값 가져오기
+		    const selectedRowKeys = add_detail_grid.getCheckedRowKeys();
+		    const orderIds = selectedRowKeys.map(rowKey => {
+		        const rowData = add_detail_grid.getRow(rowKey);
+		        return rowData.ORDER_ID;
+		    });
+		
 		    // 유효성 검사
-		    // 필수 입력 항목이 비어 있는지 확인 (remarks 제외)
-		    if (!customerId || !createDate || !orderIds) {
+		    if (!createDate || !orderIds.length) {  // orderIds가 빈 배열인지 체크
 		        alert('모든 항목을 입력해 주세요.');
-		        return; 
+		        return;
 		    }
 		
-// 		    // orderData 객체 정의
-// 		    const orderData = {
-// 		        orderDate: orderDate,
-// 		        customerId: customerId,
-// 		        salesRepId: salesRepId,
-// 		        deliveryDate: deliveryDate,
-// 		        itemId: itemId,
-// 		        orderQty: orderQty,
-// 		        orderPr: document.getElementById('orderSum').value.replace(/[^0-9.-]+/g, ''),
-// 		        remarks: remarks,
-// 		        registBy: registBy,
-// 		    };
+		    // reqData 객체 정의
+		    const reqData = orderIds.map(orderId => ({
+		        createDate: createDate,
+		        orderId: orderId,
+		        remarks: remarks,
+		        registBy: registBy
+		    }));
 		
-// 		    // 전송할 데이터 확인
-// 		    console.log(orderData);
+		    // 전송할 데이터 확인
+		    console.log(reqData);
 		
-// 		    // 서버로 데이터 전송
-// 		    fetch(`${url}/insert`, {
-// 		        method: 'POST',
-// 		        headers: {
-// 		            'Content-Type': 'application/json',
-// 		        },
-// 		        body: JSON.stringify(orderData)
-// 		    })
-// 		    .then(response => {
-// 		        if (response.ok) {
-// 		            alert('수주정보가 저장되었습니다.');
-// 		            setReadOnly(true);
-// 		            document.getElementById('btn_edit').style.display = 'inline';
-// 		            document.getElementById('btn_save').style.display = 'none';
-// 		            document.getElementById('btn_update').style.display = 'none';
-// 		            $('#orderDetailModal').modal('hide');
-// 		            loadGridData();
-// 		        } else {
-// 		            alert('저장 실패');
-// 		        }
-// 		    })
-// 		    .catch(error => {
-// 		        console.error('Error:', error);
-// 		        alert('서버와의 통신에 실패했습니다.');
-// 		    });
+		    try {
+		        // 서버로 데이터 전송
+		        const response = await fetch(`${url}/insert`, {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json',
+		            },
+		            body: JSON.stringify(reqData)
+		        });
+		
+		        console.log('Response status:', response.status);  // 응답 상태 출력
+		        
+		        // 응답을 JSON 형식으로 파싱
+		        const data = await response.json();
+		        console.log('Response data:', data);  // 서버 응답 데이터 출력
+		        
+		        if (data.success) {
+		            alert('출하요청이 등록되었습니다.');
+		            $('#addRequestModal').modal('hide');
+		            loadGridData();
+		        } else {
+		            alert('저장 실패');
+		        }
+		    } catch (error) {
+		        console.error('Error:', error);
+		        alert('서버와의 통신에 실패했습니다.');
+		    }
 		});
+
 
 	</script>
 </body>
