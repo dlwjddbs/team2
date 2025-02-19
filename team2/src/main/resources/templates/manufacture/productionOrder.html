@@ -129,7 +129,7 @@
 	<script th:inline="javascript">
 		// 작업지시
 		let productionOrderGrid = null;
-		const productionOrderUrl = '/manufacture/productionOrder';
+		const productionOrderUrl = '/rest/manufacture/productionOrder';
 		const productionOrderDataSource = {
 			api: {
 			    readData: {url: productionOrderUrl, method: 'GET'},
@@ -157,7 +157,7 @@
 		
 		// 작업지시상세
 		let productionOrderDetailGrid = null;
-		const productionOrderDetailUrl = '/manufacture/productionOrderDetail';
+		const productionOrderDetailUrl = '/rest/manufacture/productionOrderDetail';
 		const productionOrderDetailDataSource = {
 			api: {
 				createData: {url: productionOrderDetailUrl, method: 'POST'},

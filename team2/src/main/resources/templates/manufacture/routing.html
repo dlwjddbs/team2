@@ -133,7 +133,7 @@
 	<script th:inline="javascript">
 		// 라우팅
 		let routingGrid = null;
-		const routingUrl = '/manufacture/routing';
+		const routingUrl = '/rest/manufacture/routing';
 		const routingDataSource = {
 			api: {
 			    readData: {url: routingUrl, method: 'GET'},
@@ -164,7 +164,7 @@
 		
 		// 라우팅 절차
 		let sequenceGrid = null;
-		const sequenceUrl = '/manufacture/sequence';
+		const sequenceUrl = '/rest/manufacture/sequence';
 		const sequenceDataSource = {
 			api: {
 				createData: {url: sequenceUrl, method: 'POST'},

@@ -29,18 +29,18 @@ public class ManufactureRestController {
 	
 	private final ManufactureService manufactureService;
 	
-	private final String workcenter_url = "/manufacture/workcenter";
-	private final String manager_url = "/manufacture/workcenterManager";
-	private final String equipment_url = "/manufacture/equipment";
-	private final String process_url = "/manufacture/process";
-	private final String routing_url = "/manufacture/routing";
-	private final String item_url = "/manufacture/routingItem";
-	private final String routing_sequence_url = "/manufacture/sequence";
-	private final String production_order_url = "/manufacture/productionOrder";
-	private final String production_order_detail_url = "/manufacture/productionOrderDetail";
-	private final String production_order_item_url = "/manufacture/productionOrderItem";
-	private final String production_order_bom_url = "/manufacture/productionOrderBOM";
-	private final String production_order_workcenter_url = "/manufacture/productionOrderWorkcenter";
+	private final String workcenter_url = "/rest/manufacture/workcenter";
+	private final String manager_url = "/rest/manufacture/workcenterManager";
+	private final String equipment_url = "/rest/manufacture/equipment";
+	private final String process_url = "/rest/manufacture/process";
+	private final String routing_url = "/rest/manufacture/routing";
+	private final String item_url = "/rest/manufacture/routingItem";
+	private final String routing_sequence_url = "/rest/manufacture/sequence";
+	private final String production_order_url = "/rest/manufacture/productionOrder";
+	private final String production_order_detail_url = "/rest/manufacture/productionOrderDetail";
+	private final String production_order_item_url = "/rest/manufacture/productionOrderItem";
+	private final String production_order_bom_url = "/rest/manufacture/productionOrderBOM";
+	private final String production_order_workcenter_url = "/rest/manufacture/productionOrderWorkcenter";
 	
 	@GetMapping(workcenter_url)
 	public Map<String, Object> getWorkcenter() {

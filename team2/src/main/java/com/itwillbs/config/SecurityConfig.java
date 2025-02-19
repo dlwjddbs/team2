@@ -46,6 +46,7 @@ public class SecurityConfig {
 			            		, "/department/**"
 			            		, "/order/**"
 			            		, "/manufacture/**"
+			            		, "/rest/**"
 			            		, "/equipment/**"
 			            		, "/clientinfo/**"
 			            		, "/iteminfo/**"

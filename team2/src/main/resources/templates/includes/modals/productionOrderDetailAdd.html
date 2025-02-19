@@ -80,7 +80,7 @@
         { header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', hidden: true},
 	];
 	let processParam = {use_yn: 'Y', inspection_yn: '', searchKeyword: ''};
-	const processUrl = '/manufacture/productionOrderBOM';
+	const processUrl = '/rest/manufacture/productionOrderBOM';
 	const processDataSource = {
 		api: {
 		    readData: {url: processUrl, method: 'GET', initParams: {production_order_id: '', amount: ''}},

@@ -136,7 +136,7 @@
 	<script th:inline="javascript">
 		// 워크센터
 		let workcenterGrid = null;
-		const workcenterUrl = '/manufacture/workcenter';
+		const workcenterUrl = '/rest/manufacture/workcenter';
 		const workcenterDataSource = {
 			api: {
 			    readData: {url: workcenterUrl, method: 'GET'},
@@ -166,7 +166,7 @@
 		
 		// 설비
 		let equipmentGrid = null;
-		const equipmentUrl = '/manufacture/equipment';
+		const equipmentUrl = '/rest/manufacture/equipment';
 		const equipmentDataSource = {
 			api: {
 				createData: {url: equipmentUrl, method: 'POST'},
