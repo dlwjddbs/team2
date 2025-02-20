@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.itwillbs.repository.ManufactureMapper;
-import com.itwillbs.util.SelectMapperExecutor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,67 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class ManufactureService {
 	
 	private final ManufactureMapper manufactureMapper;
-	private final SelectMapperExecutor selectMapperExecutor;
-
-	public Map<String, Object> selectWorkcenter(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectWorkcenterManager(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectEquipment(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProcess(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectRouting(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectRoutingItem(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectRoutingSequence(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProductionOrder(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProductionOrderDetail(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProductionOrderItem(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProductionOrderBOM(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectProductionOrderWorkcenter(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectBom(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectBomDetail(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
-	
-	public Map<String, Object> selectBomDetailComponent(Map<String, Object> requestData) {
-		return selectMapperExecutor.execute(requestData);
-	}
 
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> modifyWorkcenter(Map<String, Object> requestData) {
