@@ -3,24 +3,27 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 	<title>Aurora</title>
 
 	<!-- Google Font: Source Sans Pro -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-	<!-- daterange picker -->
-	<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
 	<!-- Toast Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-	<!-- jQuery OrgChart CSS CDN -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css" integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	
 	<style>
 		#keyboard {
@@ -49,9 +52,6 @@
 </head>
 <body class="layout-top-nav">
 	<div class="wrapper">
-		<!-- 상단 메뉴 -->
-		<nav th:replace="~{includes/navbar :: navbar}"></nav>
-		<!-- /.상단 메뉴 -->
 		<div class="content-wrapper">
 			<!-- Main content -->
 			<section class="content pt-2">
@@ -67,18 +67,18 @@
 						<div class="card-body">
 							<div class="row">
 								<div class="col-4">
-									<div id="inboundList">
-											<!-- Toast Grid Ajax -->
+									<div id="workcenter">
+										<!-- Toast Grid -->
 									</div>
 								</div>
 								<div class="col-8">
 									<div id="inboundDetail">
-											<!-- Toast Grid Ajax -->
+										<!-- Toast Grid -->
 									</div>
 								</div>
 							</div>
 						</div>
-						<div th:insert="~{POP/inbound/inboundInspection :: inboundInspection}"></div>
+<!--						<div th:insert="~{POP/inbound/inboundInspection :: inboundInspection}"></div>-->
 					</div>
 				</div>
 			</section>
@@ -86,95 +86,67 @@
 		</div>
 	</div>
 	<!-- ./wrapper -->
-
-	<!-- jQuery -->
-	<script src="../../plugins/jquery/jquery.min.js"></script>
-	<!-- Bootstrap 4 -->
-	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<!-- DataTables  & Plugins -->
-	<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-	<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-	<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-	<script src="../../plugins/jszip/jszip.min.js"></script>
-	<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-	<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-	<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-	<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-	<!-- AdminLTE App -->
-	<script src="../../dist/js/adminlte.min.js"></script>
-	<!-- AdminLTE for demo purposes -->
-	<script src="../../dist/js/demo.js"></script>
-	<!-- InputMask -->
-	<script src="../../plugins/moment/moment.min.js"></script>
-	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
-	<!-- date-range-picker -->
-	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
-	<!-- Toast Grid -->
-	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
-	<!-- jQuery OrgChart JS CDN -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/js/jquery.orgchart.min.js" integrity="sha512-IUNqrYw8R7mj0iBzb0FOTGTgEFrxZCHVCHnePUEmcjJ/XQE/0sqRhBmGpp20N2lVzAkIBs0Sz+ibRN8/W9YFnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		let inboundListGrid = null;
+		let workcenterGrid = null;
+		/*
 		let inboundDetailGrid = null;
 		let rejectionGrid = null;
 		let rejectionInputGrid = null;
 		let po_id = '';
 		let po_detail_data = [];
+		*/
 		
-		const url = '/inspection/inboundList';
-		const dataSource = {
-	        api: {
-	            readData: {url: url, method: 'GET'},
-	        },
+		const workcenter_url = '/rest/production/workcenter';
+		const workcenter_dataSource = {
+			api: {
+				readData: {url: workcenter_url, method: 'GET'},
+			},
 			contentType: 'application/json',
-	    };
+		};
 		
 		$(function () {
-		    inboundList();
+			workcenterInit();
 		});
 		
-		function inboundList() {
-		    inboundListGrid = new tui.Grid({
-		        el: document.getElementById('inboundList'),
-		        data: dataSource,
-		        scrollX: true,
-		        scrollY: false,
-		        columns: [
-		            {header: '주문번호', name: 'PO_ID', align: 'center', editor: 'text'},
-		            {header: '거래처', name: 'CLIENT_NAME', align: 'center', editor: 'text'},
-		            {header: '발주일자', name: 'CREATE_DATE', align: 'center', editor: 'text'},
-		        ],
-				editingEvent: 'none',
+		function workcenterInit() {
+			workcenterGrid = new tui.Grid({
+				el: document.getElementById('workcenter'),
+				data: workcenter_dataSource,
+				scrollX: true,
+				scrollY: false,
+				bodyHeight: 770,
 				rowHeight: 60,
+				columns: [
+					{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center'},
+					{header: '워크센터명', name: 'WORKCENTER_NAME', align: 'left'},
+					{header: '작동상태', name: 'WORKING_CNT', align: 'center'},
+				],
 				
-		    });
+			});
 			
-			// cell 선택 -> 전체 row 선택
-		inboundListGrid.on('focusChange', (ev) => {
-			inboundListGrid.setSelectionRange({
-			    start: [ev.rowKey, 0],
-			    end: [ev.rowKey, inboundListGrid.getColumns().length]
-			  });
-			  
-			  
-			  po_id = inboundListGrid.getValue(ev.rowKey, "PO_ID");
-			  inboundDetail(po_id);
-			  
-		  });
-			
-			
-		} //function grid() 끝
+			workcenterGrid.on('click', (ev) => {
+				if (ev.targetType != "cell") {
+					return;
+				}
+				
+				workcenterGrid.setSelectionRange({
+					start: [ev.rowKey, 0],
+					end: [ev.rowKey, workcenterGrid.getColumns().length]
+				});
+				
+				const workcenterId = workcenterGrid.getValue(ev.rowKey, "WORKCENTER_ID");
+				//inboundDetail(workcenterId);
+			});
+		}
 		
+		/*
 		function inboundDetail(po_id) {
 			if(inboundDetailGrid) {
 				inboundDetailGrid.destroy();
 				inboundDetailGrid = null;
-		  }
+			}
 			
 			// Button 
 			class ButtonRenderer {
@@ -193,7 +165,7 @@
 						
 						
 						const modal = new bootstrap.Modal(document.getElementById('inboundInspection'));
-			            modal.show();
+						modal.show();
 					});
 					
 					this.el = el;
@@ -204,72 +176,41 @@
 			}
 			
 			const url = `/inspection/inboundDetail?po_id=${encodeURIComponent(po_id)}`;
-	        const inboundDetailDataSource = {
-	            api: { readData: { url: url, method: 'GET' } },
-	            contentType: 'application/json',
-	        };
+			const inboundDetailDataSource = {
+				api: {
+					readData: {url: url, method: 'GET'}
+				},
+				contentType: 'application/json',
+			};
 
-	        inboundDetailGrid = new tui.Grid({
-	            el: document.getElementById('inboundDetail'),
-	            data: inboundDetailDataSource,
-	            scrollX: false,
-	            scrollY: false,
-	            columns: [
-	                { header: '상세ID', name: 'PODETAIL_ID', align: 'center', },
-	                { header: '자재코드', name: 'MATERIAL_ID', align: 'center', },
-	                { header: '자재명', name: 'MATERIAL_NAME', align: 'center' },
-	                { header: '주문수량', name: 'PO_COUNT', align: 'center' },
-	                { header: '입고수량', name: '', align: 'center' },
+			inboundDetailGrid = new tui.Grid({
+				el: document.getElementById('inboundDetail'),
+				data: inboundDetailDataSource,
+				scrollX: false,
+				scrollY: false,
+				columns: [
+					{ header: '상세ID', name: 'PODETAIL_ID', align: 'center', },
+					{ header: '자재코드', name: 'MATERIAL_ID', align: 'center', },
+					{ header: '자재명', name: 'MATERIAL_NAME', align: 'center' },
+					{ header: '주문수량', name: 'PO_COUNT', align: 'center' },
+					{ header: '입고수량', name: '', align: 'center' },
 					{ header: '불량유형', name: '', align: 'center'},
 					{ header: '', renderer: {type: ButtonRenderer}, align: 'center', width: 150 },
-	            ],
+				],
 				editingEvent: 'none',
 				rowHeight: 60,
-	        });
+			});
 
-			        // 셀 선택 시 전체 행 선택 및 rejectionInputGrid 업데이트
-	        inboundDetailGrid.on('focusChange', (ev) => {
-	            inboundDetailGrid.setSelectionRange({
-	                start: [ev.rowKey, 0],
-	                end: [ev.rowKey, inboundDetailGrid.getColumns().length - 1]
-	            });
-	        });
-			
+			// 셀 선택 시 전체 행 선택 및 rejectionInputGrid 업데이트
+			inboundDetailGrid.on('focusChange', (ev) => {
+				inboundDetailGrid.setSelectionRange({
+					start: [ev.rowKey, 0],
+					end: [ev.rowKey, inboundDetailGrid.getColumns().length - 1]
+				});
+			});
 		}
-		
-		
-		
-		
-	/*
-	//	---------------- Modal Number Pad ----------------
-		$(document).on("shown.bs.modal", function(event) {
-			let modal = $(event.target);
-
-			if (modal.data("keyboard") !== true) {
-				return;
-			}
-
-
-			modal.find("#keyboard").off("click", ".key").on("click", ".key", function() {
-				let value = $(this).data("value");
-				modal.find("#input").val(function(index, currentVal) {
-					return currentVal + value;
-				});
-			});
-
-			modal.find("#delete").off("click").on("click", function() {
-				modal.find("#input").val(function(index, currentVal) {
-					return currentVal.slice(0, -1);
-				});
-			});
-
-			modal.find("#clear").off("click").on("click", function() {
-			modal.find("#input").val("");
-			});
-		});
-	//  --------------------------------------------------
-	*/
+		*/
 	</script>
-	<script th:src="@{/js/inboundInspection.js}"></script>
+<!--	<script th:src="@{/js/inboundInspection.js}"></script>-->
 </body>
 </html>

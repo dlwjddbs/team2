@@ -7,5 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ProductionMapper {
+	
+	List<Map<String, Object>> selectWorkcenter(Map<String, Object> requestData);
 
 }

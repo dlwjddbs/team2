@@ -5,5 +5,21 @@
 <!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
 
 <mapper namespace="com.itwillbs.repository.ProductionMapper">
-
+	<select id="selectWorkcenter" resultType="map">
+		SELECT
+			   pod.WORKCENTER_ID							AS WORKCENTER_ID 
+			 , w.NAME 										AS WORKCENTER_NAME
+			 , (SELECT CASE WHEN COUNT(*) = 0 THEN '비가동'
+			 		   		ELSE '가동중'
+			 		    END
+				  FROM WORKCENTER_LOG wl
+				 WHERE 
+				 	   1 = 1
+				   AND WORKCENTER_ID = pod.WORKCENTER_ID 
+				   AND START_DATE IS NOT NULL
+				   AND END_DATE IS NULL) 					AS WORKING_CNT
+		  FROM PRODUCTION_ORDER_DETAIL pod
+			   INNER JOIN WORKCENTER w 
+					   ON pod.WORKCENTER_ID = w.WORKCENTER_ID 
+	</select>
 </mapper>
