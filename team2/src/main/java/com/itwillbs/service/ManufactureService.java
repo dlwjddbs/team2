@@ -655,4 +655,156 @@ public class ManufactureService {
 		return resultMap;
 	}
 	
+	public Map<String, Object> selectBom(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectBom 성공";
+		
+		try {
+			List<Map<String, Object>> bomList = manufactureMapper.selectBom(requestData);
+			content.put("contents", bomList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectBom 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> modifyBom(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "modifyBom 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertBom(createdRows);
+			}
+			
+			if (updatedRows.size() > 0) {
+				manufactureMapper.updateBom(updatedRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "modifyBom 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> deleteBom(List<String> idList) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteBom 성공";
+		
+		try {
+			if (idList.size() > 0) {
+				manufactureMapper.deleteBom(idList);
+				manufactureMapper.deleteBomDetailById(idList);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteBom 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	public Map<String, Object> selectBomDetail(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectBomDetail 성공";
+		
+		try {
+			List<Map<String, Object>> bomDetailList = manufactureMapper.selectBomDetail(requestData);
+			content.put("contents", bomDetailList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectBomDetail 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> insertBomDetail(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "insertBomDetail 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertBomDetail(createdRows);
+			
+				Map<String, Object> map = createdRows.get(0);
+				map.put("createdRowsCnt", createdRows.size());
+				
+				manufactureMapper.updateBomQuantity(map);
+			}
+			
+		} catch (Exception e) {
+			result = false;
+			message = "insertBomDetail 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	public Map<String, Object> selectBomDetailComponent(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectBomDetailComponent 성공";
+		
+		try {
+			List<Map<String, Object>> ItemInfoList = manufactureMapper.selectBomDetailComponent(requestData);
+			content.put("contents", ItemInfoList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectBomDetailComponent 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
 }

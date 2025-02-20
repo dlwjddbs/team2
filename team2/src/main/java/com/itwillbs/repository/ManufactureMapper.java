@@ -87,5 +87,23 @@ public interface ManufactureMapper {
 	int deletePutMaterials(List<String> productionOrderDetailIds);
 
 	int updateProductionOrderCnt(String productionOrderId);
+	
+	List<Map<String, Object>> selectBom(Map<String, Object> requestData);
+
+	List<Map<String, Object>> selectBomDetail(Map<String, Object> requestData);
+
+	int insertBom(List<Map<String, Object>> createdRows);
+
+	int updateBom(List<Map<String, Object>> updatedRows);
+
+	int deleteBom(List<String> idList);
+
+	int deleteBomDetailById(List<String> idList);
+
+	List<Map<String, Object>> selectBomDetailComponent(Map<String, Object> requestData);
+
+	int insertBomDetail(List<Map<String, Object>> createdRows);
+
+	int updateBomQuantity(Map<String, Object> map);
 
 }

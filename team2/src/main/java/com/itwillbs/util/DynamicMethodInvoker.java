@@ -7,8 +7,6 @@ import java.util.Map;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.itwillbs.service.ManufactureService;
-
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -21,20 +19,20 @@ public class DynamicMethodInvoker {
 		return str.substring(0, 1).toUpperCase() + str.substring(1);
 	}
 	
-    private Object getServiceBean(String serviceName) {
-    	// 클래스가 @Service로 등록될 때 Bean의 이름은 자동으로 소문자로 변환되어 저장됨
-    	// 그러니 url의 대소문자 신결쓸 필요 없음.
-        String beanName = serviceName + "Service";
-        return applicationContext.getBean(beanName);
-    }
+	private Object getServiceBean(String serviceName) {
+		// 클래스가 @Service로 등록될 때 Bean의 이름은 자동으로 소문자로 변환되어 저장됨
+		// 그러니 url의 대소문자 신결쓸 필요 없음.
+		String beanName = serviceName + "Service";
+		return applicationContext.getBean(beanName);
+	}
 
 	public <T> Map<String, Object> invokeServiceMethod(String serviceName, String prefix, String urlid, Class<T> paramType, T paramValue) {
 		try {
-            Object service = getServiceBean(serviceName);
-            String methodName = prefix + capitalize(urlid);
-            Method method = service.getClass().getMethod(methodName, paramType);
+			Object service = getServiceBean(serviceName);
+			String methodName = prefix + capitalize(urlid);
+			Method method = service.getClass().getMethod(methodName, paramType);
 
-            return (Map<String, Object>) method.invoke(service, paramValue);
+			return (Map<String, Object>) method.invoke(service, paramValue);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("메서드 없음: " + e.getMessage(), e);
 		} catch (IllegalArgumentException e) {

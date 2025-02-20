@@ -26,18 +26,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/rest/{serviceName}/{urlid}")
 @RestController
-public class ManufactureRestController {
+public class DynamicRestController {
 	
 	private final DynamicMethodInvoker dynamicMethodInvoker;
 	
-    private String serviceName;
-    private String urlid;
-    
-    @ModelAttribute
-    public void setPathVariables(@PathVariable("serviceName") String serviceName, @PathVariable("urlid") String urlid) {
-        this.serviceName = serviceName;
-        this.urlid = urlid;
-    }
+	private String serviceName;
+	private String urlid;
+	
+	@ModelAttribute
+	public void setPathVariables(@PathVariable("serviceName") String serviceName, @PathVariable("urlid") String urlid) {
+		this.serviceName = serviceName;
+		this.urlid = urlid;
+	}
 
 	@GetMapping
 	public Map<String, Object> invokeGetMethod(@RequestParam Map<String, Object> requestData) {
