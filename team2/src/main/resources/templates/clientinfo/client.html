@@ -147,7 +147,23 @@
             {header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null},
             {header: '거래처명', name: 'CLIENT_NAME', align: 'left', editor: null},
             {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'center', editor: null},
-            {header: '사업자번호', name: 'BUSINESS_NUMBER', align: 'left', editor: null},
+            {
+				header: '사업자번호', 
+				name: 'BUSINESS_NUMBER', 
+				align: 'left', 
+				editor: null,
+				formatter: function({ value }) {
+				       if (!value) return ''; // 값이 없으면 빈 문자열 반환
+				       
+				       const cleanValue = value.replace(/\D/g, ''); // 숫자만 남기기
+				       
+				       if (cleanValue.length === 10) {
+				           return `${cleanValue.slice(0, 2)}-${cleanValue.slice(2, 5)}-${cleanValue.slice(5)}`;
+				       }
+				       
+				       return value; // 10자리가 아니면 그대로 반환
+				   }
+			},
             {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
             {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
             {header: '거래상태', name: 'CLIENT_STATUS', align: 'center', editor: null},
