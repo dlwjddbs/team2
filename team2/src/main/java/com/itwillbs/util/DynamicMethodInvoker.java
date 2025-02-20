@@ -20,9 +20,9 @@ public class DynamicMethodInvoker {
 	}
 	
 	private Object getServiceBean(String serviceName) {
-		// 클래스가 @Service로 등록될 때 Bean의 이름은 자동으로 소문자로 변환되어 저장됨
-		// 그러니 url의 대소문자 신결쓸 필요 없음.
-		String beanName = serviceName + "Service";
+		// 클래스가 @Service로 등록될 때 Bean의 이름의 첫글자는 자동으로 소문자로 변환되어 저장됨
+		String beanName = Character.toLowerCase(serviceName.charAt(0)) + serviceName.substring(1) + "Service";
+		
 		return applicationContext.getBean(beanName);
 	}
 

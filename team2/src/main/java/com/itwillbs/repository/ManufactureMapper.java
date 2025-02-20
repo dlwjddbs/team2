@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ManufactureMapper {
 	
-	List<Map<String, Object>> selectWorkcenter();
+	List<Map<String, Object>> selectWorkcenter(Map<String, Object> requestData);
 	
 	int insertWorkcenter(List<Map<String, Object>> createdRows);
 	
