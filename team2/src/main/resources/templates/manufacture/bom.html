@@ -136,7 +136,7 @@
 	<script th:inline="javascript">
 		// BOM 그리드
 		let bomGrid = null;
-		const bomUrl = '/manufacture/bom';
+		const bomUrl = '/rest/manufacture/bom';
 		const bomDataSource = {
 			api: {
 			    readData: {url: bomUrl, method: 'GET'},
@@ -158,7 +158,7 @@
 		
 		// BOM 상세 그리드
 		let bomDetailGrid = null;
-		const bomDetailUrl = '/manufacture/bomDetail';
+		const bomDetailUrl = '/rest/manufacture/bomDetail';
 		const bomDetailDataSource = {
 			api: {
 				createData: {url: bomDetailUrl, method: 'POST'},

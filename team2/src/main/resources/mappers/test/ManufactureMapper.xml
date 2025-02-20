@@ -638,4 +638,146 @@
 		   )
 		 WHERE PRODUCTION_ORDER_ID = #{PRODUCTION_ORDER_ID}
 	</update>
+	
+	<select id="selectBom" resultType="map">
+		SELECT 
+			   b.BOM_ID
+			 , b.ITEM_ID
+			 , i.ITEM_NAME
+			 , b.PARENT_ID
+			 , b.BOM_QUANTITY
+		  FROM BOM b
+			   LEFT JOIN ITEM i 
+					  ON b.ITEM_ID = i.ITEM_ID
+	</select>
+	
+	<insert id="insertBom">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO BOM (
+				  BOM_ID
+				, ITEM_ID
+				, PARENT_ID
+				, BOM_QUANTITY
+			)
+			VALUES (
+				  #{item.BOM_ID}
+				, #{item.ITEM_ID, jdbcType=VARCHAR}
+				, #{item.PARENT_ID, jdbcType=VARCHAR}
+				, 0
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+
+	<update id="updateBom">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE BOM
+			   SET 
+				   BOM_ID = #{row.BOM_ID}
+			 	 , ITEM_ID = #{row.ITEM_ID, jdbcType=VARCHAR}
+				 , PARENT_ID = #{row.PARENT_ID, jdbcType=VARCHAR}
+			 WHERE BOM_ID = #{row.BOM_ID}
+		</foreach>
+	</update>
+	
+	<delete id="deleteBom">
+		DELETE FROM BOM
+		 WHERE BOM_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="deleteBomDetailById">
+		DELETE FROM BOM_DETAIL
+		 WHERE BOM_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="selectBomDetail" resultType="map">
+		SELECT 
+			   bd.BOM_DETAIL_ID
+			 , bd.COMPONENT_ID
+			 , COALESCE(i.ITEM_NAME, m.MATERIAL_NAME) AS COMPONENT_NAME
+			 , bd.UNIT
+			 , bd.REQUIRED_AMOUNT
+			 , bd.BOM_ID
+		  FROM BOM_DETAIL bd
+			   LEFT JOIN ITEM i 
+			 		  ON bd.COMPONENT_ID = i.ITEM_ID
+			   LEFT JOIN MATERIAL m 
+			 		  ON bd.COMPONENT_ID = m.MATERIAL_ID
+		 WHERE
+		 	   1 = 1
+		<choose>
+			<when test='bom_id != null and bom_id != ""'>
+				AND BOM_ID = #{bom_id}
+			</when>
+			<otherwise>
+				AND BOM_ID IS NULL
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insertBomDetail">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO BOM_DETAIL (
+				  BOM_ID
+				, COMPONENT_ID
+				, UNIT
+				, REQUIRED_AMOUNT
+			)
+			VALUES (
+				  #{item.BOM_ID}
+				, #{item.COMPONENT_ID}
+				, #{item.UNIT}
+				, #{item.REQUIRED_AMOUNT}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+
+	<update id="updateBomQuantity">
+		UPDATE BOM
+		   SET BOM_QUANTITY = #{createdRowsCnt}
+		 WHERE BOM_ID = #{BOM_ID}
+	</update>
+	
+	<select id="selectBomDetailComponent" resultType="map">
+		SELECT 
+			   ITEM_ID 			AS COMPONENT_ID
+			 , ITEM_NAME 		AS COMPONENT_NAME
+			 , ITEM_UNIT 		AS UNIT
+			 , 'ITEM' 			AS TYPE
+		  FROM ITEM
+		 WHERE 
+			   1 = 1
+		<if test='type != null and type != ""'>
+			AND #{type} = 'ITEM'
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (ITEM_ID LIKE '%' || #{searchKeyword} || '%'
+				OR ITEM_NAME LIKE '%' || #{searchKeyword} || '%')
+		</if>
+		 UNION ALL
+		SELECT 
+			   MATERIAL_ID 		AS COMPONENT_ID
+			 , MATERIAL_NAME 	AS COMPONENT_NAME
+			 , UNIT 			AS UNIT
+			 , 'MATERIAL' 		AS TYPE
+		  FROM MATERIAL
+		 WHERE 
+			   1 = 1
+		<if test='type != null and type != ""'>
+			AND #{type} = 'MATERIAL'
+		</if>
+		<if test='searchKeyword != null and searchKeyword != ""'>
+			AND (MATERIAL_ID LIKE '%' || #{searchKeyword} || '%'
+				OR MATERIAL_NAME LIKE '%' || #{searchKeyword} || '%')
+		</if>
+	</select>
 </mapper>

@@ -18,28 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class ManufactureService {
 	
 	private final ManufactureMapper manufactureMapper;
-	
-	public Map<String, Object> selectWorkcenter(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectWorkcenter 성공";
-		
-		try {
-			List<Map<String, Object>> workcenterList = manufactureMapper.selectWorkcenter();
-			content.put("contents", workcenterList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectWorkcenter 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
 
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> modifyWorkcenter(Map<String, Object> requestData) {
@@ -97,50 +75,6 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectWorkcenterManager(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectWorkcenterManager 성공";
-		
-		try {
-			List<Map<String, Object>> workcenterList = manufactureMapper.selectWorkcenterManager(requestData);
-			content.put("contents", workcenterList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectWorkcenterManager 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectEquipment(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectEquipment 성공";
-		
-		try {
-			List<Map<String, Object>> workcenterList = manufactureMapper.selectEquipment(requestData);
-			content.put("contents", workcenterList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectEquipment 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
 	public Map<String, Object> insertEquipment(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		Boolean result = true;
@@ -172,28 +106,6 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "deleteEquipment 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectProcess(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProcess 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProcess(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProcess 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -277,50 +189,6 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectRouting(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectRouting 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectRouting(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectRouting 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectRoutingItem(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectRoutingItem 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectRoutingItem(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectRoutingItem 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> modifyRouting(Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
@@ -377,28 +245,6 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectRoutingSequence(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectRoutingSequence 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectRoutingSequence(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectRoutingSequence 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertRoutingSequence(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
@@ -426,71 +272,6 @@ public class ManufactureService {
 		return resultMap;
 	}
 
-	public Map<String, Object> selectProductionOrder(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProductionOrder 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrder(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProductionOrder 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectProductionOrderDetail(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProductionOrderDetail 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderDetail(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProductionOrderDetail 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectProductionOrderItem(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProductionOrderItem 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderItem(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProductionOrderItem 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
 
 	public Map<String, Object> modifyProductionOrder(Map<String, Object> requestData) {
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
@@ -520,50 +301,6 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "modifyProductionOrder 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectProductionOrderBOM(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProductionOrderBOM 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderBOM(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProductionOrderBOM 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
-
-	public Map<String, Object> selectProductionOrderWorkcenter(Map<String, Object> requestData) {
-		Map<String, List<Map<String, Object>>> content = new HashMap<>();
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "selectProductionOrderWorkcenter 성공";
-		
-		try {
-			List<Map<String, Object>> processList = manufactureMapper.selectProductionOrderWorkcenter(requestData);
-			content.put("contents", processList);
-			resultMap.put("data", content);
-		} catch (Exception e) {
-			result = false;
-			message = "selectProductionOrderWorkcenter 실패";
 		}
 		
 		resultMap.put("result", result);
@@ -645,6 +382,92 @@ public class ManufactureService {
 		} catch (Exception e) {
 			result = false;
 			message = "deleteProductionOrder 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> modifyBom(Map<String, Object> requestData) {
+		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
+		List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
+
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "modifyBom 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertBom(createdRows);
+			}
+			
+			if (updatedRows.size() > 0) {
+				manufactureMapper.updateBom(updatedRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "modifyBom 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> deleteBom(List<String> idList) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "deleteBom 성공";
+		
+		try {
+			if (idList.size() > 0) {
+				manufactureMapper.deleteBom(idList);
+				manufactureMapper.deleteBomDetailById(idList);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "deleteBom 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> insertBomDetail(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "insertBomDetail 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				manufactureMapper.insertBomDetail(createdRows);
+			
+				Map<String, Object> map = createdRows.get(0);
+				map.put("createdRowsCnt", createdRows.size());
+				
+				manufactureMapper.updateBomQuantity(map);
+			}
+			
+		} catch (Exception e) {
+			result = false;
+			message = "insertBomDetail 실패";
 			
 			throw e;
 		}
