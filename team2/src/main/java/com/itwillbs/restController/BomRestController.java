@@ -62,14 +62,14 @@ public class BomRestController {
         return bomService.addBomDetail(createdRows);
 	}
 	
-	@DeleteMapping(bomDetail_url)
-	public Map<String, Object> deletBomDetail(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		// 한글ID 넘어올 시 변환
-	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
-	    List<String> bomDetailIds = Arrays.asList(decodedIds.split(","));
-	    
-        return bomService.deleteBomDetail(bomDetailIds);
-	}
+//	@DeleteMapping(bomDetail_url)
+//	public Map<String, Object> deletBomDetail(@RequestHeader("X-Delete-IDs") String encodedIds) {
+//		// 한글ID 넘어올 시 변환
+//	    String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+//	    List<String> bomDetailIds = Arrays.asList(decodedIds.split(","));
+//	    
+//        return bomService.deleteBomDetail(bomDetailIds);
+//	}
 	
 	@GetMapping(component_url)
 	public Map<String, Object> getComponent(@RequestParam Map<String, Object> requestData) {

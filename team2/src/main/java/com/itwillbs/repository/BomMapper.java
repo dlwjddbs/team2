@@ -28,6 +28,6 @@ public interface BomMapper {
 	
 	int updateBomQuantity(Map<String, Object> map);
 
-	int deleteBomDetail(List<String> bomDetailIds);
+//	int deleteBomDetail(List<String> bomDetailIds);
 
 }

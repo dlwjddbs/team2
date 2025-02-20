@@ -166,26 +166,26 @@ public class BomService {
 		return resultMap;
 	}
 	
-	@Transactional(rollbackFor = Exception.class)
-	public Map<String, Object> deleteBomDetail(List<String> bomDetailIds) {
-		Map<String, Object> resultMap = new HashMap<>();
-		
-		Boolean result = true;
-		String message = "deleteBomDetail 성공";
-		
-		try {
-			if (bomDetailIds.size() > 0) {
-				bomMapper.deleteBomDetail(bomDetailIds);
-			}
-		} catch (Exception e) {
-			result = false;
-			message = "deleteBomDetail 실패";
-		}
-		
-		resultMap.put("result", result);
-		resultMap.put("message", message);
-		
-		return resultMap;
-	}
+//	@Transactional(rollbackFor = Exception.class)
+//	public Map<String, Object> deleteBomDetail(List<String> bomDetailIds) {
+//		Map<String, Object> resultMap = new HashMap<>();
+//		
+//		Boolean result = true;
+//		String message = "deleteBomDetail 성공";
+//		
+//		try {
+//			if (bomDetailIds.size() > 0) {
+//				bomMapper.deleteBomDetail(bomDetailIds);
+//			}
+//		} catch (Exception e) {
+//			result = false;
+//			message = "deleteBomDetail 실패";
+//		}
+//		
+//		resultMap.put("result", result);
+//		resultMap.put("message", message);
+//		
+//		return resultMap;
+//	}
 	
 }
