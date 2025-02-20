@@ -77,8 +77,6 @@ public class InspectionService {
 			message = "selectEquipment 실패";
 		}
 		
-		System.out.println(resultMap);
-		
 		resultMap.put("result", result);
 		resultMap.put("message", message);
 		
@@ -154,11 +152,27 @@ public class InspectionService {
 		Boolean result = true;
 		String message = "processInboundInspection() 성공";
 		
+		String poDetailId = rejectionList.get(0).get("PODETAIL_ID").toString();
+		
 		try {
-            String poDetailId = rejectionList.get(0).get("PODETAIL_ID").toString();
-            inspectionMapper.mergeInboundInspection(rejectionList);
-            inspectionMapper.deletemissingInboundInspection(poDetailId, rejectionList);
+			System.out.println(poDetailId);
+	        // 기존 데이터 삭제
+	        inspectionMapper.deleteInboundInspection(poDetailId);
+
+	        // 불량 수량이 0보다 큰 데이터만 필터링
+	        List<Map<String, Object>> validRejectionList = rejectionList.stream()
+	            .filter(item -> item.containsKey("DEFECT_QUANTITY") && 
+	                            item.get("DEFECT_QUANTITY") != null && 
+	                            Integer.parseInt(item.get("DEFECT_QUANTITY").toString()) > 0)
+	            .collect(Collectors.toList());
+	        
+	        // 유효한 데이터가 있을 때만 insert 수행
+	        if (!validRejectionList.isEmpty()) {
+	            inspectionMapper.insertInboundInspection(validRejectionList);
+	        }
         } catch (Exception e) {
+        	
+        	System.out.println("서비스 오류 e: " + e);
             result = false;
             message = "processInboundInspection() 실패";
         }
@@ -183,6 +197,28 @@ public class InspectionService {
 		} catch (Exception e) {
 			result = false;
 			message = "selectEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> insertInboundLots(Map<String, Object> map) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "insertInboundLots 성공";
+		
+		try {
+			inspectionMapper.insertInboundLots(map);
+			inspectionMapper.updatePoDetailStatus(map);
+			inspectionMapper.updatePurchaseOrderStatus(map);
+		} catch (Exception e) {
+			result = false;
+			message = "insertInboundLots 실패";
 		}
 		
 		resultMap.put("result", result);

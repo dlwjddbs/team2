@@ -27,9 +27,15 @@ public interface InspectionMapper {
 	// 입고 검수 불량 데이터 리스트
 	List<Map<String, Object>> selectInboundInspectionList(Map<String, Object> map);
 
-	int mergeInboundInspection(@Param("mergeList") List<Map<String, Object>> mergeList);
+	int insertInboundInspection(@Param("rejectionList") List<Map<String, Object>> rejectionList);
 
-	int deletemissingInboundInspection(@Param("poDetailId") String poDetailId, @Param("deleteList") List<Map<String, Object>> deleteList);
+	int deleteInboundInspection(@Param("poDetailId") String poDetailId);
+
+	int insertInboundLots(Map<String, Object> map);
+
+	int updatePoDetailStatus(Map<String, Object> map);
+
+	int updatePurchaseOrderStatus(Map<String, Object> map);
 
 
 }

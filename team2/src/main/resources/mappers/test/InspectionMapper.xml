@@ -25,23 +25,29 @@
 		SELECT
 			   PO.PO_ID
 			 , PO.CREATE_DATE
-			 , (
-				 SELECT MC.SUB_ID || '-' || MT.GROUP_CODE || '-' || PD.MATERIAL_ID
-			     FROM MATERIAL MT
-			     LEFT JOIN MATERIAL_CATEGORY MC ON MT.GROUP_CODE = MC.MATL_CTGR 
-			     WHERE MT.MATERIAL_ID = PD.MATERIAL_ID
-			   ) AS MATERIAL_ID
+			 , MC.SUB_ID || '-' || MT.GROUP_CODE || '-' || MT.MATERIAL_ID AS MATERIAL_ID
 			 , PD.PO_COUNT
 			 , PD.PODETAIL_ID
-			 , MT.MATERIAL_NAME 
+			 , MT.MATERIAL_NAME
+			 , NVL(SUM(II.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
 		  FROM
-		  	   PURCHASE_ORDER PO 
+		  	   PURCHASE_ORDER PO
 	 LEFT JOIN
-	 		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+	 		   PO_DETAIL PD
+	 		   							ON PO.PO_ID = PD.PO_ID
 	 LEFT JOIN
-	 		   MATERIAL MT ON PD.MATERIAL_ID = MT.MATERIAL_ID 
+	 		   MATERIAL MT
+	 		   							ON PD.MATERIAL_ID = MT.MATERIAL_ID
+	 LEFT JOIN
+	 		   MATERIAL_CATEGORY MC
+	 									ON MT.GROUP_CODE = MC.MATL_CTGR
+	 LEFT JOIN
+	 		   INBOUND_INSPECTION II
+	 									ON PD.PODETAIL_ID = II.PODETAIL_ID
 		 WHERE
 		 	   PO.PO_ID = #{po_id}
+	  GROUP BY
+	  		   PO.PO_ID, PO.CREATE_DATE, MC.SUB_ID, MT.GROUP_CODE, MT.MATERIAL_ID, PD.PO_COUNT, PD.PODETAIL_ID, MT.MATERIAL_NAME
     </select>
     
     <select id="selectInboundInspectionList" resultType="map">
@@ -59,35 +65,62 @@
 		 WHERE
 		 	   PODETAIL_ID = #{podetail_id}
     </select>
-    
-    <insert id="mergeInboundInspection">
-    	<foreach collection="mergeList" item="item" separator=";">
-			MERGE INTO INBOUND_INSPECTION target
-			USING (SELECT
-						  #{item.PODETAIL_ID} AS PODETAIL_ID, 
-						  #{item.REJECTION_CODE} AS REJECTION_CODE, 
-						  #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY 
-               		 FROM DUAL) source
-			   ON (target.PODETAIL_ID = source.PODETAIL_ID AND target.REJECTION_CODE = source.REJECTION_CODE)
-			 WHEN MATCHED THEN
-					UPDATE SET target.DEFECT_QUANTITY = source.DEFECT_QUANTITY
-			 WHEN NOT MATCHED THEN
-					INSERT (PODETAIL_ID, REJECTION_CODE, DEFECT_QUANTITY)
-					VALUES (source.PODETAIL_ID, source.REJECTION_CODE, source.DEFECT_QUANTITY)
-		</foreach>
+<!--
+	<insert id="mergeInboundInspection">
+	    MERGE INTO INBOUND_INSPECTION target
+	    USING (
+	        SELECT 
+	            #{mergeList[0].PODETAIL_ID} AS PODETAIL_ID,
+	            #{mergeList[0].PO_ID} AS PO_ID,
+	            #{mergeList[0].REJECTION_CODE} AS REJECTION_CODE,
+	            #{mergeList[0].DEFECT_QUANTITY} AS DEFECT_QUANTITY
+	        FROM DUAL
+	        <foreach collection="mergeList" item="item" index="index" open=" UNION ALL " separator=" UNION ALL ">
+	        SELECT 
+	            #{item.PODETAIL_ID} AS PODETAIL_ID,
+	            #{item.PO_ID} AS PO_ID,
+	            #{item.REJECTION_CODE} AS REJECTION_CODE,
+	            #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY
+	        FROM DUAL
+	        </foreach>
+	    ) source
+	    ON (target.PODETAIL_ID = source.PODETAIL_ID AND target.REJECTION_CODE = source.REJECTION_CODE)
+	    WHEN MATCHED THEN
+	        UPDATE SET target.DEFECT_QUANTITY = source.DEFECT_QUANTITY
+	    WHEN NOT MATCHED THEN
+	        INSERT (PODETAIL_ID, PO_ID, REJECTION_CODE, DEFECT_QUANTITY)
+	        VALUES (source.PODETAIL_ID, source.PO_ID, source.REJECTION_CODE, source.DEFECT_QUANTITY);
+	    
+	    DELETE FROM INBOUND_INSPECTION
+	    WHERE PODETAIL_ID = #{poDetailId}
+	    AND NOT EXISTS (
+	        SELECT 1 FROM DUAL WHERE #{mergeList.size()} > 0
+	    );
 	</insert>
-	
-	<delete id="deleteMissingInboundInspections">
-		DELETE FROM INBOUND_INSPECTION target
-		WHERE target.PODETAIL_ID = #{poDetailId}
-		AND NOT EXISTS (
-			SELECT 1 FROM (
-				<foreach collection="deleteList" item="item" separator=" UNION ALL ">
-					SELECT #{item.REJECTION_CODE} AS REJECTION_CODE FROM DUAL
-				</foreach>
-			) temp
-			WHERE target.REJECTION_CODE = temp.REJECTION_CODE
-		)
+	<delete id="deletemissingInboundInspection">
+		DELETE FROM INBOUND_INSPECTION
+	    WHERE PODETAIL_ID = #{poDetailId}
+	    AND REJECTION_CODE NOT IN (
+	        <foreach collection="mergeList" item="item" separator=",">
+	            #{item.REJECTION_CODE}
+	        </foreach>
+	    )
+	</delete>
+-->
+
+	<insert id="insertInboundInspection">
+	    INSERT ALL
+	    <foreach collection="rejectionList" item="item">
+	        INTO INBOUND_INSPECTION (PODETAIL_ID, PO_ID, REJECTION_CODE, DEFECT_QUANTITY)
+	        VALUES (#{item.PODETAIL_ID}, #{item.PO_ID}, #{item.REJECTION_CODE}, #{item.DEFECT_QUANTITY})
+	    </foreach>
+	    SELECT 1 FROM DUAL
+	</insert>
+
+		
+	<delete id="deleteInboundInspection">
+	    DELETE FROM INBOUND_INSPECTION
+    	WHERE PODETAIL_ID = #{poDetailId}
 	</delete>
 
 	
@@ -120,4 +153,41 @@
 		SELECT * FROM DUAL
 	</insert>
     
+    <insert id="insertInboundLots">
+		INSERT INTO INBOUND_LOTS (
+				  LOT_ID
+				, PO_ID
+				, MATERIAL_ID
+				, QUANTITY
+		)
+		   SELECT 
+				  PD.PO_ID || '/' || PD.PODETAIL_ID || '/' || (PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0)) AS LOT_ID
+				, PD.PO_ID
+				, PD.MATERIAL_ID
+				, PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0) AS QUANTITY
+			 FROM
+				  PO_DETAIL PD
+		LEFT JOIN
+				  INBOUND_INSPECTION II
+			   ON
+				  PD.PO_ID = II.PO_ID 
+			  AND
+			  	  PD.PODETAIL_ID = II.PODETAIL_ID
+			WHERE
+				  PD.PO_ID =  #{po_id}
+		 GROUP BY
+		 		  PD.PO_ID, PD.PODETAIL_ID, PD.MATERIAL_ID, PD.PO_COUNT
+    </insert>
+    
+	<update id="updatePoDetailStatus" parameterType="map">
+		UPDATE PO_DETAIL
+		   SET PO_STATUS = 'C'
+		 WHERE PO_ID = #{po_id}
+	</update>
+	
+	<update id="updatePurchaseOrderStatus" parameterType="map">
+		UPDATE PURCHASE_ORDER
+		   SET PO_STATUS = 'C'
+		 WHERE PO_ID = #{po_id}
+	</update>
 </mapper>

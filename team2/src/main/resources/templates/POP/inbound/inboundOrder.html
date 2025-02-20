@@ -60,7 +60,7 @@
 						<div class="card-header">
 							<div class="row mb-2">
 								<div class="col-6">
-									<button type="button" class="btn btn-warning btn-lg" data-toggle="defectRegist" data-target="#modal-xl"><i class="fa-solid fa-circle-minus mr-1"></i> 불량등록</button>										
+									<button type="button" class="btn btn-warning btn-lg" id="inbound_inspection_close" data-toggle="defectRegist" data-target="#modal-xl"><i class="fa-solid fa-circle-minus mr-1"></i> 불량등록마감</button>										
 								</div>
 							</div>
 						</div>
@@ -219,8 +219,7 @@
 	                { header: '자재코드', name: 'MATERIAL_ID', align: 'center', },
 	                { header: '자재명', name: 'MATERIAL_NAME', align: 'center' },
 	                { header: '주문수량', name: 'PO_COUNT', align: 'center' },
-	                { header: '입고수량', name: '', align: 'center' },
-					{ header: '불량유형', name: '', align: 'center'},
+					{ header: '불량수량', name: 'TOTAL_DEFECT_QUANTITY', align: 'center'},
 					{ header: '', renderer: {type: ButtonRenderer}, align: 'center', width: 150 },
 	            ],
 				editingEvent: 'none',
@@ -237,7 +236,29 @@
 			
 		}
 		
+//------------------ << 입고 검수 등록 마감 >> ------------------	
 		
+		$('#inbound_inspection_close').on('click', (ev) => {
+			
+			$.ajax({
+				url: '/ajax/closeInboundInspection',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ po_id: po_id }),
+				success: function (response) {
+					alert("입고 검수 마감");
+				},
+				error: function (xhr, status, error) {
+					console.log("마감 실패");
+				},
+				complete: function() {
+					inboundListGrid.readData();
+					inboundDetailGrid.destroy();
+				}
+				
+			});
+			
+		});
 		
 		
 	/*

@@ -176,7 +176,15 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 	
 // ------------------------------------------------- < 저장 버튼 >	
 	 $('#save').on('click', function () {
-
+		
+		let save = $('#save');
+		
+		if (save.prop('disabled')) {
+			return;
+		}
+		save.prop('disabled', true);
+		
+		
 		// 불량 수량 전체 합계
 		let total_count = rejectionInputGrid.getData()
 					        .map(row => parseInt(row.DEFECT_QUANTITY, 10) || 0)
@@ -188,25 +196,32 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 			return;
 		}
 		
-		if (total_count === 0) {
-			$("#error").text("불량 수량을 입력해주세요.");
-		    $("#save").prop("disabled", true);
-			return;
-		}
 		
 		let requestData = rejectionInputGrid.getData();
 		let filteredData = requestData.filter(item => item.DEFECT_QUANTITY !== 0);
-			
+		
+		if (filteredData.length === 0) {
+	       filteredData.push({ PODETAIL_ID: po_detail_data.PODETAIL_ID });
+	   }
+		
 		$.ajax({
 			url: '/ajax/saveInboundInspection',
 			type: 'POST',
 			contentType: 'application/json',
 			data: JSON.stringify(filteredData),
-			success: function () {
-				console.log("저장 성공");
+			success: function (response) {
+				if(response.result){
+					$('#inboundInspection').removeClass('show');
+		            $('body').removeClass('modal-open');
+		            $('.modal-backdrop').remove();
+					inboundDetailGrid.readData();
+				}
 			},
 			error: function (xhr, status, error) {
 				console.error("모달 저장 실패", xhr, status, error);
+			},
+			complete: function() {
+				save.prop('disabled', false);
 			}
 			
 		});
