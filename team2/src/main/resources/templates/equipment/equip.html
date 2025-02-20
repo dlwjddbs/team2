@@ -98,17 +98,16 @@
 									<div class="d-flex justify-content-between">
 								        <div class="equip-container">
 								            <label class="col-form-label equip-label">설비코드</label>
-								            <input type="text" class="form-control equip-input" id="equipId" placeholder="(미구현)">
+								            <input type="text" class="form-control equip-input" id="equipId">
 								
 								            <label class="col-form-label equip-label">설비명</label>
-								            <input type="text" class="form-control equip-input" id="equipName" placeholder="(미구현)">
+								            <input type="text" class="form-control equip-input" id="equipName">
 								
 								            <label class="col-form-label equip-label">사용여부</label>
 								            <select class="equip3 form-control equip-select" name="equipStatus">
-								                <option selected="selected" disabled>(미구현)</option>
-								                <option>전체</option>
-								                <option>사용</option>
-								                <option>미사용</option>
+												<option value="" selected="selected">전체</option>
+												<option value="Y">사용</option>
+												<option value="N">미사용</option>
 								            </select>
 								        </div>
 
@@ -339,26 +338,30 @@
 					instance: equipGrid,
 				    element: document.getElementById('equipGrid')  // DOM 엘리먼트 저장
 			};
+			
+			setTimeout(function () {
+			    allData = equipGrid.getData();
+			    console.log("전체 데이터 로드 완료:", allData);
+			}, 1);
+			
+			// 서버에서 데이터를 받아온 후 allData에 저장
+			equipGrid.on('response', function () {
+				allData = equipGrid.getData();
+				console.log("allData : " + allData);
+			});
 
 			equipGrid.on('failResponse', function (ev) {
 				alert(JSON.parse(ev.xhr.responseText).message);
 				alert("Response 실패");
 			});
 			
-			equipGrid.on('response', function (ev) {
-/* 				console.log("ev : " + ev);
-				allData = equipGrid.getData();
-				console.log("전체 데이터 로드 : ", allData); */
-			});
+			console.log("equipDataSource:", equipDataSource);
+			
+
 
 			equipGrid.on('editingStart', function (ev) {
 				const {rowKey, columnName, value} = ev;
 				const rowData = equipGrid.getRow(rowKey);
-
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-				//if (columnName == 'ID' && !rowData.isNew) {
-				//	ev.stop();
-				//}
 			});
 			
 			equipGrid.on('click', (ev) => {
@@ -507,18 +510,18 @@
 		
 		$("#btn_equip_search").on("click", function() {
 			
-			console.log(allData);
-			
 		    const equipId = $("#equipId").val().trim().toLowerCase();
 		    const equipName = $("#equipName").val().trim().toLowerCase();
 		    const equipStatus = $("select[name='equipStatus']").val(); // 사용여부 (선택값)
 
 		    // 필터링된 데이터 추출
 		    const filteredData = allData.filter(item => {
-		        return (equipId === "" || item.equipId.toLowerCase().includes(equipId)) &&
-		               (equipName === "" || item.equipName.toLowerCase().includes(equipName)) &&
-		               (!equipStatus || item.equipStatus === equipStatus);
+		        return (equipId === "" || item.EQUIPMENT_ID.toLowerCase().includes(equipId)) &&
+		               (equipName === "" || item.EQUIPMENT_NAME.toLowerCase().includes(equipName)) &&
+		               (equipStatus === "" || item.EQUIPMENT_STATUS === equipStatus);
 		    });
+			
+			console.log(filteredData);
 
 		    // 필터링된 데이터로 그리드 갱신
 		    equipGrid.resetData(filteredData);
