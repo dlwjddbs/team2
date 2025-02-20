@@ -44,6 +44,26 @@
 	    .deselected-row {
 	        background-color: #ffd1d1;
 	    }
+	    
+		.equip-container {
+	        display: flex;
+	        align-items: center;
+	        gap: 15px; /* label과 input 간격 유지 */
+	    }
+	
+	    .equip-label {
+	        flex: 0 0 auto;
+	        white-space: nowrap;
+	        text-align: right;
+	    }
+	
+	    .equip-input {
+	        width: 150px;
+	    }
+	
+	    .equip-select {
+	        min-width: 120px;
+	    }
 	</style>
 </head>
 <body class="hold-transition sidebar-mini">
@@ -75,46 +95,24 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<div class="d-flex justify-content-between px-3 py-3">
-								        <div class="d-flex">
-<!-- 								            <label class="col-form-label" style="min-width: 70px">설비코드 : </label>
-								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="(미구현)">
-								            
-								            <label class="col-form-label" style="min-width: 70px">설비명 : </label>
-								            <input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="(미구현)">
-	
-								            <label class="col-form-label" style="min-width: 70px">사용여부 : </label>
-								            <select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
+									<div class="d-flex justify-content-between">
+								        <div class="equip-container">
+								            <label class="col-form-label equip-label">설비코드</label>
+								            <input type="text" class="form-control equip-input" id="equipId" placeholder="(미구현)">
+								
+								            <label class="col-form-label equip-label">설비명</label>
+								            <input type="text" class="form-control equip-input" id="equipName" placeholder="(미구현)">
+								
+								            <label class="col-form-label equip-label">사용여부</label>
+								            <select class="equip3 form-control equip-select" name="equipStatus">
 								                <option selected="selected" disabled>(미구현)</option>
+								                <option>전체</option>
 								                <option>사용</option>
 								                <option>미사용</option>
-								            </select> -->
-											
-											<div class="d-flex">
-												<div class="custom-label">설비코드 :</div>
-												<input type="text" class="form-control mr-3" id="equip1" style="width: 150px;" Placeholder="(미구현)">
-											</div>
-											
-											<div class="d-flex ml-4">
-												<div class="custom-label">설비명 :</div>
-												<select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
-									                <option selected="selected" disabled>(미구현)</option>
-									                <option>사용</option>
-									                <option>미사용</option>
-									            </select>
-												<!-- <select id="itemInput" class="selectpicker" data-live-search="true"></select> -->
-											</div>
-											
-											<div class="d-flex ml-4">
-												<div class="custom-label">사용여부 :</div>
-												<div class="form-check form-switch">
-													<input class="form-check-input" type="checkbox"
-														role="switch" id="statusInput">
-												</div>
-											</div>
+								            </select>
 								        </div>
 
-								        <input type="button" id="btn_equip_insert" class="btn btn-primary" value="조회">
+								        <input type="button" id="btn_equip_search" class="btn btn-primary" value="조회">
 								    </div> 
 								</div>
 								<div class="card-body">
@@ -179,6 +177,7 @@
 		let equipGrid = null;
 		let equipCurrentSelectedRowKey = null;
 		let equipIsEditModeEnabled = false; 
+		let allData = [];
 		
 		// 그리드 정보를 저장하기 위한 전역변수
 		window.gridInstances = window.gridInstances || {};
@@ -337,13 +336,19 @@
 			});
 			
 			window.gridInstances['equipGrid'] = {
-				    instance: equipGrid,
+					instance: equipGrid,
 				    element: document.getElementById('equipGrid')  // DOM 엘리먼트 저장
 			};
 
 			equipGrid.on('failResponse', function (ev) {
 				alert(JSON.parse(ev.xhr.responseText).message);
 				alert("Response 실패");
+			});
+			
+			equipGrid.on('response', function (ev) {
+/* 				console.log("ev : " + ev);
+				allData = equipGrid.getData();
+				console.log("전체 데이터 로드 : ", allData); */
 			});
 
 			equipGrid.on('editingStart', function (ev) {
@@ -500,6 +505,24 @@
 			equipGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
+		$("#btn_equip_search").on("click", function() {
+			
+			console.log(allData);
+			
+		    const equipId = $("#equipId").val().trim().toLowerCase();
+		    const equipName = $("#equipName").val().trim().toLowerCase();
+		    const equipStatus = $("select[name='equipStatus']").val(); // 사용여부 (선택값)
+
+		    // 필터링된 데이터 추출
+		    const filteredData = allData.filter(item => {
+		        return (equipId === "" || item.equipId.toLowerCase().includes(equipId)) &&
+		               (equipName === "" || item.equipName.toLowerCase().includes(equipName)) &&
+		               (!equipStatus || item.equipStatus === equipStatus);
+		    });
+
+		    // 필터링된 데이터로 그리드 갱신
+		    equipGrid.resetData(filteredData);
+		});
 	</script>
 </body>
 
