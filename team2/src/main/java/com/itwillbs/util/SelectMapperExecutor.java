@@ -27,11 +27,11 @@ public class SelectMapperExecutor {
 			// Bean의 이름의 첫글자는 자동으로 소문자로 변환되어 저장됨 주의!
 			Object mapper = applicationContext.getBean(mapperName);
 			
-            // 매퍼 인터페이스 파라미터 반드시 Map<String, Object>로 작성 필수!!!!!
-            Method method = mapper.getClass().getMethod(methodName, Map.class);
-            
-            List<Map<String, Object>> dataList = (List<Map<String, Object>>) method.invoke(mapper, requestData);
-            
+			// 매퍼 인터페이스 파라미터 반드시 Map<String, Object>로 작성 필수!!!!!
+			Method method = mapper.getClass().getMethod(methodName, Map.class);
+			
+			List<Map<String, Object>> dataList = (List<Map<String, Object>>) method.invoke(mapper, requestData);
+			
 			content.put("contents", dataList);
 			resultMap.put("data", content);
 		} catch (Exception e) {
