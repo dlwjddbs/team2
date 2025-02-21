@@ -66,19 +66,18 @@
 						</div>
 						<div class="card-body">
 							<div class="row">
-								<div class="col-4">
+								<div class="col-3">
 									<div id="workcenter">
 										<!-- Toast Grid -->
 									</div>
 								</div>
-								<div class="col-8">
-									<div id="inboundDetail">
+								<div class="col-9">
+									<div id="productionOrderDetail">
 										<!-- Toast Grid -->
 									</div>
 								</div>
 							</div>
 						</div>
-<!--						<div th:insert="~{POP/inbound/inboundInspection :: inboundInspection}"></div>-->
 					</div>
 				</div>
 			</section>
@@ -90,13 +89,8 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let workcenterGrid = null;
-		/*
-		let inboundDetailGrid = null;
-		let rejectionGrid = null;
-		let rejectionInputGrid = null;
-		let po_id = '';
-		let po_detail_data = [];
-		*/
+		let productionOrderDetailGrid = null;
+		let selectedProductionDetailOrderId = '';
 		
 		const workcenter_url = '/rest/production/workcenter';
 		const workcenter_dataSource = {
@@ -115,15 +109,18 @@
 				el: document.getElementById('workcenter'),
 				data: workcenter_dataSource,
 				scrollX: true,
-				scrollY: false,
+				scrollY: true,
 				bodyHeight: 770,
 				rowHeight: 60,
 				columns: [
-					{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center'},
+					{header: '워크센터 코드', name: 'WORKCENTER_ID', align: 'center', width: 100},
 					{header: '워크센터명', name: 'WORKCENTER_NAME', align: 'left'},
-					{header: '작동상태', name: 'WORKING_CNT', align: 'center'},
+					{header: '작동상태', name: 'WORKING_CNT', align: 'center', width: 100},
 				],
-				
+			});
+			
+			workcenterGrid.on('failResponse', function(ev) {
+				alert(JSON.parse(ev.xhr.responseText).message);
 			});
 			
 			workcenterGrid.on('click', (ev) => {
@@ -137,32 +134,49 @@
 				});
 				
 				const workcenterId = workcenterGrid.getValue(ev.rowKey, "WORKCENTER_ID");
-				//inboundDetail(workcenterId);
+				productionOrderDetailInit(workcenterId);
 			});
 		}
 		
-		/*
-		function inboundDetail(po_id) {
-			if(inboundDetailGrid) {
-				inboundDetailGrid.destroy();
-				inboundDetailGrid = null;
+		function productionOrderDetailInit(workcenterId) {
+			if(productionOrderDetailGrid) {
+				productionOrderDetailGrid.destroy();
+				productionOrderDetailGrid = null;
 			}
 			
-			// Button 
 			class ButtonRenderer {
 				constructor(props) {
 					const el = document.createElement('button');
-					el.textContent = '불량등록';
-					el.classList.add('btn', 'btn-outline-primary');
 					
-					el.setAttribute("data-bs-toggle", "modal");
-					el.setAttribute("data-bs-target", "#inboundInspection");
+					const row = props.rowKey;
+					const value = productionOrderDetailGrid.getValue(row, 'STATUS_CODE');
+					
+					const runnning_workcenter_cnt = props.grid.getValue(row, 'RUNNNING_WORKCENTER_CNT');
+					
+					let textContent = '';
+					let btnOption = 'btn-outline-';
+					switch(value) {
+						case 'ST-001':
+							textContent = '작업시작';
+							btnOption += 'primary';
+							
+							if (runnning_workcenter_cnt > 0) {
+								el.disabled = true;
+							}
+							
+							break;
+						case 'ST-002':
+							textContent = '작업종료';
+							btnOption += 'danger';
+							
+							break;
+					}
+					el.textContent = textContent;
+					el.classList.add('btn', btnOption);
 
 					el.addEventListener('click', (ev) => {
 						const rowKey = props.rowKey;
-						po_detail_data = props.grid.getRow(rowKey);
-						
-						
+						selectedProductionDetailOrderId = props.grid.getValue(rowKey, 'PRODUCTION_ORDER_DETAIL_ID');
 						
 						const modal = new bootstrap.Modal(document.getElementById('inboundInspection'));
 						modal.show();
@@ -175,42 +189,38 @@
 				}
 			}
 			
-			const url = `/inspection/inboundDetail?po_id=${encodeURIComponent(po_id)}`;
+			const production_order_url = '/rest/production/productionOrderDetail';
 			const inboundDetailDataSource = {
 				api: {
-					readData: {url: url, method: 'GET'}
+					readData: {url: production_order_url, method: 'GET', initParams: {workcenter_id: workcenterId}}
 				},
 				contentType: 'application/json',
 			};
 
-			inboundDetailGrid = new tui.Grid({
-				el: document.getElementById('inboundDetail'),
+			productionOrderDetailGrid = new tui.Grid({
+				el: document.getElementById('productionOrderDetail'),
 				data: inboundDetailDataSource,
-				scrollX: false,
-				scrollY: false,
-				columns: [
-					{ header: '상세ID', name: 'PODETAIL_ID', align: 'center', },
-					{ header: '자재코드', name: 'MATERIAL_ID', align: 'center', },
-					{ header: '자재명', name: 'MATERIAL_NAME', align: 'center' },
-					{ header: '주문수량', name: 'PO_COUNT', align: 'center' },
-					{ header: '입고수량', name: '', align: 'center' },
-					{ header: '불량유형', name: '', align: 'center'},
-					{ header: '', renderer: {type: ButtonRenderer}, align: 'center', width: 150 },
-				],
-				editingEvent: 'none',
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 770,
 				rowHeight: 60,
-			});
-
-			// 셀 선택 시 전체 행 선택 및 rejectionInputGrid 업데이트
-			inboundDetailGrid.on('focusChange', (ev) => {
-				inboundDetailGrid.setSelectionRange({
-					start: [ev.rowKey, 0],
-					end: [ev.rowKey, inboundDetailGrid.getColumns().length - 1]
-				});
+				columns: [
+					{header: '상세작업코드', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center'},
+					{header: '품목코드', name: 'ITEM_ID', align: 'center',},
+					{header: '품목명', name: 'ITEM_NAME', align: 'left'},
+					{header: '생산량', name: 'AMOUNT', align: 'right'},
+					{header: '기준단위', name: 'ITEM_UNIT', align: 'center'},
+					{header: '생성일자', name: 'CREATE_DATE', align: 'center'},
+					{header: '진행상태', name: 'STATUS_NAME', align: 'center'},
+					{header: '', renderer: {type: ButtonRenderer}, align: 'center', width: 150},
+					{header: '상태코드', name: 'STATUS_CODE', hidden: true},
+					{header: '작동중개수', name: 'RUNNNING_WORKCENTER_CNT', hidden: true},
+				],
 			});
 		}
-		*/
+		
 	</script>
-<!--	<script th:src="@{/js/inboundInspection.js}"></script>-->
+	
+<!-- 	<div th:insert="~{POP/inbound/inboundInspection :: inboundInspection}"></div> -->
 </body>
 </html>

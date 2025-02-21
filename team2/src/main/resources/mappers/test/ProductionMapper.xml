@@ -6,20 +6,49 @@
 
 <mapper namespace="com.itwillbs.repository.ProductionMapper">
 	<select id="selectWorkcenter" resultType="map">
-		SELECT
-			   pod.WORKCENTER_ID							AS WORKCENTER_ID 
-			 , w.NAME 										AS WORKCENTER_NAME
+		SELECT DISTINCT
+			   pod.WORKCENTER_ID								AS WORKCENTER_ID 
+			 , w.NAME 											AS WORKCENTER_NAME
 			 , (SELECT CASE WHEN COUNT(*) = 0 THEN '비가동'
-			 		   		ELSE '가동중'
-			 		    END
-				  FROM WORKCENTER_LOG wl
+					 		ELSE '가동중'
+					 	END
+				  FROM PRODUCTION_ORDER_DETAIL
 				 WHERE 
 				 	   1 = 1
-				   AND WORKCENTER_ID = pod.WORKCENTER_ID 
-				   AND START_DATE IS NOT NULL
-				   AND END_DATE IS NULL) 					AS WORKING_CNT
+				   AND WORKCENTER_ID = pod.WORKCENTER_ID
+				   AND STATUS = 'ST-002') 						AS WORKING_CNT
 		  FROM PRODUCTION_ORDER_DETAIL pod
 			   INNER JOIN WORKCENTER w 
 					   ON pod.WORKCENTER_ID = w.WORKCENTER_ID 
+	</select>
+	
+	<select id="selectProductionOrderDetail" resultType="map">
+		SELECT
+			   pod.PRODUCTION_ORDER_DETAIL_ID 				AS PRODUCTION_ORDER_DETAIL_ID
+			 , pod.ITEM_ID 									AS ITEM_ID
+			 , i.ITEM_NAME 									AS ITEM_NAME
+			 , pod.AMOUNT 									AS AMOUNT
+			 , i.ITEM_UNIT 									AS ITEM_UNIT
+			 , po.CREATE_DATE 								AS CREATE_DATE
+			 , pod.STATUS 									AS STATUS_CODE
+			 , mc.SUB_NAME 									AS STATUS_NAME
+			 , (SELECT COUNT(*) 
+				  FROM PRODUCTION_ORDER_DETAIL 
+				 WHERE 
+					   1 = 1
+				   AND WORKCENTER_ID = #{workcenter_id}
+				   AND STATUS = 'ST-002')					AS RUNNNING_WORKCENTER_CNT
+		  FROM PRODUCTION_ORDER_DETAIL pod
+			   INNER JOIN PRODUCTION_ORDER po 
+					   ON pod.PRODUCTION_ORDER_ID = po.PRODUCTION_ORDER_ID
+			   INNER JOIN ITEM i 
+					   ON pod.ITEM_ID = i.ITEM_ID
+			   INNER JOIN MES_COMMON mc 
+					   ON pod.STATUS = mc.CLASSIFICATION_ID 
+		 WHERE 
+			   1 = 1
+		   AND pod.WORKCENTER_ID = #{workcenter_id}
+		   AND pod.STATUS IN('ST-001', 'ST-002')
+		 ORDER BY po.CREATE_DATE, po.CREATE_TIME ASC
 	</select>
 </mapper>
