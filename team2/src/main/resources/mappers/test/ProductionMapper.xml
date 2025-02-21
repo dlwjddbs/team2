@@ -51,4 +51,26 @@
 		   AND pod.STATUS IN('ST-001', 'ST-002')
 		 ORDER BY po.CREATE_DATE, po.CREATE_TIME ASC
 	</select>
+	
+	<select id="selectProductionOrderDetailBom" resultType="map">
+		SELECT
+			   pm.ITEM_ID 	AS ITEM_ID
+			 , i.ITEM_NAME 	AS ITEM_NAME
+			 , pm.AMOUNT	AS ITEM_AMOUNT
+			 , i.ITEM_UNIT 	AS ITEM_UNIT
+		  FROM PUT_MATERIALS pm
+			   INNER JOIN ITEM i 
+					   ON pm.ITEM_ID = i.ITEM_ID
+		 WHERE PRODUCTION_ORDER_DETAIL_ID = #{productionOrderDetailId}
+		 UNION ALL
+		SELECT 
+			   pm.ITEM_ID		AS ITEM_ID
+			 , m.MATERIAL_NAME 	AS ITEM_NAME
+			 , pm.AMOUNT 		AS ITEM_AMOUNT
+			 , m.UNIT 			AS ITEM_UNIT
+		  FROM PUT_MATERIALS pm 
+			   INNER JOIN MATERIAL m 
+					   ON pm.ITEM_ID = m.MATERIAL_ID 
+		 WHERE PRODUCTION_ORDER_DETAIL_ID = #{productionOrderDetailId}
+	</select>
 </mapper>

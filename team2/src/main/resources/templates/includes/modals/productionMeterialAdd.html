@@ -1,0 +1,257 @@
+<!-- 모달창 -->
+<div class="modal fade" id="productionMeterialAdd" th:fragment="productionMeterialAdd">
+	<div class="modal-dialog modal-custom-size">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">자재 투입</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-4">
+								<span style="padding-left: 20px;">BOM</span>
+								<div class="card-body" id="bomGrid" style="padding-top: 10px;">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+							<div class="col-md-8">
+								<span style="padding-left: 20px;">선택 목록</span>
+								<div class="card-body" id="equipmentModalSelectedGrid" style="padding-top: 10px;">
+									 <!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveEquipment">적용</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="productionMeterialAdd" th:inline="javascript">
+	let bomGrid = null;
+	let selectedEquipmentList = [];
+	let equipmentModalSelectedGrid = null;
+	const equipmentSelected_columns = [
+		{header: '설비 코드', name: 'ITEM_ID', align: 'center', editor: null, width: 100},
+		{header: '설비명', name: 'ITEM_NAME', align: 'left', editor: null},
+		{header: '소요량', name: 'ITEM_AMOUNT', align: 'right', editor: null, width: 90},
+		{header: '단위', name: 'ITEM_UNIT', align: 'center', editor: null, width: 100},
+	];
+	let equipmentParam = {use_yn: '', searchKeyword: ''};
+	
+	const bom_url = '/rest/production/productionOrderDetailBom';
+	const bom_dataSource = {
+		api: {
+			readData: {url: bom_url, method: 'GET', initParams: {productionOrderDetailId: '' }},
+		},
+		contentType: 'application/json',
+	};
+	
+	$('#productionMeterialAdd').on('shown.bs.modal', function () {
+		selectedEquipmentList.length = 0;
+		$("#use_yn").val("").attr("selected", "selected");
+		equipmentParam.use_yn = 'Y';
+		equipmentParam.searchKeyword = '';
+        
+		equipmentModalInit();
+	});
+	
+	function equipmentModalInit() {
+		if (bomGrid) {
+			bomGrid.destroy(); // 기존 그리드 제거
+			bomGrid = null;
+		}
+		
+		bomGrid = new tui.Grid({
+	        el: document.getElementById('bomGrid'),
+	        data: bom_dataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: equipmentSelected_columns,
+	    });
+		
+	    bomGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+	    
+	    // 테이블 데이터 렌더링 완료후에 실행 (테이블 출력이 끝나는 정확한 타이밍을 못잡아서 onGridMounted로 잡고 후처리)
+// 	    bomGrid.on('onGridMounted', () => {
+// 		    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+// 		    const checkGridRendered = () => {
+// 		        setTimeout(() => {
+// 		            if (bomGrid.getData().length > 0) {
+// 		    	    	const equipmentGridNewRows = equipmentGrid.getData().filter(row => row.isNew);
+// 		    		    const selectedRowKeys = bomGrid.getData()
+// 		    			    .filter(row => equipmentGridNewRows.some(newRow => newRow.EQUIPMENT_ID == row.EQUIPMENT_ID))
+// 		    			    .map(row => row.rowKey);
+		    		    
+// 		    		    // 설비 그리드에서 새로 추가된 행 가져와서 설비모달에 선택값 그대로 적용함.
+// 		    		    selectedRowKeys.forEach(function(key) {
+// 			    		    bomGrid.addRowClassName(key, 'selected-row');
+// 		    		    });
+		    		    
+// 		    		    // 설비 그리드에서 새로 추가된 행 selectedEquipmentList 초기값 설정
+// 		    		    equipmentGridNewRows.forEach(function(row) {
+// 		    		    	const mapRowData = {
+// 		    		        	"EQUIPMENT_ID": row.EQUIPMENT_ID,
+// 		    		        	"EQUIPMENT_NAME": row.EQUIPMENT_NAME,
+// 		    		        	"EQUIPMENT_STATUS": row.EQUIPMENT_STATUS,
+// 		    		        	"EQUIPMENT_NOTE": row.EQUIPMENT_NOTE,
+// 		    		        	"WORKCENTER_ID": workcenterCurrentSelectedID,
+// 		    		            isNew: true
+// 		    			    };
+		    		    	
+// 		    		    	selectedEquipmentList.push(mapRowData);
+// 		    		    });
+						
+// 						// selectedEquipmentList 배열을 다 채우고나서 실행해야 값을 가져올 수 있음. 타이밍 유의! 
+// 						equipmentModalSelectedInit();
+// 		            } else {
+// 		                checkGridRendered(); // 데이터가 없으면 다시 체크
+// 		            }
+// 		        }, 100);
+// 		    };
+
+// 		    checkGridRendered(); // 실행
+// 	    });
+	    
+// 	    bomGrid.on('click', (ev) => {
+// 		    if (ev.targetType != "cell") {
+// 				return;
+// 			}
+			
+// 		    const newRowKey = ev.rowKey;
+// 		    const isSelectedRow = bomGrid.getRowClassName(newRowKey).includes('selected-row');
+// 		    const rowData = bomGrid.getRow(newRowKey);
+// 		    const equipment_id = rowData.EQUIPMENT_ID;
+		    
+// 		    if (isSelectedRow) {
+// 		    	bomGrid.removeRowClassName(newRowKey, 'selected-row');
+// 		    	selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
+				
+// 				equipmentModalSelectedGrid.getData().forEach(row => {
+// 				    if (equipment_id == row.EQUIPMENT_ID) {
+// 						equipmentModalSelectedGrid.removeRow(row.rowKey)
+// 				    }
+// 				});
+// 		    } else {
+// 		    	const mapRowData = {
+// 		        	"EQUIPMENT_ID": equipment_id,
+// 		        	"EQUIPMENT_NAME": rowData.EQUIPMENT_NAME,
+// 		        	"EQUIPMENT_STATUS": rowData.EQUIPMENT_STATUS,
+// 		        	"EQUIPMENT_NOTE": rowData.EQUIPMENT_NOTE,
+// 		        	"WORKCENTER_ID": workcenterCurrentSelectedID,
+// 		            isNew: true
+// 			    };
+		    	
+// 		    	selectedEquipmentList.push(mapRowData);
+// 		    	bomGrid.addRowClassName(newRowKey, 'selected-row');
+				
+// 				equipmentModalSelectedGrid.appendRow(mapRowData);
+// 		    }
+// 		});
+	}
+	
+// 	$("#saveEquipment").on('click', function() {
+// 		const rowKeysToDelete = equipmentGrid.getData()
+// 		    .filter(row => row.isNew)
+// 		    .map(row => row.rowKey);
+		
+// 		// 워크센터설비 그리드 기존의 새로 추가된 행 삭제
+// 		rowKeysToDelete.forEach(function(key) {
+// 			equipmentGrid.removeRow(key);
+// 		});
+		
+// 		// 새로 선택된 값 워크센터설비 그리드 행 추가
+// 		selectedEquipmentList.forEach(function(data) {
+// 			equipmentGrid.appendRow(data);
+// 		});
+		
+// 		$("#productionMeterialAdd").modal('hide');
+// 	});
+	
+// 	function equipmentModalSelectedInit() {
+// 		if (equipmentModalSelectedGrid) {
+// 			equipmentModalSelectedGrid.destroy(); // 기존 그리드 제거
+// 			equipmentModalSelectedGrid = null;
+// 		}
+		
+// 		equipmentModalSelectedGrid = new tui.Grid({
+// 	        el: document.getElementById('equipmentModalSelectedGrid'),
+// 			data: selectedEquipmentList,
+// 	        scrollX: true,
+// 	        scrollY: true,
+// 	        bodyHeight: 250,
+// 	        columns: equipmentSelected_columns,
+// 	    });
+// 		//setEquipmentModalSelectedGridColor();
+		
+// 		equipmentModalSelectedGrid.on('click', (ev) => {
+// 			if (ev.targetType != "cell") {
+// 				return;
+// 			}
+			
+// 			const newRowKey = ev.rowKey;
+// 			const rowData = equipmentModalSelectedGrid.getRow(newRowKey);
+// 			const allData = equipmentModalSelectedGrid.getData();
+			
+// 			const equipment_id = rowData.EQUIPMENT_ID;
+// 			selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
+			
+// 			equipmentModalSelectedGrid.removeRow(newRowKey);
+			
+// 			bomGrid.getData().forEach(row => {
+// 			    if (equipment_id == row.EQUIPMENT_ID) {
+// 			        bomGrid.removeRowClassName(row.rowKey, 'selected-row');
+// 			    }
+// 			});
+// 		});
+//     };
+	
+// 	$("#btnEquipmentSearch").on("click", function() {
+// //		equipmentParam.use_yn = $("#use_yn").val();
+// 		equipmentParam.use_yn = 'Y';
+// 		equipmentParam.searchKeyword = $("#equipmentSearchKeyword").val();
+		
+// 		const selectedEquipmentIds = selectedEquipmentList.map(row => row.EQUIPMENT_ID);
+// 		bomGrid.readData(1, equipmentParam, true);
+
+// 		bomGrid.off('onGridUpdated');
+// 		bomGrid.on('onGridUpdated', () => {
+// 		    const updatedRows = bomGrid.getData();
+			
+// 		    // 기존 선택된 설비 ID가 있는 행에 'selected-row' 클래스 추가
+// 		    updatedRows.forEach(row => {
+// 		        if (selectedEquipmentIds.includes(row.EQUIPMENT_ID)) {
+// 		            bomGrid.addRowClassName(row.rowKey, 'selected-row');
+// 		        }
+// 		    });
+// 		});
+// 	});
+	
+// 	function setEquipmentModalSelectedGridColor() {
+// 		equipmentModalSelectedGrid.getData().forEach((row, index) => {
+// 		    equipmentModalSelectedGrid.addRowClassName(index, 'selected-row');
+// 		});
+// 	}
+</script>

@@ -26,26 +26,33 @@
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	
 	<style>
-		#keyboard {
-			display: grid;
-		    grid-template-columns: repeat(3, 1fr);
-		    gap: 3px;
-		    width: 100%;
-		    max-width: 100%;
-			margin-bottom: 20px;
+/* 		#keyboard { */
+/* 			display: grid; */
+/* 			grid-template-columns: repeat(3, 1fr); */
+/* 			gap: 3px; */
+/* 			width: 100%; */
+/* 			max-width: 100%; */
+/* 			margin-bottom: 20px; */
+/* 		} */
+/* 		#keyboard .btn { */
+/* 			flex: 1; */
+/* 			aspect-ratio: 1 / 1; */
+/* 			display: flex;  */
+/* 			align-items: center;  */
+/* 			justify-content: center; */
+/* 			font-size: 1.5rem; */
+/* 		} */
+/* 		.tui-grid-cell-has-input  { */
+/* 			background-color: white !important; */
+/* 		} */
+		.selected-row {
+			background-color: #d1ffd6;
 		}
-		
-		#keyboard .btn {
-			flex: 1;
-			aspect-ratio: 1 / 1;
-		    display: flex; 
-		    align-items: center; 
-		    justify-content: center;
-			font-size: 1.5rem;
+		.deselected-row {
+			background-color: #ffd1d1;
 		}
-		
-		.tui-grid-cell-has-input  {
-		    background-color: white !important;
+		.modal-custom-size {
+			max-width: 1700px;
 		}
 	</style>
 	
@@ -86,11 +93,12 @@
 	</div>
 	<!-- ./wrapper -->
 	
+	<nav th:replace="~{includes/modals/productionMeterialAdd :: productionMeterialAdd}"></nav>
+	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let workcenterGrid = null;
 		let productionOrderDetailGrid = null;
-		let selectedProductionDetailOrderId = '';
 		
 		const workcenter_url = '/rest/production/workcenter';
 		const workcenter_dataSource = {
@@ -150,7 +158,6 @@
 					
 					const row = props.rowKey;
 					const value = productionOrderDetailGrid.getValue(row, 'STATUS_CODE');
-					
 					const runnning_workcenter_cnt = props.grid.getValue(row, 'RUNNNING_WORKCENTER_CNT');
 					
 					let textContent = '';
@@ -176,9 +183,9 @@
 
 					el.addEventListener('click', (ev) => {
 						const rowKey = props.rowKey;
-						selectedProductionDetailOrderId = props.grid.getValue(rowKey, 'PRODUCTION_ORDER_DETAIL_ID');
+						bom_dataSource.api.readData.initParams.productionOrderDetailId = props.grid.getValue(rowKey, 'PRODUCTION_ORDER_DETAIL_ID');
 						
-						const modal = new bootstrap.Modal(document.getElementById('inboundInspection'));
+						const modal = new bootstrap.Modal(document.getElementById('productionMeterialAdd'));
 						modal.show();
 					});
 					
@@ -220,7 +227,5 @@
 		}
 		
 	</script>
-	
-<!-- 	<div th:insert="~{POP/inbound/inboundInspection :: inboundInspection}"></div> -->
 </body>
 </html>
