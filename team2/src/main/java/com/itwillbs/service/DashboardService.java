@@ -50,5 +50,10 @@ public class DashboardService {
 	public List<Map<String, Object>> getAttendanceHistoryStackedBarChart(Map<String, Object> map) {
 		return dashboardMapper.getAttendanceHistoryStackedBarChart(map);
 	}
+	
+	// 막대기 차트(발주(입고))
+	public List<Map<String, Object>> getPoHistoryStackedBarChart(Map<String, Object> map) {
+		return dashboardMapper.getPoStackedBarChart(map);
+	}
 
 }

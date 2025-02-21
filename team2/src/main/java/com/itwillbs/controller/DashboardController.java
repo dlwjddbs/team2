@@ -56,7 +56,7 @@ public class DashboardController {
 		return memberSelectBoxList;
 	}
 	
-	// 도넛 차트
+	// 도넛 차트(테스트 - 설비 정보)
 	@PostMapping("/dashboard/getEquipmentDonutChart")
 	@ResponseBody
 	public List<Map<String, Object>> getEquipmentDonutChart(@RequestParam Map<String, Object> map) {
@@ -66,13 +66,22 @@ public class DashboardController {
 		return attendanceHistoryDonut;
 	}
 	
-	// 막대기 차트
+	// 막대기 차트(테스트 - 설비 정보)
 	@PostMapping("/dashboard/getEquipmentStackedBarChart")
 	@ResponseBody
 	public List<Map<String, Object>> getEquipmentStackedBarChart(@RequestParam Map<String, Object> map) {
 		List<Map<String, Object>> attendanceHistoryStackedBar = dashboardService.getAttendanceHistoryStackedBarChart(map);
 		
 		return attendanceHistoryStackedBar;
+	}
+	
+	// 막대기 차트(발주(입고))
+	@PostMapping("/dashboard/getPoStackedChart")
+	@ResponseBody
+	public List<Map<String, Object>> getPoStackedChart(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> poHistoryStackedBar = dashboardService.getPoHistoryStackedBarChart(map);
+		
+		return poHistoryStackedBar;
 	}
 	
 }

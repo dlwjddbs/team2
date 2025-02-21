@@ -29,7 +29,7 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
-	<!-- ChartJS -->
+	<!-- ChartJS (v2.9.4) -->
 	<script src="../../plugins/chart.js/Chart.min.js"></script>
 	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
@@ -158,6 +158,23 @@
 	                        </div>
 	                    </div>
 	                </div>
+	                
+	                <!-- Donut Chart -->
+	                <!-- 테스트 용 도넛 차트 -->
+					<div class="col-xl-4 col-lg-5">
+					    <div class="card shadow mb-4">
+					        <!-- Card Header - Dropdown -->
+					        <div class="card-header py-3">
+					            <h6 class="m-0 font-weight-bold text-primary">CPU 사용량</h6>
+					        </div>
+					        <!-- Card Body -->
+					        <div class="card-body">
+					            <div class="chart-pie pt-4">
+					                <canvas id="myChart"></canvas>
+					            </div>
+					        </div>
+					    </div>
+					</div>
 	            </div>
 	        </section>
 			<!-- /.content -->
@@ -192,7 +209,21 @@
 		        type: "doughnut",
 		        data: {
 		            labels: ["사용중", "사용안함"],
-		            datasets: [{ data: [85, 15], backgroundColor: ["green", "gray"] }]
+		            datasets: [{
+		                data: [85, 15],
+		                backgroundColor: ["green", "gray"]
+		            }]
+		        },
+		        options: {
+		            responsive: true,	// 반응형, 캔버스 크기 조절
+		            maintainAspectRatio: false,	// 크기 조절될 때 원본 캔버스 방향 비율 유지
+		            rotation: 1 * Math.PI,	// 위쪽을 시작점으로 설정
+		            circumference: 1 * Math.PI,	 // 반원 형태를 위해 180도 설정
+		            cutout: "50%" // 도넛 두께 조정 (차트의 중앙 부분을 비움, 필요시 조절)
+		        
+		            // chart.js 3.9.1부턴 단순 숫자로만 적어도 됨
+		            //rotation: -90, 
+		            //circumference: 180,
 		        }
 		    });
 	

@@ -64,7 +64,7 @@
 	            <div class="container-fluid">
 	                <div class="row mb-2">
 	                    <div class="col-sm-6">
-	                        <h1 class="m-0">발주(입고) 현황 (예시)</h1>
+	                        <h1 class="m-0">생산 현황 (예시)</h1>
 	                    </div>
 	                </div>
 	            </div>
@@ -78,10 +78,10 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">일별 발주 상태</h3>
+	                                <h3 class="card-title">월별 생산량</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="poChart"></canvas>
+	                                <canvas id="productionChart"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -93,7 +93,7 @@
 	                                <h3 class="card-title">불량률</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="poInboundChart"></canvas>
+	                                <canvas id="defectChart"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -133,98 +133,61 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 	    // Chart.js를 사용하여 차트 생성
-		$(function () {
-		    stackedBarChart('poChart', false);
-		});
-		
-		function stackedBarChart(chartId, isUpdate) {
-		    $.ajax({
-		        type: "POST",
-		        url: "/dashboard/getPoStackedChart",
-		        success: function (res) {
-		        	
-		        	console.log(res);
-		        	
-		            let labels = [];
-		            let poStatusMap = {}; // { '미결': [], '진행중': [], '마감': [], '검수마감': [] }
-		            let statusColors = {
-		                '미결': '#f56954',
-		                '진행중': '#f39c12',
-		                '마감': '#00a65a',
-		                '검수마감': '#00c0ef',
-		                '미정': '#3c8dbc'
-		            };
-		
-		            // 데이터 전처리 : 날짜별 그룹화
-		            res.forEach((el) => {
-		                let date = el.ORDER_DATE;
-		                let status = el.PO_TEXT;
-		                let value = el.STACK_CHART_VALUE;
-		
-		                if (!labels.includes(date)) {
-		                    labels.push(date);
-		                }
-		
-		                if (!poStatusMap[status]) {
-		                    poStatusMap[status] = [];
-		                }
-		            });
-		
-		            // 모든 날짜에 대해 초기화
-		            labels.forEach((date) => {
-		                for (let status in poStatusMap) {
-		                    poStatusMap[status].push(0); // 기본값 0으로 초기화
-		                }
-		            });
-		
-		            // 실제 데이터 반영
-		            res.forEach((el) => {
-		                let dateIndex = labels.indexOf(el.ORDER_DATE);
-		                let status = el.PO_TEXT;
-		                poStatusMap[status][dateIndex] = el.STACK_CHART_VALUE;
-		            });
-		
-		            // Chart.js의 datasets 형식으로 변환
-		            let datasets = [];
-		            for (let status in poStatusMap) {
-		                datasets.push({
-		                    label: status,
-		                    backgroundColor: statusColors[status],
-		                    data: poStatusMap[status]
-		                });
-		            }
-		
-		            let stackedBarChartCanvas = $('#' + chartId).get(0).getContext('2d');
-		            let stackedBarChartData = {
-		                labels: labels,
-		                datasets: datasets
-		            };
-		
-		            let stackedBarChartOptions = {
-		                maintainAspectRatio: false,
-		                responsive: true,
-		                scales: {
-		                    x: { stacked: true },
-		                    y: { stacked: true }
-		                }
-		            };
-		
-		            // 기존 차트 삭제 후 재생성
-		            if (isUpdate && window.myStackedBarChart) {
-		                window.myStackedBarChart.destroy();
-		            }
-		
-		            window.myStackedBarChart = new Chart(stackedBarChartCanvas, {
-		                type: 'bar',
-		                data: stackedBarChartData,
-		                options: stackedBarChartOptions
-		            });
-		        },
-		        error: function (XMLHttpRequest, textStatus, errorThrown) {
-		            console.log("stackedBarChart() ajax 실패");
-		        }
-		    });
-		}
+	    const ctx1 = document.getElementById('productionChart').getContext('2d');
+	    const productionChart = new Chart(ctx1, {
+	        type: 'bar',
+	        data: {
+	            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+	            datasets: [{
+	                label: '생산량',
+	                data: [120, 150, 180, 200, 170, 190],
+	                backgroundColor: 'rgba(60,141,188,0.9)'
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            maintainAspectRatio: false
+	        }
+	    });
+	
+	    const ctx2 = document.getElementById('defectChart').getContext('2d');
+	    const defectChart = new Chart(ctx2, {
+	        type: 'line',
+	        data: {
+	            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+	            datasets: [{
+	                label: '불량률 (%)',
+	                data: [2.5, 3.0, 1.8, 2.2, 2.0, 1.5],
+	                backgroundColor: 'rgba(255,99,132,0.2)',
+	                borderColor: 'rgba(255,99,132,1)',
+	                borderWidth: 1
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            maintainAspectRatio: false
+	        }
+	    });
+	
+	    // Toast UI Grid를 사용하여 그리드 생성
+	    const grid = new tui.Grid({
+	        el: document.getElementById('grid'),
+	        data: {
+	            contentType: 'json',
+	            api: {
+	                readData: { url: '/api/production-results', method: 'GET' }
+	            }
+	        },
+	        columns: [
+	            { header: '날짜', name: 'date' },
+	            { header: '제품명', name: 'productName' },
+	            { header: '생산량', name: 'quantity' },
+	            { header: '불량 수', name: 'defectCount' }
+	        ],
+	        pageOptions: {
+	            perPage: 10
+	        }
+	    });
 	</script>
 </body>
 </html>

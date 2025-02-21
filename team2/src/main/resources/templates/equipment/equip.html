@@ -339,26 +339,18 @@
 				    element: document.getElementById('equipGrid')  // DOM 엘리먼트 저장
 			};
 			
-			setTimeout(function () {
-			    allData = equipGrid.getData();
-			    console.log("전체 데이터 로드 완료:", allData);
-			}, 1);
-			
-			// 서버에서 데이터를 받아온 후 allData에 저장
-			equipGrid.on('response', function () {
-				allData = equipGrid.getData();
-				console.log("allData : " + allData);
-			});
-
 			equipGrid.on('failResponse', function (ev) {
 				alert(JSON.parse(ev.xhr.responseText).message);
 				alert("Response 실패");
 			});
 			
-			console.log("equipDataSource:", equipDataSource);
+			// 서버에서 데이터를 받아온 후 allData에 저장
+			// 서버에서 데이터를 받아오는데 약간의 시간이 걸림 (약 110~250ms)
+			setTimeout(function () {
+			    allData = equipGrid.getData();
+			    console.log("전체 데이터 로드 완료:", allData);
+			}, 350);
 			
-
-
 			equipGrid.on('editingStart', function (ev) {
 				const {rowKey, columnName, value} = ev;
 				const rowData = equipGrid.getRow(rowKey);
