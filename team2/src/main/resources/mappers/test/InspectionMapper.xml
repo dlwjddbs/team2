@@ -177,6 +177,8 @@
 				  PD.PO_ID =  #{po_id}
 		 GROUP BY
 		 		  PD.PO_ID, PD.PODETAIL_ID, PD.MATERIAL_ID, PD.PO_COUNT
+		   HAVING
+				  PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0) > 0
     </insert>
     
 	<update id="updatePoDetailStatus" parameterType="map">

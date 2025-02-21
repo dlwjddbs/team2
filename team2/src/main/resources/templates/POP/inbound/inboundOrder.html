@@ -239,7 +239,15 @@
 //------------------ << 입고 검수 등록 마감 >> ------------------	
 		
 		$('#inbound_inspection_close').on('click', (ev) => {
-			
+			//중복 클릭 방지
+			let	close = $('#inbound_inspection_close');
+					
+			if (close.prop('disabled')) {
+				return;
+			}
+			close.prop('disabled', true);
+				
+				
 			$.ajax({
 				url: '/ajax/closeInboundInspection',
 				type: 'POST',
@@ -252,6 +260,7 @@
 					console.log("마감 실패");
 				},
 				complete: function() {
+					close.prop('disabled', false);
 					inboundListGrid.readData();
 					inboundDetailGrid.destroy();
 				}

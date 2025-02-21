@@ -191,7 +191,7 @@ $(document).on("shown.bs.modal", "#inboundInspection", function() {
 					        .reduce((acc, cur) => acc + cur, 0);
 				
 		if (total_count > po_detail_data.PO_COUNT) {
-		    $("#error").text("불량 수량이 검사 수량을 초과할 수 없습니다.");
+		    $("#error").text("불량 수량이 검사 수량을 초과할 수 없습니다. total_count: ",total_count, "po_count: ", po_detail_data.PO_COUNT);
 		    $("#save").prop("disabled", true);
 			return;
 		}

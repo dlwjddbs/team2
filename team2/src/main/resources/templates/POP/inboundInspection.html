@@ -1,5 +1,5 @@
 <!--
-	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
+	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#inboundInspection">
 		생성
 	</button>
 -->
@@ -8,23 +8,14 @@
 <div class="modal fade" id="inboundInspection" th:fragment="inboundInspection">
 	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
-			<!-- 모달창 헤더 -->
-			<div class="modal-header">
-				<h4 class="modal-title">불량등록</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">닫기</span>
-				</button>
-			</div>
-			<!-- /.모달창 헤더 -->
 			<div class="modal-body">
 				<div class="card-body">
 					<div class="row">
-						<div class="col-7">
+						<div class="col-4">
 							<div id="rejection_grid"></div>
 						</div>
-						<div class="col-1 d-flex flex-column justify-content-between">
-							<button type="button" id="btnUp" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-up-long"></i></button>
-							<button type="button" id="btnDown" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-down-long"></i></button>
+						<div class="col-4">
+							<div id="rejection_grid"></div>
 						</div>
 						<div class="col-4">
 							<div id="keyboard" th:fragment="numberPad">
@@ -43,17 +34,14 @@
 							</div>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-11">
-							<div id="rejectioni_input_grid"></div>
-						</div>
-						<div class="col-1 d-flex flex-column justify-content-between">
-							<button type="button" id="btnUp" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-up-long"></i></button>
-							<button type="button" id="btnDown" class="btn btn-default btn-lg w-100 flex-fill"><i class="fa-solid fa-down-long"></i></button>
-						</div>
-					</div>
+					<div id="rejectioni_input_grid"></div>
+					<p id="error"></p>
 				</div>
 			</div>
+			<div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="save">Save changes</button>
+            </div>
 		</div>
 	</div>
 </div>
