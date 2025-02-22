@@ -70,11 +70,6 @@ public class NoticeController {
             notice.put("editable", isAdmin);
             notice.put("deletable", isAdmin);
         }
-//        // 글 순번
-//        for(Map<String, Object> list : noticeList) {
-//        	list.put("NUM", list.get("NOTICE_ID"));
-//        }
-//    	System.out.println("noticeList: " + noticeList);
     	return noticeList;
     }    
        
@@ -127,7 +122,6 @@ public class NoticeController {
 //    공지사항 수정 (관리자 전용)
     @PostMapping("/updateNotice")
     public String updateNotice(@AuthenticationPrincipal User user,@RequestParam Map<String, Object> map, Model model) {
-    	System.out.println(map.toString() + " iiiiiiiiiiiiii");
     	String id = user.getUsername();
 		map.put("memberId", id);
 	    noticeService.updateNotice(map);

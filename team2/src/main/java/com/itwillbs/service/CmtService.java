@@ -14,9 +14,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CmtService {
-    private final CmtMapper cmtMapper;
-
-    
+	
+    private final CmtMapper cmtMapper;   
 
 	public void getCheckIn(Map<String, Object> map) {
 		map.put("member_id", map);
@@ -35,12 +34,6 @@ public class CmtService {
 	    map.put("checkOutDate", checkOutDate); 
 
 		cmtMapper.getCheckIn(map);
-		
-		
-		// createDate도 동일하게 처리
-//	    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//	    String createDate = sdf1.format(new java.util.Date());
-//	    map.put("createDate", createDate); // varchar2로 저장될 수 있도록 String 값으로 저장
 	}
 
 
@@ -52,7 +45,6 @@ public class CmtService {
 		    String checkOutTime = sdf.format(new java.util.Date());
 		    map.put("checkOutTime", checkOutTime); // varchar2로 저장될 수 있도록 String 값으로 저장
 		    
-//		    map.put("checkOutTime", new Timestamp(System.currentTimeMillis()));
 		    cmtMapper.updateCheckOut(map);
 	}
 	

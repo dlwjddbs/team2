@@ -264,7 +264,7 @@
 								grid1.removeRowClassName(row.rowKey, 'selected-row');
 							});
 
-							// 선택한 행에 클래스 추가 (초록색 하이라이트)
+							// 선택한 행에 클래스 추가 (하이라이트)
 							grid1.addRowClassName(ev.rowKey, 'selected-row');
 
 
@@ -317,15 +317,6 @@
 								});
 							}
 							grid2.resetData(data);
-						
-							
-							
-							// '마감' 상태 행의 체크박스 비활성화 처리
-						    data.forEach((row, index) => {
-						        if (row.GO_STATUS === '마감') {
-						            grid2.disableRowCheck(index); // 체크박스 비활성화
-						        }
-						    });
 							
 							
 							// 체크박스가 활성화된 행의 index를 배열에 저장
@@ -471,7 +462,16 @@
 							showError("입고할 행을 선택하세요.", "warning");
 							return;
 						}
-
+						
+						
+						// "마감" 상태인 행이 있는지 확인
+						    const isAlreadyClosed = selectedRows.some(row => row.GO_STATUS === "마감" || row.GO_STATUS === "입고완료");
+						    if (isAlreadyClosed) {
+						        showError("입고된 항목이 포함되어 있습니다.", "warning");
+						        return;
+						    }
+						
+						
 						const dataToSave = selectedRows.map(row =>
 							({...row, rowType: "insert", goId: goId, goDetailId: goDetailId}));
 
