@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itwillbs.util.DynamicMethodInvoker;
+import com.itwillbs.util.MethodType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,27 +42,36 @@ public class DynamicRestController {
 
 	@GetMapping
 	public Map<String, Object> invokeGetMethod(@RequestParam Map<String, Object> requestData) {
-		return dynamicMethodInvoker.invokeServiceMethod(serviceName, "select", urlid, Map.class, requestData);
+		return invokeService(MethodType.SELECT, requestData, Map.class);
 	}
 
 	@PutMapping
 	public Map<String, Object> invokePutMethod(@RequestBody Map<String, Object> requestData) {
-		return dynamicMethodInvoker.invokeServiceMethod(serviceName, "modify", urlid, Map.class, requestData);
+		return invokeService(MethodType.MODIFY, requestData, Map.class);
 	}
 
 	@PostMapping
 	public Map<String, Object> invokePostMethod(@RequestBody Map<String, Object> requestData) {
 		List<Map<String, Object>> createdRows = (List<Map<String, Object>>) requestData.get("createdRows");
 
-		return dynamicMethodInvoker.invokeServiceMethod(serviceName, "insert", urlid, List.class, createdRows);
+		return invokeService(MethodType.INSERT, createdRows, List.class);
 	}
 
 	@DeleteMapping
 	public Map<String, Object> invokeDeleteMethod(@RequestHeader("X-Delete-IDs") String encodedIds) {
-		String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);  // 한글 ID가 넘어올 경우 디코딩
-		List<String> idList = Arrays.asList(decodedIds.split(","));
-
-		return dynamicMethodInvoker.invokeServiceMethod(serviceName, "delete", urlid, List.class, idList);
+		List<String> idList = decodeIds(encodedIds);
+		
+		return invokeService(MethodType.DELETE, idList, List.class);
+	}
+	
+	private <T> Map<String, Object> invokeService(MethodType prefix, T requestData, Class<T> paramType) {
+		return dynamicMethodInvoker.invokeServiceMethod(serviceName, prefix, urlid, paramType, requestData);
+	}
+	
+	private List<String> decodeIds(String encodedIds) {
+		String decodedIds = URLDecoder.decode(encodedIds, StandardCharsets.UTF_8);
+		
+		return Arrays.asList(decodedIds.split(","));
 	}
 	
 }
