@@ -63,7 +63,7 @@
 	</div>
 	<!-- ./wrapper -->
 	
-	<nav th:replace="~{includes/modals/productionMeterialAdd :: productionMeterialAdd}"></nav>
+	<nav th:replace="~{includes/modals/productionMaterialAdd :: productionMaterialAdd}"></nav>
 	
 	<style>
 		.selected-row {
@@ -167,8 +167,7 @@
 						const rowKey = props.rowKey;
 						bom_dataSource.api.readData.initParams.productionOrderDetailId = props.grid.getValue(rowKey, 'PRODUCTION_ORDER_DETAIL_ID');
 						
-						const modal = new bootstrap.Modal(document.getElementById('productionMeterialAdd'));
-						modal.show();
+						$('#productionMaterialAdd').modal();
 					});
 					
 					this.el = el;

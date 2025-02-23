@@ -91,7 +91,7 @@
 		 WHERE 
 			   1 = 1
 		   AND il.MATERIAL_ID = #{itemId}
-		   AND loc.CURRENT_QUANTITY > 0
+		   AND il.QUANTITY > 0
 		 UNION ALL 
 		SELECT 
 			   loc.WAREHOUSE_ID 		AS WAREHOUSE_ID
@@ -109,6 +109,124 @@
 		 WHERE
 		 	   1 = 1
 		   AND pl.ITEM_ID = #{itemId}
-		   AND loc.CURRENT_QUANTITY > 0
+		   AND pl.quantity > 0
 	</select>
+	
+	<select id="selectMaxPutMaterialsDetailId" resultType="int">
+		SELECT NVL(TO_NUMBER(SUBSTR(MAX(PUT_MATERIALS_DETAIL_ID), 4)), 0) + 1 AS MAX_NUMBER 
+		  FROM PUT_MATERIALS_DETAIL
+	</select>
+	
+	<insert id="insertMaterialsDetail">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PUT_MATERIALS_DETAIL (
+				  PUT_MATERIALS_DETAIL_ID
+				, PUT_MATERIALS_ID
+				, ITEM_LOT
+				, AMOUNT
+			) VALUES (
+				  #{item.PUT_MATERIALS_DETAIL_ID}
+				, (SELECT PUT_MATERIALS_ID 
+					 FROM PUT_MATERIALS pm 
+					WHERE 
+						  1 = 1
+					  AND PRODUCTION_ORDER_DETAIL_ID = #{item.PRODUCTION_ORDER_DETAIL_ID}
+					  AND ITEM_ID = #{item.ITEM_ID})
+				, #{item.LOT_ID}
+				, #{item.RELEASE_QUANTITY}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<insert id="insertWorkcenterLog">
+		INSERT INTO WORKCENTER_LOG (
+			  WORKCENTER_LOG_ID
+			, WORKCENTER_ID
+			, PRODUCTION_ORDER_DETAIL_ID
+			, START_DATE
+			, START_TIME
+		) VALUES (
+			  (SELECT 'WLI' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(WORKCENTER_LOG_ID, 4))), 0) + 1, 6, '0') AS NEW_ID FROM WORKCENTER_LOG)
+			, (
+				SELECT WORKCENTER_ID 
+				  FROM PRODUCTION_ORDER_DETAIL
+				 WHERE PRODUCTION_ORDER_DETAIL_ID = #{PRODUCTION_ORDER_DETAIL_ID}
+			  )
+			, #{PRODUCTION_ORDER_DETAIL_ID}
+			, (SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') FROM dual)
+			, (SELECT TO_CHAR(CURRENT_DATE, 'HH24:MM:DD') FROM dual)
+		)
+	</insert>
+	
+	<update id="updateLotQuantity">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+			UPDATE
+			<choose>
+				<when test="item.ITEM_ID.matches('^ITEM[0-9]+$')">
+					PRODUCTION_LOT
+				</when>
+				<otherwise>
+					INBOUND_LOTS
+				</otherwise>
+			</choose>
+			   SET QUANTITY = QUANTITY - #{item.RELEASE_QUANTITY}
+			 WHERE
+	 		<choose>
+				<when test="item.ITEM_ID.matches('^ITEM[0-9]+$')">
+						ITEM_ID = #{item.ITEM_ID}
+					AND PRODUCTION_LOT_ID = #{item.LOT_ID}
+				</when>
+				<otherwise>
+						MATERIAL_ID = #{item.ITEM_ID}
+					AND LOT_ID = #{item.LOT_ID}
+				</otherwise>
+			</choose>
+		</foreach>
+	</update>
+
+	<update id="updateWarehouseItemQuantity">
+		<foreach collection="list" item="item" open="DECLARE BEGIN" separator=";" close="; END;">
+			UPDATE ITEM_LOCATION
+			   SET CURRENT_QUANTITY = CURRENT_QUANTITY - #{item.RELEASE_QUANTITY}
+			 WHERE
+	 		<choose>
+				<when test="item.ITEM_ID.matches('^ITEM[0-9]+$')">
+						ITEM_ID = #{item.ITEM_ID}
+					AND WAREHOUSE_ID = #{item.WAREHOUSE_ID}
+				</when>
+				<otherwise>
+						MATERIAL_ID = #{item.ITEM_ID}
+					AND WAREHOUSE_ID = #{item.WAREHOUSE_ID}
+				</otherwise>
+			</choose>
+		</foreach>
+	</update>
+	
+	<update id="updateProductionOrderDetailStatus">
+		UPDATE PRODUCTION_ORDER_DETAIL 
+		   SET STATUS = 'ST-002'
+		 WHERE PRODUCTION_ORDER_DETAIL_ID = #{PRODUCTION_ORDER_DETAIL_ID}
+	</update>
+	
+	<update id="updateProductionOrderStatus">
+		UPDATE PRODUCTION_ORDER 
+		   SET STATUS = 'ST-002'
+		 WHERE PRODUCTION_ORDER_ID = (
+		    SELECT PRODUCTION_ORDER_ID
+		      FROM PRODUCTION_ORDER_DETAIL
+		     WHERE PRODUCTION_ORDER_DETAIL_ID = #{PRODUCTION_ORDER_DETAIL_ID}
+		   )
+		   AND (SELECT COUNT(*) AS STATUS_COUNT
+				  FROM PRODUCTION_ORDER_DETAIL
+				 WHERE 
+				 	   1 = 1
+				   AND PRODUCTION_ORDER_ID = (
+						  SELECT PRODUCTION_ORDER_ID
+						    FROM PRODUCTION_ORDER_DETAIL
+						   WHERE PRODUCTION_ORDER_DETAIL_ID = #{PRODUCTION_ORDER_DETAIL_ID}
+					   )
+				   AND STATUS = 'ST-002') >= 1
+	</update>
 </mapper>

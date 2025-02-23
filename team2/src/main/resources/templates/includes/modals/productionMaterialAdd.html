@@ -1,5 +1,5 @@
 <!-- 모달창 -->
-<div class="modal fade" id="productionMeterialAdd" th:fragment="productionMeterialAdd">
+<div class="modal fade" id="productionMaterialAdd" th:fragment="productionMaterialAdd">
 	<div class="modal-dialog modal-custom-size">
 		<div class="modal-content">
 			<!-- 모달창 헤더 -->
@@ -38,7 +38,7 @@
 						<div class="row">
 							<div class="col-md-12">
 								<span style="padding-left: 20px;">자재 출고 목록</span>
-								<div class="card-body" id="releaseMeterialGrid" style="padding-top: 10px;">
+								<div class="card-body" id="releaseMaterialGrid" style="padding-top: 10px;">
 									<!-- Toast Grid Ajax -->
 								</div>
 							</div>
@@ -60,7 +60,7 @@
 </div>
 <!-- /.모달창 -->
 
-<script th:fragment="productionMeterialAdd" th:inline="javascript">
+<script th:fragment="productionMaterialAdd" th:inline="javascript">
 	let stockArr = [];
 	let bomCurrentSelectedRowKey = '';
 	
@@ -145,8 +145,8 @@
 		contentType: 'application/json',
 	};
 	
-	let releaseMeterialGrid = null;
-	const releaseMeterial_columns = [
+	let releaseMaterialGrid = null;
+	const releaseMaterial_columns = [
 		{header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
 		{header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
 		{header: '창고코드', name: 'WAREHOUSE_ID', align: 'center', editor: null},
@@ -167,7 +167,7 @@
 		},
 	];
 	
-	$('#productionMeterialAdd').on('shown.bs.modal', function () {
+	$('#productionMaterialAdd').on('shown.bs.modal', function () {
 		stockArr.length = 0;
 		$("#saveProductionDetailOrder").attr('disabled', true);
 		$("#btn_material_add").hide();
@@ -177,9 +177,9 @@
 			stockGrid = null;
 		}
 		
-		if (releaseMeterialGrid) {
-			releaseMeterialGrid.destroy();
-			releaseMeterialGrid = null;
+		if (releaseMaterialGrid) {
+			releaseMaterialGrid.destroy();
+			releaseMaterialGrid = null;
 		}
 		
 		bomGridInit();
@@ -272,11 +272,11 @@
 					}
 					
 					if (stockGrid.getData().length > 0) {
-						if (!releaseMeterialGrid) {
+						if (!releaseMaterialGrid) {
 							return;
 						}
 						
-						for (const row of releaseMeterialGrid.getData()) {
+						for (const row of releaseMaterialGrid.getData()) {
 							if (row.ITEM_ID == item_id) {
 								const mapData = {
 									"RELEASE_QUANTITY": row.RELEASE_QUANTITY,
@@ -393,7 +393,11 @@
 			}
 		});
 		
-		releaseMeterialGridInit();
+		if (releaseMaterialGrid) {
+			releaseMaterialGrid.resetData(stockArr);
+		} else {
+			releaseMaterialGridInit();
+		}
 		
 		for (const row of bomGrid.getData()) {
 			if (row.ITEM_AMOUNT != row.RELEASE_QUANTITY) {
@@ -405,39 +409,42 @@
 		$("#saveProductionDetailOrder").attr('disabled', false);
 	});
 	
-	function releaseMeterialGridInit() {
-		if (releaseMeterialGrid) {
-			releaseMeterialGrid.destroy(); // 기존 그리드 제거
-			releaseMeterialGrid = null;
+	function releaseMaterialGridInit() {
+		if (releaseMaterialGrid) {
+			releaseMaterialGrid.destroy(); // 기존 그리드 제거
+			releaseMaterialGrid = null;
 		}
 		
-		releaseMeterialGrid = new tui.Grid({
-			el: document.getElementById('releaseMeterialGrid'),
+		releaseMaterialGrid = new tui.Grid({
+			el: document.getElementById('releaseMaterialGrid'),
 			data: stockArr,
 			scrollX: true,
 			scrollY: true,
 			bodyHeight: 250,
-			columns: releaseMeterial_columns,
+			columns: releaseMaterial_columns,
 			editingEvent: 'click'
 		});
 	};
 	
-	
-	// 	$("#saveEquipment").on('click', function() {
-	// 		const rowKeysToDelete = equipmentGrid.getData()
-	// 		    .filter(row => row.isNew)
-	// 		    .map(row => row.rowKey);
-			
-	// 		// 워크센터설비 그리드 기존의 새로 추가된 행 삭제
-	// 		rowKeysToDelete.forEach(function(key) {
-	// 			equipmentGrid.removeRow(key);
-	// 		});
-			
-	// 		// 새로 선택된 값 워크센터설비 그리드 행 추가
-	// 		selectedEquipmentList.forEach(function(data) {
-	// 			equipmentGrid.appendRow(data);
-	// 		});
-			
-	// 		$("#productionMeterialAdd").modal('hide');
-	// 	});
+	$("#saveProductionDetailOrder").on('click', function() {
+		$.ajax({
+			type : "POST",
+			url : "/rest/production/materialsDetail",
+			contentType: "application/json",
+			data: JSON.stringify({createdRows: releaseMaterialGrid.getData()}),
+			success : function(res){
+				if (!res.result) {
+					alert("등록 실패");
+					
+					return;
+				}
+			},
+			error : function(e){
+				console.log("/rest/production/materialsDetail ajax 실패");
+			}
+		});
+		
+		$("#productionMaterialAdd").modal('hide');
+		window.location.reload();
+	});
 </script>

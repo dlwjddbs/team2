@@ -16,4 +16,18 @@ public interface ProductionMapper {
 	
 	List<Map<String, Object>> selectStock(Map<String, Object> requestData);
 
+	int insertMaterialsDetail(List<Map<String, Object>> createdRows);
+
+	int selectMaxPutMaterialsDetailId();
+
+	int insertWorkcenterLog(Map<String, Object> map);
+
+	int updateLotQuantity(List<Map<String, Object>> createdRows);
+
+	int updateWarehouseItemQuantity(List<Map<String, Object>> createdRows);
+
+	int updateProductionOrderDetailStatus(Map<String, Object> first);
+
+	int updateProductionOrderStatus(Map<String, Object> first);
+
 }
