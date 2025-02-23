@@ -39,49 +39,9 @@
 	            SELECT COUNT(*) 
 	            FROM ORDERS O 
 	            WHERE O.ITEM_ID = I.ITEM_ID
-	        ) 
+	        ) AS USING_CNT
 	    FROM ITEM I
 	    	ORDER BY I.ITEM_ID ASC
-<!--		SELECT-->
-<!--	          I.ITEM_ID-->
-<!--	        , I.ITEM_NAME-->
-<!--	        , I.ITEM_TYPE-->
-<!--	        , I.USE_YN -->
-<!--	        , I.ITEM_UNIT-->
-<!--	        , I.ITEM_COST-->
-<!--	        , I.INB_INSP-->
-<!--	        , I.WAREHOUSE_ID-->
-<!--	        , W.WAREHOUSE_NAME-->
-<!--	        , I.SAFETY_INVENTORY-->
-<!--	        , I.DESCRIPTION-->
-<!--	        , (-->
-<!--	            SELECT COUNT(*) -->
-<!--	            FROM ROUTING R -->
-<!--	            WHERE R.ITEM_ID = I.ITEM_ID-->
-<!--	        ) +-->
-<!--	        (-->
-<!--	            SELECT COUNT(*) -->
-<!--	            FROM BOM B -->
-<!--	            WHERE B.ITEM_ID = I.ITEM_ID-->
-<!--	        ) +-->
-<!--	        (-->
-<!--	            SELECT COUNT(*) -->
-<!--	            FROM ITEM_LOCATION IL -->
-<!--	            WHERE IL.ITEM_ID = I.ITEM_ID-->
-<!--	        ) +-->
-<!--	        (-->
-<!--	            SELECT COUNT(*) -->
-<!--	            FROM ORDERS O -->
-<!--	            WHERE O.ITEM_ID = I.ITEM_ID-->
-<!--	        ) AS USING_CNT-->
-<!--	    FROM ITEM I-->
-<!--		    LEFT JOIN WAREHOUSE W ON I.WAREHOUSE_ID = W.WAREHOUSE_ID-->
-<!--		WHERE -->
-<!--			   1 = 1-->
-<!--		<if test='use_yn != null and use_yn != ""'>-->
-<!--			AND r.USE_YN = 'Y'-->
-<!--		</if>    -->
-<!--		    ORDER BY I.ITEM_ID ASC;-->
     </select>
     
     <select id="selectMesCommonCode" resultType="map">

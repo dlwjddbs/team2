@@ -54,16 +54,15 @@
 
 											<!-- 품목유형 -->
 								            <label class="col-form-label" style="min-width: 70px">품목유형</label>
-											<select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
-								                <option selected="selected" disabled>품목유형(미구현)</option>
-								                <option>전체</option>
-								                <option>반제품</option>
-								                <option>완제품</option>
+											<select class="item form-control mr-3" name="itemType" style="min-width: 120px;" >
+								                <option value="" selected="selected">전체</option>
+								                <option value="SF">반제품</option>
+								                <option value="FP">완제품</option>
 								            </select>
 
 											<!-- 품목 -->
 								            <label class="col-form-label" style="min-width: 70px">품목</label>
-											<select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
+											<select class="item form-control mr-3" name="item3" style="min-width: 120px;" >
 								                <option selected="selected" disabled>품목명(미구현)</option>
 								                <option>A 품목</option>
 								                <option>B 품목</option>
@@ -79,7 +78,7 @@
 								        </div>
 								
 								        <!-- 조회 버튼 -->
-								        <input type="button" id="btn_item_insert" class="btn btn-primary" value="조회">
+								        <input type="button" id="btn_item_search" class="btn btn-primary" value="조회">
 								    </div>
 								</div>
 								<div class="card-header">
@@ -328,8 +327,8 @@
 		    const options = [
 		        { text: 'Y', value: 'Y' },
 		        { text: 'N', value: 'N' },
-		        { text: '반제품', value: '반제품' },
-		        { text: '완제품', value: '완제품' },
+		        { text: '반제품', value: 'SF' },
+		        { text: '완제품', value: 'FP' },
 		        { text: 'EA', value: 'EA' },
 		        { text: 'G', value: 'G' },
 		        { text: 'KG', value: 'KG' },
@@ -575,6 +574,23 @@
 			
 		    itemGrid.request('deleteData');
 			itemGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+		$("#btn_item_search").on("click", function() {
+			
+		    // const equipId = $("#equipId").val().trim().toLowerCase();
+		    // const equipName = $("#equipName").val().trim().toLowerCase();
+		    const itemType = $("select[name='itemType']").val(); // 사용여부 (선택값)
+
+		    // 필터링된 데이터 추출
+		    const filteredData = allData.filter(item => {
+		        return (itemType === "" || item.ITEM_TYPE === itemType);
+		    });
+			
+			console.log(filteredData);
+
+		    // 필터링된 데이터로 그리드 갱신
+		    itemGrid.resetData(filteredData);
 		});
 		
 		$(document).ready(function () {
