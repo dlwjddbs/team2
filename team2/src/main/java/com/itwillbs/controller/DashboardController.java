@@ -84,4 +84,13 @@ public class DashboardController {
 		return poHistoryStackedBar;
 	}
 	
+	// 거래처별 불량률 차트
+	@PostMapping("/dashboard/getClientInbound")
+	@ResponseBody
+	public List<Map<String, Object>> getClientInboundChart(@RequestParam Map<String, Object> map) {
+		List<Map<String, Object>> clientInbound = dashboardService.getClientInboundChart(map);
+		
+		return clientInbound;
+	}
+	
 }

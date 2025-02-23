@@ -81,7 +81,7 @@
 	                                <h3 class="card-title">일별 발주 상태</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="poChart"></canvas>
+	                                <canvas id="poChartDaily"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -98,7 +98,59 @@
 	                        </div>
 	                    </div>
 	                </div>
-	
+					
+					<div class="row">
+					    <!-- 생산 현황 차트 -->
+					    <div class="col-lg-6">
+					        <div class="card">
+					            <div class="card-header">
+					                <h3 class="card-title">주별 발주 상태</h3>
+					            </div>
+					            <div class="card-body">
+					                <canvas id="poChartWeekly"></canvas>
+					            </div>
+					        </div>
+					    </div>
+
+					    <!-- 불량률 차트 -->
+					    <div class="col-lg-6">
+					        <div class="card">
+					            <div class="card-header">
+					                <h3 class="card-title">불량률</h3>
+					            </div>
+					            <div class="card-body">
+					                <canvas id="poInboundChart"></canvas>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					
+					<div class="row">
+					    <!-- 생산 현황 차트 -->
+					    <div class="col-lg-6">
+					        <div class="card">
+					            <div class="card-header">
+					                <h3 class="card-title">월별 발주 상태</h3>
+					            </div>
+					            <div class="card-body">
+					                <canvas id="poChartMonthly"></canvas>
+					            </div>
+					        </div>
+					    </div>
+
+					    <!-- 불량률 차트 -->
+					    <div class="col-lg-6">
+					        <div class="card">
+					            <div class="card-header">
+					                <h3 class="card-title">불량률</h3>
+					            </div>
+					            <div class="card-body">
+					                <canvas id="poInboundChart"></canvas>
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					
 	                <!-- 생산 실적 그리드 -->
 	                <div class="row">
 	                    <div class="col-12">
@@ -112,6 +164,20 @@
 	                        </div>
 	                    </div>
 	                </div>
+					
+					<!-- 거래처별 불량률 그리드 -->
+					<div class="row">
+					    <div class="col-12">
+					        <div class="card">
+					            <div class="card-header">
+					                <h3 class="card-title">거래처별 불량률</h3>
+					            </div>
+								<div class="card-body">
+								    <canvas id="clientInboundChart" style="height: 300px;"></canvas>
+								</div>
+					        </div>
+					    </div>
+					</div>
 	            </div>
 	        </section>
 	        <!-- /.content -->
@@ -134,7 +200,10 @@
 	<script th:inline="javascript">
 	    // Chart.js를 사용하여 차트 생성
 		$(function () {
-		    stackedBarChart('poChart', false);
+		    stackedBarChart('poChartDaily', false);
+		    stackedBarChart('poChartWeekly', false);
+		    stackedBarChart('poChartMonthly', false);
+			clientInboundChart();
 		});
 		
 		function stackedBarChart(chartId, isUpdate) {
@@ -222,6 +291,66 @@
 		        },
 		        error: function (XMLHttpRequest, textStatus, errorThrown) {
 		            console.log("stackedBarChart() ajax 실패");
+		        }
+		    });
+		}
+		
+		function clientInboundChart() {
+		    $.ajax({
+		        type: "POST",
+		        url: "/dashboard/getClientInbound",  // SQL 실행하는 API
+		        success: function (res) {
+		            let labels = [];   // X축 (거래처명)
+		            let data = [];     // Y축 (불량률 %)
+
+		            res.forEach((el) => {
+		                labels.push(el.CLIENT_NAME);
+		                data.push(el.DEFECT_RATE);
+		            });
+
+		            let ctx = $('#clientInboundChart').get(0).getContext('2d');
+		            
+		            // 기존 차트 삭제 후 재생성
+		            if (window.myDefectRateChart) {
+		                window.myDefectRateChart.destroy();
+		            }
+
+		            window.myDefectRateChart = new Chart(ctx, {
+		                type: 'bar',
+		                data: {
+		                    labels: labels,
+		                    datasets: [{
+		                        label: '불량률 (%)',
+		                        data: data,
+		                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+		                        borderColor: 'rgba(255, 99, 132, 1)',
+		                        borderWidth: 1
+		                    }]
+		                },
+		                options: {
+		                    responsive: true,
+		                    maintainAspectRatio: false,
+		                    scales: {
+		                        y: {
+		                            beginAtZero: true,
+		                            max: 100,
+		                            title: {
+		                                display: true,
+		                                text: '불량률 (%)'
+		                            }
+		                        },
+		                        x: {
+		                            title: {
+		                                display: true,
+		                                text: '거래처'
+		                            }
+		                        }
+		                    }
+		                }
+		            });
+		        },
+		        error: function () {
+		            console.log("clientInboundChart() ajax 실패");
 		        }
 		    });
 		}
