@@ -25,37 +25,7 @@
 	<!-- Toast Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	
-	<style>
-/* 		#keyboard { */
-/* 			display: grid; */
-/* 			grid-template-columns: repeat(3, 1fr); */
-/* 			gap: 3px; */
-/* 			width: 100%; */
-/* 			max-width: 100%; */
-/* 			margin-bottom: 20px; */
-/* 		} */
-/* 		#keyboard .btn { */
-/* 			flex: 1; */
-/* 			aspect-ratio: 1 / 1; */
-/* 			display: flex;  */
-/* 			align-items: center;  */
-/* 			justify-content: center; */
-/* 			font-size: 1.5rem; */
-/* 		} */
-/* 		.tui-grid-cell-has-input  { */
-/* 			background-color: white !important; */
-/* 		} */
-		.selected-row {
-			background-color: #d1ffd6;
-		}
-		.deselected-row {
-			background-color: #ffd1d1;
-		}
-		.modal-custom-size {
-			max-width: 1700px;
-		}
-	</style>
-	
+	<script src="../../js/tuiCustom.js"></script>
 </head>
 <body class="layout-top-nav">
 	<div class="wrapper">
@@ -94,6 +64,18 @@
 	<!-- ./wrapper -->
 	
 	<nav th:replace="~{includes/modals/productionMeterialAdd :: productionMeterialAdd}"></nav>
+	
+	<style>
+		.selected-row {
+			background-color: #d1ffd6;
+		}
+		.deselected-row {
+			background-color: #ffd1d1;
+		}
+		.modal-custom-size {
+			max-width: 1600px;
+		}
+	</style>
 	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
@@ -215,7 +197,17 @@
 					{header: '상세작업코드', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center'},
 					{header: '품목코드', name: 'ITEM_ID', align: 'center',},
 					{header: '품목명', name: 'ITEM_NAME', align: 'left'},
-					{header: '생산량', name: 'AMOUNT', align: 'right'},
+					{
+						header: '생산량', 
+						name: 'AMOUNT', 
+						align: 'right',
+						formatter: function({ value }) {
+							if (!value) {
+								return '0';
+							}
+							return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+						}
+					},
 					{header: '기준단위', name: 'ITEM_UNIT', align: 'center'},
 					{header: '생성일자', name: 'CREATE_DATE', align: 'center'},
 					{header: '진행상태', name: 'STATUS_NAME', align: 'center'},

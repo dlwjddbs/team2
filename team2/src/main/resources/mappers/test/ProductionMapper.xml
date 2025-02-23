@@ -73,4 +73,42 @@
 					   ON pm.ITEM_ID = m.MATERIAL_ID 
 		 WHERE PRODUCTION_ORDER_DETAIL_ID = #{productionOrderDetailId}
 	</select>
+	
+	<select id="selectStock" resultType="map">
+		SELECT 
+			   loc.WAREHOUSE_ID 		AS WAREHOUSE_ID
+			 , w.WAREHOUSE_NAME 		AS WAREHOUSE_NAME
+			 , il.LOT_ID 				AS LOT_ID
+			 , m.UNIT 					AS UNIT
+			 , loc.CURRENT_QUANTITY 	AS CURRENT_QUANTITY
+		  FROM INBOUND_LOTS il
+			   INNER JOIN ITEM_LOCATION loc 
+					   ON il.MATERIAL_ID = loc.MATERIAL_ID 
+			   INNER JOIN WAREHOUSE w 
+					   ON loc.WAREHOUSE_ID = w.WAREHOUSE_ID 
+			   INNER JOIN MATERIAL m 
+					   ON il.MATERIAL_ID = m.MATERIAL_ID 
+		 WHERE 
+			   1 = 1
+		   AND il.MATERIAL_ID = #{itemId}
+		   AND loc.CURRENT_QUANTITY > 0
+		 UNION ALL 
+		SELECT 
+			   loc.WAREHOUSE_ID 		AS WAREHOUSE_ID
+			 , w.WAREHOUSE_NAME 		AS WAREHOUSE_NAME
+			 , pl.PRODUCTION_LOT_ID 	AS LOT_ID
+			 , i.ITEM_UNIT 				AS UNIT
+			 , loc.CURRENT_QUANTITY 	AS CURRENT_QUANTITY
+		  FROM PRODUCTION_LOT pl
+			   INNER JOIN ITEM_LOCATION loc
+					   ON pl.ITEM_ID = loc.ITEM_ID 
+			   INNER JOIN WAREHOUSE w 
+					   ON loc.WAREHOUSE_ID = w.WAREHOUSE_ID 
+			   INNER JOIN ITEM i 
+					   ON pl.ITEM_ID = i.ITEM_ID 
+		 WHERE
+		 	   1 = 1
+		   AND pl.ITEM_ID = #{itemId}
+		   AND loc.CURRENT_QUANTITY > 0
+	</select>
 </mapper>

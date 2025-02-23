@@ -13,5 +13,7 @@ public interface ProductionMapper {
 	List<Map<String, Object>> selectProductionOrderDetail(Map<String, Object> requestData);
 	
 	List<Map<String, Object>> selectProductionOrderDetailBom(Map<String, Object> requestData);
+	
+	List<Map<String, Object>> selectStock(Map<String, Object> requestData);
 
 }
