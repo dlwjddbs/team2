@@ -293,7 +293,11 @@
 		    const el = document.createElement('input');
 		    el.type = 'checkbox';
 		    el.checked = (props.value === 'Y');  // 초기값 지정
-		
+			
+			if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0) {
+		    	el.disabled = true;
+		    }
+						
 			el.addEventListener('change', function() {
 		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
 		    });
@@ -466,6 +470,7 @@
 		            {header: '창고명', name: 'WAREHOUSE_NAME', align: 'center', editor: null},
 		            {header: '안전재고', name: 'SAFETY_INVENTORY', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            {header: '품목 사용 개수', name: 'USING_CNT', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {
 		        itemGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
