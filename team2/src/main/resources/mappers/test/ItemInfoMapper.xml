@@ -41,7 +41,7 @@
 	            WHERE O.ITEM_ID = I.ITEM_ID
 	        ) 
 	    FROM ITEM I
-	    	ORDER BY I.ITEM_ID ASC;
+	    	ORDER BY I.ITEM_ID ASC
 <!--		SELECT-->
 <!--	          I.ITEM_ID-->
 <!--	        , I.ITEM_NAME-->

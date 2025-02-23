@@ -51,7 +51,7 @@
 			<div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
-					<button type="submit" class="btn btn-primary" id="saveEquipment">작업시작</button>
+					<button type="submit" class="btn btn-primary" id="saveProductionDetailOrder">작업시작</button>
 				</div>
 			</div>
 			<!-- /.모달창 푸터-->
@@ -61,6 +61,7 @@
 <!-- /.모달창 -->
 
 <script th:fragment="productionMeterialAdd" th:inline="javascript">
+	let stockArr = [];
 	let bomCurrentSelectedRowKey = '';
 	
 	let bomGrid = null;
@@ -80,7 +81,25 @@
 				return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
 			}
 		},
-		{header: '단위', name: 'ITEM_UNIT', align: 'center', editor: null, width: 100},
+		{header: '단위', name: 'ITEM_UNIT', align: 'center', editor: null, width: 90},
+		{
+			header: '투입량', 
+			name: 'RELEASE_QUANTITY', 
+			align: 'right', 
+			editor: null, 
+			formatter: function ({ row, value }) {
+				if (!value) {
+					value = 0;
+				}
+				
+				const itemAmount = row.ITEM_AMOUNT || 0;
+				
+				let color = (value < itemAmount) ? 'red' : 'blue';
+
+				return `<span style="color: ${color};">${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>`;
+			},
+			width: 100
+		},
 	];
 	const bom_url = '/rest/production/productionOrderDetailBom';
 	const bom_dataSource = {
@@ -95,7 +114,7 @@
 		{header: '창고코드', name: 'WAREHOUSE_ID', align: 'center', editor: null, width: 100},
 		{header: '창고명', name: 'WAREHOUSE_NAME', align: 'left', editor: null},
 		{header: '로트번호', name: 'LOT_ID', align: 'center', editor: null, width: 250},
-		{header: '투입단위', name: 'UNIT', align: 'center', editor: null, width: 100},
+		{header: '투입단위', name: 'UNIT', align: 'center', editor: null, width: 90},
 		{
 			header: '현재고', 
 			name: 'CURRENT_QUANTITY', 
@@ -149,6 +168,10 @@
 	];
 	
 	$('#productionMeterialAdd').on('shown.bs.modal', function () {
+		stockArr.length = 0;
+		$("#saveProductionDetailOrder").attr('disabled', true);
+		$("#btn_material_add").hide();
+		
 		if (stockGrid) {
 			stockGrid.destroy();
 			stockGrid = null;
@@ -182,6 +205,10 @@
 		});
 		
 		bomGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
 			const newRowKey = ev.rowKey;
 
 			if (bomCurrentSelectedRowKey != null) {
@@ -236,6 +263,46 @@
 		stockGrid.on('successResponse', function(ev) {
 			const resultCnt = JSON.parse(ev.xhr.responseText).data.contents.length;
 			
+			let arr = [];
+			// 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+			const checkGridRendered = () => {
+				setTimeout(() => {
+					if (resultCnt == 0) {
+						return;
+					}
+					
+					if (stockGrid.getData().length > 0) {
+						if (!releaseMeterialGrid) {
+							return;
+						}
+						
+						for (const row of releaseMeterialGrid.getData()) {
+							if (row.ITEM_ID == item_id) {
+								const mapData = {
+									"RELEASE_QUANTITY": row.RELEASE_QUANTITY,
+									"LOT_ID": row.LOT_ID,
+								};
+
+								arr.push(mapData);
+							}
+						}
+						
+						for (const row of stockGrid.getData()) {
+							for (const data of arr) {
+								if (row.LOT_ID == data.LOT_ID) {
+									stockGrid.setValue(row.rowKey, 'RELEASE_QUANTITY', data.RELEASE_QUANTITY);
+								}
+							}
+						}
+						
+					} else {
+						checkGridRendered(); // 데이터가 없으면 다시 체크
+					}
+				}, 100);
+			};
+
+			checkGridRendered(); // 실행
+			
 			if (resultCnt == 0) {
 				$("#btn_material_add").hide();
 			}
@@ -245,63 +312,100 @@
 	$("#btn_material_add").on('click', function() {
 		stockGrid.finishEditing();
 	
-		let stockArr = [];
 		let totalQuantity = 0;
-		const rows = stockGrid.getData();
 		
-		for (const row of rows) {
-			if (row.RELEASE_QUANTITY == null) {
-				row.RELEASE_QUANTITY = 0;
+		let item_amount = 0;
+		let item_id = '';
+		let item_name = '';
+		let item_unit = '';
+		
+		let selectedRowKey = '';
+		
+		for (const stockRow of stockGrid.getData()) {
+			if (stockRow.RELEASE_QUANTITY == null || stockRow.RELEASE_QUANTITY == '') {
+				stockRow.RELEASE_QUANTITY = 0;
 			}
 
-			if (row.RELEASE_QUANTITY > row.CURRENT_QUANTITY) {
+			if (stockRow.RELEASE_QUANTITY > stockRow.CURRENT_QUANTITY) {
 				alert("출고수량은 현재고보다 많을 수 없습니다.");
 				
 				return;
 			}
 			
-			if (row.RELEASE_QUANTITY != 0) {
-				const mapRowData = {
-					"LOT_ID": row.LOT_ID,
-					"RELEASE_QUANTITY": row.RELEASE_QUANTITY,
-					"WAREHOUSE_ID": row.WAREHOUSE_ID,
-					"WAREHOUSE_NAME": row.WAREHOUSE_NAME,
-					isNew: true
-				};
-
-				stockArr.push(mapRowData);
-				
-				totalQuantity += Number(row.RELEASE_QUANTITY);
+			for (const bomRow of bomGrid.getData()) {
+				if (bomGrid.getRowClassName(bomRow.rowKey).includes('selected-row')) {
+					selectedRowKey = bomRow.rowKey;
+					
+					item_amount = bomRow.ITEM_AMOUNT;
+					item_id = bomRow.ITEM_ID;
+					item_name = bomRow.ITEM_NAME;
+					item_unit = bomRow.ITEM_UNIT;
+					
+					if (stockRow.RELEASE_QUANTITY > item_amount) {
+						alert("출고수량은 소요량보다 많을 수 없습니다.");
+						
+						return;
+					}
+				}
+			}
+			
+			if (stockRow.RELEASE_QUANTITY != 0) {
+				totalQuantity += Number(stockRow.RELEASE_QUANTITY);
 			}
 		}
-
-		let item_amount = 0;
 		
-		bomGrid.getData().forEach((bomRow) => {
-			if (bomGrid.getRowClassName(bomRow.rowKey).includes('selected-row')) {
-				item_amount = bomRow.ITEM_AMOUNT;
-				
-				stockArr.forEach((stockRow) => {
-					stockRow.ITEM_ID = bomRow.ITEM_ID;
-					stockRow.ITEM_NAME = bomRow.ITEM_NAME;
-					stockRow.ITEM_UNIT = bomRow.ITEM_UNIT;
-					stockRow.ITEM_AMOUNT = item_amount;
-				});
-			}
-		});
-
-		/* 테스트 완료 후 주석 해제.
+		bomGrid.setValue(selectedRowKey, 'RELEASE_QUANTITY', totalQuantity);
+		
 		if (Number(item_amount) > Number(totalQuantity)) {
 			alert("출고수량이 부족합니다.");
 
 			return;
 		}
-		*/
 		
-		releaseMeterialGridInit(stockArr);
+		if (Number(item_amount) < Number(totalQuantity)) {
+			alert("출고수량은 소요량보다 많을 수 없습니다.");
+
+			return;
+		}
+		
+		for (const stockRow of stockGrid.getData()) {
+			if (stockRow.RELEASE_QUANTITY != null && stockRow.RELEASE_QUANTITY != '') {
+				stockArr = stockArr.filter(row => row.LOT_ID != stockRow.LOT_ID);
+				
+				const mapRowData = {
+					"LOT_ID": stockRow.LOT_ID,
+					"RELEASE_QUANTITY": stockRow.RELEASE_QUANTITY,
+					"WAREHOUSE_ID": stockRow.WAREHOUSE_ID,
+					"WAREHOUSE_NAME": stockRow.WAREHOUSE_NAME,
+					isNew: true
+				};
+
+				stockArr.push(mapRowData);
+			}
+		}
+				
+		stockArr.forEach((stockRow) => {
+			if (stockRow.rowKey == null) {
+				stockRow.ITEM_ID = item_id;
+				stockRow.ITEM_NAME = item_name;
+				stockRow.ITEM_UNIT = item_unit;
+				stockRow.PRODUCTION_ORDER_DETAIL_ID = bom_dataSource.api.readData.initParams.productionOrderDetailId;
+			}
+		});
+		
+		releaseMeterialGridInit();
+		
+		for (const row of bomGrid.getData()) {
+			if (row.ITEM_AMOUNT != row.RELEASE_QUANTITY) {
+				$("#saveProductionDetailOrder").attr('disabled', true);
+				
+				return;
+			}
+		}
+		$("#saveProductionDetailOrder").attr('disabled', false);
 	});
 	
-	function releaseMeterialGridInit(stockArr) {
+	function releaseMeterialGridInit() {
 		if (releaseMeterialGrid) {
 			releaseMeterialGrid.destroy(); // 기존 그리드 제거
 			releaseMeterialGrid = null;
