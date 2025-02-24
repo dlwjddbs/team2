@@ -234,12 +234,13 @@
 		let clientDetailCurrentSelectedRowKey = null;
 		let clientDetailIsEditModeEnabled = false; 
 		const clientDetail_columns = [
-            {header: '우편번호', name: 'ZIPCODE', align: 'center', width: 150, editor: null},
-            {header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'left', width: 500, editor: null},
+            {header: '우편번호', name: 'ZIPCODE', align: 'center', width: 100, editor: null},
+            {header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'left', width: 300, editor: null},
+            {header: '상세주소', name: 'ADDRESS_DETAIL', align: 'left', width: 200, editor: null},
             {header: '담당자명', name: 'RESP_NAME', align: 'center', width: 150, editor: null},
-			{header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: null},
-			{header: '비고', name: 'DESCRIPTION', align: 'center', editor: null},
-			{header: 'clientDetail', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
+			{header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', width: 150, editor: null},
+			{header: '비고', name: 'DESCRIPTION', align: 'center', width: 300, editor: null},
+			{header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
         ];
 		
 		const TextInputRenderer = function(props) {
@@ -499,7 +500,7 @@
 		    
 		    if (clientIsEditModeEnabled) {
 		        clientGrid.setColumns([
-		        	{header: 'clientDetail *', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+		        	{header: '거래처 코드 *', name: 'CLIENT_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
 		            {header: '거래처명 *', name: 'CLIENT_NAME', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
 		            {
 						header: '거래처 유형 *', 
@@ -662,10 +663,11 @@
 		    if (clientIsEditModeEnabled) {
 		        clientDetailGrid.setColumns([
 					{ header: '우편번호', name: 'ZIPCODE', align: 'center', width: 150, renderer: { type: TextInputBtnRenderer }},
-					{ header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'center', editor: 'text', width: 500, renderer: { type: TextInputBtnRenderer }},
+					{ header: '거래처 주소', name: 'CLIENT_ADDRESS', align: 'center', editor: 'text', width: 300, renderer: { type: TextInputBtnRenderer }},
+					{ header: '상세주소', name: 'ADDRESS_DETAIL', align: 'center', editor: 'text', width: 200, renderer: { type: TextInputRenderer }},
 		            { header: '담당자명', name: 'RESP_NAME', align: 'left', editor: 'text', width: 150, renderer: { type: TextInputRenderer }},
-		            { header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
-		            { header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+		            { header: '담당자 메일', name: 'RESP_EMAIL', align: 'left', editor: 'text', width: 150, renderer: { type: TextInputRenderer }},
+		            { header: '비고', name: 'DESCRIPTION', align: 'center', editor: 'text', width: 300, renderer: { type: TextInputRenderer }},
 					{ header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null, hidden: true},
 		        ]);
 		    } else {

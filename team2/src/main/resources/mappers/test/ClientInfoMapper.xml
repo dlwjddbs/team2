@@ -23,6 +23,7 @@
     	SELECT
     		  ZIPCODE
 			, CLIENT_ADDRESS
+			, ADDRESS_DETAIL
 			, RESP_NAME
 			, RESP_EMAIL
 			, DESCRIPTION
@@ -77,6 +78,7 @@
 	           SET 
 	               ZIPCODE = #{row.ZIPCODE, jdbcType=VARCHAR}
 	             , CLIENT_ADDRESS = #{row.CLIENT_ADDRESS, jdbcType=VARCHAR}
+	             , ADDRESS_DETAIL = #{row.ADDRESS_DETAIL, jdbcType=VARCHAR}
 	             , RESP_NAME = #{row.RESP_NAME, jdbcType=VARCHAR}
 				 , RESP_EMAIL = #{row.RESP_EMAIL, jdbcType=VARCHAR}
 	             , DESCRIPTION = #{row.DESCRIPTION, jdbcType=VARCHAR}
@@ -97,6 +99,7 @@
     	 	SET 
     	 		ZIPCODE = NULL
     	 	  , CLIENT_ADDRESS = NULL
+    	 	  , ADDRESS_DETAIL = NULL
     	 	  , RESP_NAME = NULL
     	 	  , RESP_EMAIL = NULL
     	 	  , DESCRIPTION = NULL
