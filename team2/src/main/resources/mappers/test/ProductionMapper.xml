@@ -232,4 +232,24 @@
 					   )
 				   AND STATUS = 'ST-002') >= 1
 	</update>
+	
+<!-- ================ << LOT Tracking >> ================ -->
+
+	<select id="selectProductionLot" resultType="map">
+		SELECT
+			   PL.PRODUCTION_LOT_ID 
+			 , I.ITEM_NAME 
+		  FROM
+		  	   PRODUCTION_LOT PL
+	INNER JOIN
+			   ITEM I
+			   		ON PL.ITEM_ID = I.ITEM_ID 
+		WHERE I.ITEM_TYPE = '완제품'
+	</select>
+	
+	<!--
+	<select id="selectProductionLotDetail" resultType="map">
+		
+	</select>
+	-->
 </mapper>
