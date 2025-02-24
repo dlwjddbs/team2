@@ -26,6 +26,29 @@
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	<!-- Daum 우편번호 서비스 -->
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	
+	<style>
+		.client-container {
+	        display: flex;
+	        align-items: center;
+	        gap: 15px; /* label과 input 간격 유지 */
+	    }
+						
+		.client-label	{
+	        flex: 0 0 auto;
+	        white-space: nowrap;
+	        text-align: right;
+	    }
+		
+		.client-input {
+	        width: 150px;
+	    }
+		
+		.client-select {
+			        min-width: 120px;
+			    }	
+	</style>
+	
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -50,6 +73,33 @@
 					<div class="row">
 						<div class="col-12">
 							<div class="card">
+								<div class="card-header">
+									<div class="d-flex justify-content-between">
+								        <div class="client-container">
+											<!-- 거래처 유형 -->
+										    <label class="col-form-label client-label" >거래처 유형</label>
+											<select class="client form-control client-select" name="clientType">
+										        <option value="" selected="selected">전체</option>
+										        <option value="매입사">매입사</option>
+										        <option value="매출사">매출사</option>
+										    </select>
+
+											<!-- 거래처명 -->
+										    <label class="col-form-label client-label" >거래처명</label>
+											<input type="text" class="form-control client-input" id="clientName">
+											
+										    <!-- 거래상태 -->
+										    <label class="col-form-label client-label" >거래상태</label>
+										    <select class="client form-control client-select" name="clientStatus">
+										        <option value="" selected="selected">전체</option>
+										        <option value="거래중">거래중</option>
+										        <option value="거래중지">거래중지</option>
+										    </select>
+										</div>
+								        <!-- 조회 버튼 -->
+								        <input type="button" id="btn_client_search" class="btn btn-primary" value="조회">
+								    </div>
+								</div>
 								<div class="card-header">
 									<div class="row">
 										<div class="col-6">
@@ -132,6 +182,7 @@
 	<script th:inline="javascript">
 		// 거래처 정보
 		let clientGrid = null;
+		let allData = [];
 		const clientUrl = '/clientinfo/client';
 		const clientDataSource = {
 			api: {
@@ -352,6 +403,13 @@
 		    clientGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
+			
+			// 서버에서 데이터를 받아온 후 allData에 저장
+			// 서버에서 데이터를 받아오는데 약간의 시간이 걸림 (약 110~250ms)
+			setTimeout(function () {
+			    allData = clientGrid.getData();
+			    console.log("전체 데이터 로드 완료:", allData);
+			}, 350);
 			
 			clientGrid.on('editingStart', function(ev) {
 			    const {rowKey, columnName, value} = ev;
@@ -672,6 +730,26 @@
 		    clientDetailGrid.request('deleteData');
 			clientDetailGrid.reloadData();  // 실패시 테이블 리로드
 		});
+		
+		$("#btn_client_search").on("click", function() {
+					
+		    const clientType = $("select[name='clientType']").val();
+		    const clientName = $("#clientName").val().trim().toLowerCase();
+			const clientStatus = $("select[name='clientStatus']").val(); // 사용여부 (선택값)
+
+		    // 필터링된 데이터 추출
+		    const filteredData = allData.filter(item => {
+				return	(clientType === "" || item.CLIENT_TYPE === clientType) &&
+		        		(clientName === "" || item.CLIENT_NAME.toLowerCase().includes(clientName)) &&
+						(clientStatus === "" || item.CLIENT_STATUS === clientStatus);
+		    });
+			
+			console.log(filteredData);
+
+		    // 필터링된 데이터로 그리드 갱신
+		    clientGrid.resetData(filteredData);
+		});
+		
 	</script>
 
 </body>

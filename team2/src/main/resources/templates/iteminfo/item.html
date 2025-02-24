@@ -24,6 +24,28 @@
 	<script src="../../dist/js/adminlte.min.js"></script>
 	<!-- Toast Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	
+	<style>
+		.item-container {
+	        display: flex;
+	        align-items: center;
+	        gap: 15px; /* label과 input 간격 유지 */
+	    }
+						
+		.item-label	{
+	        flex: 0 0 auto;
+	        white-space: nowrap;
+	        text-align: right;
+	    }
+		
+		.item-input {
+	        width: 150px;
+	    }
+		
+		.item-select {
+			        min-width: 120px;
+			    }	
+	</style>
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -49,31 +71,27 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<div class="d-flex justify-content-between align-items-center">
-								        <div class="d-flex align-items-center">
+									<div class="d-flex justify-content-between">
+								        <div class="item-container">
 
 											<!-- 품목유형 -->
-								            <label class="col-form-label" style="min-width: 70px">품목유형</label>
-											<select class="item form-control mr-3" name="itemType" style="min-width: 120px;" >
+								            <label class="col-form-label item-label" >품목유형</label>
+											<select class="item form-control item-select" name="itemType">
 								                <option value="" selected="selected">전체</option>
-								                <option value="SF">반제품</option>
-								                <option value="FP">완제품</option>
+								                <option value="반제품">반제품</option>
+								                <option value="완제품">완제품</option>
 								            </select>
 
-											<!-- 품목 -->
-								            <label class="col-form-label" style="min-width: 70px">품목</label>
-											<select class="item form-control mr-3" name="item3" style="min-width: 120px;" >
-								                <option selected="selected" disabled>품목명(미구현)</option>
-								                <option>A 품목</option>
-								                <option>B 품목</option>
-								            </select>
+											<!-- 품목명 -->
+								            <label class="col-form-label item-label" >품목명</label>
+											<input type="text" class="form-control item-input" id="itemName">
 											
 								            <!-- 사용여부 -->
-								            <label class="col-form-label mr-2" style="min-width: 70px">사용여부</label>
-								            <select class="equip3 form-control mr-3" name="equip3" style="min-width: 120px;" >
-								                <option selected="selected" disabled>사용여부(미구현)</option>
-								                <option>사용</option>
-								                <option>미사용</option>
+								            <label class="col-form-label item-label" >사용여부</label>
+								            <select class="item form-control item-select" name="useYN">
+								                <option value="" selected="selected">전체</option>
+								                <option value="Y">사용</option>
+								                <option value="N">미사용</option>
 								            </select>
 								        </div>
 								
@@ -139,6 +157,10 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let itemGrid = null;
+		let itemCurrentSelectedRowKey = null;
+		let itemIsEditModeEnabled = false; 
+		let allData = [];
+		
 		const itemUrl = '/iteminfo/item';
 		const itemDataSource = {
 			api: {
@@ -149,8 +171,6 @@
 			},
 			contentType: 'application/json',
 	    };
-		let itemCurrentSelectedRowKey = null;
-		let itemIsEditModeEnabled = false; 
 		const item_columns = [
             {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
             {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
@@ -324,18 +344,11 @@
 		    el.style.margin = 'auto 5px';
 
 		    // 드롭다운 옵션 설정
-		    const options = [
+		   const options = [
 		        { text: 'Y', value: 'Y' },
 		        { text: 'N', value: 'N' },
-		        { text: '반제품', value: 'SF' },
-		        { text: '완제품', value: 'FP' },
-		        { text: 'EA', value: 'EA' },
-		        { text: 'G', value: 'G' },
-		        { text: 'KG', value: 'KG' },
-		        { text: 'M', value: 'M' },
-		        { text: '', value: 'MM' },
-		        { text: '반제품 창고', value: '반제품 창고' },
-		        { text: '완제품 창고', value: '완제품 창고' }
+		        { text: '반제품', value: '반제품' },
+		        { text: '완제품', value: '완제품' },
 		    ];
 
 		    options.forEach(option => {
@@ -381,6 +394,13 @@
 		        alert(JSON.parse(ev.xhr.responseText).message);
 				alert("Response 실패");
 		    });
+			
+			// 서버에서 데이터를 받아온 후 allData에 저장
+			// 서버에서 데이터를 받아오는데 약간의 시간이 걸림 (약 110~250ms)
+			setTimeout(function () {
+			    allData = itemGrid.getData();
+			    console.log("전체 데이터 로드 완료:", allData);
+			}, 350);
 			
 			itemGrid.on('editingStart', function(ev) {
 			    const {rowKey, columnName, value} = ev;
@@ -578,13 +598,15 @@
 		
 		$("#btn_item_search").on("click", function() {
 			
-		    // const equipId = $("#equipId").val().trim().toLowerCase();
-		    // const equipName = $("#equipName").val().trim().toLowerCase();
-		    const itemType = $("select[name='itemType']").val(); // 사용여부 (선택값)
+		    const itemType = $("select[name='itemType']").val();
+		    const itemName = $("#itemName").val().trim().toLowerCase();
+			const useYN = $("select[name='useYN']").val(); // 사용여부 (선택값)
 
 		    // 필터링된 데이터 추출
 		    const filteredData = allData.filter(item => {
-		        return (itemType === "" || item.ITEM_TYPE === itemType);
+				return	(itemType === "" || item.ITEM_TYPE === itemType) &&
+		        		(itemName === "" || item.ITEM_NAME.toLowerCase().includes(itemName)) &&
+						(useYN === "" || item.USE_YN === useYN);
 		    });
 			
 			console.log(filteredData);
@@ -639,27 +661,6 @@
 				}
 			});
 		});
-		/* $.ajax({
-		    url: '/ajax/getMesCommonCode',
-		    method: 'POST',
-		    success: function (data) {
-
-		        function mesCommonCodeByGroup(dataArray) {
-		            let groupedData = {};
-		            dataArray.forEach(item => {
-		                if (!groupedData[item.MAIN_ID]) {
-		                    groupedData[item.MAIN_ID] = [];
-		                }
-		                groupedData[item.MAIN_ID].push({ text: item.SUB_ID + (item.SUB_NAME ? ` (${item.SUB_NAME})` : ''), value: item.SUB_ID });
-		            });
-		            return groupedData;
-		        }
-
-		        let groupedData = mesCommonCodeByGroup(data);
-
-		        let itemTypeOptions = groupedData["MATL"] || [];
-		        let itemUnitOptions = groupedData["UNIT"] || []; */
-				
 	</script>
 </body>
 </html>

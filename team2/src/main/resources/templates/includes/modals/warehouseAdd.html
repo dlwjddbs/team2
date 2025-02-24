@@ -13,6 +13,29 @@
 			
 			<!-- 모달창 바디 -->
 			<div class="modal-body">
+				<!-- 검색 필터 -->
+				<div class="d-flex justify-content-between bg-secondary rounded p-3 mb-4 m-2">
+					<div class="d-flex">
+						<div class="d-flex">
+							<label class="col-form-label mr-3">창고 유형</label> 
+							<select class="appointGubun" style="min-width: 120px" name="whseType">
+								<option value="" selected="selected">전체</option>
+				                <option value="원자재">원자재</option>
+				                <option value="반제품">반제품</option>
+				                <option value="완제품">완제품</option>
+								<!-- ajax -->
+							</select>
+						</div>
+						<div class="d-flex ml-4">
+							<!-- Date range -->
+							<label for="" class="col-form-label mr-3" style="min-width: 70px;">창고명</label>
+							<input type="text" class="form-control float-right" id="whseName">
+						</div>
+					</div>
+					<div class="d-flex">
+						<button type="button" class="btn btn-primary" id="btn_whse_search">조회</button>
+					</div>
+				</div>
 				<div class="card-body">
 					<div class="form-group">
 						<div class="row">
@@ -52,6 +75,8 @@
 		let whseCurrentSelectedRowKey = null;
 		let selectedWhseId = '';
 		let selectedWhseName = '';
+		let lAllData = [];
+		
 		const whseUrl = '/iteminfo/whse';
 		const whseDataSource = {
 			api: {
@@ -62,7 +87,7 @@
 		const whse_columns = [
 	        {header: '창고 코드', name: 'WAREHOUSE_ID', align: 'center'},
 	        {header: '창고명', name: 'WAREHOUSE_NAME', align: 'left'},
-	        {header: '창고유형', name: 'WAREHOUSE_TYPE', align: 'left'},
+	        {header: '창고 유형', name: 'WAREHOUSE_TYPE', align: 'left'},
 	    ];
 
 	$('#warehouseAdd').on('shown.bs.modal', function () {
@@ -96,6 +121,19 @@
 		whseGrid.on('failResponse', function(ev) {
 	        alert(JSON.parse(ev.xhr.responseText).message);
 	    });
+		
+		// 서버에서 데이터를 받아온 후 allData에 저장
+		// 서버에서 데이터를 받아오는데 약간의 시간이 걸림 (약 110~250ms)
+		setTimeout(function () {
+		    lAllData = whseGrid.getData();
+		    console.log("전체 데이터 로드 완료:", lAllData);
+		}, 350);
+		
+		whseGrid.on('editingStart', function(ev) {
+		    const {rowKey, columnName, value} = ev;
+		    const rowData = whseGrid.getRow(rowKey);
+			
+		});
 		
 	    whseGrid.on('click', (ev) => {
 			if (ev.targetType != "cell") {
@@ -134,5 +172,23 @@
 		
 		$('#warehouseAdd').modal('hide');
 	});
+	
+	$("#btn_whse_search").on("click", function() {
+				
+	    const whseType = $("select[name='whseType']").val();
+	    const whseName = $("#whseName").val().trim().toLowerCase();
+
+	    // 필터링된 데이터 추출
+	    const filteredData = lAllData.filter(item => {
+			return	(whseType === "" || item.WAREHOUSE_TYPE === whseType) &&
+	        		(whseName === "" || item.WAREHOUSE_NAME.toLowerCase().includes(whseName))
+	    });
+		
+		console.log(filteredData);
+
+	    // 필터링된 데이터로 그리드 갱신
+	    whseGrid.resetData(filteredData);
+	});
+	
 
 </script>

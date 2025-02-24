@@ -32,7 +32,7 @@ public class MesCommonCodeController {
             return "redirect:/login"; 
         }
 		
-		return "/commonCode/common_code2";
+		return "/commonCode/mes_com_code";
 	}
 	
 	@PostMapping("/system/getGroupMesCommonCode")

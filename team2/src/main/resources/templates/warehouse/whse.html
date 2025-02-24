@@ -24,6 +24,28 @@
 	<script src="../../dist/js/adminlte.min.js"></script>
 	<!-- Toast Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+	
+	<style>
+		.whse-container {
+	        display: flex;
+	        align-items: center;
+	        gap: 15px; /* label과 input 간격 유지 */
+	    }
+						
+		.whse-label	{
+	        flex: 0 0 auto;
+	        white-space: nowrap;
+	        text-align: right;
+	    }
+		
+		.whse-input {
+	        width: 150px;
+	    }
+		
+		.whse-select {
+			        min-width: 120px;
+			    }	
+	</style>
 </head>
 <body class="hold-transition sidebar-mini">
 	<div class="wrapper">
@@ -51,6 +73,34 @@
 					<div class="row">
 						<div class="col-12">
 							<div class="card">
+								<div class="card-header">
+									<div class="d-flex justify-content-between">
+								        <div class="whse-container">
+											<!-- 창고 유형 -->
+										    <label class="col-form-label whse-label" >창고 유형</label>
+											<select class="whse form-control whse-select" name="whseType">
+										        <option value="" selected="selected">전체</option>
+										        <option value="원자재">원자재</option>
+										        <option value="반제품">반제품</option>
+										        <option value="완제품">완제품</option>
+										    </select>
+
+											<!-- 거래처명 -->
+										    <label class="col-form-label whse-label" >창고명</label>
+											<input type="text" class="form-control whse-input" id="whseName">
+											
+										    <!-- 거래상태 -->
+										    <label class="col-form-label whse-label" >운영 상태</label>
+										    <select class="whse form-control whse-select" name="whseStatus">
+										        <option value="" selected="selected">전체</option>
+										        <option value="Y">운영</option>
+										        <option value="N">미운영</option>
+										    </select>
+										</div>
+								        <!-- 조회 버튼 -->
+								        <input type="button" id="btn_whse_search" class="btn btn-primary" value="조회">
+								    </div>
+								</div>
 								<div class="card-header">
 									<div class="row">
 										<div class="col-6">
@@ -80,6 +130,17 @@
 				<div class="row">
 					<div class="col-12">
 						<div class="card">
+							<div class="card-header location" id="location_id_search" style="display: none;">
+								<div class="d-flex justify-content-between">
+							        <div class="whse-container">
+										<!-- 거래처명 -->
+									    <label class="col-form-label whse-label" >자재 코드</label>
+										<input type="text" class="form-control whse-input" id="productId">
+									</div>
+							        <!-- 조회 버튼 -->
+							        <input type="button" id="btn_location_search" class="btn btn-primary" value="조회">
+							    </div>
+							</div>
 							<div class="card-header">
 								<div class="row">
 									<div class="col-6">
@@ -138,6 +199,11 @@
 	<script th:inline="javascript">
 		// 창고 정보
 		let whseGrid = null;
+		let whseCurrentSelectedRowKey = null;
+		let whseCurrentSelectedID = null;
+		let whseIsEditModeEnabled = false; 
+		let allData = [];
+		
 		const whseUrl = '/warehouse/whse';
 		const whseDataSource = {
 			api: {
@@ -147,9 +213,6 @@
 			},
 			contentType: 'application/json',
 	    };
-		let whseCurrentSelectedRowKey = null;
-		let whseCurrentSelectedID = null;
-		let whseIsEditModeEnabled = false; 
 		const whse_columns = [
             {header: '창고 코드', name: 'WAREHOUSE_ID', align: 'center', editor: null},
             {header: '창고명', name: 'WAREHOUSE_NAME', align: 'left', editor: null},
@@ -167,6 +230,10 @@
 		
 		// 제품 위치
 		let locationGrid = null;
+		let locationCurrentSelectedRowKey = null;
+		let locationIsEditModeEnabled = false; 
+		let lAllData = [];
+		
 		const locationUrl = '/warehouse/location';
 		const locationDataSource = {
 			api: {
@@ -176,15 +243,13 @@
 			},
 			contentType: 'application/json',
 		};
-		let locationCurrentSelectedRowKey = null;
-		let locationIsEditModeEnabled = false; 
 		const location_columns = [
 		    {header: '구역 코드', name: 'LOCATION_ID', align: 'center', editor: null},
-		    {header: '구역명', name: 'LOCATION_NAME', align: 'left', editor: null},
+		    {header: '구역명', name: 'LOCATION_NAME', align: 'center', editor: null},
 		    {header: '자재 코드', name: 'PRODUCT_ID', align: 'left', editor: null},
-		    {header: '정렬', name: 'LOCATION_ORDER', align: 'left', editor: null},
-		    {header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'left', editor: null},
-		    {header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'left', editor: null},
+		    {header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: null},
+		    {header: '적재 수량', name: 'CURRENT_QUANTITY', align: 'center', editor: null},
+		    {header: '예약된 수량', name: 'RESERVED_QUANTITY', align: 'center', editor: null},
 			{
 			    header: '사용여부', 
 			    name: 'USE_YN', 
@@ -447,6 +512,13 @@
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 			
+			// 서버에서 데이터를 받아온 후 allData에 저장
+			// 서버에서 데이터를 받아오는데 약간의 시간이 걸림 (약 110~250ms)
+			setTimeout(function () {
+			    allData = whseGrid.getData();
+			    console.log("전체 데이터 로드 완료:", allData);
+			}, 350);
+			
 			whseGrid.on('editingStart', function(ev) {
 			    const {rowKey, columnName, value} = ev;
 			    const rowData = whseGrid.getRow(rowKey);
@@ -632,6 +704,25 @@
 			whseGrid.reloadData();  // 실패시 테이블 리로드
 		});
 		
+		$("#btn_whse_search").on("click", function() {
+					
+		    const whseType = $("select[name='whseType']").val();
+		    const whseName = $("#whseName").val().trim().toLowerCase();
+			const whseStatus = $("select[name='whseStatus']").val(); // 사용여부 (선택값)
+
+		    // 필터링된 데이터 추출
+		    const filteredData = allData.filter(item => {
+				return	(whseType === "" || item.WAREHOUSE_TYPE === whseType) &&
+		        		(whseName === "" || item.WAREHOUSE_NAME.toLowerCase().includes(whseName)) &&
+						(whseStatus === "" || item.WAREHOUSE_STATUS === whseStatus);
+		    });
+			
+			console.log(filteredData);
+
+		    // 필터링된 데이터로 그리드 갱신
+		    whseGrid.resetData(filteredData);
+		});
+		
 		// 제품 위치
 		function locationInit(warehouse_id) {
 			// 파라미터 설정
@@ -652,11 +743,16 @@
 		        columns: location_columns,
 		    });
 			
-			$("#btn_group_location").show();
+			$("#location_id_search").show();
 
 		    locationGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
+			
+			setTimeout(function () {
+			    lAllData = locationGrid.getData();
+			    console.log("전체 데이터 로드 완료:", lAllData);
+			}, 350);
 		}
 		
 		$("#btn_location_add_row").on("click", function () {
@@ -777,13 +873,12 @@
 			}
 			
 			locationGrid.request('modifyData');
-//			locationGrid.readData(1, null, true);  // 그리드 새로고침 
 			locationGrid.reloadData();  // 그리드 새로고침 
 			locationGrid.setColumns(location_columns);  // 수정모드 해제 (새로 렌더링)
 			
-			locationIsEditModeEnabled = false;
+			/*locationIsEditModeEnabled = false;
 	    	$("#btn_location_add_row").hide();
-			$("#btn_location_remove_row").hide();
+			$("#btn_location_remove_row").hide();*/
 		});
 		
         $("#btn_location_delete").on("click", function() {
@@ -799,6 +894,22 @@
 		    locationGrid.request('deleteData');
 			locationGrid.reloadData();  // 실패시 테이블 리로드
 		});
+		
+		$("#btn_location_search").on("click", function() {
+			
+		    const productId = $("#productId").val().trim().toLowerCase();
+
+		    // 필터링된 데이터 추출
+		    const filteredData = lAllData.filter(item => {
+				return	(productId === "" || item.PRODUCT_ID.toLowerCase().includes(productId));
+		    });
+			
+			console.log(filteredData);
+
+		    // 필터링된 데이터로 그리드 갱신
+		    locationGrid.resetData(filteredData);
+		});
+		
 
 	</script>
 </body>
