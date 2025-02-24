@@ -47,15 +47,21 @@ public class PopController {
 	
 	@PostMapping("/ajax/saveInboundInspection")
 	@ResponseBody
-	public Map<String, Object> saveInboundInspection(@RequestBody List<Map<String, Object>> rejectionList) {
-	    return inspectionService.processInboundInspection(rejectionList);
+	public Map<String, Object> saveInboundInspection(@RequestBody List<Map<String, Object>> map) {
+	    return inspectionService.processInboundInspection(map);
 	}
 	
 	@PostMapping("/ajax/closeInboundInspection")
 	@ResponseBody
 	public Map<String, Object> closeInboundInspection(@RequestBody Map<String, Object> map) {
-		System.out.println("controller: " + map);
 		return inspectionService.insertInboundLots(map);
+	}
+	
+	@PostMapping("/ajax/saveProductionInspection")
+	@ResponseBody
+	public Map<String, Object> saveProductionInspection(@RequestBody List<Map<String, Object>> map) {
+		System.out.println(map);
+	    return inspectionService.insertProductionInspection(map);
 	}
 	
 	

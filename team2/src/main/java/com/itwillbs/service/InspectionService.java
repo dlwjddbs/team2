@@ -227,4 +227,71 @@ public class InspectionService {
 		return resultMap;
 	}
 
+	public Map<String, Object> selectDefectCode(Map<String, Object> map) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectEquipment 성공";
+		
+		try {
+			List<Map<String, Object>> rejectionList = inspectionMapper.selectDefectCode(map);
+			content.put("contents", rejectionList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> selectDefectCauseCode(Map<String, Object> map) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		Boolean result = true;
+		String message = "selectEquipment 성공";
+		
+		try {
+			List<Map<String, Object>> rejectionList = inspectionMapper.selectDefectCauseCode(map);
+			content.put("contents", rejectionList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			result = false;
+			message = "selectEquipment 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
+	public Map<String, Object> insertProductionInspection(List<Map<String, Object>> list) {
+		Map<String, Object> resultMap = new HashMap<>();
+		System.out.println("insertProductionInspection");
+		Boolean result = true;
+		String message = "insertProductionInspection 성공";
+		
+		try {
+			inspectionMapper.insertProductionInspection(list);
+			inspectionMapper.insertProductionLot(list);
+			inspectionMapper.updateProductionOrderDetail(list);
+			inspectionMapper.updateWortcenterLog(list);
+		} catch (Exception e) {
+			System.out.println(e);
+			result = false;
+			message = "insertProductionInspection 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+
 }

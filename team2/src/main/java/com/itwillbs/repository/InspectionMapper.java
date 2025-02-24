@@ -37,5 +37,18 @@ public interface InspectionMapper {
 
 	int updatePurchaseOrderStatus(Map<String, Object> map);
 
+	//------------------------
+	
+	List<Map<String, Object>> selectDefectCode(Map<String, Object> map);
+	
+	List<Map<String, Object>> selectDefectCauseCode(Map<String, Object> map);
+
+	int insertProductionInspection(@Param("list")List<Map<String, Object>> list);
+
+	int insertProductionLot(@Param("list")List<Map<String, Object>> list);
+	
+	int updateProductionOrderDetail(@Param("list")List<Map<String, Object>> list);
+
+	int updateWortcenterLog(@Param("list")List<Map<String, Object>> list);
 
 }

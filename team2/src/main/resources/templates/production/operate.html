@@ -26,6 +26,36 @@
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	
 	<script src="../../js/tuiCustom.js"></script>
+	
+	<style>
+		#keyboard {
+			display: grid;
+		    grid-template-columns: repeat(3, 1fr);
+		    gap: 3px;
+		    width: 100%;
+		    max-width: 100%;
+			margin-top: 5px;
+		}
+		
+		#keyboard .btn {
+			flex: 1;
+			aspect-ratio: 1 / 1;
+		    display: flex; 
+		    align-items: center; 
+		    justify-content: center;
+			font-size: 1.5rem;
+		}
+		
+		.tui-grid-cell-has-input  {
+		    background-color: white !important;
+		}
+		
+		.defect-type-hidden {
+		    display: none !important;
+		}
+
+	</style>
+
 </head>
 <body class="layout-top-nav">
 	<div class="wrapper">
@@ -64,6 +94,8 @@
 	<!-- ./wrapper -->
 	
 	<nav th:replace="~{includes/modals/productionMaterialAdd :: productionMaterialAdd}"></nav>
+	<nav th:replace="~{POP/productionInspection :: productionInspection}"></nav>
+	
 	
 	<style>
 		.selected-row {
@@ -81,6 +113,11 @@
 	<script th:inline="javascript">
 		let workcenterGrid = null;
 		let productionOrderDetailGrid = null;
+		let defectGrid = null;
+		let causeGrid = null;
+		let defectInputGrid = null;
+		
+		
 		
 		const workcenter_url = '/rest/production/workcenter';
 		const workcenter_dataSource = {
@@ -124,6 +161,7 @@
 				});
 				
 				const workcenterId = workcenterGrid.getValue(ev.rowKey, "WORKCENTER_ID");
+				window.currentWorkcenterId = workcenterId;
 				productionOrderDetailInit(workcenterId);
 			});
 		}
@@ -164,10 +202,21 @@
 					el.classList.add('btn', btnOption);
 
 					el.addEventListener('click', (ev) => {
+						
 						const rowKey = props.rowKey;
+						const productionRowData = props.grid.getRow(rowKey);
+						
+						window.selectedProductionRow = productionRowData;
+						
+						
 						bom_dataSource.api.readData.initParams.productionOrderDetailId = props.grid.getValue(rowKey, 'PRODUCTION_ORDER_DETAIL_ID');
 						
-						$('#productionMaterialAdd').modal();
+						if (value === 'ST-001') {
+			                $('#productionMaterialAdd').modal();
+			            }
+						if (value === 'ST-002') {
+			                $('#productionInspection').modal();
+			            }
 					});
 					
 					this.el = el;
@@ -218,5 +267,6 @@
 		}
 		
 	</script>
+	<script th:src="@{/js/productionInspection.js}"></script>
 </body>
 </html>

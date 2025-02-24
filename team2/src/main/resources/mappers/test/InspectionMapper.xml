@@ -192,4 +192,133 @@
 		   SET PO_STATUS = 'C'
 		 WHERE PO_ID = #{po_id}
 	</update>
+	
+<!-- ======================= << PRODUCTION INSPECTION >> ======================= -->
+	<select id="selectDefectCode" resultType="map">
+		SELECT 
+			   DEFECT_ID
+			 , DEFECT_NAME
+			 , DESCRIPTION
+		  FROM
+		  	   DEFECT_CODE
+		 WHERE
+			   PROCESS_ID = #{process_id}	
+		   AND USE_YN = 'Y'
+    </select>
+    
+    <select id="selectDefectCauseCode" resultType="map">
+    	SELECT
+			   DCC.CAUSE_TYPE_CODE
+			 , MC.SUB_NAME
+		     , DCC.CAUSE_TYPE_CODE || DCC.CAUSE_ID AS CAUSE_ID
+		     , DCC.DESCRIPTION
+		  FROM
+		  	   DEFECT_CAUSE_CODE DCC
+	 LEFT JOIN
+	 		   MES_COMMON MC
+	 		   					ON
+	 		   					   DCC.CAUSE_TYPE_CODE = MC.SUB_ID
+		 WHERE 
+			   MC.MAIN_ID = 'DFTY'
+	       AND 
+	       	   DCC.PROCESS_ID = #{process_id}
+	       AND
+	       	   DCC.CAUSE_TYPE_CODE = #{cause_type}
+		   AND
+		   	   DCC.USE_YN = 'Y'
+    </select>
+	
+	<insert id="insertProductionInspection">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PRODUCTION_INSPECTION (
+				  PRODUCTION_ORDER_ID	
+				, PRODUCTION_ORDER_DETAIL_ID
+				, ITEM_ID				
+				, TOTAL_QUANTITY		
+				, DEFECT_QUANTITY		
+				, DEFECT_CODE			
+				, DEFECT_CAUSE_CODE
+			) VALUES (
+				  #{item.PRODUCTION_ORDER_ID}
+				, #{item.PRODUCTION_ORDER_DETAIL_ID}
+				, #{item.ITEM_ID}
+				, #{item.TOTAL_QUANTITY}
+				, #{item.DEFECT_QUANTITY}
+				, #{item.DEFECT_CODE}
+				, #{item.DEFECT_CAUSE_CODE}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<insert id="insertProductionLot">
+        INSERT INTO PRODUCTION_LOT ( 
+		      PRODUCTION_LOT_ID
+		    , PRODUCTION_ORDER_DETAIL_ID
+		    , ITEM_ID
+		    , QUANTITY
+		)
+		SELECT * FROM (
+		    WITH PARAMS AS (
+				<foreach collection="list" item="item" separator="UNION ALL">
+					SELECT
+						   #{item.PRODUCTION_ORDER_DETAIL_ID} AS PRODUCTION_ORDER_DETAIL_ID
+						 , #{item.ITEM_ID} AS ITEM_ID
+						 , #{item.PRODUCTION_ORDER_ID} AS PRODUCTION_ORDER_ID
+						 , #{item.TOTAL_QUANTITY} AS TOTAL_QUANTITY
+						 , #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY
+					FROM
+						 DUAL
+				</foreach>
+		    ),
+		    AGG AS (
+		        SELECT 
+		               PRODUCTION_ORDER_DETAIL_ID
+		             , ITEM_ID
+		             , PRODUCTION_ORDER_ID
+		             , MAX(TOTAL_QUANTITY) AS TOTAL_QUANTITY
+		             , SUM(DEFECT_QUANTITY) AS SUM_DEFECT_QUANTITY
+		        FROM PARAMS
+		        GROUP BY PRODUCTION_ORDER_DETAIL_ID, ITEM_ID, PRODUCTION_ORDER_ID
+		    )
+		    SELECT 
+		        CASE 
+		            WHEN I.ITEM_TYPE = '완제품' 
+		            THEN A.PRODUCTION_ORDER_ID || '/' || A.ITEM_ID || '/' || (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY)
+		            ELSE A.PRODUCTION_ORDER_DETAIL_ID || '/' || A.ITEM_ID || '/' || (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY)
+		        END AS PRODUCTION_LOT_ID
+		        , A.PRODUCTION_ORDER_DETAIL_ID
+		        , A.ITEM_ID
+		        , (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY) AS QUANTITY
+		    FROM AGG A
+		    LEFT JOIN ITEM I ON A.ITEM_ID = I.ITEM_ID
+		)
+
+    </insert>
+    
+    <update id="updateProductionOrderDetail">
+    	UPDATE
+    		   PRODUCTION_ORDER_DETAIL
+		   SET
+		   	   COMPLETE_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+			 , COMPLETE_TIME = TO_CHAR(SYSDATE, 'HH24:MI:SS')
+			 , STATUS = 'ST-003'
+		 WHERE
+		 	   PRODUCTION_ORDER_DETAIL_ID = #{list[0].PRODUCTION_ORDER_DETAIL_ID}
+    </update>
+    
+    <update id="updateWortcenterLog">
+    	UPDATE
+    		   WORKCENTER_LOG
+		   SET 
+		   	   END_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+			 , END_TIME = TO_CHAR(SYSDATE, 'HH24:MI:SS')
+		 WHERE
+		 	   PRODUCTION_ORDER_DETAIL_ID = #{list[0].PRODUCTION_ORDER_DETAIL_ID}
+    </update>
+<!-- =========================================================================== -->	
+	
+	
+	
 </mapper>

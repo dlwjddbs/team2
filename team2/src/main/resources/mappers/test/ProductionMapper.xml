@@ -25,6 +25,7 @@
 	<select id="selectProductionOrderDetail" resultType="map">
 		SELECT
 			   pod.PRODUCTION_ORDER_DETAIL_ID 				AS PRODUCTION_ORDER_DETAIL_ID
+			 , pod.PRODUCTION_ORDER_ID 						AS PRODUCTION_ORDER_ID
 			 , pod.ITEM_ID 									AS ITEM_ID
 			 , i.ITEM_NAME 									AS ITEM_NAME
 			 , pod.AMOUNT 									AS AMOUNT

@@ -59,21 +59,18 @@ public class InspectionRestController {
 	@PostMapping(rejection_url)
 	public Map<String, Object> insertRejectionCode(@RequestBody Map<String, Object> requestData) {
 	    List<Map<String, Object>> createdRows = (List<Map<String, Object>>)requestData.get("createdRows");
-		
         return inspectionService.insertRejectionCode(createdRows);
 	}	
 	
 	@DeleteMapping(rejection_url)
 	public Map<String, Object> deleteRejectionCode(@RequestHeader("X-Delete-IDs") String ids) {
         List<String> idList = Arrays.asList(ids.split(","));
-        
         return inspectionService.deleteRejectionCode(idList);
 	}	
 	
 	@PutMapping(rejection_url)
 	public Map<String, Object> updateRejectionCode(@RequestBody Map<String, Object> requestData) {
 		List<Map<String, Object>> updatedRows = (List<Map<String, Object>>)requestData.get("updatedRows");
-		
 		return inspectionService.updateRejectionCode(updatedRows);
 	}	
 	
@@ -86,12 +83,20 @@ public class InspectionRestController {
 		return data;
 	}
 	
-	//================= 02.15 =================
-	
 	
 	@GetMapping("/inspection/rejectionCode")
 	public Map<String, Object> getrejectionCode(@RequestParam Map<String, Object> map) {
 		return inspectionService.selectRejectionCode();
+	}
+	
+	@GetMapping("/inspection/defectCode")
+	public Map<String, Object> getDefectCode(@RequestParam Map<String, Object> map) {
+		return inspectionService.selectDefectCode(map);
+	}
+	
+	@GetMapping("/inspection/defectCauseCode")
+	public Map<String, Object> getDefectCauseCode(@RequestParam Map<String, Object> map) {
+		return inspectionService.selectDefectCauseCode(map);
 	}
 	
 	
