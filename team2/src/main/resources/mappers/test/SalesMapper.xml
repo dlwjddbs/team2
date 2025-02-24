@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.SalesMapper">
+	<select id="selectOrder" resultType="map">
+		SELECT 
+			   oi.ORDER_ID			AS ORDER_ID
+			 , oi.ORDER_DATE 		AS ORDER_DATE
+			 , oi.STATUS			AS STATUS_CODE
+			 , mc.SUB_NAME 			AS STATUS_NAME
+			 , oi.CLIENT_ID 		AS CLIENT_ID
+			 , c.CLIENT_NAME 		AS CLIENT_NAME
+			 , oi.ITEM_ID 			AS ITEM_ID
+			 , i.ITEM_NAME 			AS ITEM_NAME
+			 , oi.DELIVERY_DATE 	AS DELIVERY_DATE
+			 , oi.QUANTITY 			AS QUANTITY
+			 , oi.NOTE 				AS NOTE
+			 , oi.PRICE 			AS PRICE
+		  FROM ORDER_INTAKE oi 
+			   INNER JOIN MES_COMMON mc 
+					   ON oi.STATUS = mc.CLASSIFICATION_ID 
+			   INNER JOIN CLIENT c 
+					   ON oi.CLIENT_ID = c.CLIENT_ID 
+			   INNER JOIN ITEM i 
+					   ON oi.ITEM_ID = i.ITEM_ID 
+	</select>
+	
+	<select id="selectOrderClient" resultType="map">
+		SELECT
+			   CLIENT_ID 
+			 , CLIENT_NAME 
+		  FROM CLIENT
+	</select>
+	
+	<select id="selectOrderItem" resultType="map">
+		SELECT
+			   ITEM_ID
+			 , ITEM_NAME
+			 , ITEM_TYPE
+		  FROM ITEM
+		 WHERE USE_YN = 'Y'
+	</select>
+	
+	<insert id="insertOrder">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO ORDER_INTAKE (
+				  ORDER_ID
+				, ORDER_DATE
+				, STATUS
+				, CLIENT_ID
+				, ITEM_ID
+				, DELIVERY_DATE
+				, QUANTITY
+				, NOTE
+				, PRICE
+			)
+			VALUES (
+				  #{item.ORDER_ID}
+				, TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+				,'OS-001'
+				, #{item.CLIENT_ID}
+				, #{item.ITEM_ID}
+				, #{item.DELIVERY_DATE}
+				, #{item.QUANTITY}
+				, #{item.NOTE, jdbcType=VARCHAR}
+				, (
+					SELECT TO_NUMBER(NVL(ITEM_COST, 0) * #{item.QUANTITY})
+					  FROM item
+					 WHERE ITEM_ID = #{item.ITEM_ID}
+				)
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<update id="updateOrder">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE ORDER_INTAKE 
+			   SET 
+				   DELIVERY_DATE = #{row.DELIVERY_DATE, jdbcType=VARCHAR}
+				 , NOTE = #{row.NOTE, jdbcType=VARCHAR}
+			 WHERE ORDER_ID = #{row.ORDER_ID}
+		</foreach>
+	</update>
+	
+	<select id="selectTodayMaxOrderId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(ORDER_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+		  FROM ORDER_INTAKE
+		 WHERE ORDER_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
+	</select>
+	
+	<delete id="deleteOrder">
+		DELETE FROM ORDER_INTAKE
+		 WHERE ORDER_ID IN
+		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

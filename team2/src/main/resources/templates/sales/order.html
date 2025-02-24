@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>AdminLTE 3 | DataTables</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast Grid -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+
+	<!-- jQuery -->
+	<script src="../../plugins/jquery/jquery.min.js"></script>
+	<!-- Bootstrap 4 -->
+	<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- AdminLTE App -->
+	<script src="../../dist/js/adminlte.min.js"></script>
+	<!-- Toast Grid -->
+	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
+</head>
+<body class="hold-transition sidebar-mini">
+	<div class="wrapper">
+
+		<!-- 상단 메뉴 -->
+		<nav th:replace="~{includes/navbar :: navbar}"></nav>
+
+		<!-- 좌측 메뉴 -->
+		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+		
+		<nav th:replace="~{includes/modals/orderClientAdd :: orderClientAdd}"></nav>
+		<nav th:replace="~{includes/modals/orderItemAdd :: orderItemAdd}"></nav>
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- 콘텐츠 헤더 (Page header) -->
+			<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+			
+			<!-- 메인 콘텐츠 -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-6">
+											<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">수주목록</p>
+										</div>
+										<div class="col-6">
+											<div class="card-tools" style="text-align: right;">
+												<input type="button" id="btn_process_add_row" class="btn btn-primary" value="행추가" style="display : none;">
+												<input type="button" id="btn_process_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
+												<input type="button" id="btn_process_toggleEditMode" class="btn btn-primary" value="편집">
+												<input type="button" id="btn_process_modify" class="btn btn-primary" value="저장">
+												<input type="button" id="btn_process_delete" class="btn btn-primary" value="삭제">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body" id="processGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							<!-- /.card-body -->
+							</div>
+						<!-- /.card -->
+						</div>
+					<!-- /.col -->
+					</div>
+				<!-- /.row -->
+				</div>
+			<!-- /.container-fluid -->
+			</section>
+		<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<!-- 좌측 메뉴 -->
+		<footer th:replace="~{includes/footer :: footer}"></footer>
+		<!-- /.좌측 메뉴 -->
+		<!-- Control Sidebar -->
+		<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+		</aside>
+	<!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	
+	<style>
+		.selected-row {
+			background-color: #d1ffd6;
+		}
+		.deselected-row {
+			background-color: #ffd1d1;
+		}
+	</style>
+	
+	<!-- Page specific script -->
+	<script th:inline="javascript">
+		// 워크센터
+		let processGrid = null;
+		const processUrl = '/rest/sales/order';
+		const processDataSource = {
+			api: {
+				readData: {url: processUrl, method: 'GET'},
+				modifyData: { url: processUrl, method: 'PUT' },
+				deleteData: {url: processUrl, method: 'DELETE', headers: {'X-Delete-IDs': ''}}
+			},
+			contentType: 'application/json',
+		};
+		let processIsEditModeEnabled = false; 
+		const process_columns = [
+			{header: '수주번호', name: 'ORDER_ID', align: 'center', editor: null},
+			{header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: null},
+			{header: '상태', name: 'STATUS_NAME', align: 'center', editor: null},
+			{header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
+			{header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
+			{header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+			{header: '납품예정일', name: 'DELIVERY_DATE', align: 'center', editor: null},
+			{
+				header: '수량', 
+				name: 'QUANTITY', 
+				align: 'right', 
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+			{header: '비고', name: 'NOTE', align: 'left', editor: null},
+			{
+				header: '합계', 
+				name: 'PRICE', 
+				align: 'right',
+				formatter: function({ value }) {
+					if (!value) {
+						return '0' + '원';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원'; // 천 단위 콤마 추가
+				}
+			},
+			{header: '거래처코드', name: 'CLIENT_ID', align: 'left', hidden: true},
+		];
+		
+		const TextInputRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'text';
+			el.style.width = 'calc(100% - 10px)';
+			el.style.padding = '6px 7px';
+			el.style.border = 'solid 1px #ddd';
+			el.style.margin = 'auto 5px';
+			
+			if (props.columnInfo.name == 'QUANTITY'
+				&& processGrid.getValue(props.rowKey, 'isNew') == null) {
+				el.disabled = true;
+				el.style.border = 'solid 1px white';
+			}
+				
+			this.el = el;
+			this.render(props);
+		}
+
+		TextInputRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+		
+		TextInputRenderer.prototype.render = function (props) {
+			this.el.value = props.value;
+		}
+		
+		const TextInputBtnRenderer = function(props) {
+			const container = document.createElement('div');
+			container.style.display = 'flex';
+			container.style.alignItems = 'center';
+			container.style.gap = '5px';
+			
+			const el = document.createElement('input');
+			el.type = 'text';
+			el.style.width = 'calc(100% - 10px)';
+			el.style.padding = '6px 7px';
+			el.style.border = 'solid 1px #ddd';
+			el.style.color = 'solid 1px #ddd';
+			el.style.marginLeft = '1px';
+			el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
+			
+			container.appendChild(el);
+			
+			// PROCESS_ID 기존값은 수정 불가 조건
+			if (!((props.columnInfo.name == 'CLIENT_NAME' || props.columnInfo.name == 'ITEM_ID')
+				&& processGrid.getValue(props.rowKey, 'isNew') == null)) {
+				const button = document.createElement('button');
+				button.textContent = '🔍';
+				button.style.border = 'solid 1px #007BFF';
+				button.style.background = 'white';
+				button.style.color = 'white';
+				button.style.padding = '6px 10px';
+				button.style.cursor = 'pointer';
+				button.style.borderRadius = '4px';
+				button.style.marginRight = '5px';
+				
+				container.appendChild(button);
+					
+				button.addEventListener('click', function() {
+					const row = props.rowKey;
+					const column = props.columnInfo.name;
+					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
+					const value = processGrid.getValue(row, column);
+					
+					switch (column) {
+						case 'CLIENT_NAME':
+							$("#managerRow").val(row);
+							$("#managerColumn").val(column);
+							$('#orderClientAdd').modal();
+							
+							break;
+						case 'ITEM_ID':
+							$("#itemRow").val(row);
+							$("#itemColumn").val(column);
+							
+							$('#orderItemAdd').modal(); 
+							
+							break;
+					}
+				});
+			}
+			
+			this.el = container;
+			this.input = el;
+			this.render(props);
+		}
+
+		TextInputBtnRenderer.prototype.getElement = function () {
+			return this.el;
+		}
+
+		TextInputBtnRenderer.prototype.render = function (props) {
+			this.input.value = props.value;
+		}
+		
+		const CheckboxRenderer = function(props) {
+			const el = document.createElement('input');
+			el.type = 'checkbox';
+			el.checked = (props.value === 'Y');  // 초기값 지정
+		
+			if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0) {
+				el.disabled = true;
+			}
+			
+			el.addEventListener('change', function() {
+				props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
+			});
+					
+			this.el = el;
+		};
+
+		CheckboxRenderer.prototype.getElement = function() {
+			return this.el;
+		};
+
+		CheckboxRenderer.prototype.getValue = function() {
+			return this.el.checked ? 'Y' : 'N';
+		};
+
+		CheckboxRenderer.prototype.mounted = function() {
+			this.el.focus();
+		};
+
+		$(function () {
+			processInit();
+		});
+		
+		// 워크센터
+		function processInit() {
+			processGrid = new tui.Grid({
+				el: document.getElementById('processGrid'),
+				data: processDataSource,
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 600,
+				rowHeaders: ['checkbox'],
+				editingEvent: 'click',
+				columns: process_columns,
+			});
+			
+			processGrid.on('failResponse', function(ev) {
+				alert(JSON.parse(ev.xhr.responseText).message);
+			});
+		}
+		
+		// 수정 모드 토글 버튼 이벤트
+		$("#btn_process_toggleEditMode").on("click", function () {
+			processIsEditModeEnabled = !processIsEditModeEnabled; // 수정 모드 상태 토글
+			
+			if (processIsEditModeEnabled) {
+				$("#btn_process_add_row").show();
+				$("#btn_process_remove_row").show();
+			} else {
+				$("#btn_process_add_row").hide();
+				$("#btn_process_remove_row").hide();
+			}
+			
+			if (processIsEditModeEnabled) {
+				processGrid.setColumns([
+					{header: '수주번호', name: 'ORDER_ID', align: 'center', editor: null},
+					{header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: null},
+					{header: '상태', name: 'STATUS_NAME', align: 'center', editor: null},
+					{header: '거래처*', name: 'CLIENT_NAME', align: 'left', renderer: { type: TextInputBtnRenderer }},
+					{header: '품목코드*', name: 'ITEM_ID', align: 'center', renderer: { type: TextInputBtnRenderer }},
+					{header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+					{header: '납품예정일*', name: 'DELIVERY_DATE', align: 'center', editor: 'text', renderer: { type: TextInputRenderer }},
+					{header: '수량*', name: 'QUANTITY', align: 'right', editor: 'text', renderer: { type: TextInputRenderer }},
+					{header: '비고', name: 'NOTE', align: 'left', editor: 'text', renderer: { type: TextInputRenderer }},
+					{
+						header: '합계', 
+						name: 'PRICE', 
+						align: 'right',
+						formatter: function({ value }) {
+							if (!value) {
+								return '0' + '원';
+							}
+							return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원'; // 천 단위 콤마 추가
+						}
+					},
+					{header: '거래처코드', name: 'CLIENT_ID', align: 'left', hidden: true},
+				]);
+			} else {
+				processGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
+				processGrid.setColumns(process_columns);
+			}
+		});
+		
+		$("#btn_process_add_row").on("click", function () {
+			const newRowKey = processGrid.appendRow(
+				{
+					"ORDER_ID": '',
+					"ORDER_DATE": '',
+					"STATUS_NAME": '',
+					"CLIENT_NAME": '',
+					"ITEM_ID": '',
+					"ITEM_NAME": '',
+					"DELIVERY_DATE": '',
+					"QUANTITY": '',
+					"NOTE": '',
+					"PRICE": '',
+					"CLIENT_ID": '',
+					isNew: true
+				},
+				{focus: true}
+			);
+		});
+		
+		$("#btn_process_remove_row").on("click", function () {
+			const rowCount = processGrid.getRowCount(); // 현재 행 개수 가져오기
+			
+			const allRows = processGrid.getData(); // 전체 데이터 가져오기
+			const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
+			
+			if (newRows.length === 0) {
+				alert("삭제할 수 있는 신규 행이 없습니다.");
+				return;
+			}
+
+			const lastRowKey = processGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
+			processGrid.removeRow(lastRowKey); // 마지막 행 삭제
+		});
+		
+		$("#btn_process_modify").on("click", function() {
+			processGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
+			
+			let createdRows = processGrid.getModifiedRows().createdRows;
+			let updatedRows = processGrid.getModifiedRows().updatedRows;
+			
+			// 필수 입력 컬럼
+			const requiredFields = ["CLIENT_NAME", "ITEM_ID", "DELIVERY_DATE", "QUANTITY"];
+			
+			let validCreatedRows = createdRows.filter(row =>
+				requiredFields.every(field => 
+					row[field] && row[field].trim() !== ''
+				)
+			);
+			
+			let validUpdatedRows = updatedRows.filter(row =>
+				requiredFields.every(field => 
+//					row[field] && row[field].trim() !== ''
+					row[field] && row[field] !== ''
+				)
+			);
+			
+			if (createdRows.length == 0 && updatedRows.length == 0) {
+				alert("수정된 데이터가 없습니다.");
+				return;
+			}
+
+			if (createdRows.length > 0) {
+				if ((validCreatedRows.length == 0)
+					|| (validCreatedRows.length != createdRows.length)) {
+					alert("필수값을 모두 입력해주세요.");
+					return;
+				}
+			}
+				
+			if (updatedRows.length > 0 && validUpdatedRows.length == 0) {
+				alert("필수값을 모두 입력해주세요.");
+				return;
+			}
+			
+			processGrid.request('modifyData');
+			processGrid.readData(1, null, true);
+			processGrid.setColumns(process_columns);
+			
+			processIsEditModeEnabled = false;
+			$("#btn_process_add_row").hide();
+			$("#btn_process_remove_row").hide();
+		});
+		
+		$("#btn_process_delete").on("click", function() {
+			processGrid.removeCheckedRows();
+			
+			// 반드시 removeCheckedRows()후에 실행 순서
+			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
+			const ids = processGrid.getModifiedRows().deletedRows
+				.map(row => encodeURIComponent(row.ORDER_ID))  // 한글 변환
+				.join(',');
+			processDataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
+			
+			processGrid.request('deleteData');
+			processGrid.reloadData();  // 실패시 테이블 리로드
+		});
+		
+	</script>
+</body>
+</html>

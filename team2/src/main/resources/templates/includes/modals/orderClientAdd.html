@@ -1,0 +1,140 @@
+<!-- 모달창 -->
+<div class="modal fade" id="orderClientAdd" th:fragment="orderClientAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">수주 거래처 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="managerRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="managerColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card-body" id="ManagerGrid">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveManager" disabled>입력</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="orderClientAdd" th:inline="javascript">
+	let managerGrid = null;
+	let managerCurrentSelectedRowKey = null;
+	let selectedManagerId = '';
+	let selectedManagerName = '';
+	const managerUrl = '/rest/sales/orderClient';
+	const managerDataSource = {
+		api: {
+		    readData: {url: managerUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const manager_columns = [
+		{header: '거래처코드', name: 'CLIENT_ID', align: 'center'},
+		{header: '거래처명', name: 'CLIENT_NAME', align: 'left'},
+	];
+	
+	$('#orderClientAdd').on('shown.bs.modal', function () {
+		selectedManagerId = '';
+		selectedManagerName = '';
+		$("#managerName").val('');
+		$("#saveManager").attr("disabled", true);
+		
+		if (managerGrid == null) {
+	        managerInit();
+	        
+	        return;
+		}
+		
+		managerGrid.readData(1, null, true);
+	});
+	
+	function managerInit() {
+		managerGrid = new tui.Grid({
+	        el: document.getElementById('ManagerGrid'),
+	        data: managerDataSource,
+	        scrollX: true,
+	        scrollY: true,
+	        bodyHeight: 250,
+	        columns: manager_columns,
+	    });
+		
+		managerGrid.on('failResponse', function(ev) {
+	        alert(JSON.parse(ev.xhr.responseText).message);
+	    });
+		
+	    managerGrid.on('click', (ev) => {
+		    const newRowKey = ev.rowKey;
+
+		    if (managerCurrentSelectedRowKey != null) {
+		    	managerGrid.removeRowClassName(managerCurrentSelectedRowKey, 'selected-row');
+		    }
+		    
+		    if (managerCurrentSelectedRowKey != newRowKey) {
+		    	managerGrid.addRowClassName(newRowKey, 'selected-row');
+		        managerCurrentSelectedRowKey = newRowKey;
+		        
+		        selectedManagerId = managerGrid.getRow(newRowKey).CLIENT_ID;
+		        selectedManagerName = managerGrid.getRow(newRowKey).CLIENT_NAME;
+		        $("#saveManager").attr("disabled", false);
+		    } else {
+		        // 같은 행을 클릭한 경우 선택 해제
+		        managerCurrentSelectedRowKey = null;
+		        $("#saveManager").attr("disabled", true);
+		        selectedManagerId = '';
+		        selectedManagerName = '';
+		    }
+		});
+	}
+	
+	$("#saveManager").on('click', function() {
+		const workcenterRow = $("#workcenterRow").val();
+		const workcenterColumn = $("#workcenterColumn").val();
+		const workcenterCode = $("#workcenterCode").val();
+		
+		let managerRow = $("#managerRow").val();
+		let managerColumn = $("#managerColumn").val();
+		processGrid.setValue(managerRow, 'CLIENT_ID', selectedManagerId);
+		processGrid.setValue(managerRow, managerColumn, selectedManagerName);
+		
+		$('#orderClientAdd').modal('hide');
+	});
+	
+	$("#btnMemberSearch").on("click", function() {
+		selectedManagerId = '';
+		selectedManagerName = '';
+		$("#saveManager").attr("disabled", true);
+		
+		managerGrid.readData(1, null, true);
+	});
+</script>

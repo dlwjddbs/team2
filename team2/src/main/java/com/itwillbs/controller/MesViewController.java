@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class MesViewController {
 	
 	@GetMapping
-	public String manufacture(@PathVariable("packageName") String packageName
+	public String redirectView(@PathVariable("packageName") String packageName
 								, @PathVariable("urlid") String urlid) {
 		return "/" + packageName + "/" + urlid;
 	}
