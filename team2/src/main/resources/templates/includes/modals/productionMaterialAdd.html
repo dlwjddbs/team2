@@ -136,6 +136,7 @@
 			editor: { type: CustomNumberEditor }, 
 			renderer: { type: NumberTextInputRenderer }
 		},
+		{header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null, width: 90, hidden: true},
 	];
 	const stock_url = '/rest/production/stock';
 	const stock_dataSource = {
@@ -354,8 +355,6 @@
 			}
 		}
 		
-		bomGrid.setValue(selectedRowKey, 'RELEASE_QUANTITY', totalQuantity);
-		
 		if (Number(item_amount) > Number(totalQuantity)) {
 			alert("출고수량이 부족합니다.");
 
@@ -368,10 +367,13 @@
 			return;
 		}
 		
+		bomGrid.setValue(selectedRowKey, 'RELEASE_QUANTITY', totalQuantity);
+		
 		for (const stockRow of stockGrid.getData()) {
+			// 자재 재고 현황 수정 시 자재 출고 목록 해당 품목 제거
+			stockArr = stockArr.filter(row => row.ITEM_ID != stockRow.ITEM_ID);
+			
 			if (stockRow.RELEASE_QUANTITY != null && stockRow.RELEASE_QUANTITY != '') {
-				stockArr = stockArr.filter(row => row.LOT_ID != stockRow.LOT_ID);
-				
 				const mapRowData = {
 					"LOT_ID": stockRow.LOT_ID,
 					"RELEASE_QUANTITY": stockRow.RELEASE_QUANTITY,

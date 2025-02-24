@@ -81,6 +81,7 @@
 			 , il.LOT_ID 				AS LOT_ID
 			 , m.UNIT 					AS UNIT
 			 , il.QUANTITY 				AS CURRENT_QUANTITY
+			 , m.MATERIAL_ID 			AS ITEM_ID
 		  FROM INBOUND_LOTS il
 			   INNER JOIN ITEM_LOCATION loc 
 					   ON il.MATERIAL_ID = loc.MATERIAL_ID 
@@ -99,6 +100,7 @@
 			 , pl.PRODUCTION_LOT_ID 	AS LOT_ID
 			 , i.ITEM_UNIT 				AS UNIT
 			 , pl.quantity 				AS CURRENT_QUANTITY
+			 , i.ITEM_ID				AS ITEM_ID
 		  FROM PRODUCTION_LOT pl
 			   INNER JOIN ITEM_LOCATION loc
 					   ON pl.ITEM_ID = loc.ITEM_ID 
