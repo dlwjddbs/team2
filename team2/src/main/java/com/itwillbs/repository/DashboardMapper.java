@@ -32,5 +32,9 @@ public interface DashboardMapper {
 	
 	List<Map<String, Object>> getPoStackedBarChart(Map<String, Object> map);
 	
+	List<Map<String, Object>> selectClientPo(Map<String, Object> map);
+	
 	List<Map<String, Object>> getClientInboundChart(Map<String, Object> map);
+	
+	List<Map<String, Object>> selectInboundChart(Map<String, Object> map);
 }

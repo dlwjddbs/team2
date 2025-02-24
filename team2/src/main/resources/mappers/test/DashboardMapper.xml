@@ -89,7 +89,7 @@
     <select id="getPoStackedBarChart" resultType="map">
     	<!-- get___StackedBarChart 기록 스택바차트 조회 -->
     	<!-- PO_DETAIL 기록 스택바차트 조회 -->
-    	<!-- 현재 일별-주별 발주 상태 기록을 조회 -->
+    	<!-- 일별-주별-월별 발주 상태 기록을 조회 -->
 		SELECT 
 		       TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM-DD') AS ORDER_DATE
 		     , PO_STATUS
@@ -117,7 +117,46 @@
 		           ELSE 5  
 	    	   END
     </select>
-
+    
+    <!-- 막대 차트 조회 (거래처별 발주량 및 불량률) -->
+    <select id="selectClientPo" resultType="map">
+    	<!-- getClientInboundChart 기록 스택바차트 조회 -->
+    	<!-- 거래처별 발주량 및 불량률 기록을 조회 -->
+		SELECT
+		       CL.CLIENT_NAME
+		     , PO.CREATE_DATE
+		     , MC.SUB_ID || '-' || MT.GROUP_CODE || '-' || MT.MATERIAL_ID AS MATERIAL_ID
+		     , MT.MATERIAL_NAME
+		     , NVL(SUM(PD.PO_COUNT), 0) 		AS TOTAL_PO_COUNT
+		     , NVL(SUM(II.DEFECT_QUANTITY), 0) 	AS TOTAL_DEFECT_QUANTITY
+		     , CASE 
+		       	   WHEN SUM(PD.PO_COUNT) = 0 THEN 0
+		           ELSE ROUND(NVL(SUM(II.DEFECT_QUANTITY), 0) / SUM(PD.PO_COUNT) * 100, 2)
+		       END AS DEFECT_RATE
+		  FROM 
+			   PURCHASE_ORDER PO
+     LEFT JOIN 
+     		   CLIENT CL ON PO.CLIENT_ID = CL.CLIENT_ID
+     LEFT JOIN 
+     		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+     LEFT JOIN 
+     		   MATERIAL MT ON PD.MATERIAL_ID = MT.MATERIAL_ID
+     LEFT JOIN 
+     		   MATERIAL_CATEGORY MC ON MT.GROUP_CODE = MC.MATL_CTGR
+     LEFT JOIN 
+     		   INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
+	  GROUP BY 
+	  		   CL.CLIENT_NAME
+	  		 , PO.CREATE_DATE
+	  		 , MC.SUB_ID
+	  		 , MT.GROUP_CODE
+	  		 , MT.MATERIAL_ID
+	  		 , MT.MATERIAL_NAME
+	  ORDER BY 
+	  		   CL.CLIENT_NAME
+	  		 , PO.CREATE_DATE
+    </select>
+    
     <!-- 막대 차트 조회 (거래처별 불량률) -->
     <select id="getClientInboundChart" resultType="map">
     	<!-- getClientInboundChart 기록 스택바차트 조회 -->
@@ -142,5 +181,29 @@
 	  		   CL.CLIENT_NAME
 	  ORDER BY 
 	  		   DEFECT_RATE DESC
+    </select>
+    
+    <!-- 라인 차트 조회 (일별 불량률) -->
+    <select id="selectInboundChart" resultType="map">
+    	<!-- selectInboundChart 기록 스택바차트 조회 -->
+    	<!-- 일별 불량률 기록을 조회 -->
+		SELECT
+		       TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM-DD') AS ORDER_DATE
+		     , NVL(SUM(PD.PO_COUNT), 0) 		AS TOTAL_PO_COUNT
+		     , NVL(SUM(II.DEFECT_QUANTITY), 0) 	AS TOTAL_DEFECT_QUANTITY
+		     , CASE 
+		       	   WHEN SUM(PD.PO_COUNT) = 0 THEN 0
+		           ELSE ROUND(NVL(SUM(II.DEFECT_QUANTITY), 0) / SUM(PD.PO_COUNT) * 100, 2)
+		       END AS DEFECT_RATE
+		  FROM 
+			   PURCHASE_ORDER PO
+     LEFT JOIN 
+     		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+     LEFT JOIN 
+     		   INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
+	  GROUP BY 
+	  		   TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM-DD')
+	  ORDER BY 
+	  		   ORDER_DATE
     </select>
 </mapper>

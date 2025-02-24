@@ -56,6 +56,11 @@ public class DashboardService {
 		return dashboardMapper.getPoStackedBarChart(map);
 	}
 	
+	// 거래처별 발주량 및 불량률
+//	public List<Map<String, Object>> getClientPo(Map<String, Object> map) {
+//		return dashboardMapper.selectClientPo(map);
+//	}
+	
 	// 거래처별 불량률 차트
 	public List<Map<String, Object>> getClientInboundChart(Map<String, Object> map) {
 		return dashboardMapper.getClientInboundChart(map);

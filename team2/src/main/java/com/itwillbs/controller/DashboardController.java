@@ -84,6 +84,15 @@ public class DashboardController {
 		return poHistoryStackedBar;
 	}
 	
+	// 거래처별 발주량 및 불량률 조회 (grid)
+//	@PostMapping("/dashboard/getClientPo")
+//	@ResponseBody
+//	public List<Map<String, Object>> getClientPo(@RequestParam Map<String, Object> map) {
+//		List<Map<String, Object>> clientPo = dashboardService.getClientPo(map);
+//		
+//		return clientPo;
+//	}
+	
 	// 거래처별 불량률 차트
 	@PostMapping("/dashboard/getClientInbound")
 	@ResponseBody
