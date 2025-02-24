@@ -465,7 +465,7 @@
 						
 						
 						// "마감" 상태인 행이 있는지 확인
-						    const isAlreadyClosed = selectedRows.some(row => row.GO_STATUS === "마감" || row.GO_STATUS === "입고완료");
+						    const isAlreadyClosed = selectedRows.some(row => row.GO_STATUS === "마감" || row.GO_STATUS === "검수완료");
 						    if (isAlreadyClosed) {
 						        showError("입고된 항목이 포함되어 있습니다.", "warning");
 						        return;
