@@ -21,7 +21,7 @@
         <where>
         <if test="DEPT_ID != null and DEPT_ID != ''">
     AND d.DEPT_ID = #{DEPT_ID}
-</if>
+		</if>
     AND d.PARENT_DEPT_ID IS NULL
         </where>
 	</select>
