@@ -2,7 +2,7 @@
 
 # Variables
 DOCKER_HUB_USERNAME=wsryu
-IMAGE_NAME=tomcat10
+IMAGE_NAME=my-app
 
 # Change to the directory containing docker-compose.yml (if using docker-compose)
 cd /home/ec2-user/deployment
