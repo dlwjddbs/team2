@@ -1,9 +1,7 @@
 # Build stage
 FROM gradle:jdk21 AS build
-WORKDIR /app/team2
-COPY team2/ .
-#WORKDIR /app
-#COPY . .
+WORKDIR /app
+COPY . .
 
 # Gradle 권한 설정 및 빌드 실행
 RUN chmod +x ./gradlew
