@@ -14,7 +14,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $DOCKER_HUB_USERNAME/$IMAGE_NAME:latest -f team2/Dockerfile .
+      - docker build -t $DOCKER_HUB_USERNAME/$IMAGE_NAME:latest .
   post_build:
     commands:
       - echo Build completed on `date`
