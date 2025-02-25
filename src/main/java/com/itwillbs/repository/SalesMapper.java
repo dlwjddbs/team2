@@ -30,4 +30,8 @@ public interface SalesMapper {
 	
 	List<Map<String, Object>> selectShipmentRequest(Map<String, Object> requestData);
 	
+	List<Map<String, Object>> selectShipmentRequestDetailLot(Map<String, Object> requestData);
+	
+	List<Map<String, Object>> selectShipmentRequestDetail(Map<String, Object> requestData);
+	
 }

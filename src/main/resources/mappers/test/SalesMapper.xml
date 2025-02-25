@@ -150,12 +150,90 @@
 	
 	<select id="selectShipmentRequest" resultType="map">
 		SELECT
-			   SHIPMENT_REQUEST_ID
-			 , ORDER_INTAKE_ID
-			 , REQUEST_DATE
-			 , STATUS
-			 , SHIPMENT_COMPLETION_DATE
-			 , QUANTITY
-		  FROM SHIPMENT_REQUEST
+			   sr.SHIPMENT_REQUEST_ID		AS SHIPMENT_REQUEST_ID
+			 , sr.ORDER_INTAKE_ID			AS ORDER_INTAKE_ID
+			 , sr.REQUEST_DATE				AS REQUEST_DATE
+			 , sr.STATUS					AS STATUS_CODE
+			 , sr.SHIPMENT_COMPLETION_DATE	AS SHIPMENT_COMPLETION_DATE
+			 , sr.QUANTITY					AS QUANTITY
+			 , mc.SUB_NAME					AS STATUS_NAME
+			 , i.ITEM_NAME					AS ITEM_NAME
+			 , i.ITEM_UNIT 					AS ITEM_UNIT
+		  FROM SHIPMENT_REQUEST sr
+			   INNER JOIN MES_COMMON mc
+			   		   ON sr.STATUS = mc.CLASSIFICATION_ID
+			   INNER JOIN ORDER_INTAKE oi
+			   		   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID
+			   INNER JOIN ITEM i
+			   		   ON oi.ITEM_ID = i.ITEM_ID
+	</select>
+	
+	<select id="selectShipmentRequestDetailLot" resultType="map">
+		WITH SHIPMENT_DATA AS (
+			SELECT 
+				   oi.ITEM_ID																	AS ITEM_ID
+			 	 , i.ITEM_NAME																	AS ITEM_NAME
+				 , i.ITEM_UNIT																	AS ITEM_UNIT
+				 , pl.PRODUCTION_LOT_ID															AS PRODUCTION_LOT_ID
+				 , pl.CREATE_DATE																AS CREATE_DATE
+				 , pl.QUANTITY																	AS CURRENT_QUANTITY
+				 , w.WAREHOUSE_NAME																AS WAREHOUSE_NAME
+				 , SUM(pl.QUANTITY) OVER (PARTITION BY oi.ITEM_ID ORDER BY pl.CREATE_DATE ASC) 	AS CUM_SUM
+			  FROM SHIPMENT_REQUEST sr
+				   INNER JOIN ORDER_INTAKE oi 
+						   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID 
+				   INNER JOIN ITEM i 
+						   ON oi.ITEM_ID = i.ITEM_ID 
+				   INNER JOIN PRODUCTION_LOT pl 
+						   ON i.ITEM_ID = pl.ITEM_ID 
+				   INNER JOIN ITEM_LOCATION il 
+						   ON i.ITEM_ID = il.ITEM_ID 
+				   INNER JOIN WAREHOUSE w 
+						   ON il.WAREHOUSE_ID = w.WAREHOUSE_ID 
+			 WHERE
+				   1 = 1
+			   AND sr.SHIPMENT_REQUEST_ID = #{shipment_request_id}
+			   AND pl.QUANTITY > 0
+			 ORDER BY pl.CREATE_DATE ASC
+		)
+		SELECT 
+			   SHIPMENT_DATA.*
+			 , CASE 
+					WHEN CUM_SUM - CURRENT_QUANTITY >= #{request_quantity} 	THEN 0
+					WHEN CUM_SUM >= #{request_quantity} 					THEN #{request_quantity} - (CUM_SUM - CURRENT_QUANTITY)
+					ELSE CURRENT_QUANTITY
+			   END AS SHIPPED_QUANTITY
+			 , CASE 
+					WHEN (CASE 
+								WHEN CUM_SUM - CURRENT_QUANTITY >= #{request_quantity} 	THEN 0
+								WHEN CUM_SUM >= #{request_quantity} 					THEN #{request_quantity} - (CUM_SUM - CURRENT_QUANTITY)
+								ELSE CURRENT_QUANTITY
+						   END) > 0 THEN 'Y'
+					ELSE 'N'
+			   END AS SHIPPED_FLAG
+		  FROM SHIPMENT_DATA
+	</select>
+	
+	<select id="selectShipmentRequestDetail" resultType="map">
+		SELECT
+			   srd.ITEM_LOT 
+			 , srd.QUANTITY
+			 , i.ITEM_UNIT 
+			 , pl.CREATE_DATE 
+			 , w.WAREHOUSE_NAME 
+		  FROM SHIPMENT_REQUEST_DETAIL srd 
+			   INNER JOIN SHIPMENT_REQUEST sr 
+					   ON srd.SHIPMENT_REQUEST_ID = sr.SHIPMENT_REQUEST_ID 
+			   INNER JOIN ORDER_INTAKE oi 
+					   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID 
+			   INNER JOIN ITEM i 
+					   ON oi.ITEM_ID = i.ITEM_ID
+			   INNER JOIN PRODUCTION_LOT pl 
+					   ON srd.ITEM_LOT = pl.PRODUCTION_LOT_ID 
+			   INNER JOIN ITEM_LOCATION il 
+					   ON i.ITEM_ID = il.ITEM_ID 
+			   INNER JOIN WAREHOUSE w 
+					   ON il.WAREHOUSE_ID = w.WAREHOUSE_ID 
+		 WHERE srd.SHIPMENT_REQUEST_ID = #{shipment_request_id}
 	</select>
 </mapper>

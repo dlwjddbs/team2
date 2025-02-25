@@ -39,7 +39,7 @@ public class ProductionService {
 //				1. put_materials_detail LOT연결
 				productionMapper.insertMaterialsDetail(createdRows);
 				
-//				2. inbound_lot, production_lot 개수차감 --- production_lot테스트 해야됨.
+//				2. inbound_lot, production_lot 개수차감
 				productionMapper.updateLotQuantity(createdRows);
 				
 //				3. item_location 개수차감

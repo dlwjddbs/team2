@@ -34,8 +34,6 @@
 		<!-- 좌측 메뉴 -->
 		<aside th:replace="~{includes/sidebar :: sidebar}"></aside>
 		
-		<nav th:replace="~{includes/modals/requestOrderAdd :: requestOrderAdd}"></nav>
-
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- 콘텐츠 헤더 (Page header) -->
@@ -54,11 +52,7 @@
 										</div>
 										<div class="col-6">
 											<div class="card-tools" style="text-align: right;">
-												<input type="button" id="btn_productionOrder_add_row" class="btn btn-primary" value="행추가" style="display : none;">
-												<input type="button" id="btn_productionOrder_remove_row" class="btn btn-primary" value="행삭제" style="display : none;">
 												<input type="button" id="btn_shipment_request" class="btn btn-primary" value="출하요청">
-												<input type="button" id="btn_productionOrder_toggleEditMode" class="btn btn-primary" value="편집">
-												<input type="button" id="btn_productionOrder_modify" class="btn btn-primary" value="저장">
 												<input type="button" id="btn_productionOrder_delete" class="btn btn-primary" value="삭제">
 											</div>
 										</div>
@@ -83,9 +77,10 @@
 										<p class="font-weight-bold" style="margin-bottom: 0px; padding-top: 8px;">출하목록상세</p>
 									</div>
 									<div class="col-6">
-										<div class="card-tools" id="btn_group_productionOrderDetail" style="text-align: right; display: none;">
-											<input type="button" id="btn_productionOrderDetail_modal" class="btn btn-primary" value="추가">
-											<input type="button" id="btn_productionOrderDetail_add" class="btn btn-primary" value="저장">
+<!--										<div class="card-tools" id="btn_group_productionOrderDetail" style="text-align: right; display: none;">-->
+										<div class="card-tools" id="btn_group_productionOrderDetail" style="text-align: right;">
+											<input type="button" id="btn_productionOrderDetail_modal" class="btn btn-primary" value="목록추가">
+											<input type="button" id="btn_productionOrderDetail_add" class="btn btn-primary" value="제품출하">
 										</div>
 									</div>
 								</div>
@@ -149,190 +144,95 @@
             {header: '출하번호', name: 'SHIPMENT_REQUEST_ID', align: 'center', editor: null},
             {header: '수주번호', name: 'ORDER_INTAKE_ID', align: 'center', editor: null},
             {header: '출하요청일자', name: 'REQUEST_DATE', align: 'center', editor: null},
-            {header: '상태', name: 'STATUS', align: 'left', editor: null},
-            {header: '출하일자', name: 'SHIPMENT_COMPLETION_DATE', align: 'right', editor: null},
-            {header: '수량', name: 'QUANTITY', align: 'center', editor: null},
+            {header: '상태', name: 'STATUS_NAME', align: 'center', editor: null},
+            {header: '품목', name: 'ITEM_NAME', align: 'left', editor: null},
+            {
+				header: '수량', 
+				name: 'QUANTITY', 
+				align: 'right', 
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+            {header: '단위', name: 'ITEM_UNIT', align: 'center', editor: null},
+            {header: '출하일자', name: 'SHIPMENT_COMPLETION_DATE', align: 'center', editor: null},
         ];
 		
 		// 작업지시상세
 		let productionOrderDetailGrid = null;
-		const productionOrderDetailUrl = '/rest/manufacture/productionOrderDetail';
-		const productionOrderDetailDataSource = {
+		const productionOrderDetailLotUrl = '/rest/sales/shipmentRequestDetailLot';
+		const productionOrderDetailLotDataSource = {
 			api: {
-				createData: {url: productionOrderDetailUrl, method: 'POST'},
-			    readData: {url: productionOrderDetailUrl, method: 'GET', initParams: { productionOrder_id: ''}},
+				createData: {url: productionOrderDetailLotUrl, method: 'POST'},
+			    readData: {url: productionOrderDetailLotUrl, method: 'GET', initParams: { shipment_request_id: '', request_quantity: ''}},
 			},
 			contentType: 'application/json',
 		};
 		let productionOrderDetailCurrentSelectedRowKey = null;
-		const productionOrderDetail_columns = [
-		    {header: '작업지시상세 번호', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center', editor: null},
-		    {header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
-		    {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
-		    {header: '생산량', name: 'AMOUNT', align: 'right', editor: null},
+		const productionOrderDetailLot_columns = [
+		    {header: 'LOT일자', name: 'CREATE_DATE', align: 'center', editor: null},
+		    {header: 'LOT번호', name: 'PRODUCTION_LOT_ID', align: 'center', editor: null},
+		    {header: '창고', name: 'WAREHOUSE_NAME', align: 'left', editor: null},
 		    {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
-		    {header: '워크센터코드', name: 'WORKCENTER_ID', align: 'center', editor: null},
-		    {header: '워크센터명', name: 'WORKCENTER_NAME', align: 'left', editor: null},
-		    {header: '상태', name: 'STATUS_NAME', align: 'center', editor: null},
-		    {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
-		    {header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', hidden: true},
-		];
-		
-		class CustomNumberEditor {
-		    constructor(props) {
-		        const el = document.createElement('input');
-		        el.type = 'text'; // 숫자만 입력 가능하도록 처리
-		        el.style.width = '100%';
-		        el.style.textAlign = 'right';
-		        el.value = props.value || '';
-		
-		        this.el = el;
-		    }
-		
-		    getElement() {
-		        return this.el;
-		    }
-		
-		    getValue() {
-		        return this.el.value;
-		    }
-		
-		    mounted() {
-		        this.el.focus(); // 자동 포커스
-		
-		        // **입력할 때 숫자만 남기기**
-		        this.el.addEventListener('input', (event) => {
-		            event.target.value = event.target.value.replace(/[^0-9]/g, '');
-		        });
-		    }
-		}
-		
-		const TextInputRenderer = function(props) {
-			const el = document.createElement('input');
-			el.type = 'text';
-		 	el.style.width = 'calc(100% - 10px)';
-		 	el.style.padding = '6px 7px';
-		  	el.style.border = 'solid 1px #ddd';
-		  	el.style.margin = 'auto 5px';
-		  	
-		  	if (props.columnInfo.name == 'AMOUNT'
-		  		&& productionOrderGrid.getValue(props.rowKey, 'isNew') == null) {
-		  		el.disabled = true;
-		  		el.style.border = 'solid 1px white';
-		  	}
-		  	
-		  	this.el = el;
-		  	this.render(props);
-		}
-
-		TextInputRenderer.prototype.getElement = function () {
-			return this.el;
-		}
-		
-		TextInputRenderer.prototype.render = function (props) {
-			this.el.value = props.value;
-		}
-		
-		const TextInputBtnRenderer = function(props) {
-		    const container = document.createElement('div');
-		    container.style.display = 'flex';
-		    container.style.alignItems = 'center';
-		    container.style.gap = '5px';
-		    
-		    const el = document.createElement('input');
-		    el.type = 'text';
-		    el.style.width = 'calc(100% - 10px)';
-		    el.style.padding = '6px 7px';
-		    el.style.border = 'solid 1px #ddd';
-		    el.style.color = 'solid 1px #ddd';
-		    el.style.marginLeft = '1px';
-		    el.setAttribute('disabled', true); // 입력 및 클릭 비활성화
-			
-			container.appendChild(el);
-			
-			// PRODUCTION_ORDER_ID 기존값은 수정 불가 조건
-			if (!((props.columnInfo.name == 'ITEM_ID')
-				&& productionOrderGrid.getValue(props.rowKey, 'isNew') == null)) {
-				const button = document.createElement('button');
-			    button.textContent = '🔍';
-			    button.style.border = 'solid 1px #007BFF';
-			    button.style.background = 'white';
-			    button.style.color = 'white';
-			    button.style.padding = '6px 10px';
-			    button.style.cursor = 'pointer';
-			    button.style.borderRadius = '4px';
-			    button.style.marginRight = '5px';
-				
-				container.appendChild(button);
-					
-				button.addEventListener('click', function() {
-					const row = props.rowKey;
-					const column = props.columnInfo.name;
-					// props.formattedValue로 가져오면 모달 다시 띄울 때 값을 못받아옴.
-					const value = productionOrderGrid.getValue(row, column);
-					
-					switch (column) {
-						case 'ITEM_ID': 
-							$("#itemRow").val(row);
-							$("#itemColumn").val(column);
-						
-							$('#productionOrderItemAdd').modal();
-							
-							break;
-						case 'WORKCENTER_ID': 
-							selectedWorkcenterCell.row = row;
-							selectedWorkcenterCell.col = column;
-							workcenterDataSource.api.readData.initParams.item_id = processModalSelectedGrid.getValue(row, 'ITEM_ID');
-							
-							$('#productionOrderWorkcenterAdd').modal();
-							
-							break;
+		    {
+				header: '재고량', 
+				name: 'CURRENT_QUANTITY', 
+				align: 'right', 
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
 					}
-			    });
-			}
-			
-		    this.el = container;
-		    this.input = el;
-		    this.render(props);
-		}
-
-		TextInputBtnRenderer.prototype.getElement = function () {
-		    return this.el;
-		}
-
-		TextInputBtnRenderer.prototype.render = function (props) {
-		    this.input.value = props.value;
-		}
-		
-		const CheckboxRenderer = function(props) {
-		    const el = document.createElement('input');
-		    el.type = 'checkbox';
-		    el.checked = (props.value === 'Y');  // 초기값 지정
-			
-			// 워크센터 비가동 중이거나 앞으로의 작업 대기열 없을 때만 사용여부 수정 가능.
-			if (props.grid.getValue(props.rowKey, 'USING_CNT') > 0
-				|| props.grid.getValue(props.rowKey, 'USED_N_CNT')) {
-				el.disabled = true;
-			}
-		
-			el.addEventListener('change', function() {
-		        props.grid.setValue(props.rowKey, props.columnInfo.name, el.checked ? 'Y' : 'N'); // 즉시 값 업데이트
-		    });
-		    		
-		    this.el = el;
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+		    {
+				header: '출하수량', 
+				name: 'SHIPPED_QUANTITY', 
+				align: 'right', 
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+			{
+				header: '출하대상',
+				name: 'SHIPPED_FLAG', 
+				align: 'center', 
+				formatter: function({value}) {
+					return `<input type="checkbox" ${value === 'Y' ? 'checked' : ''} style="pointer-events: none;" />`;
+				}
+			},
+		];
+		const productionOrderDetailUrl = '/rest/sales/shipmentRequestDetail';
+		const productionOrderDetailDataSource = {
+			api: {
+				createData: {url: productionOrderDetailUrl, method: 'POST'},
+			    readData: {url: productionOrderDetailUrl, method: 'GET', initParams: { shipment_request_id: '', request_quantity: ''}},
+			},
+			contentType: 'application/json',
 		};
-
-		CheckboxRenderer.prototype.getElement = function() {
-		    return this.el;
-		};
-
-		CheckboxRenderer.prototype.getValue = function() {
-		    return this.el.checked ? 'Y' : 'N';
-		};
-
-		CheckboxRenderer.prototype.mounted = function() {
-		    this.el.focus();
-		};
+		const productionOrderDetail_columns = [
+		    {header: 'LOT일자', name: 'CREATE_DATE', align: 'center', editor: null},
+		    {header: 'LOT번호', name: 'PRODUCTION_LOT_ID', align: 'center', editor: null},
+		    {header: '창고', name: 'WAREHOUSE_NAME', align: 'left', editor: null},
+		    {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
+		    {
+				header: '출하수량', 
+				name: 'SHIPPED_QUANTITY', 
+				align: 'right', 
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+		];
 
 		$(function () {
 			productionOrderInit();
@@ -351,41 +251,9 @@
 		        columns: productionOrder_columns,
 		    });
 			
-			productionOrderGrid.on('onGridMounted', () => {
-			    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
-			    const checkGridRendered = function() {
-				    setTimeout(function() {
-			            if (productionOrderGrid.getData().length > 0) {
-		 	            	productionOrderGrid.getData().forEach((row, index) => {
-		 	            		// 이미 생산에 들어간 작업지시는 삭제 불가.
-		 				        if (row.DISABLE_CHECK_CNT > 0) {
-		 				        	productionOrderGrid.disableRowCheck(index); // 해당 행의 체크박스를 비활성화
-		 				        }
-		 				    });
-			            } else {
-			                checkGridRendered(); // 데이터가 없으면 다시 체크
-			            }
-				    }, 100);
-			    };
-			    
-			    checkGridRendered();
-			});
-			
 		    productionOrderGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
-			
-			productionOrderGrid.on('editingStart', function(ev) {
-			    const {rowKey, columnName, value} = ev;
-			    const rowData = productionOrderGrid.getRow(rowKey);
-				
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-// 				if (columnName == 'PRODUCTION_ORDER_ID' && !rowData.isNew) {
-// 				if (columnName == 'MANAGER_ID') {
-// 					$('#categoryAdd').modal();
-// 					ev.stop();
-// 				}
-			});
 			
 			productionOrderGrid.on('click', (ev) => {
 			    if (ev.targetType != "cell" || productionOrderIsEditModeEnabled) {
@@ -413,9 +281,9 @@
 			        productionOrderCurrentSelectedRowKey = newRowKey;
 					
 					// 작업지시상세 그리드 생성
-					const productionOrderID = productionOrderGrid.getRow(newRowKey).PRODUCTION_ORDER_ID;
-					const orderDetailCount = productionOrderGrid.getRow(newRowKey).ORDER_DETAIL_QUANTITY;
-					productionOrderDetailInit(productionOrderID, orderDetailCount);
+					const productionOrderID = productionOrderGrid.getRow(newRowKey).SHIPMENT_REQUEST_ID;
+					const orderDetailCount = productionOrderGrid.getRow(newRowKey).QUANTITY;
+					productionOrderDetailInit(productionOrderID, orderDetailCount, 1);
 					
 					productionOrderCurrentSelectedID = productionOrderID;
 					productionOrderCurrentSelectedAmount = productionOrderGrid.getRow(newRowKey).AMOUNT;
@@ -429,130 +297,11 @@
 					productionOrderCurrentSelectedAmount = null;
 					productionOrderCurrentSelectedItem = null;
 					
-					$("#btn_group_productionOrderDetail").hide();
+					//$("#btn_group_productionOrderDetail").hide();
 			    }
 			});
 		}
-		
-		// 수정 모드 토글 버튼 이벤트
-		$("#btn_productionOrder_toggleEditMode").on("click", function () {
-		    productionOrderIsEditModeEnabled = !productionOrderIsEditModeEnabled; // 수정 모드 상태 토글
-		    
-		    if (productionOrderIsEditModeEnabled) {
-				$("#btn_productionOrder_add_row").show();
-				$("#btn_productionOrder_remove_row").show();
-		    } else {
-		    	$("#btn_productionOrder_add_row").hide();
-				$("#btn_productionOrder_remove_row").hide();
-		    }
-		    
-		    if (productionOrderIsEditModeEnabled) {
-		        productionOrderGrid.setColumns([
-		            {header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', editor: null},
-		            {header: '생성일시', name: 'CREATE_DATETIME', align: 'center', editor: null},
-		            {header: '품목코드 *', name: 'ITEM_ID', align: 'center', editor: null, renderer: { type: TextInputBtnRenderer }},
-		            {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
-		            {header: '생산량 *', name: 'AMOUNT', align: 'center', editor: { type: CustomNumberEditor }, renderer: { type: TextInputRenderer }},
-		            {header: '기준단위', name: 'ITEM_UNIT', align: 'center', editor: null},
-		            {header: '상태', name: 'SUB_NAME', align: 'center', editor: null},
-		            {header: '상태코드', name: 'STATUS', align: 'center', editor: null, hidden: true},
-		            {header: '작업지시 번호', name: 'PRODUCTION_ORDER_ID', align: 'center', editor: null, hidden: true},
-		        ]);
-		    } else {
-		        productionOrderGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 수정모드 종료시 값이 초기화 되버림
-		        productionOrderGrid.setColumns(productionOrder_columns);
-		    }
-		});
-		
-		function formatDate() {
-			let date = new Date();
-			let year = date.getFullYear();
-			let month = String(date.getMonth() + 1).padStart(2, '0');
-			let day = String(date.getDate()).padStart(2, '0');
-			
-			return `${year}${month}${day}`;
-		}
 
-		$("#btn_productionOrder_add_row").on("click", function () {
-		    const newRowKey = productionOrderGrid.appendRow(
-		        {
-		        	"PRODUCTION_ORDER_ID": '',
-		        	"CREATE_DATETIME": '',
-		        	"ITEM_ID": '',
-		        	"ITEM_NAME": '',
-		        	"ITEM_UNIT": '',
-		        	"AMOUNT": '',
-		        	"SUB_NAME": '',
-		        	"STATUS": '',
-		            isNew: true
-		        },
-		        {focus: true}
-		    );
-		});
-		
-		$("#btn_productionOrder_remove_row").on("click", function () {
-		    const rowCount = productionOrderGrid.getRowCount(); // 현재 행 개수 가져오기
-		    
-		    const allRows = productionOrderGrid.getData(); // 전체 데이터 가져오기
-		    const newRows = allRows.filter(row => row.isNew); // 새로 추가된 행만 필터링
-		    
-		    if (newRows.length === 0) {
-		        alert("삭제할 수 있는 신규 행이 없습니다.");
-		        return;
-		    }
-
-		    const lastRowKey = productionOrderGrid.getRowAt(rowCount - 1).rowKey; // 마지막 행의 rowKey 가져오기
-		    productionOrderGrid.removeRow(lastRowKey); // 마지막 행 삭제
-		});
-
-		$("#btn_productionOrder_modify").on("click", function() {
-			productionOrderGrid.finishEditing();  // 현재 편집 중인 셀 종료를 안하면 값이 초기화 되버림
-			
-		    let createdRows = productionOrderGrid.getModifiedRows().createdRows;
-		    let updatedRows = productionOrderGrid.getModifiedRows().updatedRows;
-		    
-		    // 필수 입력 컬럼
-		    const requiredFields = ["ITEM_ID", "AMOUNT"];
-
-		    let validCreatedRows = createdRows.filter(row =>
-		        requiredFields.every(field => 
-		        	row[field] && row[field].trim() !== ''
-		        )
-		    );
-		    
-		    let validUpdatedRows = updatedRows.filter(row =>
-		        requiredFields.every(field => 
-		        	row[field] && row[field].trim() !== ''
-		        )
-		    );
-		    
-		    if (createdRows.length == 0 && updatedRows.length == 0) {
-		    	alert("수정된 데이터가 없습니다.");
-		        return;
-		    }
-
-			if (createdRows.length > 0) {
-				if ((validCreatedRows.length == 0)
-					|| (validCreatedRows.length != createdRows.length)) {
-					alert("필수값을 모두 입력해주세요.");
-			        return;
-				}
-			}
-				
-			if (updatedRows.length > 0 && validUpdatedRows.length == 0) {
-				alert("필수값을 모두 입력해주세요.");
-		        return;
-			}
-			
-			productionOrderGrid.request('modifyData');
-			productionOrderGrid.readData(1, null, true);  // 그리드 새로고침 
-			productionOrderGrid.setColumns(productionOrder_columns);  // 수정모드 해제 (새로 렌더링)
-			
-			productionOrderIsEditModeEnabled = false;
-	    	$("#btn_productionOrder_add_row").hide();
-			$("#btn_productionOrder_remove_row").hide();
-		});
-		
         $("#btn_productionOrder_delete").on("click", function() {
 			productionOrderGrid.removeCheckedRows();
 			
@@ -569,33 +318,56 @@
 		});
 		
 		// 작업지시상세
-		function productionOrderDetailInit(productionOrder_id, orderDetailCount) {
-			// 파라미터 설정
-			productionOrderDetailDataSource.api.readData.initParams.productionOrder_id = productionOrder_id;
-			
+		function productionOrderDetailInit(productionOrder_id, orderDetailCount, flag) {
 			if (productionOrderDetailGrid) {
 				productionOrderDetailGrid.destroy(); // 기존 그리드 제거
 				productionOrderDetailGrid = null;
 			}
 			
+			// todo
+			// 제품출하 버튼 클릭 시 수량 체크 후 insert
+			// 출하목록, 수주목록 같이 update
+			// 삭제기능 시간되면
+			
+			let columns = '';
+			let data = '';
+			
+			if (flag == 1) {
+				columns = productionOrderDetail_columns
+				data = productionOrderDetailDataSource
+				
+				productionOrderDetailDataSource.api.readData.initParams.shipment_request_id = productionOrder_id;
+				productionOrderDetailDataSource.api.readData.initParams.request_quantity = orderDetailCount;
+			} else {
+				columns = productionOrderDetailLot_columns
+				data = productionOrderDetailLotDataSource
+				
+				productionOrderDetailLotDataSource.api.readData.initParams.shipment_request_id = productionOrder_id;
+				productionOrderDetailLotDataSource.api.readData.initParams.request_quantity = orderDetailCount;
+			}
+			
 			productionOrderDetailGrid = new tui.Grid({
 		        el: document.getElementById('productionOrderDetailGrid'),
-		        data: productionOrderDetailDataSource,
+		        data: data,
 		        scrollX: true,
 		        scrollY: true,
 		        bodyHeight: 250,
-		        columns: productionOrderDetail_columns,
+		        columns: columns,
 		    });
 			
-			if (orderDetailCount > 0) {
-				$("#btn_group_productionOrderDetail").hide();
-			} else {
-				$("#btn_group_productionOrderDetail").show();
-			}
-
-		    productionOrderDetailGrid.on('failResponse', function(ev) {
-		        alert(JSON.parse(ev.xhr.responseText).message);
-		    });
+			productionOrderDetailGrid.on('failResponse', function(ev) {
+				alert(JSON.parse(ev.xhr.responseText).message);
+			});
+			
+			productionOrderDetailGrid.on('successResponse', function(ev) {
+				const arrLength = JSON.parse(ev.xhr.responseText).data.contents.length;
+				
+				if (arrLength > 0 && flag == 1) {
+					$("#btn_group_productionOrderDetail").hide();
+				} else {
+					$("#btn_group_productionOrderDetail").show();
+				}
+			});
 		}
 		
 		$("#btn_productionOrderDetail_add").on("click", function() {
@@ -604,10 +376,17 @@
 		});
 		
 		$("#btn_productionOrderDetail_modal").on("click", function() {
-			processDataSource.api.readData.initParams.amount = productionOrderCurrentSelectedAmount;
-			processDataSource.api.readData.initParams.item_id = productionOrderCurrentSelectedItem;
-			
-			$("#productionOrderDetailAdd").modal();
+			for (let row of productionOrderGrid.getData()) {
+				const rowkey = row.rowKey;
+
+				if (productionOrderGrid.getRowClassName(rowkey).includes('selected-row')) {
+					const id = productionOrderGrid.getRow(rowkey).SHIPMENT_REQUEST_ID;
+					const quantity = productionOrderGrid.getRow(rowkey).QUANTITY;
+					productionOrderDetailInit(id, quantity, 0);
+					
+					return;
+				}
+			}
 		});
 		
 		$("#btn_shipment_request").on("click", function() {
@@ -615,10 +394,7 @@
 		});
 	</script>
 	
-	<nav th:replace="~{includes/modals/mesCodeValidate :: mesCodeValidate}"></nav>
-	<nav th:replace="~{includes/modals/productionOrderItemAdd :: productionOrderItemAdd}"></nav>
-	<nav th:replace="~{includes/modals/productionOrderDetailAdd :: productionOrderDetailAdd}"></nav>
-	<nav th:replace="~{includes/modals/productionOrderWorkcenterAdd :: productionOrderWorkcenterAdd}"></nav>
+	<nav th:replace="~{includes/modals/requestOrderAdd :: requestOrderAdd}"></nav>
 	
 </body>
 </html>

@@ -88,6 +88,7 @@ public class SalesService {
 		return resultMap;
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertRequestOrder(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		Boolean result = true;
@@ -95,24 +96,26 @@ public class SalesService {
 		
 		try {
 			if (createdRows.size() > 0) {
-	 			int max_id = salesMapper.selectTodayMaxShipmentRequestId();
-	 			
-	 			LocalDate now = LocalDate.now();
-	 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-	 			String formatedNow = now.format(formatter);
-	 			
-	 			for (Map<String, Object> row : createdRows) {
-	 				String shipmentRequestId = "SRI-" + formatedNow + "-" + String.format("%04d", max_id);
-	 				row.put("SHIPMENT_REQUEST_ID", shipmentRequestId);
-	 				
-	 				max_id++;
-	 			}
-	 			
-	 			salesMapper.insertRequestOrder(createdRows);
+				int max_id = salesMapper.selectTodayMaxShipmentRequestId();
+				
+				LocalDate now = LocalDate.now();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+				String formatedNow = now.format(formatter);
+				
+				for (Map<String, Object> row : createdRows) {
+					String shipmentRequestId = "SRI-" + formatedNow + "-" + String.format("%04d", max_id);
+					row.put("SHIPMENT_REQUEST_ID", shipmentRequestId);
+					
+					max_id++;
+				}
+				
+				salesMapper.insertRequestOrder(createdRows);
 			}
 		} catch (Exception e) {
 			result = false;
 			message = "insertRequestOrder 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);

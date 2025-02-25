@@ -19,7 +19,13 @@
 				   AND STATUS = 'ST-002') 						AS WORKING_CNT
 		  FROM PRODUCTION_ORDER_DETAIL pod
 			   INNER JOIN WORKCENTER w 
-					   ON pod.WORKCENTER_ID = w.WORKCENTER_ID 
+					   ON pod.WORKCENTER_ID = w.WORKCENTER_ID
+		 WHERE (SELECT COUNT(*)
+				  FROM PRODUCTION_ORDER_DETAIL
+				 WHERE 
+				 	   1 = 1
+				   AND WORKCENTER_ID = pod.WORKCENTER_ID
+				   AND STATUS IN('ST-001', 'ST-002')) > 0
 	</select>
 	
 	<select id="selectProductionOrderDetail" resultType="map">
