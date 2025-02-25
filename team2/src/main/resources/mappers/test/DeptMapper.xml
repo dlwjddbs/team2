@@ -51,10 +51,10 @@
 <!-- 	셀렉트박스 부서 목록 -->
 	<select id="getCcodeList" resultType="map">
 	SELECT CC.CODE_ID AS codeId, CC.CODE_NAME AS codeName
-FROM COMMON_CODE CC
-LEFT JOIN DEPARTMENT D ON CC.CODE_ID = D.DEPT_ID
-WHERE CC.GROUP_ID LIKE 'DEP%' 
-  AND D.DEPT_ID IS NULL
+	FROM COMMON_CODE CC
+		LEFT JOIN DEPARTMENT D ON CC.CODE_ID = D.DEPT_ID
+	WHERE CC.GROUP_ID LIKE 'DEP%' 
+  	AND D.DEPT_ID IS NULL
 	</select>
 	
 <!-- 	셀렉트박스 유저 목록 -->
@@ -214,7 +214,6 @@ WHERE CC.GROUP_ID LIKE 'DEP%'
         d.USE_YN, 
         m.name AS dept_name      
     FROM DEPARTMENT d 
-LEFT JOIN MEMBER m
-ON d.MEMBER_ID = m.MEMBER_ID
+		LEFT JOIN MEMBER m ON d.MEMBER_ID = m.MEMBER_ID
 	</select>
 </mapper>
