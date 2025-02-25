@@ -100,4 +100,62 @@
 			#{id}
 		</foreach>
 	</delete>
+	
+	<select id="selectRequestOrder" resultType="map">
+		SELECT
+			   oi.ORDER_ID 		AS ORDER_ID
+			 , oi.ORDER_DATE 	AS ORDER_DATE
+			 , oi.CLIENT_ID 	AS CLIENT_ID
+			 , c.CLIENT_NAME 	AS CLIENT_NAME
+			 , oi.ITEM_ID 		AS ITEM_ID
+			 , i.ITEM_NAME 		AS ITEM_NAME
+			 , oi.QUANTITY 		AS QUANTITY
+		  FROM ORDER_INTAKE oi
+			   INNER JOIN CLIENT c 
+			   		   ON oi.CLIENT_ID = c.CLIENT_ID 
+			   INNER JOIN ITEM i 
+			   		   ON oi.ITEM_ID = i.ITEM_ID 
+		 WHERE 
+		 	   1 = 1
+		   AND oi.STATUS = 'OS-001'
+		   AND oi.ORDER_ID NOT IN (SELECT ORDER_INTAKE_ID FROM SHIPMENT_REQUEST)
+	</select>
+	
+	<insert id="insertRequestOrder">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO SHIPMENT_REQUEST (
+				  SHIPMENT_REQUEST_ID
+				, ORDER_INTAKE_ID
+				, REQUEST_DATE
+				, STATUS
+				, QUANTITY
+			)
+			VALUES (
+				  #{item.SHIPMENT_REQUEST_ID}
+				, #{item.ORDER_ID}
+				, TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+				, 'RS-001'
+				, #{item.QUANTITY}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<select id="selectTodayMaxShipmentRequestId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(SHIPMENT_REQUEST_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+		  FROM SHIPMENT_REQUEST
+		 WHERE SHIPMENT_REQUEST_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
+	</select>
+	
+	<select id="selectShipmentRequest" resultType="map">
+		SELECT
+			   SHIPMENT_REQUEST_ID
+			 , ORDER_INTAKE_ID
+			 , REQUEST_DATE
+			 , STATUS
+			 , SHIPMENT_COMPLETION_DATE
+			 , QUANTITY
+		  FROM SHIPMENT_REQUEST
+	</select>
 </mapper>

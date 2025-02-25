@@ -22,4 +22,12 @@ public interface SalesMapper {
 
 	int deleteOrder(List<String> orderIds);
 
+	List<Map<String, Object>> selectRequestOrder(Map<String, Object> requestData);
+
+	int insertRequestOrder(List<Map<String, Object>> createdRows);
+
+	int selectTodayMaxShipmentRequestId();
+	
+	List<Map<String, Object>> selectShipmentRequest(Map<String, Object> requestData);
+	
 }

@@ -87,4 +87,38 @@ public class SalesService {
 		
 		return resultMap;
 	}
+	
+	public Map<String, Object> insertRequestOrder(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Boolean result = true;
+		String message = "insertRequestOrder 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+	 			int max_id = salesMapper.selectTodayMaxShipmentRequestId();
+	 			
+	 			LocalDate now = LocalDate.now();
+	 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+	 			String formatedNow = now.format(formatter);
+	 			
+	 			for (Map<String, Object> row : createdRows) {
+	 				String shipmentRequestId = "SRI-" + formatedNow + "-" + String.format("%04d", max_id);
+	 				row.put("SHIPMENT_REQUEST_ID", shipmentRequestId);
+	 				
+	 				max_id++;
+	 			}
+	 			
+	 			salesMapper.insertRequestOrder(createdRows);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "insertRequestOrder 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
 }

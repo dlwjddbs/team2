@@ -1,0 +1,200 @@
+<!-- 모달창 -->
+<div class="modal fade" id="requestOrderAdd" th:fragment="requestOrderAdd">
+	<div class="modal-dialog modal-custom-size">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">출하요청 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- 모달창 바디 -->
+			<div class="modal-body">
+				<div class="card-body">
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<input type="hidden" id="equipmentRow" class="form-control">
+							</div>
+							<div class="col-md-6">
+								<input type="hidden" id="equipmentColumn" class="form-control">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-8">
+								<span style="padding-left: 20px;">수주 목록</span>
+								<div class="card-body" id="equipmentModalGrid" style="padding-top: 10px;">
+									<!-- Toast Grid Ajax -->
+								</div>
+							</div>
+							<div class="col-md-4">
+								<span style="padding-left: 20px;">선택 목록</span>
+								<div class="card-body" id="equipmentModalSelectedGrid" style="padding-top: 10px;">
+									 <!-- Toast Grid Ajax -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.모달창 바디 -->
+			<!-- 모달창 푸터-->
+			<div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="saveEquipment">적용</button>
+				</div>
+			</div>
+			<!-- /.모달창 푸터-->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->
+
+<script th:fragment="requestOrderAdd" th:inline="javascript">
+	let equipmentModalGrid = null;
+	let selectedEquipmentList = [];
+	let equipmentModalSelectedGrid = null;
+	const equipmentUrl = '/rest/sales/requestOrder';
+	const equipmentDataSource = {
+		api: {
+			readData: {url: equipmentUrl, method: 'GET'},
+		},
+		contentType: 'application/json',
+	};
+	const equipment_columns = [
+		{header: '수주번호', name: 'ORDER_ID', align: 'center', editor: null},
+		{header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: null},
+		{header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
+		{header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
+		{header: '수량', name: 'QUANTITY', align: 'left', hidden: true},
+	];
+	const equipmentSelected_columns = [
+		{header: '수주번호', name: 'ORDER_ID', align: 'center', editor: null},
+		{header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
+		{header: '수량', name: 'QUANTITY', align: 'left', hidden: true},
+	];
+	
+	$('#requestOrderAdd').on('shown.bs.modal', function () {
+		selectedEquipmentList.length = 0;
+		
+		equipmentModalInit();
+		equipmentModalSelectedInit();
+	});
+	
+	function equipmentModalInit() {
+		if (equipmentModalGrid) {
+			equipmentModalGrid.destroy(); // 기존 그리드 제거
+			equipmentModalGrid = null;
+		}
+		
+		equipmentModalGrid = new tui.Grid({
+			el: document.getElementById('equipmentModalGrid'),
+			data: equipmentDataSource,
+			scrollX: true,
+			scrollY: true,
+			bodyHeight: 250,
+			columns: equipment_columns,
+		});
+		
+		equipmentModalGrid.on('failResponse', function(ev) {
+			alert(JSON.parse(ev.xhr.responseText).message);
+		});
+		
+		equipmentModalGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+			const newRowKey = ev.rowKey;
+			const isSelectedRow = equipmentModalGrid.getRowClassName(newRowKey).includes('selected-row');
+			const rowData = equipmentModalGrid.getRow(newRowKey);
+			const equipment_id = rowData.ORDER_ID;
+			
+			if (isSelectedRow) {
+				equipmentModalGrid.removeRowClassName(newRowKey, 'selected-row');
+				selectedEquipmentList = selectedEquipmentList.filter(item => item.ORDER_ID != equipment_id);
+				
+				equipmentModalSelectedGrid.getData().forEach(row => {
+					if (equipment_id == row.ORDER_ID) {
+						equipmentModalSelectedGrid.removeRow(row.rowKey)
+					}
+				});
+			} else {
+				const mapRowData = {
+					"ORDER_ID": equipment_id,
+					"CLIENT_NAME": rowData.CLIENT_NAME,
+					"QUANTITY": rowData.QUANTITY,
+					isNew: true
+				};
+				
+				selectedEquipmentList.push(mapRowData);
+				equipmentModalGrid.addRowClassName(newRowKey, 'selected-row');
+				
+				equipmentModalSelectedGrid.appendRow(mapRowData);
+			}
+		});
+	}
+	
+	$("#saveEquipment").on('click', function() {
+		$.ajax({
+			type : "POST",
+			url : equipmentUrl,
+			contentType: "application/json",
+			data: JSON.stringify({createdRows: equipmentModalSelectedGrid.getData()}),
+			success : function(res){
+				if (!res.result) {
+					alert("등록 실패");
+					
+					return;
+				}
+			},
+			error : function(e){
+				console.log("/rest/sales/requestOrder ajax 실패");
+			}
+		});
+		
+		window.location.reload();
+		$("#requestOrderAdd").modal('hide');
+	});
+	
+	function equipmentModalSelectedInit() {
+		if (equipmentModalSelectedGrid) {
+			equipmentModalSelectedGrid.destroy(); // 기존 그리드 제거
+			equipmentModalSelectedGrid = null;
+		}
+		
+		equipmentModalSelectedGrid = new tui.Grid({
+			el: document.getElementById('equipmentModalSelectedGrid'),
+			data: selectedEquipmentList,
+			scrollX: true,
+			scrollY: true,
+			bodyHeight: 250,
+			columns: equipmentSelected_columns,
+		});
+		
+		equipmentModalSelectedGrid.on('click', (ev) => {
+			if (ev.targetType != "cell") {
+				return;
+			}
+			
+			const newRowKey = ev.rowKey;
+			const rowData = equipmentModalSelectedGrid.getRow(newRowKey);
+			const allData = equipmentModalSelectedGrid.getData();
+			
+			const equipment_id = rowData.EQUIPMENT_ID;
+			selectedEquipmentList = selectedEquipmentList.filter(item => item.EQUIPMENT_ID != equipment_id);
+			
+			equipmentModalSelectedGrid.removeRow(newRowKey);
+			
+			equipmentModalGrid.getData().forEach(row => {
+				if (equipment_id == row.EQUIPMENT_ID) {
+					equipmentModalGrid.removeRowClassName(row.rowKey, 'selected-row');
+				}
+			});
+		});
+	};
+</script>
