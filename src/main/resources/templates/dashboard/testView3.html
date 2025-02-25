@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="_csrf" th:content="${_csrf.token}" />
 	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+	
 	<title>AdminLTE 3 | DataTables</title>
 	
 	<!-- Google Font: Source Sans Pro -->
@@ -13,6 +14,8 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
 	<!-- Toast UI Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css"/>
 	<!-- daterange picker -->
@@ -31,6 +34,8 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- ChartJS -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	<!-- SheetJS (Excel 변환 라이브러리) -->
@@ -222,12 +227,15 @@
 	    // Chart.js를 사용하여 차트 생성
 		$(function () {
 		    clientPoInit();
-		    
-		    stackedBarChart('poChartDaily', false);
-		    //stackedBarChart('poChartWeekly', false);
-		    //stackedBarChart('poChartMonthly', false);
-		    
-		    lineChart('poInboundChart1', false);
+
+		    dailyPoBarChart(false);
+		    weeklyPoBarChart(false);
+		    monthlyPoBarChart(false);
+		    	    
+		    inboundlineChart(false);
+		    //dailyinboundlineChart(false);
+		    //weeklyinboundlineChart(false);
+		    //monthlyinboundlineChart(false);
 
 			clientInboundChart('clientInboundChart', false);
 		});
@@ -241,115 +249,127 @@
 		        scrollY: true,
 		        bodyHeight: 250,
 				editingEvent: 'click',
-		        columns: clientPo_columns,
+ 		        pageOptions: {
+		            useClient: true, // 클라이언트에서 페이징 처리
+		            perPage: 10  // 한 페이지당 10개씩 표시
+		        },
+		        columns: clientPo_columns
 		    });
-
+			
 			clientPoGrid.on('failResponse', function(ev) {
 		        alert(JSON.parse(ev.xhr.responseText).message);
 		    });
 		}
-	    
 		
-		function stackedBarChart(chartId, isUpdate) {
+		// 발주 상태 데이터 조회
+		function fetchPoBarChartData(url, onSuccess) {
 		    $.ajax({
-		        type: "POST",
-		        url: "/dashboard/getPoStackedChart",
+		        type: "GET",
+		        url: url,
 		        success: function (res) {
-		        	
-		        	console.log(res);
-		        	
-		            let labels = [];
-		            let poStatusMap = {}; // { '미결': [], '진행중': [], '마감': [], '검수마감': [] }
-		            let statusColors = {
-		                '미결': '#f56954',
-		                '진행중': '#f39c12',
-		                '마감': '#00a65a',
-		                '검수마감': '#00c0ef',
-		                '미정': '#3c8dbc'
-		            };
-		
-		            // 데이터 전처리 : 날짜별 그룹화
-		            res.forEach((el) => {
-		                let date = el.ORDER_DATE;
-		                let status = el.PO_TEXT;
-		                let value = el.STACK_CHART_VALUE;
-		
-		                if (!labels.includes(date)) {
-		                    labels.push(date);
-		                }
-		
-		                if (!poStatusMap[status]) {
-		                    poStatusMap[status] = [];
-		                }
-		            });
-		
-		            // 모든 날짜에 대해 초기화
-		            labels.forEach((date) => {
-		                for (let status in poStatusMap) {
-		                    poStatusMap[status].push(0); // 기본값 0으로 초기화
-		                }
-		            });
-		
-		            // 실제 데이터 반영
-		            res.forEach((el) => {
-		                let dateIndex = labels.indexOf(el.ORDER_DATE);
-		                let status = el.PO_TEXT;
-		                poStatusMap[status][dateIndex] = el.STACK_CHART_VALUE;
-		            });
-		
-		            // Chart.js의 datasets 형식으로 변환
-		            let datasets = [];
-		            for (let status in poStatusMap) {
-		                datasets.push({
-		                    label: status,
-		                    backgroundColor: statusColors[status],
-		                    data: poStatusMap[status]
-		                });
+		            console.log(url + " 데이터: ", res);
+		            if (res.result && res.data) {
+		                onSuccess(res.data.contents);
+		            } else {
+		                console.log(url + " 데이터가 없습니다.");
 		            }
-		
-		            let stackedBarChartCanvas = $('#' + chartId).get(0).getContext('2d');
-		            let stackedBarChartData = {
-		                labels: labels,
-		                datasets: datasets
-		            };
-		
-		            let stackedBarChartOptions = {
-		                maintainAspectRatio: false,
-		                responsive: true,
-		                scales: {
-		                    x: { stacked: true },
-		                    y: { stacked: true }
-		                }
-		            };
-		
-		            // 기존 차트 삭제 후 재생성
-		            if (isUpdate && window.myStackedBarChart) {
-		                window.myStackedBarChart.destroy();
-		            }
-		
-		            window.myStackedBarChart = new Chart(stackedBarChartCanvas, {
-		                type: 'bar',
-		                data: stackedBarChartData,
-		                options: stackedBarChartOptions
-		            });
 		        },
-		        error: function (XMLHttpRequest, textStatus, errorThrown) {
-		            console.log("stackedBarChart() ajax 실패");
+		        error: function () {
+		            console.log(url + " ajax 실패");
 		        }
 		    });
 		}
-		
+
+		// 공통 차트 생성 함수
+		function createPoBarChart(chartId, labels, datasets, isUpdate) {
+		    const ctx = $('#' + chartId).get(0).getContext('2d');
+
+		    if (isUpdate && window[chartId]) {
+		        window[chartId].destroy();
+		    }
+
+		    window[chartId] = new Chart(ctx, {
+		        type: 'bar',
+		        data: {
+		            labels: labels,
+		            datasets: Object.keys(datasets).map((key, index) => ({
+		                label: key,
+		                data: datasets[key],
+		                backgroundColor: ['#00c0ef', '#00a65a', '#f39c12', '#f56954'][index % 4]
+		            }))
+		        },
+		        options: {
+		            responsive: true,
+		            maintainAspectRatio: false,
+		            scales: {
+		                x: { title: { display: true, text: '날짜' } },
+		                y: { title: { display: true, text: '발주 상태 (건수)' }, min: 0 }
+		            }
+		        }
+		    });
+		}
+
+		// 일별 발주 상태 차트
+		function dailyPoBarChart(isUpdate) {
+		    fetchPoBarChartData("/rest/dashboard/poBarChartDaily", function (data) {
+		        let labels = [];
+		        let datasets = {};
+
+		        data.forEach(item => {
+		            if (!labels.includes(item.DAILY_DATE)) labels.push(item.DAILY_DATE);
+		            if (!datasets[item.PO_TEXT]) datasets[item.PO_TEXT] = [];
+		            datasets[item.PO_TEXT].push(item.STACK_CHART_VALUE);
+		        });
+
+		        createPoBarChart("poChartDaily", labels, datasets, isUpdate);
+		    });
+		}
+
+		// 주별 발주 상태 차트
+		function weeklyPoBarChart(isUpdate) {
+		    fetchPoBarChartData("/rest/dashboard/poBarChartWeekly", function (data) {
+		        let labels = [];
+		        let datasets = {};
+
+		        data.forEach(item => {
+		            if (!labels.includes(item.WEEKLY_DATE)) labels.push(item.WEEKLY_DATE);
+		            if (!datasets[item.PO_TEXT]) datasets[item.PO_TEXT] = [];
+		            datasets[item.PO_TEXT].push(item.STACK_CHART_VALUE);
+		        });
+
+		        createPoBarChart("poChartWeekly", labels, datasets, isUpdate);
+		    });
+		}
+
+		// 월별 발주 상태 차트
+		function monthlyPoBarChart(isUpdate) {
+		    fetchPoBarChartData("/rest/dashboard/poBarChartMonthly", function (data) {
+		        let labels = [];
+		        let datasets = {};
+
+		        data.forEach(item => {
+		            if (!labels.includes(item.MONTHLY_DATE)) labels.push(item.MONTHLY_DATE);
+		            if (!datasets[item.PO_TEXT]) datasets[item.PO_TEXT] = [];
+		            datasets[item.PO_TEXT].push(item.STACK_CHART_VALUE);
+		        });
+
+		        createPoBarChart("poChartMonthly", labels, datasets, isUpdate);
+		    });
+		}
+
+		// 불량률 차트
 		function clientInboundChart(chartId, isUpdate) {
 		    $.ajax({
-		        type: "POST",
-		        url: "/dashboard/getClientInbound",
+		        type: "GET",
+		        url: "/rest/dashboard/clientInboundChart",
 		        success: function (res) {
 		            let labels = [];   // X축 (거래처명)
 		            let data = [];     // Y축 (불량률 %)
 		            
+		            console.log("clientInboundChart : ");
 		            console.log(res);
 		            
-		            res.forEach((el) => {
+		            res.data.contents.forEach((el) => {
 		                labels.push(el.CLIENT_NAME);
 		                data.push(el.DEFECT_RATE);
 		            });
@@ -377,20 +397,9 @@
 		                    responsive: true,
 		                    maintainAspectRatio: false,
 		                    scales: {
-		                        x: {
-		                            /* title: {
-		                                display: true,
-		                                text: '거래처'
-		                            } */
-		                        },
-		                        y: {
-		                            beginAtZero: true,
-		                            max: 100,
-		                            /* title: {
-		                                display: true,
-		                                text: '불량률 (%)'
-		                            } */
-		                        }
+		                        // x: { title: { display: true, text: '거래처' } },
+		                        y: { beginAtZero: true, max: 100 }
+		                            // title: { display: true, text: '불량률 (%)' }
 		                    }
 		                }
 		            });
@@ -401,19 +410,100 @@
 		    });
 		}
 		
-		function lineChart(chartId, isUpdate) {
+		function inboundlineChart(period, chartId, isUpdate) {
+		    $.ajax({
+		        type: "GET",
+		        url: "/rest/dashboard/inboundChart",
+		        success: function (res) {
+		            if (!res.result || !res.data || !res.data.contents) {
+		                console.log("데이터가 없습니다.");
+		                return;
+		            }
+		            
+		            // period (daily, weekly, monthly) 에 해당하는 데이터만 필터링
+		            const filteredData = res.data.contents.filter(item => item.TYPE === period);
+		            
+		            let labels = [];
+		            let data = [];
+		            
+		            console.log("inboundlineChart - period: " + period);
+		            console.log(filteredData);
+		            
+		            filteredData.forEach((item) => {
+		                labels.push(item.TIME_PERIOD);  // X축: 기간(날짜/주/월)
+		                data.push(item.DEFECT_RATE);      // Y축: 불량률 (%)
+		            });
+
+		            // 지정된 canvas의 컨텍스트 가져오기
+		            const ctx = $('#' + chartId).get(0).getContext('2d');
+
+		            // 기존 차트가 있으면 삭제 (업데이트 시)
+		            if (isUpdate && window.myLineChart) {
+		                window.myLineChart.destroy();
+		            }
+
+		            // 불량률 라인 차트 생성
+		            window.myLineChart = new Chart(ctx, {
+		                type: 'line',
+		                data: {
+		                    labels: labels,
+		                    datasets: [{
+		                        label: `불량률 (%) - ${period.toUpperCase()}`,
+		                        data: data,
+		                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+		                        borderColor: 'rgba(255, 99, 132, 1)',
+		                        borderWidth: 2,
+		                        pointRadius: 5,
+		                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+		                        fill: false,
+		                        tension: 0.1
+		                    }]
+		                },
+		                options: {
+		                    responsive: true,
+		                    maintainAspectRatio: false,
+		                    scales: {
+		                        y: {
+		                            beginAtZero: true,
+		                            ticks: {
+		                                callback: function (value) {
+		                                    return value + "%";
+		                                }
+		                            }
+		                        }
+		                    },
+		                    plugins: {
+		                        tooltip: {
+		                            callbacks: {
+		                                label: function (tooltipItem) {
+		                                    return tooltipItem.raw + " %";
+		                                }
+		                            }
+		                        }
+		                    }
+		                }
+		            });
+		        },
+		        error: function () {
+		            console.log("inboundlineChart() ajax 실패");
+		        }
+		    });
+		}
+		
+/* 		function inboundlineChart(chartId, isUpdate) {
 		    $.ajax({
 		        type: "GET",
 		        url: "/rest/dashboard/inboundChart",
 		        success: function (res) {
 		            if (!res.result || !res.data) {
-		                console.log("📌 데이터가 없습니다.");
+		                console.log("데이터가 없습니다.");
 		                return;
 		            }
 		            
 		            let labels = [];
 		            let data = [];
 		            
+		            console.log("inboundlineChart : ");
 		            console.log(res);
 		            
 		            // 서버에서 받은 객체를 배열로 변환 후 반복문 실행
@@ -451,18 +541,10 @@
 		                    responsive: true,
 		                    maintainAspectRatio: false,
 		                    scales: {
-		                        x: {
-		                            /* title: {
-		                                display: true,
-		                                text: '날짜'
-		                            } */
-		                        },
-		                        y: {
-		                            beginAtZero: true,	// 최소값 0으로 설정
- 		                            /* title: {
-		                                display: true,
-		                                text: '불량률 (%)'
-		                            }, */
+		                        x: { },
+		                            // title: { display: true, text: '날짜' } 
+		                        y: { beginAtZero: true,	// 최소값 0으로 설정
+ 		                            // title: {display: true, text: '불량률 (%)' },
 		                            ticks: {
 		                                callback: function (value) {
 		                                    return value + "%"; // Y축 % 단위 표시
@@ -483,10 +565,10 @@
 		            });
 		        },
 		        error: function () {
-		            console.log("lineChart() ajax 실패");
+		            console.log("inboundlineChart() ajax 실패");
 		        }
 		    });
-		}
+		} */
 	</script>
 </body>
 </html>

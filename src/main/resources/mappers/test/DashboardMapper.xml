@@ -32,14 +32,14 @@
 			       ELSE '미정'
 		       END 							AS ATTENDANCE_TEXT
 			 , COUNT(EQUIPMENT_STATUS)		AS PIE_CHART_VALUE
-		FROM EQUIPMENT
-		GROUP BY EQUIPMENT_STATUS
-		ORDER BY 
-		    CASE 
-		        WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
-		        WHEN EQUIPMENT_STATUS = 'N' THEN 2  
-		        ELSE 3  
-		    END
+		  FROM EQUIPMENT
+	  GROUP BY EQUIPMENT_STATUS
+	  ORDER BY 
+		       CASE 
+		           WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
+		           WHEN EQUIPMENT_STATUS = 'N' THEN 2  
+		           ELSE 3  
+		       END
     </select>
     
     <!-- 막대 차트 조회 (에시 - 설비 상태) -->
@@ -53,14 +53,14 @@
 			       ELSE '미정'
 		       END 							AS ATTENDANCE_TEXT
 			 , COUNT(EQUIPMENT_STATUS)		AS PIE_CHART_VALUE
-		FROM EQUIPMENT
-		GROUP BY EQUIPMENT_STATUS
-		ORDER BY 
-		    CASE 
-		        WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
-		        WHEN EQUIPMENT_STATUS = 'N' THEN 2  
-		        ELSE 3  
-		    END
+		  FROM EQUIPMENT
+	  GROUP BY EQUIPMENT_STATUS
+	  ORDER BY 
+		       CASE 
+		           WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
+		           WHEN EQUIPMENT_STATUS = 'N' THEN 2  
+		           ELSE 3  
+		       END
     </select>
     
     <!-- 현재 미사용 -->
@@ -75,50 +75,93 @@
 			       ELSE '미정'
 		       END 							AS ATTENDANCE_TEXT
 			 , COUNT(EQUIPMENT_STATUS)		AS PIE_CHART_VALUE
-		FROM EQUIPMENT
-		GROUP BY EQUIPMENT_STATUS
-		ORDER BY 
-		    CASE 
-		        WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
-		        WHEN EQUIPMENT_STATUS = 'N' THEN 2  
-		        ELSE 3  
-		    END
-    </select>
-    
-    <!-- 막대 차트 조회 (발주 상태) -->
-    <select id="getPoStackedBarChart" resultType="map">
-    	<!-- get___StackedBarChart 기록 스택바차트 조회 -->
-    	<!-- PO_DETAIL 기록 스택바차트 조회 -->
-    	<!-- 일별-주별-월별 발주 상태 기록을 조회 -->
-		SELECT 
-		       TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM-DD') AS ORDER_DATE
-		     , PO_STATUS
-		     , CASE 
-		       		WHEN PO_STATUS = 'N' THEN '미결' 
-		       		WHEN PO_STATUS = 'I' THEN '진행중' 
-		       		WHEN PO_STATUS = 'Y' THEN '마감' 
-		       		WHEN PO_STATUS = 'C' THEN '검수마감' 
-		       		ELSE '미정'
-		       END AS PO_TEXT
-		     , COUNT(PO_STATUS) AS STACK_CHART_VALUE
-		  FROM PO_DETAIL
-		 WHERE 
-			   CREATE_DATE IS NOT NULL
-	  GROUP BY 
-			   CREATE_DATE
-			 , PO_STATUS
+		  FROM EQUIPMENT
+	  GROUP BY EQUIPMENT_STATUS
 	  ORDER BY 
-			   ORDER_DATE ASC
-			 , CASE 
-		           WHEN PO_STATUS = 'N' THEN 1  
-		           WHEN PO_STATUS = 'I' THEN 2  
-		           WHEN PO_STATUS = 'Y' THEN 3  
-		           WHEN PO_STATUS = 'C' THEN 4  
-		           ELSE 5  
-	    	   END
+		       CASE 
+		           WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
+		           WHEN EQUIPMENT_STATUS = 'N' THEN 2  
+		           ELSE 3  
+		       END
     </select>
     
-    <!-- 막대 차트 조회 (거래처별 발주량 및 불량률) -->
+    <!-- 막대 차트 조회 (발주 상태 - 일별) -->
+    <select id="selectPoBarChartDaily" resultType="map">
+    	<!-- PO_DETAIL 기록 스택바차트 조회 -->
+    	<!-- 일별 발주 상태 기록을 조회 -->
+	    SELECT 
+	           TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD') AS DAILY_DATE
+	         , PO_STATUS
+	         , CASE 
+	               WHEN PO_STATUS = 'N' THEN '미결' 
+	               WHEN PO_STATUS = 'I' THEN '진행중' 
+	               WHEN PO_STATUS = 'Y' THEN '마감' 
+	               WHEN PO_STATUS = 'C' THEN '검수마감' 
+	               ELSE '미정'
+	           END AS PO_TEXT
+	         , COUNT(PO_STATUS) AS STACK_CHART_VALUE
+	      FROM 
+	    	   PO_DETAIL
+	  GROUP BY 
+	           TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD')
+	         , PO_STATUS
+	  ORDER BY 
+	  		   DAILY_DATE
+    </select>
+    
+    <!-- 막대 차트 조회 (발주 상태 - 주별) -->
+    <select id="selectPoBarChartWeekly" resultType="map">
+    	<!-- PO_DETAIL 기록 스택바차트 조회 -->
+    	<!-- 주별 발주 상태 기록을 조회 -->
+	    SELECT 
+	           TO_NUMBER(TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+    		   (TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'WW') - 
+    		    TO_CHAR(TRUNC(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주' AS WEEKLY_DATE
+	         , PO_STATUS
+	         , CASE 
+	               WHEN PO_STATUS = 'N' THEN '미결' 
+	               WHEN PO_STATUS = 'I' THEN '진행중' 
+	               WHEN PO_STATUS = 'Y' THEN '마감' 
+	               WHEN PO_STATUS = 'C' THEN '검수마감' 
+	               ELSE '미정'
+	           END AS PO_TEXT
+	         , COUNT(PO_STATUS) AS STACK_CHART_VALUE
+	      FROM 
+	    	   PO_DETAIL
+	  GROUP BY 
+	           TO_NUMBER(TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM'))
+	         , TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'WW')
+	         , TO_CHAR(TRUNC(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW')
+	         , PO_STATUS
+	  ORDER BY 
+	  		   WEEKLY_DATE
+    </select>
+    
+    <!-- 막대 차트 조회 (발주 상태 - 월별) -->
+    <select id="selectPoBarChartMonthly" resultType="map">
+    	<!-- PO_DETAIL 기록 스택바차트 조회 -->
+    	<!-- 월별 발주 상태 기록을 조회 -->
+	    SELECT 
+	           TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM') AS MONTHLY_DATE
+	         , PO_STATUS
+	         , CASE 
+	               WHEN PO_STATUS = 'N' THEN '미결' 
+	               WHEN PO_STATUS = 'I' THEN '진행중' 
+	               WHEN PO_STATUS = 'Y' THEN '마감' 
+	               WHEN PO_STATUS = 'C' THEN '검수마감' 
+	               ELSE '미정'
+	           END AS PO_TEXT
+	         , COUNT(PO_STATUS) AS STACK_CHART_VALUE
+	      FROM 
+	    	   PO_DETAIL
+	  GROUP BY 
+	           TO_CHAR(TO_DATE(CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM')
+	         , PO_STATUS
+	  ORDER BY 
+	  		   MONTHLY_DATE
+    </select>
+    
+    <!-- 그리드 조회 (거래처별 발주량 및 불량률) -->
     <select id="selectClientPo" resultType="map">
     	<!-- getClientInboundChart 기록 스택바차트 조회 -->
     	<!-- 거래처별 발주량 및 불량률 기록을 조회 -->
@@ -158,7 +201,7 @@
     </select>
     
     <!-- 막대 차트 조회 (거래처별 불량률) -->
-    <select id="getClientInboundChart" resultType="map">
+    <select id="selectClientInboundChart" resultType="map">
     	<!-- getClientInboundChart 기록 스택바차트 조회 -->
     	<!-- 거래처별 불량률 기록을 조회 -->
 		SELECT
@@ -186,24 +229,37 @@
     <!-- 라인 차트 조회 (일별 불량률) -->
     <select id="selectInboundChart" resultType="map">
     	<!-- selectInboundChart 기록 스택바차트 조회 -->
-    	<!-- 일별 불량률 기록을 조회 -->
-		SELECT
-		       TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM-DD') AS ORDER_DATE
-		     , NVL(SUM(PD.PO_COUNT), 0) 		AS TOTAL_PO_COUNT
-		     , NVL(SUM(II.DEFECT_QUANTITY), 0) 	AS TOTAL_DEFECT_QUANTITY
+    	<!-- 일별/주별/월별 불량률 기록을 조회 -->
+    	<!-- GROUPING SETS 활용 -->
+		SELECT 
+		       CASE 
+		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD')) = 0 THEN 'daily'
+		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'IYYY-IW')) = 0 THEN 'weekly'
+		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM')) = 0 THEN 'monthly'
+		       END AS TYPE
+		     , COALESCE(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD'), 
+		                TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'IYYY-IW'),
+		                TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM')) AS TIME_PERIOD
+		     , NVL(SUM(PD.PO_COUNT), 0) AS TOTAL_PO_COUNT
+		     , NVL(SUM(II.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
 		     , CASE 
-		       	   WHEN SUM(PD.PO_COUNT) = 0 THEN 0
+		           WHEN SUM(PD.PO_COUNT) = 0 THEN 0
 		           ELSE ROUND(NVL(SUM(II.DEFECT_QUANTITY), 0) / SUM(PD.PO_COUNT) * 100, 2)
 		       END AS DEFECT_RATE
 		  FROM 
 			   PURCHASE_ORDER PO
-     LEFT JOIN 
-     		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
-     LEFT JOIN 
-     		   INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
+	 LEFT JOIN 
+	 		   PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+	 LEFT JOIN 
+	 		   INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
 	  GROUP BY 
-	  		   TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM-DD')
+			   GROUPING SETS (
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD')), -- 일별
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'IYYY-IW')),   -- 주별
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM'))    -- 월별
+			   )
 	  ORDER BY 
-	  		   ORDER_DATE
+	  		   TYPE
+	  		 , TIME_PERIOD
     </select>
 </mapper>
