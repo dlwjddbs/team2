@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.MenuMapper">
+    <select id="selectMenu" resultType="map">
+        SELECT *
+          FROM MENU
+         WHERE 
+         	   1 = 1
+           AND ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+           AND USE_YN = 'Y'
+           <choose>
+           		<when test="menuCategory != null and menuCategory != ''">
+           			AND MENU_CATEGORY_ID = #{menuCategory}
+           		</when>
+           		<otherwise>
+           			AND MENU_CATEGORY_ID = (SELECT *
+											FROM (SELECT CATEGORY_ID
+													FROM MENU_CATEGORY
+													ORDER BY SORT_ORDER ASC)
+											WHERE ROWNUM = 1)
+           		</otherwise>
+           </choose>
+         ORDER BY DEPTH, SORT_ORDER ASC 
+    </select>
+    
+    <select id="selectTopMenu" resultType="map">
+        SELECT *
+          FROM MENU_CATEGORY
+         WHERE 
+         	   1 = 1
+           AND ROLE LIKE CONCAT(CONCAT('%', #{auth}), '%')
+           AND USE_YN = 'Y'
+         ORDER BY SORT_ORDER ASC
+    </select>
+    
+    <select id="selectUser" parameterType="String" resultType="map">
+    	SELECT
+			   MEMBER_ID 
+			 , NAME 
+			 , CONCAT('/images/', NVL(PROFILE_PIC, 'default.jpg')) AS PROFILE_PIC 
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{id}
+    </select>
+    
+    <select id="getMenuList" resultType="map">
+	    SELECT
+			   MENU_ID 
+			 , PARENT_ID
+			 , NAME 
+			 , URL 
+			 , ROLE 
+			 , SORT_ORDER
+			 , DEPTH
+			 , USE_YN 
+			 , MENU_CATEGORY_ID
+			 , CASE 
+			 		WHEN URL IS NULL THEN '폴더'
+			 		ELSE '페이지'
+			 	END	AS TYPE
+		  FROM MENU
+		 WHERE 
+		 	   1 = 1
+		   <if test="depth != null and depth != ''">
+		   	   AND DEPTH = #{depth}
+		   </if>
+		   <if test="parent_id != null and parent_id != ''">
+		   	   AND PARENT_ID = #{parent_id}
+		   </if>
+		   <if test="menu_id != null and menu_id != ''">
+		   	   AND MENU_ID = #{menu_id}
+		   </if>
+		   <if test="categoryID != null and categoryID != ''">
+		   	   AND MENU_CATEGORY_ID = #{categoryID}
+		   </if>
+		 ORDER BY SORT_ORDER ASC
+    </select>
+    
+    <insert id="insertMenu">
+    	INSERT INTO MENU (
+			  MENU_ID
+			, NAME
+			, PARENT_ID
+			, URL
+			, ROLE
+			, SORT_ORDER
+			, DEPTH
+			, USE_YN
+			, MENU_CATEGORY_ID
+		) VALUES (
+			  (SELECT 'ME' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(MENU_ID, 3))), 0) + 1, 10, '0') FROM MENU)
+			, #{NAME}
+			, #{PARENT_ID}
+			, #{URL}
+			, #{ROLE}
+			, #{SORT_ORDER}
+			, #{DEPTH}
+			, #{USE_YN}
+			, #{MENU_CATEGORY_ID}
+		)
+    </insert>
+    
+    <select id="isDuplicateMenuSortOrder" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   <choose>
+		   	   <when test="PARENT_ID != null and PARENT_ID != ''">
+		   	   		AND PARENT_ID = #{PARENT_ID}
+		   	   </when>
+		   	   <otherwise>
+		   	   		 AND PARENT_ID IS NULL
+		   	   </otherwise>
+		   </choose>
+		   <if test="MENU_ID != null and MENU_ID != ''">
+		   		AND MENU_ID != #{MENU_ID}
+		   </if>
+		   AND MENU_CATEGORY_ID = #{MENU_CATEGORY_ID}
+		   AND SORT_ORDER = #{SORT_ORDER}
+    </select>
+    
+    <select id="isDuplicateMenuURL" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   AND URL IS NOT NULL
+		   AND URL = #{URL}
+   		   <if test="MENU_ID != null and MENU_ID != ''">
+		   		AND MENU_ID != #{MENU_ID}
+		   </if>
+    </select>
+    
+    <select id="isExistChildMenu" resultType="Integer">
+	    SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 1 = 1
+		   AND PARENT_ID = #{MENU_ID}
+    </select>
+    
+    <update id="updateMenu">
+    	UPDATE MENU
+		   SET 
+			     NAME = #{NAME}
+			   , URL = #{URL, jdbcType=VARCHAR}
+			   , SORT_ORDER = #{SORT_ORDER}
+			   , ROLE = #{ROLE}
+			   , USE_YN = #{USE_YN}
+		 WHERE MENU_ID = #{MENU_ID}
+    </update>
+    
+    <delete id="deleteMenu">
+    	DELETE FROM MENU
+    	 WHERE MENU_ID = #{MENU_ID}
+    </delete>
+    
+    <select id="selectMenuCategoryList">
+    	SELECT
+			   CATEGORY_ID	AS CATEGORY_ID
+			 , NAME 		AS CATEGORY_NAME
+			 , ROLE 		AS CATEGORY_ROLE
+			 , SORT_ORDER 	AS CATEGORY_SORT_ORDER
+			 , USE_YN 		AS CATEGORY_USE_YN
+		  FROM MENU_CATEGORY
+		 WHERE 
+		 	   1 = 1
+		 <if test="cate_id != null and cate_id != ''">
+		   	   AND CATEGORY_ID = #{cate_id}
+		 </if>
+		 ORDER BY SORT_ORDER ASC
+    </select>
+    
+    <select id="isDuplicateMenuCategorySortOrder" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU_CATEGORY
+		 WHERE 1 = 1
+		   AND SORT_ORDER = #{SORT_ORDER}
+			<if test="CATEGORY_ID != null and CATEGORY_ID != ''">
+				AND CATEGORY_ID != #{CATEGORY_ID}
+			</if>
+    </select>
+    
+    <insert id="insertMenuCategory">
+    	INSERT INTO MENU_CATEGORY (
+			  CATEGORY_ID
+			, NAME
+			, ROLE
+			, SORT_ORDER
+			, USE_YN
+		) VALUES (
+			  (SELECT 'MEC' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(CATEGORY_ID, 4))), 0) + 1, 10, '0') FROM MENU_CATEGORY)
+			, #{NAME}
+			, #{ROLE}
+			, #{SORT_ORDER}
+			, #{USE_YN}
+		)
+    </insert>
+    
+    <update id="updateMenuCategory">
+		UPDATE MENU_CATEGORY
+		   SET 
+			     NAME = #{NAME}
+			   , SORT_ORDER = #{SORT_ORDER}
+			   , ROLE = #{ROLE}
+			   , USE_YN = #{USE_YN}
+		 WHERE CATEGORY_ID = #{CATEGORY_ID}
+    </update>
+    
+    <select id="isExistChildMenuCategory" resultType="Integer">
+	    SELECT COUNT(*) AS COUNT
+		  FROM MENU
+		 WHERE 
+		 	   1 = 1
+		   AND MENU_CATEGORY_ID = #{MENU_CATEGORY_ID}
+    </select>
+    
+    <delete id="deleteMenuCategory">
+    	DELETE FROM MENU_CATEGORY
+    	 WHERE CATEGORY_ID = #{MENU_CATEGORY_ID}
+    </delete>
+    
+    <select id="isDuplicateMenuCategoryName" resultType="Integer">
+    	SELECT COUNT(*) AS COUNT
+		  FROM MENU_CATEGORY
+		 WHERE 
+		 	   1 = 1
+		   AND NAME = #{NAME}
+			<if test="CATEGORY_ID != null and CATEGORY_ID != ''">
+				AND CATEGORY_ID != #{CATEGORY_ID}
+			</if>
+    </select>
+    
+    <select id="getPageHeader">
+    	SELECT LISTAGG(NAME, ' / ') WITHIN GROUP (ORDER BY DEPTH ASC) AS BREADCRUMB
+		FROM MENU
+		CONNECT BY PRIOR PARENT_ID = MENU_ID
+		START WITH MENU_ID = (
+		    SELECT MENU_ID FROM MENU WHERE URL = #{url}
+		)
+    </select>
+</mapper>

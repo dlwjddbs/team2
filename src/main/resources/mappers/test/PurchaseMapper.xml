@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.PurchaseMapper">
+
+	<!-- 발주 리스트 -->
+	<select id="getPurchaseList" resultType="map"
+		parameterType="map">
+		SELECT
+			PO.PO_ID,
+			PO.PO_NUM,
+			NVL(SUM(PD.PO_COUNT), 0) AS PO_COUNT,
+			TO_CHAR(NVL(SUM(PD.TOTAL_PRICE), 0), 'FM9,999,999,999,999,999,999,999,999,999') || '원' AS PO_PRICE,
+			TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE,
+			C.RESP_NAME,
+			<!-- M1.NAME AS MEMBER_NAME, -->
+			PO.CLIENT_ID,
+			C.CLIENT_NAME,
+			(SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = PO.PO_STATUS AND MAIN_ID =
+			'STATUS') AS PO_STATUS,
+			TO_CHAR(PO.UPDATE_DATE, 'YYYY-MM-DD') AS UPDATE_DATE,
+			M2.NAME AS UPDATE_MEMBER
+		FROM PURCHASE_ORDER PO
+			LEFT JOIN PO_DETAIL PD ON PO.PO_ID = PD.PO_ID -- 주문 상세 정보 조인
+			LEFT JOIN MEMBER M1 ON PO.MEMBER_ID = M1.MEMBER_ID -- 주문 생성자 조인
+			LEFT JOIN CLIENT C ON PO.CLIENT_ID = C.CLIENT_ID -- 거래처 조인
+			LEFT JOIN MEMBER M2 ON PO.UPDATE_MEMBER = M2.MEMBER_ID -- 수정한 사람 조인
+		GROUP BY
+			PO.PO_ID, PO.PO_NUM, PO.CREATE_DATE, C.RESP_NAME, PO.CLIENT_ID,
+			C.CLIENT_NAME, PO.PO_STATUS, PO.UPDATE_DATE, M2.NAME
+		ORDER BY PO.CREATE_DATE DESC
+	</select>
+
+	<!-- 발주 등록 -->
+	<insert id="insertPurchase" parameterType="map">
+		INSERT INTO PURCHASE_ORDER (
+			PO_ID,
+			CREATE_DATE,
+			MEMBER_ID,
+			CLIENT_ID,
+			PO_STATUS,
+			PO_NUM
+		)
+		SELECT
+			'PO-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(PO_SEQ.NEXTVAL, 4,
+			'0'),
+			CURRENT_DATE,
+			RESP_NAME,
+			CLIENT_ID,
+			#{PO_STATUS},
+			'ORD-' || TO_CHAR(SYSDATE, 'MMDD-HH24MISS')
+		FROM CLIENT
+		WHERE CLIENT_ID = #{CLIENT_ID}
+	</insert>
+
+	<!-- 발주 수정 -->
+	<update id="updatePurchase" parameterType="map">
+		UPDATE PURCHASE_ORDER
+		SET
+			CREATE_DATE = CURRENT_DATE,
+			CLIENT_ID = #{CLIENT_ID, jdbcType=VARCHAR},
+			UPDATE_DATE = CURRENT_DATE,
+			UPDATE_MEMBER = #{UPDATE_MEM},
+			PO_NUM = #{PO_NUM, jdbcType=VARCHAR}
+		WHERE PO_ID = #{PO_ID}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
+
+	<!-- DELETE (데이터 삭제) -->
+	<delete id="deletePurchase">
+		DELETE FROM PURCHASE_ORDER
+			WHERE PO_ID = #{PO_ID}
+	</delete>
+
+	<select id="getPurchaseDetail" resultType="map"
+		parameterType="map">
+		SELECT
+			ROW_NUMBER() OVER (ORDER BY TO_NUMBER(pd.PODETAIL_ID)) AS SEQ, -- 숫자 변환 후 정렬
+			pd.PODETAIL_ID,
+			pd.MATERIAL_ID,
+			TO_CHAR((pd.PO_COUNT * m.MATERIAL_PRICE) * 0.1, 'FM9,999,999,999,999,999,999,999') || '원' AS VAT,
+			TO_CHAR((pd.PO_COUNT * m.MATERIAL_PRICE) * 1.1, 'FM9,999,999,999,999,999,999,999') || '원' AS TOTAL_PRICE,
+			pd.PO_COUNT,
+			pd.TOTAL_PRICE,
+			pd.UPDATE_DATE,
+			pd.UPDATE_MEMBER,
+			m.MATERIAL_NAME,
+			m.UNIT,
+			TO_CHAR(m.MATERIAL_PRICE, 'FM9,999,999,999,999,999,999,999') || '원' AS MATERIAL_PRICE,
+		(SELECT SUB_NAME FROM MES_COMMON WHERE SUB_ID = pd.PO_STATUS AND MAIN_ID = 'STATUS') AS PO_STATUS
+		FROM PO_DETAIL pd
+			JOIN PURCHASE_ORDER p ON pd.PO_ID = p.PO_ID
+			JOIN MATERIAL m ON pd.MATERIAL_ID = m.MATERIAL_ID
+		WHERE pd.PO_ID = #{PO_ID}
+		ORDER BY TO_NUMBER(pd.PODETAIL_ID)
+	</select>
+
+	<!-- 발주 상세 등록 -->
+	<insert id="insertDetail" parameterType="map">
+		INSERT INTO PO_DETAIL (
+			PODETAIL_ID,
+			PO_ID,
+			MATERIAL_ID,
+			PO_COUNT,
+			PO_PRICE,
+			TOTAL_PRICE,
+			CREATE_DATE,
+			PO_STATUS
+		)
+		SELECT
+			SEQ_PODETAIL.NEXTVAL,
+			po.PO_ID,
+			#{MATERIAL_ID},
+			#{PO_COUNT},
+			m.MATERIAL_PRICE,
+			(#{PO_COUNT} * m.MATERIAL_PRICE) * 1.1,
+			CURRENT_DATE,
+			#{PO_STATUS}
+		FROM PURCHASE_ORDER po
+			JOIN MATERIAL m ON m.MATERIAL_ID = #{MATERIAL_ID}
+		WHERE po.PO_ID = #{poId}
+	</insert>
+
+	<!-- 발주 상세 수정 -->
+	<update id="updateDetail" parameterType="map">
+		UPDATE PO_DETAIL
+		SET
+			MATERIAL_ID = #{MATERIAL_ID, jdbcType=VARCHAR},
+			PO_COUNT = #{PO_COUNT},
+			TOTAL_PRICE = #{PO_COUNT} * PO_PRICE,
+			UPDATE_DATE = CURRENT_DATE,
+			UPDATE_MEMBER = #{UPDATE_MEM},
+			PO_STATUS = #{PO_STATUS}
+		WHERE PODETAIL_ID = #{PODETAIL_ID, jdbcType=VARCHAR}  <!-- PO_ID를 기준으로 업데이트 -->
+	</update>
+
+
+	<!-- DELETE (데이터 삭제) -->
+	<delete id="deleteDetail" parameterType="map">
+		DELETE FROM PO_DETAIL
+			WHERE PODETAIL_ID = #{PODETAIL_ID}
+	</delete>
+
+	<!-- 거래처 목록 -->
+	<select id="getClientList" resultType="map" parameterType="map">
+		SELECT 
+			CLIENT_ID, CLIENT_NAME, RESP_NAME
+		FROM CLIENT
+		WHERE
+		1 = 1
+		<if test='client_id != null and client_id != ""'>
+			AND CLIENT_ID = #{client_id}
+		</if>
+		<if test='client_name != null and client_name != ""'>
+			AND CLIENT_NAME = #{client_name}
+		</if>
+		<if test='resp_name != null and resp_name != ""'>
+			AND RESP_NAME = #{resp_name}
+		</if>
+	</select>
+
+
+	<!-- 모달창 재료 목록 -->
+	<select id="getMaterialList" resultType="map" parameterType="map">
+		SELECT 
+			MATERIAL_ID, MATERIAL_NAME, MATERIAL_PRICE, UNIT
+		FROM MATERIAL
+		WHERE
+		1 = 1
+		<if test='material_id != null and material_id != ""'>
+			AND MATERIAL_ID = #{material_id}
+		</if>
+		<if test='material_name != null and material_name != ""'>
+			AND MATERIAL_NAME LIKE '%' || #{material_name} || '%'
+		</if>
+	</select>
+
+</mapper>
+

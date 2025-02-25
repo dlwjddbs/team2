@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.TestMapper">
+    <select id="selectTest" resultType="string">
+        SELECT 
+        	  TO_CHAR(SYSDATE, 'yyyy-mm-dd')
+  		  FROM 
+  			  dual
+    </select>
+
+    <select id="selectToastTest" resultType="map">
+        SELECT *
+          FROM TEST
+    </select>
+	
+	<select id="countExistingIds" parameterType="list" resultType="int">
+	    SELECT COUNT(*) AS count
+	      FROM TEST
+	     WHERE ID IN
+	    <foreach collection="list" item="row" open="(" separator="," close=")">
+	        #{row.ID}
+	    </foreach>
+	</select>
+    
+    <insert id="insertToastTest">
+	    INSERT ALL
+		<foreach collection="list" item="item">
+			INTO TEST (ID, COL_1, COL_2, COL_3)
+			VALUES (#{item.ID}, #{item.COL_1}, #{item.COL_2}, #{item.COL_3})
+		</foreach>
+		SELECT * FROM DUAL
+    </insert>
+    
+    <delete id="deleteToastTest">
+	    DELETE FROM TEST
+	     WHERE ID IN
+	    <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </delete>
+    
+    <update id="updateToastTest">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+	        UPDATE TEST
+	           SET 
+				   COL_1 = #{row.COL_1}
+	             , COL_2 = #{row.COL_2}
+	             , COL_3 = #{row.COL_3}
+	         WHERE ID = #{row.ID}
+	    </foreach>
+    </update>
+    
+<!--     <select id="getColumnNames" parameterType="map" resultType="map">
+	    SELECT LISTAGG(COLUMN_NAME, ',') WITHIN GROUP (ORDER BY COLUMN_ID) AS COLUMN_NAME
+	    FROM USER_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+	</select> -->
+	
+	<select id="getColumnNames" parameterType="map" resultType="string">
+	    SELECT COLUMN_NAME 
+	    FROM ALL_TAB_COLUMNS
+	    WHERE TABLE_NAME = UPPER(#{tableName})
+    	ORDER BY COLUMN_ID
+	</select>
+	
+	<select id="getColumnTypes" resultType="map">
+	    SELECT COLUMN_NAME, DATA_TYPE 
+	    FROM USER_TAB_COLUMNS 
+	    WHERE TABLE_NAME = #{tableName}
+	</select>
+	
+	<select id="selectToastTestById" parameterType="list" resultType="map">
+		SELECT *
+	    FROM TEST
+	    WHERE ID IN
+	    <foreach collection="list" item="id" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+    </select>
+    
+    <insert id="insertToastTestById" parameterType="list">
+	    INSERT INTO TEST (ID, COL_1, COL_2, COL_3)
+	    VALUES
+	    <foreach collection="list" item="row" separator=", ">
+	    	<if test='id != null and id != ""'>
+	        	(#{row.ID}, #{row.COL_1}, #{row.COL_2}, #{row.COL_3})
+	    	</if>
+	    </foreach>
+	</insert>
+    
+	<update id="updateToastTestById">
+	    DECLARE 
+	    BEGIN
+	        MERGE INTO TEST t
+	        USING (
+	            <foreach collection="list" item="row" separator=" UNION ALL ">
+	                SELECT #{row.ID} AS ID, 
+	                       #{row.COL_1} AS COL_1, 
+	                       #{row.COL_2} AS COL_2, 
+	                       #{row.COL_3} AS COL_3
+	                FROM DUAL
+	            </foreach>
+	        ) src
+	        ON (TRIM(t.ID) = TRIM(src.ID))
+	        WHEN MATCHED THEN 
+	            UPDATE SET t.COL_1 = src.COL_1,
+	                       t.COL_2 = src.COL_2,
+	                       t.COL_3 = src.COL_3;
+	    END;
+	    <!-- 
+	    DECLARE 
+	    	v_update_count NUMBER := 0;
+	    BEGIN
+	        MERGE INTO TEST t
+	        USING (
+	            <foreach collection="list" item="row" separator=" UNION ALL ">
+	                SELECT #{row.ID} AS ID, 
+	                       #{row.COL_1} AS COL_1, 
+	                       #{row.COL_2} AS COL_2, 
+	                       #{row.COL_3} AS COL_3
+	                FROM DUAL
+	            </foreach>
+	        ) src
+	        ON (TRIM(t.ID) = TRIM(src.ID))
+	        WHEN MATCHED THEN 
+	            UPDATE SET t.COL_1 = src.COL_1,
+	                       t.COL_2 = src.COL_2,
+	                       t.COL_3 = src.COL_3;
+	        
+	        v_update_count := SQL%ROWCOUNT;
+	        DBMS_OUTPUT.PUT_LINE('Updated Rows: ' || v_update_count);
+	        
+	        :updateCount := v_update_count;
+	    END;
+	     -->
+	</update>
+
+</mapper>

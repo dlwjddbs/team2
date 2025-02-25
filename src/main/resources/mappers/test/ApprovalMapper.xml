@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.ApprovalMapper">
+    <insert id="insertApprovalRequest">
+    	INSERT INTO APPROVAL_REQUEST (
+			  REQUEST_ID
+			, APPROVAL_TYPE
+			, TITLE
+			, CONTENT
+			, MEMBER_ID
+			, START_DATE
+			, END_DATE
+			, REQUEST_FILE
+			, CREATE_DATE
+		) VALUES (
+			  (SELECT 'AR' || LPAD(NVL(MAX(SUBSTR(REQUEST_ID, 3)), 0) + 1, 10, 0) FROM APPROVAL_REQUEST)
+			, #{APPROVAL_TYPE}
+			, #{TITLE}
+			, #{CONTENT}
+			, #{MEMBER_ID}
+			, #{START_DATE}
+			, #{END_DATE}
+			, #{REQUEST_FILE, jdbcType=VARCHAR}
+			, CURRENT_DATE
+		)
+		
+	    <selectKey keyProperty="request_id" resultType="String" order="AFTER">
+	        SELECT 'AR' || LPAD(NVL(MAX(SUBSTR(REQUEST_ID, 3)), 0), 10, 0) FROM APPROVAL_REQUEST
+	    </selectKey>
+    </insert>
+    
+    <select id="selectApprovalLine" parameterType="String" resultType="map">
+	    SELECT 
+			   DEPT_ID
+			 , MEMBER_ID		AS APPROVER_ID
+			 , LEVEL			AS HIERARCHY_LEVEL
+		  FROM DEPARTMENT
+		 START WITH DEPT_ID = (SELECT DEPT_ID FROM MEMBER WHERE MEMBER_ID = #{MEMBER_ID})
+		CONNECT BY PRIOR PARENT_DEPT_ID = DEPT_ID
+		 ORDER SIBLINGS BY DEPT_ID
+	</select>
+	
+	<insert id="insertApprovalStep" parameterType="map">
+	    INSERT INTO APPROVAL_STEP (
+			  STEP_ID
+			, REQUEST_ID
+			, APPROVER_ID
+			, STEP_ORDER
+			, STATUS
+			, CREATE_DATE
+		) VALUES (
+			  (SELECT 'AS' || LPAD(NVL(MAX(SUBSTR(STEP_ID, 3)), 0) + 1, 10, 0) FROM APPROVAL_STEP)
+			, #{REQUEST_ID}
+			, #{APPROVER_ID}
+			, #{STEP_ORDER}
+			, #{STATUS}
+			, CURRENT_DATE
+		)
+	</insert>
+	
+	<select id="selectApprovalPendingList" resultType="map">
+		SELECT 
+			   r.REQUEST_ID 
+			 , cc.CODE_NAME 
+			 , r.TITLE 
+			 , r.CONTENT 
+			 , r.MEMBER_ID 
+			 , m.NAME
+			 , cc2.CODE_NAME
+			 , r.START_DATE 
+			 , r.END_DATE 
+			 , r.REQUEST_FILE 
+			 , TO_CHAR(r.CREATE_DATE, 'YYYY-MM-DD')		AS CREATE_DATE
+		  FROM APPROVAL_REQUEST r
+			   INNER JOIN APPROVAL_STEP s
+			   		   ON r.REQUEST_ID = s.REQUEST_ID
+			   INNER JOIN COMMON_CODE cc 
+			   		   ON r.APPROVAL_TYPE = cc.CODE_ID 
+			   INNER JOIN MEMBER m
+			   		   ON r.MEMBER_ID = m.MEMBER_ID 
+			   INNER JOIN COMMON_CODE cc2
+			   		   ON m.DEPT_ID = cc2.CODE_ID 
+		 WHERE 
+		 	   1 = 1
+		   AND s.APPROVER_ID = #{id}
+		   AND s.STATUS = 'PENDING'
+   			<if test='startDate != null and startDate != ""
+		 		and endDate != null and endDate != ""'>
+				AND TO_CHAR(s.CREATE_DATE, 'YYYY-MM-DD') BETWEEN #{startDate} 
+									  						 AND #{endDate} 
+			</if>
+		 ORDER BY r.START_DATE DESC 
+	</select>
+	
+	<select id="getApprovalRequestStandbyMinMaxDate" parameterType="map">
+		SELECT 
+		       MAX(TO_CHAR(CREATE_DATE, 'YYYY-MM-DD'))	AS APPROVAL_STEP_MAX_DATE
+    		 , MIN(TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')) 	AS APPROVAL_STEP_MIN_DATE
+		  FROM
+		       APPROVAL_STEP
+	     WHERE
+			   1 = 1
+		   AND APPROVER_ID = #{id}
+		   AND STATUS = 'PENDING'
+	</select>
+	
+	<select id="approvalRequestDetail" resultType="map">
+		SELECT 
+			   ar.REQUEST_ID 								AS REQUEST_ID 
+			 , ar.TITLE 									AS TITLE 
+			 , ar.CONTENT 									AS CONTENT 
+			 , ar.START_DATE								AS LEAVE_START_DATE 
+			 , ar.END_DATE 									AS LEAVE_END_DATE 
+			 , ar.REQUEST_FILE 								AS REQUEST_FILE 
+			 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 		AS APPROVAL_CREATE_DATE
+			 , m.NAME 										AS NAME
+			 , cc.CODE_NAME									AS DEPT
+			 , cc2.CODE_NAME								AS GRADE
+			 , cc3.CODE_NAME								AS LEAVE_NAME
+			 , as1.STEP_ORDER 								AS STEP_ORDER
+			 , as1.STATUS 									AS STATUS
+			 , NVL(as1.DECISION_DATE, ' ') 					AS DECISION_DATE
+			 , m2.NAME 										AS APPROVER_NAME
+			 , cc4.CODE_NAME								AS APPROVER_DEPT
+			 , cc5.CODE_NAME								AS APPROVER_GRADE
+			 , cc6.CODE_NAME								AS APPROVER_STATUS
+		  FROM APPROVAL_REQUEST ar
+		  	   INNER JOIN MEMBER m
+		  	   		   ON ar.MEMBER_ID = m.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc 
+		  	   		   ON m.DEPT_ID = cc.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc2 
+		  	   		   ON m.GRADE_ID = cc2.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc3 
+		  	   		   ON ar.APPROVAL_TYPE = cc3.CODE_ID 
+		  	   INNER JOIN APPROVAL_STEP as1 
+		  	   		   ON ar.REQUEST_ID = as1.REQUEST_ID 
+		  	   INNER JOIN MEMBER m2 
+		  	   		   ON as1.APPROVER_ID = m2.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc4 
+		  	   		   ON m2.DEPT_ID = cc4.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc5 
+		  	   		   ON m2.GRADE_ID = cc5.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc6 
+		  	   		   ON as1.STATUS = cc6.CODE_ID 
+		 WHERE 
+		 	   1 = 1
+		   AND ar.REQUEST_ID = #{REQUEST_ID}
+		 ORDER BY as1.STEP_ORDER ASC
+	</select>
+	
+	<update id="updateApprovalRequest">
+		UPDATE APPROVAL_STEP 
+		   SET 
+		   	   STATUS = #{STATUS}
+		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID = (
+				SELECT STEP_ID 
+				  FROM APPROVAL_STEP
+				 WHERE 
+				 	   1 = 1
+				   AND REQUEST_ID = #{REQUEST_ID}
+				   AND APPROVER_ID = #{APPROVER_ID}
+		)
+	</update>
+	
+	<update id="pendingApprovalRequest">
+		<selectKey keyProperty="step" resultType="Integer" order="BEFORE">
+	        SELECT STEP_ORDER 
+			  FROM APPROVAL_STEP
+			 WHERE 
+			 	   REQUEST_ID = #{REQUEST_ID}
+			   AND APPROVER_ID = #{APPROVER_ID}
+	    </selectKey>
+	    
+	    UPDATE APPROVAL_STEP 
+		   SET 
+		   	   STATUS = 'PENDING'
+	   	     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID = (
+				SELECT STEP_ID 
+				  FROM APPROVAL_STEP
+				 WHERE 
+				 	   1 = 1
+				   AND REQUEST_ID = #{REQUEST_ID}
+				   AND STEP_ORDER = #{step} + 1
+		)
+	</update>
+	
+	<update id="psRejectedApprovalRequest">
+		<selectKey keyProperty="step" resultType="Integer" order="BEFORE">
+	        SELECT STEP_ORDER 
+			  FROM APPROVAL_STEP
+			 WHERE 
+			 	   REQUEST_ID = #{REQUEST_ID}
+			   AND APPROVER_ID = #{APPROVER_ID}
+	    </selectKey>
+	    
+	    UPDATE APPROVAL_STEP 
+		   SET 
+		   	   STATUS = 'PSREJECTED'
+		   	 , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+	   	     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID IN (
+				SELECT STEP_ID 
+				  FROM APPROVAL_STEP
+				 WHERE 
+				 	   1 = 1
+				   AND REQUEST_ID = #{REQUEST_ID}
+				   AND STEP_ORDER > #{step}
+		)
+	</update>
+	
+	<update id="cancelApprovalRequest">
+		UPDATE APPROVAL_STEP 
+		   SET STATUS = 'CANCELED'
+		     , DECISION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		     , UPDATE_DATE = CURRENT_DATE
+		 WHERE STEP_ID IN (
+			 SELECT STEP_ID 
+			  FROM APPROVAL_STEP
+			 WHERE 1 = 1
+			   AND REQUEST_ID = #{REQUEST_ID}
+			   AND DECISION_DATE IS NULL
+		 )
+	</update>
+	
+	<select id="getApprovalRequestCompletionMinMaxDate" parameterType="map">
+		SELECT
+			   MAX(DECISION_DATE) AS APPROVAL_STEP_MAX_DATE
+			 , MIN(DECISION_DATE) AS APPROVAL_STEP_MIN_DATE
+		  FROM APPROVAL_STEP as1
+		 WHERE 1 = 1
+		   AND APPROVER_ID = #{id}
+		   AND DECISION_DATE IS NOT NULL 
+	</select>
+	
+	<select id="selectApprovalCompletionList" resultType="map">
+		SELECT 
+			   ar.REQUEST_ID 							AS REQUEST_ID
+			 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE 
+			 , cc1.CODE_NAME							AS APPROVAL_TYPE
+			 , ar.TITLE 								AS TITLE
+			 , m.NAME 									AS MEMBER_NAME
+			 , as1.DECISION_DATE 						AS DECISION_DATE
+			 , cc2.CODE_NAME 							AS STATUS
+		  FROM APPROVAL_STEP as1
+		  	   INNER JOIN APPROVAL_REQUEST ar 
+		  	   		   ON as1.REQUEST_ID = ar.REQUEST_ID 
+			   INNER JOIN MEMBER m 
+			   		   ON ar.MEMBER_ID = m.MEMBER_ID 
+		  	   INNER JOIN COMMON_CODE cc1 
+		  	   		   ON ar.APPROVAL_TYPE = cc1.CODE_ID 
+		  	   INNER JOIN COMMON_CODE cc2 
+		  	   		   ON as1.STATUS = cc2.CODE_ID 
+		 WHERE 1 = 1
+		   AND APPROVER_ID = #{id}
+		   AND DECISION_DATE IS NOT NULL
+		   <if test='startDate != null and startDate != ""
+		 		and endDate != null and endDate != ""'>
+				AND DECISION_DATE BETWEEN #{startDate} 
+									  AND #{endDate} 
+		   </if>
+	     ORDER BY as1.DECISION_DATE DESC
+	</select>
+	
+		<select id="getMyApprovalRequestCompletionMinMaxDate" parameterType="map">
+ 		SELECT
+ 			   MAX(CREATE_DATE) AS MAX_CREATE_DATE
+	 		 , MIN(CREATE_DATE) AS MIN_CREATE_DATE
+		  FROM (
+				SELECT 
+					   ar.REQUEST_ID							AS REQUEST_ID
+				   	 , cc.CODE_NAME								AS APPROVAL_TYPE
+					 , ar.TITLE 								AS TITLE
+					 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE
+				     , CASE 
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'REJECTED'
+				           ) THEN '반려'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'CANCELED'
+				           ) THEN '취소'
+				           WHEN NOT EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS NOT IN ('APPROVED')
+				           ) THEN '승인'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS IN ('DEACTIVATION', 'PENDING')
+				           ) THEN '진행중'
+				           ELSE '기타'
+				       END AS TOTAL_STATUS
+				  FROM APPROVAL_REQUEST ar
+					   INNER JOIN COMMON_CODE cc 
+						   	   ON ar.APPROVAL_TYPE = cc.CODE_ID 
+				 WHERE 1 = 1
+				   AND ar.MEMBER_ID = #{id}   
+		)
+		WHERE 1 = 1
+		<choose>
+			<when test='status != null and status.equals("completion")'>
+				AND TOTAL_STATUS != '진행중'
+			</when>
+			<when test='status != null and status.equals("pending")'>
+				AND TOTAL_STATUS = '진행중'
+			</when>
+		</choose>
+	</select>
+	
+	<select id="selectMyApprovalList" parameterType="map">
+		SELECT *
+		  FROM (
+				SELECT 
+					   ar.REQUEST_ID							AS REQUEST_ID
+				   	 , cc.CODE_NAME								AS APPROVAL_TYPE
+					 , ar.TITLE 								AS TITLE
+					 , TO_CHAR(ar.CREATE_DATE, 'YYYY-MM-DD') 	AS CREATE_DATE
+				     , CASE 
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'REJECTED'
+				           ) THEN '반려'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS = 'CANCELED'
+				           ) THEN '취소'
+				           WHEN NOT EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS NOT IN ('APPROVED')
+				           ) THEN '승인'
+				           WHEN EXISTS (
+				               SELECT 1 
+				                 FROM APPROVAL_STEP as2 
+				                WHERE as2.REQUEST_ID = ar.REQUEST_ID 
+				                  AND as2.STATUS IN ('DEACTIVATION', 'PENDING')
+				           ) THEN '진행중'
+				           ELSE '기타'
+				       END AS TOTAL_STATUS
+				  FROM APPROVAL_REQUEST ar
+					   INNER JOIN COMMON_CODE cc 
+						   	   ON ar.APPROVAL_TYPE = cc.CODE_ID 
+				 WHERE 1 = 1
+				   AND ar.MEMBER_ID = #{id}   
+		)
+		WHERE 1 = 1
+		<choose>
+			<when test='status != null and status.equals("completion")'>
+				AND TOTAL_STATUS != '진행중'
+			</when>
+			<when test='status != null and status.equals("pending")'>
+				AND TOTAL_STATUS = '진행중'
+			</when>
+		</choose>
+		<if test='startDate != null and startDate != ""
+		 		and endDate != null and endDate != ""'>
+				AND CREATE_DATE BETWEEN #{startDate} 
+									AND #{endDate} 
+	    </if>
+	    ORDER BY CREATE_DATE DESC
+	</select>
+</mapper>

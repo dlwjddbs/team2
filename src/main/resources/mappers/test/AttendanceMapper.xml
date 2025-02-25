@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.AttendanceMapper">
+    <select id="getMyCommuteHistory" resultType="map">
+    <!-- getMyCommuteHistory 출퇴근기록 조회 -->
+		SELECT 
+				a.*
+			  , c.CODE_NAME			AS DEPT_NAME
+			  , c2.CHECK_IN_DATE 	AS COMMUTE_CHECK_IN_DATE
+			  , c2.CHECK_IN_TIME 	AS COMMUTE_CHECK_IN_TIME
+			  , c2.CHECK_OUT_DATE 	AS COMMUTE_CHECK_OUT_DATE
+			  , c2.CHECK_OUT_TIME 	AS COMMUTE_CHECK_OUT_TIME
+			  , c2.COMMUTE_ID 		AS COMMUTE_ID
+		  FROM (SELECT 
+						m.MEMBER_ID		AS COMMUTE_MEMBER_ID
+					  , m.NAME 
+					  , m.GRADE_ID 
+					  , c.CODE_NAME		AS GRADE_NAME
+					  , m.DEPT_ID 
+				  FROM 	MEMBER					m
+						INNER JOIN COMMON_CODE	c
+				 				ON m.GRADE_ID = c.CODE_ID) a
+		 INNER JOIN COMMON_CODE c
+				 ON a.dept_id = c.CODE_ID
+		 INNER JOIN COMMUTE c2 
+		 		 ON a.COMMUTE_MEMBER_ID = c2.MEMBER_ID 
+		 WHERE 
+		 		1 = 1
+				<if test='id != null and id != ""'>
+		   	 		AND a.COMMUTE_MEMBER_ID = #{id}
+				</if>
+				<choose>
+					<when test='isToday != null and isToday != ""'>
+						AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE    
+					</when>
+			 	 	<when test='startDate != null and startDate != ""
+ 	   			 				and endDate != null and endDate != ""'>
+						AND CHECK_IN_DATE BETWEEN #{startDate} 
+											  AND #{endDate}   
+			  	 	</when>    
+				</choose>
+				<if test='deptCode != null and deptCode != ""'>
+		   	 		AND a.dept_id = #{deptCode}
+				</if>
+				<if test='rankCode != null and rankCode != ""'>
+		   	 		AND a.grade_id = #{rankCode}
+				</if>
+		 ORDER BY
+		 	  CHECK_IN_DATE DESC
+    </select>
+    
+    <select id="getMyCommuteHistoryMinMaxDate" resultType="map">
+    <!-- getMyCommuteHistoryMinMaxDate 출퇴근기록에서 최대최소일 조회 -->
+        SELECT 
+		      TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')	AS COMMUTE_MAX_DATE
+    		, MIN(CHECK_IN_DATE) 					AS COMMUTE_MIN_DATE
+		  FROM
+		      COMMUTE
+	     WHERE
+			  1 = 1
+		  <if test='id != null and id != ""'>
+			   AND
+				  member_id = #{id}
+		  </if>
+    </select>
+    
+    <select id="getMyAttendanceHistory" resultType="map">
+    <!-- getMyAttendanceHistory 근태 기록 조회 -->
+    	SELECT 
+			   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+			 , b.*
+		  FROM (SELECT 
+					   a.*
+					   <choose>
+							<when test='id != null and id != ""'>
+							 	, ROW_NUMBER() OVER(PARTITION BY DATE_TIME ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+							 </when>
+							<otherwise> 
+								, ROW_NUMBER() OVER(PARTITION BY DATE_TIME, MEMBER_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+							</otherwise>
+						</choose>
+				  FROM (SELECT
+							   h.DATE_TIME
+							 , c.COMMUTE_ID																AS COMMUTE_ID
+							 , m.MEMBER_ID 																AS MEMBER_ID
+							 , c.CHECK_IN_TIME															AS CHECK_IN_TIME 	
+							 , c.CHECK_OUT_TIME															AS CHECK_OUT_TIME
+							 , CASE 
+									WHEN c.CHECK_IN_TIME IS NULL OR c.CHECK_OUT_TIME IS NULL	THEN '결근'
+									WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 					THEN '지각' 
+									WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 		THEN '조퇴'
+									ELSE '정상출근'
+								END																		AS ATTENDANCE_TEXT
+							 , c.CREATE_DATE 															AS CREATE_DATE
+							 , ct.STARTING_DATE 														AS CT_STARTING_DATE
+							 , ct.CHECK_IN_TIME 														AS CT_CHECK_IN_TIME
+							 , ct.CHECK_OUT_TIME 														AS CT_CHECK_OUT_TIME
+							 , m.NAME 																	AS MEMBER_NAME
+							 , m.DEPT_ID 																AS DEPT_ID
+							 , m.GRADE_ID 																AS GRADE_ID
+							 , cc.CODE_NAME 															AS DEPT_NAME
+							 , cc2.CODE_NAME 															AS GRADE_NAME
+						  FROM HOLIDAY h 
+							   INNER JOIN MEMBER m
+									   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+									  AND h.IS_BUSINESS_DAY = 'Y'
+										<if test='id != null and id != ""'>
+											AND m.member_id = #{id}
+							         	</if>
+						 		LEFT JOIN COMMUTE c 
+					   		    	   ON c.CHECK_IN_DATE = h.DATE_TIME 
+					   		    	   <choose>
+											<when test='id != null and id != ""'>
+											 	AND m.member_id = #{id}
+											 </when>
+											<otherwise> 
+												AND c.MEMBER_ID = m.MEMBER_ID 
+											</otherwise>
+										</choose>
+						 		LEFT JOIN COMMUTE_TIME ct 
+									   ON (c.CHECK_IN_DATE >= ct.STARTING_DATE OR c.CHECK_IN_DATE IS NULL) 
+									  AND m.MEMBER_ID = ct.MEMBER_ID
+							   INNER JOIN COMMON_CODE cc
+									   ON m.DEPT_ID = cc.CODE_ID 
+							   INNER JOIN COMMON_CODE cc2
+									   ON m.grade_id = cc2.CODE_ID
+						 WHERE 1 = 1
+				         	<if test='deptCode != null and deptCode != ""'>
+					   	 		AND m.dept_id = #{deptCode}
+							</if>
+							<if test='rankCode != null and rankCode != ""'>
+					   	 		AND m.grade_id = #{rankCode}
+							</if>
+				 		) a
+				ORDER BY a.DATE_TIME DESC
+			) b
+		 WHERE 1 = 1
+		   AND ROW_NUM = 1
+			AND (
+			        (commute_id is not null AND ROW_NUM = 1)
+			        OR (commute_id is null AND 1 = 1)
+			    )
+			<if test='startDate != null and startDate != ""
+	  			 		and endDate != null and endDate != ""'>
+				AND DATE_TIME BETWEEN #{startDate} 
+								  AND #{endDate} 
+			</if>
+    </select>
+    
+    <select id="getMyAttendanceHistoryDonutChart" resultType="map">
+    <!-- getMyAttendanceHistoryDonutChart 지각/조퇴/결근 기록 조회 -->
+	     SELECT
+		  	  	c.ATTENDANCE_TEXT
+		      , COUNT(c.ATTENDANCE_TEXT)	AS PIE_CHART_VALUE
+		  FROM  (SELECT 
+					   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+					 , b.*
+					  FROM (SELECT 
+								   a.*
+								   <choose>
+										<when test='id != null and id != ""'>
+										 	, ROW_NUMBER() OVER(PARTITION BY DATE_TIME ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+										 </when>
+										<otherwise> 
+											, ROW_NUMBER() OVER(PARTITION BY DATE_TIME, MEMBER_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+										</otherwise>
+									</choose>
+							  FROM (SELECT
+										   h.DATE_TIME
+										 , c.COMMUTE_ID																AS COMMUTE_ID
+										 , m.MEMBER_ID 																AS MEMBER_ID
+										 , c.CHECK_IN_TIME															AS CHECK_IN_TIME 	
+										 , c.CHECK_OUT_TIME															AS CHECK_OUT_TIME
+										 , CASE 
+										 		WHEN c.CHECK_IN_TIME IS NULL OR c.CHECK_OUT_TIME IS NULL	THEN '결근'
+												WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 					THEN '지각' 
+												WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 		THEN '조퇴'
+												ELSE '정상출근'
+											END																		AS ATTENDANCE_TEXT
+										 , c.CREATE_DATE 															AS CREATE_DATE
+										 , ct.STARTING_DATE 														AS CT_STARTING_DATE
+										 , ct.CHECK_IN_TIME 														AS CT_CHECK_IN_TIME
+										 , ct.CHECK_OUT_TIME 														AS CT_CHECK_OUT_TIME
+										 , m.NAME 																	AS MEMBER_NAME
+										 , m.DEPT_ID 																AS DEPT_ID
+										 , m.GRADE_ID 																AS GRADE_ID
+										 , cc.CODE_NAME 															AS DEPT_NAME
+										 , cc2.CODE_NAME 															AS GRADE_NAME
+									  FROM HOLIDAY h 
+										   INNER JOIN MEMBER m
+												   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+												  AND h.IS_BUSINESS_DAY = 'Y'
+													<if test='id != null and id != ""'>
+														AND m.member_id = #{id}
+										         	</if>
+									 		LEFT JOIN COMMUTE c 
+								   		    	   ON c.CHECK_IN_DATE = h.DATE_TIME 
+								   		    	   <choose>
+														<when test='id != null and id != ""'>
+														 	AND m.member_id = #{id}
+														 </when>
+														<otherwise> 
+															AND c.MEMBER_ID = m.MEMBER_ID 
+														</otherwise>
+													</choose>
+									 		LEFT JOIN COMMUTE_TIME ct 
+												   ON (c.CHECK_IN_DATE >= ct.STARTING_DATE OR c.CHECK_IN_DATE IS NULL) 
+												  AND m.MEMBER_ID = ct.MEMBER_ID
+										   INNER JOIN COMMON_CODE cc
+												   ON m.DEPT_ID = cc.CODE_ID 
+										   INNER JOIN COMMON_CODE cc2
+												   ON m.grade_id = cc2.CODE_ID
+									 WHERE 1 = 1
+							         	<if test='deptCode != null and deptCode != ""'>
+								   	 		AND m.dept_id = #{deptCode}
+										</if>
+										<if test='rankCode != null and rankCode != ""'>
+								   	 		AND m.grade_id = #{rankCode}
+										</if>
+							 		) a
+							ORDER BY a.DATE_TIME DESC
+						) b
+					 WHERE 1 = 1
+					 	AND ROW_NUM = 1
+						AND (
+						        (commute_id is not null AND ROW_NUM = 1)
+						        OR (commute_id is null AND 1 = 1)
+						    )
+						<if test='startDate != null and startDate != ""
+				  			 		and endDate != null and endDate != ""'>
+							AND DATE_TIME BETWEEN #{startDate} 
+											  AND #{endDate} 
+						</if>
+			) c
+		 GROUP BY ATTENDANCE_TEXT
+    </select>
+    
+    <select id="getMyCommuteTimeMinMaxDate" resultType="map">
+    <!-- getMyCommuteTimeMinMaxDate 출퇴근기록에서 최대최소일 조회 -->
+		SELECT 
+		     MAX(STARTING_DATE)		AS MAX_STARTING_DATE
+		   , MIN(STARTING_DATE) 	AS MIN_STARTING_DATE
+		 FROM
+		     COMMUTE_TIME
+		WHERE
+		  	 1 = 1
+	  	 <if test='id != null and id != ""'>
+			  AND
+			  	 member_id = #{id}
+	  	 </if>
+    </select>
+    
+    <select id="getMyCommuteTime" resultType="map">
+    <!-- getMyCommuteTime 내 출퇴근 기준 시간 조회 -->
+		SELECT
+				c.COM_TIME_ID 		AS COM_TIME_ID
+			  , c.MEMBER_ID 		AS MEMBER_ID
+		  	  , c.CHECK_IN_TIME 	AS CHECK_IN_TIME
+			  , c.CHECK_OUT_TIME 	AS CHECK_OUT_TIME
+			  , c.STARTING_DATE 	AS STARTING_DATE
+			  , m.NAME 				AS NAME
+		  FROM 
+				COMMUTE_TIME c
+				INNER JOIN MEMBER m 
+						ON c.MEMBER_ID = m.MEMBER_ID 
+		 WHERE
+				1 = 1
+			<if test='id != null and id != ""'>
+				AND m.member_id = #{id}
+			</if>
+			<if test='startDate != null and startDate != ""
+   			 		and endDate != null and endDate != ""'>
+				AND STARTING_DATE BETWEEN #{startDate} 
+									  AND #{endDate} 
+			</if>
+		 ORDER BY STARTING_DATE DESC
+    </select>
+    
+    <select id="getWeekend" resultType="map" parameterType="map">
+    <!-- getWeekend 주말 조회 -->
+		WITH HOLIDAY AS (
+			<foreach collection="list" item="holiday" separator="UNION ALL">
+				SELECT 
+						#{holiday.DATE_TIME} AS DATE_TIME
+					  , #{holiday.DATE_NAME} AS DATE_NAME 
+				FROM DUAL
+			</foreach>
+		),
+		DATE_INFO AS (
+		    SELECT TO_CHAR(TO_DATE(DT, 'YYYY-MM-DD'), 'YYYY-MM-DD') 			AS DATE_TIME,
+		           CASE WHEN TO_CHAR(TO_DATE(DT), 'D') IN ('1', '7') THEN 'Y'
+		                ELSE 'N'
+		           END 															AS IS_WEEKEND
+		     FROM (SELECT TO_CHAR(TO_DATE(ST_DT, 'YYYYMMDD') + LEVEL - 1, 'YYYYMMDD') AS DT
+		          	 FROM (SELECT #{year} || '0101' AS ST_DT, #{year} || '1231' AS END_DT FROM DUAL)
+				  CONNECT BY LEVEL <![CDATA[<=]]> TO_DATE(END_DT, 'YYYYMMDD') - TO_DATE(ST_DT, 'YYYYMMDD') + 1
+		     )
+		)
+		SELECT
+			   DI.DATE_TIME
+			 , DI.IS_WEEKEND
+			 , H.DATE_NAME				AS HOLIDAY_NAME
+			 , CASE 
+			 		WHEN H.DATE_NAME IS NOT NULL THEN 'Y' 
+			 		ELSE 'N'
+				END						AS IS_HOLIDAY_DAY
+			 , CASE 
+			 		WHEN DI.IS_WEEKEND = 'Y' OR H.DATE_NAME IS NOT null THEN 'N' 
+			 		ELSE 'Y'
+				END						AS IS_BUSINESS_DAY
+		  FROM DATE_INFO DI
+			   LEFT JOIN HOLIDAY H 
+			   		  ON DI.DATE_TIME = H.DATE_TIME
+		 ORDER BY DI.DATE_TIME
+    </select>
+	
+	<insert id="insertHoliday">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO HOLIDAY (
+				  DATE_TIME
+				, IS_WEEKEND
+				, HOLIDAY_NAME
+				, IS_HOLIDAY_DAY
+				, IS_BUSINESS_DAY
+			)
+			VALUES (
+				  #{item.DATE_TIME}
+	            , #{item.IS_WEEKEND}
+	            , #{item.HOLIDAY_NAME, jdbcType=VARCHAR}  -- null값 허용
+	            , #{item.IS_HOLIDAY_DAY}
+	            , #{item.IS_BUSINESS_DAY}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<select id="getHoliday" resultType="map">
+	<!-- getHoliday 공휴일 조회 -->
+		SELECT
+		   DATE_TIME 
+		 , IS_WEEKEND 
+		 , HOLIDAY_NAME 
+		 , IS_HOLIDAY_DAY 
+		 , IS_BUSINESS_DAY 
+	  FROM holiday
+	 WHERE 
+	 	   1 = 1
+<!-- 	   AND IS_WEEKEND = 'Y' -->
+	   AND IS_HOLIDAY_DAY = 'Y'
+	   AND IS_BUSINESS_DAY = 'N'
+	   <if test='startDate != null and startDate != ""
+  			 				and endDate != null and endDate != ""'>
+			AND DATE_TIME BETWEEN #{startDate} 
+							  AND #{endDate}   
+  	 	</if>
+	 ORDER BY DATE_TIME DESC
+	</select>
+	
+	<select id="isDuplicateHoliday" parameterType="String" resultType="Integer">
+	<!-- isDuplicateHoliday 공휴일 insert전 중복 확인 -->
+		SELECT COUNT(*) AS EXIST_COUNT
+		  FROM HOLIDAY
+		 WHERE DATE_TIME LIKE CONCAT(#{year}, '%') 
+	</select>
+	
+	<select id="getHolidayMinMaxDate" resultType="map">
+	<!-- getHolidayMinMaxDate 공휴일 데이터 최대, 최소일 조회 -->
+		SELECT 
+		     MAX(DATE_TIME)		AS HOLIDAY_MAX_DATE
+		   , MIN(DATE_TIME) 	AS HOLIDAY_MIN_DATE
+		 FROM
+		     HOLIDAY
+	</select>
+    
+    <select id="isDeletableAttendanceTime" resultType="Boolean">
+    <!-- isDeletableAttendanceTime 출퇴근 시간 적용 일자 오늘부터 이전까진 삭제 불가 -->
+    	SELECT CASE WHEN STARTING_DATE <![CDATA[<=]]> TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') THEN 'false'
+					ELSE 'true'
+				END				AS IS_DELETABLE
+		  FROM COMMUTE_TIME
+		 WHERE 
+			   1 = 1
+		   AND COM_TIME_ID = #{id} 
+    </select>
+
+	<delete id="deleteAttendanceTime">
+	<!-- deleteAttendanceTime 출퇴근 시간 기준 삭제 -->
+		DELETE FROM COMMUTE_TIME
+ 		 WHERE COM_TIME_ID = #{id}
+	</delete>
+	
+	<select id="isDuplicateAttendanceTime" resultType="Integer">
+	<!-- isDuplicateAttendanceTime 출퇴근 시간 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMUTE_TIME
+		 WHERE 
+			   MEMBER_ID = #{MEMBER_ID} 
+		   AND STARTING_DATE = #{STARTING_DATE}
+	</select>
+   
+	<insert id="insertAttendanceTime">
+   	<!-- insertAttendanceTime 출퇴근 기준 시간 등록 -->
+	   	INSERT INTO COMMUTE_TIME
+		VALUES(
+			  (SELECT 'CT' || LPAD(NVL(MAX(SUBSTR(COM_TIME_ID, 3)), 0) + 1, 10, 0) FROM COMMUTE_TIME)
+			, #{CHECK_IN_TIME}
+			, #{CHECK_OUT_TIME}
+			, #{MEMBER_ID}
+			, CURRENT_DATE
+			, #{STARTING_DATE}
+		)
+	</insert>
+	
+	<select id="getSelectBoxList" resultType="map">
+    <!-- getSelectBoxList 셀렉트박스 목록 조회 -->
+		SELECT 
+		 		CODE_ID 	AS CODE
+		 	  , CODE_NAME 	AS NAME
+		 	  , GROUP_ID	AS GROUP_ID
+		  FROM  COMMON_CODE
+		 WHERE 
+				1 = 1
+		   AND  USE_YN = 'Y'
+		   <if test='type != null and type != ""'>
+				AND  GROUP_ID = #{type}
+		   </if>
+    </select>
+    
+	<select id="getMemberSelectBoxList" resultType="map">
+    <!-- getMemberSelectBoxList 멤버 셀렉트박스 목록 조회 -->
+		SELECT 
+			   MEMBER_ID 
+		 	 , NAME 
+		  FROM MEMBER
+    </select>
+    
+    <insert id="insertCheckInTime">
+   	<!-- insertCheckTime 출퇴근 등록 -->
+	   INSERT INTO COMMUTE (
+	         COMMUTE_ID
+	       , CHECK_IN_TIME
+	       , MEMBER_ID
+	       , CHECK_IN_DATE
+	       , CREATE_DATE
+	   )
+	   VALUES (
+	         (SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)	
+	       , TO_CHAR(CURRENT_DATE, 'HH24:MI:SS') 
+	       , #{id}
+	       , TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+	       , CURRENT_DATE
+	   )
+	</insert>
+	
+	<update id="insertCheckOutTime">
+		UPDATE COMMUTE 
+	   	   SET 
+	   	   	   CHECK_OUT_TIME = TO_CHAR(CURRENT_DATE, 'HH24:MI:SS')
+	       	 , CHECK_OUT_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+	 	 WHERE TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') = CHECK_IN_DATE
+	</update>
+	
+	<select id="getWeekendTotalWorkHour" resultType="Double">
+		SELECT NVL(SUM(TRUNC((TO_DATE(CHECK_OUT_TIME,'HH24:MI:SS') - TO_DATE(CHECK_IN_TIME,'HH24:MI:SS')) * 24, 2)), 0) AS WEEKEND_TOTAL_HOUR
+		  FROM COMMUTE
+		 WHERE CHECK_IN_DATE BETWEEN TO_CHAR(TRUNC(CURRENT_DATE, 'IW'), 'YYYY-MM-DD')
+		 						 AND TO_CHAR(TRUNC(CURRENT_DATE, 'IW') + 6, 'YYYY-MM-DD')
+		   AND MEMBER_ID = #{id}
+	</select>
+	
+	<delete id="deleteCommuteTime">
+	<!-- deleteCommuteTime 출퇴근 기록 삭제 -->
+		DELETE FROM COMMUTE
+ 		 WHERE COMMUTE_ID = #{id}
+	</delete>
+	
+	<select id="isDuplicateCommuteTime" resultType="Integer">
+	<!-- isDuplicateCommuteTime 출퇴근 시간 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM COMMUTE
+		 WHERE 
+			   MEMBER_ID = #{MEMBER_ID} 
+		   AND CHECK_IN_DATE = #{CHECK_IN_DATE}
+	</select>
+	
+	<insert id="insertCommuteTime">
+		INSERT INTO COMMUTE(
+			COMMUTE_ID
+			, CHECK_IN_TIME
+			, CHECK_OUT_TIME
+			, MEMBER_ID
+			, CHECK_IN_DATE
+			, CHECK_OUT_DATE
+			, CREATE_DATE
+			, UPDATE_DATE
+			, CORRECTOR_ID
+		)
+		VALUES(
+			(SELECT 'C' || LPAD(NVL(MAX(TO_NUMBER(SUBSTR(COMMUTE_ID, 2))), 0) + 1, 10, '0') FROM COMMUTE)
+			, #{CHECK_IN_TIME}
+			, #{CHECK_OUT_TIME}
+			, #{MEMBER_ID}
+			, #{CHECK_IN_DATE}
+			, #{CHECK_IN_DATE}
+			, CURRENT_DATE
+			, CURRENT_DATE
+			, #{session_id}
+		)
+	</insert>
+	
+	<select id="getUserInfo" resultType="map">
+    <!-- getUserInfo 메인화면 유저 정보 조회 -->
+	    SELECT 
+				MEMBER_ID
+		  	  , NAME
+		  	  , PROFILE_PIC	
+		  	  , c.CODE_NAME AS DEPT_NAME
+	  	  FROM 	MEMBER m
+				INNER JOIN COMMON_CODE c
+	  					ON m.dept_id = c.code_id
+		 WHERE	m.MEMBER_ID = #{id}
+    </select>
+    
+    <select id="getAttendanceHistoryStackedBarChart" resultType="map">
+    <!-- getAttendanceHistoryStackedBarChart 지각/조퇴/결근 기록 스택바차트 조회 -->
+		SELECT
+				c.MEMBER_ID
+			  , MAX(c.MEMBER_NAME)																			AS MEMBER_NAME
+			  , NVL(SUM(CASE WHEN c.ATTENDANCE_TEXT = '정상출근' THEN 1 END), 0) 								AS NORMAL_ATTENDANCE
+			  , NVL(SUM(CASE WHEN c.ATTENDANCE_TEXT = '지각' THEN 1 END), 0) 									AS LATE_ATTENDANCE
+			  , NVL(SUM(CASE WHEN c.ATTENDANCE_TEXT = '조퇴' THEN 1 END), 0) 									AS EARLY_LEAVE_ATTENDANCE
+			  , NVL(SUM(CASE WHEN c.ATTENDANCE_TEXT = '결근' THEN 1 END), 0) 									AS ABSENCE_ATTENDANCE
+			  , NVL(SUM(CASE WHEN c.ATTENDANCE_TEXT IN('지각', '조퇴', '결근') THEN 1 END), 0) 					AS TOTAL_COUNT
+		  FROM  (SELECT 
+					   TO_CHAR(CREATE_DATE, 'YYYY-MM-DD')	AS CREATE_DATE
+					 , b.*
+		  			FROM (SELECT 
+							   a.*
+							   <choose>
+									<when test='id != null and id != ""'>
+									 	, ROW_NUMBER() OVER(PARTITION BY DATE_TIME ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+									 </when>
+									<otherwise> 
+										, ROW_NUMBER() OVER(PARTITION BY DATE_TIME, MEMBER_ID ORDER BY CT_STARTING_DATE DESC)	AS ROW_NUM
+									</otherwise>
+								</choose>
+						  FROM (SELECT
+									   h.DATE_TIME
+									 , c.COMMUTE_ID																AS COMMUTE_ID
+									 , m.MEMBER_ID 																AS MEMBER_ID
+									 , c.CHECK_IN_TIME															AS CHECK_IN_TIME 	
+									 , c.CHECK_OUT_TIME															AS CHECK_OUT_TIME
+									 , CASE 
+									 		WHEN c.CHECK_IN_TIME IS NULL OR c.CHECK_OUT_TIME IS NULL	THEN '결근'
+											WHEN c.CHECK_IN_TIME > ct.CHECK_IN_TIME 					THEN '지각' 
+											WHEN c.CHECK_OUT_TIME <![CDATA[<]]> ct.CHECK_OUT_TIME 		THEN '조퇴'
+											ELSE '정상출근'
+										END																		AS ATTENDANCE_TEXT
+									 , c.CREATE_DATE 															AS CREATE_DATE
+									 , ct.STARTING_DATE 														AS CT_STARTING_DATE
+									 , ct.CHECK_IN_TIME 														AS CT_CHECK_IN_TIME
+									 , ct.CHECK_OUT_TIME 														AS CT_CHECK_OUT_TIME
+									 , m.NAME 																	AS MEMBER_NAME
+									 , m.DEPT_ID 																AS DEPT_ID
+									 , m.GRADE_ID 																AS GRADE_ID
+									 , cc.CODE_NAME 															AS DEPT_NAME
+									 , cc2.CODE_NAME 															AS GRADE_NAME
+								  FROM HOLIDAY h 
+									   INNER JOIN MEMBER m
+											   ON h.DATE_TIME BETWEEN m.JOIN_DATE AND TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') 
+											  AND h.IS_BUSINESS_DAY = 'Y'
+												<if test='id != null and id != ""'>
+													AND m.member_id = #{id}
+									         	</if>
+								 		LEFT JOIN COMMUTE c 
+							   		    	   ON c.CHECK_IN_DATE = h.DATE_TIME 
+							   		    	   <choose>
+													<when test='id != null and id != ""'>
+													 	AND m.member_id = #{id}
+													 </when>
+													<otherwise> 
+														AND c.MEMBER_ID = m.MEMBER_ID 
+													</otherwise>
+												</choose>
+								 		LEFT JOIN COMMUTE_TIME ct 
+											   ON (c.CHECK_IN_DATE >= ct.STARTING_DATE OR c.CHECK_IN_DATE IS NULL) 
+											  AND m.MEMBER_ID = ct.MEMBER_ID
+									   INNER JOIN COMMON_CODE cc
+											   ON m.DEPT_ID = cc.CODE_ID 
+									   INNER JOIN COMMON_CODE cc2
+											   ON m.grade_id = cc2.CODE_ID
+								 WHERE 1 = 1
+						         	<if test='deptCode != null and deptCode != ""'>
+							   	 		AND m.dept_id = #{deptCode}
+									</if>
+									<if test='rankCode != null and rankCode != ""'>
+							   	 		AND m.grade_id = #{rankCode}
+									</if>
+						 		) a
+							ORDER BY a.DATE_TIME DESC
+							) b
+						 WHERE 1 = 1
+						   AND ROW_NUM = 1
+							AND (
+							        (commute_id is not null AND ROW_NUM = 1)
+							        OR (commute_id is null AND 1 = 1)
+							    )
+							<if test='startDate != null and startDate != ""
+					  			 		and endDate != null and endDate != ""'>
+								AND DATE_TIME BETWEEN #{startDate} 
+												  AND #{endDate} 
+							</if>
+				) c
+		GROUP BY MEMBER_ID
+   		ORDER BY TOTAL_COUNT DESC
+   		FETCH FIRST 10 ROWS ONLY
+    </select>
+
+    <select id="getMyLeave" resultType="map">
+	<!-- getMyLeave 연차 조회 -->
+		SELECT
+				LEAVE_ID
+			  , YEAR
+			  , TOTAL_DAYS
+			  , USED_DAYS
+			  , REMAINING_DAYS 
+		  FROM  LEAVE
+		 WHERE
+		 		MEMBER_ID = #{id}
+		   AND  YEAR = EXTRACT(YEAR FROM SYSDATE)
+    </select>
+    
+    <select id="getLeaveType" resultType="map">
+    <!-- getLeaveType 연차 타입 조회 -->
+    	SELECT
+    			LT.LEAVE_TYPE_ID
+			  , CC.CODE_NAME
+			  , LT.MAX_DAYS
+			  , LT.IS_PAID
+			  , LT.DOCUMENTATION_REQUIRED
+			  , LT.DESCRIPTION
+		  FROM  LEAVE_TYPES LT
+				JOIN COMMON_CODE CC
+				  ON LT.LEAVE_TYPE_ID = CC.CODE_ID 
+		 WHERE  LT.USE_YN = 'Y'
+    </select>
+</mapper>

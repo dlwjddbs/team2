@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.MesCommonCodeMapper">
+	<select id="getGroupMesCommonCode" resultType="map">
+	<!-- getGroupMesCommonCode 공통코드 대분류 조회 -->
+		SELECT
+			   MAIN_ID
+			 , MAIN_NAME 
+			 , DESCRIPTION
+			 , MAIN_ORDER
+		  FROM MES_COMMON_GROUP
+		  <if test='MAIN_ID != null and MAIN_ID != ""'>
+		  		WHERE MAIN_ID = #{MAIN_ID}
+		  </if>
+		  ORDER BY MAIN_ORDER ASC
+	</select>
+	
+	<select id="isDuplicateMesCommonCodeGroup" resultType="Integer">
+	<!-- isDuplicateMesCommonCodeGroup 공통코드 대분류 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM MES_COMMON_GROUP
+		 WHERE MAIN_ID = #{MAIN_ID}
+	</select>
+	
+    <select id="isDuplicateMainOrder" resultType="Integer">
+    <!-- isDuplicateMainOrder 공통코드 순서 중복 확인 -->
+    	SELECT COUNT(*) AS COUNT
+		  FROM MES_COMMON_GROUP
+		WHERE 1 = 1
+		  AND MAIN_ORDER = #{MAIN_ORDER}
+		  <if test="MAIN_ID != null and MAIN_ID != ''">
+		  	   AND MAIN_ID != #{MAIN_ID}
+		  </if>
+    </select>
+    	
+	<insert id="insertMesCommonCodeGroup">
+	<!-- insertMesCommonCodeGroup 공통코드 대분류 등록 -->
+		INSERT INTO MES_COMMON_GROUP (
+			  MAIN_ID 
+			, MAIN_NAME
+			, MAIN_ORDER
+			, DESCRIPTION 
+			, CREATE_DATE 
+		) VALUES (
+			  #{MAIN_ID}
+			, #{MAIN_NAME}
+			, #{MAIN_ORDER}
+			, #{DESCRIPTION}
+			, CURRENT_DATE
+		)
+	</insert>
+
+	<update id="updateMesCommonCodeGroup">
+	<!-- updateMesCommonCodeGroup 공통코드 대분류 수정 -->
+		UPDATE MES_COMMON_GROUP 
+		   SET 
+			   MAIN_NAME = #{MAIN_NAME}
+			 , DESCRIPTION = #{DESCRIPTION}
+			 , MAIN_ORDER = #{MAIN_ORDER}
+			 , UPDATE_DATE = CURRENT_DATE
+		 WHERE MAIN_ID = #{MAIN_ID}
+	</update>	
+	
+	<select id="isExistMesCommonCodeGroupChild" resultType="Integer">
+	<!-- isExistMesCommonCodeGroupChild 공통코드 대분류 삭제전 하위 코드 존재 확인 -->
+		SELECT COUNT(*) 
+		  FROM MES_COMMON
+		 WHERE MAIN_ID = #{MAIN_ID}
+	</select>
+	
+	<delete id="deleteMesCommonCodeGroup">
+	<!-- deleteMesCommonCodeGroup 공통코드 대분류 삭제 -->
+		DELETE FROM MES_COMMON_GROUP
+ 		 WHERE MAIN_ID = #{MAIN_ID}
+	</delete>
+	
+	<select id="getMesCommonCode" resultType="map">
+	<!-- getMesCommonCode 공통코드 소분류 조회 -->
+		SELECT 
+			   SUB_ID 
+			 , MAIN_ID 
+			 , SUB_NAME
+			 , CLASSIFICATION_ID
+			 , SUB_ORDER
+			 , DESCRIPTION 
+			 , USE_STATUS
+		  FROM MES_COMMON
+		 WHERE 
+		 	   1 = 1
+			<if test='MAIN_ID != null and MAIN_ID != ""'>
+		   		AND MAIN_ID = #{MAIN_ID}
+		   	</if>
+			<if test='SUB_ID != null and SUB_ID != ""'>
+		   		AND SUB_ID = #{SUB_ID}
+		   	</if>
+		   	ORDER BY SUB_ORDER ASC
+	</select>
+	
+	<select id="isDuplicateMesCommonCode" resultType="Integer">
+	<!-- isDuplicateMesCommonCode 공통코드 소분류 insert전 중복 확인 -->
+		SELECT COUNT(*)	AS COUNT
+		  FROM MES_COMMON
+		WHERE 1 = 1
+		  AND SUB_ORDER = #{SUB_ORDER}
+		  AND MAIN_ID = #{MAIN_ID}
+	</select>
+	
+	<select id="isDuplicateSubOrder" resultType="Integer">
+    <!-- isDuplicateSubOrder 공통코드 순서 중복 확인 -->
+    	SELECT COUNT(*) AS COUNT
+		  FROM MES_COMMON
+		WHERE 1 = 1
+		  AND SUB_ORDER = #{SUB_ORDER}
+		  AND MAIN_ID = #{MAIN_ID}
+		  <if test="SUB_ORDER != null and SUB_ORDER != ''">
+		  	   AND SUB_ORDER != #{SUB_ORDER}
+		  </if>
+    </select>	
+	
+	<insert id="insertMesCommonCode">
+	<!-- insertMesCommonCode 공통코드 소분류 등록 -->
+		INSERT INTO MES_COMMON (
+			  SUB_ID
+			, MAIN_ID
+			, CLASSIFICATION_ID
+			, SUB_NAME
+			, SUB_ORDER
+			, DESCRIPTION
+			, USE_STATUS
+			, CREATE_DATE
+		) VALUES (
+			  #{SUB_ID}
+			, #{MAIN_ID}
+			, #{MAIN_ID} || '-' || #{SUB_ID}
+			, #{SUB_NAME}
+			, #{SUB_ORDER}
+			, #{DESCRIPTION}
+			, #{USE_STATUS}
+			, CURRENT_DATE
+		)
+	</insert>
+
+	<update id="updateMesCommonCode">
+	<!-- "updateMesCommonCode" 공통코드 소분류 수정 -->
+		UPDATE MES_COMMON 
+		   SET 
+			   SUB_NAME = #{SUB_NAME}
+			 , USE_STATUS = #{USE_STATUS}
+			 , SUB_ORDER = #{SUB_ORDER}
+			 , DESCRIPTION = #{DESCRIPTION}
+			 , UPDATE_DATE = CURRENT_DATE
+		 WHERE CLASSIFICATION_ID = CONCAT(CONCAT(#{MAIN_ID}, '-'), #{SUB_ID})
+	</update>
+	
+	<delete id="deleteMesCommonCode">
+	<!-- deleteMesCommonCode 공통코드 소분류 삭제 -->
+		DELETE FROM MES_COMMON
+ 		 WHERE SUB_ID = #{SUB_ID}
+	</delete>
+		
+</mapper>

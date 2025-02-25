@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 오라클 MyBatis 사용시 문장 끝에 세미콜론 있으면 오류남! -->
+
+<mapper namespace="com.itwillbs.repository.InspectionMapper">
+	
+	<select id="selectInboundList" resultType="map">
+		SELECT 
+			   PO_ID 
+			 , C.CLIENT_NAME 
+			 , TO_CHAR(PO.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
+		  FROM
+		  	   PURCHASE_ORDER PO
+     LEFT JOIN
+     		   CLIENT C					ON PO.CLIENT_ID = C.CLIENT_ID 
+		 WHERE
+		 	   PO.PO_STATUS = 'Y'
+	  ORDER BY
+	  		   PO.CREATE_DATE ASC
+    </select>
+    
+	<select id="selectInboundDetail" resultType="map">
+		SELECT
+			   PO.PO_ID
+			 , PO.CREATE_DATE
+			 , MC.SUB_ID || '-' || MT.GROUP_CODE || '-' || MT.MATERIAL_ID AS MATERIAL_ID
+			 , PD.PO_COUNT
+			 , PD.PODETAIL_ID
+			 , MT.MATERIAL_NAME
+			 , NVL(SUM(II.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
+		  FROM
+		  	   PURCHASE_ORDER PO
+	 LEFT JOIN
+	 		   PO_DETAIL PD
+	 		   							ON PO.PO_ID = PD.PO_ID
+	 LEFT JOIN
+	 		   MATERIAL MT
+	 		   							ON PD.MATERIAL_ID = MT.MATERIAL_ID
+	 LEFT JOIN
+	 		   MATERIAL_CATEGORY MC
+	 									ON MT.GROUP_CODE = MC.MATL_CTGR
+	 LEFT JOIN
+	 		   INBOUND_INSPECTION II
+	 									ON PD.PODETAIL_ID = II.PODETAIL_ID
+		 WHERE
+		 	   PO.PO_ID = #{po_id}
+	  GROUP BY
+	  		   PO.PO_ID, PO.CREATE_DATE, MC.SUB_ID, MT.GROUP_CODE, MT.MATERIAL_ID, PD.PO_COUNT, PD.PODETAIL_ID, MT.MATERIAL_NAME
+    </select>
+    
+    <select id="selectInboundInspectionList" resultType="map">
+    	SELECT
+			   II.INSPECTION_ID
+			 , II.PO_ID
+			 , II.PODETAIL_ID
+			 , RC.REJECTION 
+			 , II.DEFECT_QUANTITY
+			 , II.REJECTION_CODE
+		  FROM
+		  	   INBOUND_INSPECTION II
+	 LEFT JOIN
+	 		   REJECTION_CODE RC ON II.REJECTION_CODE = RC.CODE_ID 
+		 WHERE
+		 	   PODETAIL_ID = #{podetail_id}
+    </select>
+<!--
+	<insert id="mergeInboundInspection">
+	    MERGE INTO INBOUND_INSPECTION target
+	    USING (
+	        SELECT 
+	            #{mergeList[0].PODETAIL_ID} AS PODETAIL_ID,
+	            #{mergeList[0].PO_ID} AS PO_ID,
+	            #{mergeList[0].REJECTION_CODE} AS REJECTION_CODE,
+	            #{mergeList[0].DEFECT_QUANTITY} AS DEFECT_QUANTITY
+	        FROM DUAL
+	        <foreach collection="mergeList" item="item" index="index" open=" UNION ALL " separator=" UNION ALL ">
+	        SELECT 
+	            #{item.PODETAIL_ID} AS PODETAIL_ID,
+	            #{item.PO_ID} AS PO_ID,
+	            #{item.REJECTION_CODE} AS REJECTION_CODE,
+	            #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY
+	        FROM DUAL
+	        </foreach>
+	    ) source
+	    ON (target.PODETAIL_ID = source.PODETAIL_ID AND target.REJECTION_CODE = source.REJECTION_CODE)
+	    WHEN MATCHED THEN
+	        UPDATE SET target.DEFECT_QUANTITY = source.DEFECT_QUANTITY
+	    WHEN NOT MATCHED THEN
+	        INSERT (PODETAIL_ID, PO_ID, REJECTION_CODE, DEFECT_QUANTITY)
+	        VALUES (source.PODETAIL_ID, source.PO_ID, source.REJECTION_CODE, source.DEFECT_QUANTITY);
+	    
+	    DELETE FROM INBOUND_INSPECTION
+	    WHERE PODETAIL_ID = #{poDetailId}
+	    AND NOT EXISTS (
+	        SELECT 1 FROM DUAL WHERE #{mergeList.size()} > 0
+	    );
+	</insert>
+	<delete id="deletemissingInboundInspection">
+		DELETE FROM INBOUND_INSPECTION
+	    WHERE PODETAIL_ID = #{poDetailId}
+	    AND REJECTION_CODE NOT IN (
+	        <foreach collection="mergeList" item="item" separator=",">
+	            #{item.REJECTION_CODE}
+	        </foreach>
+	    )
+	</delete>
+-->
+
+	<insert id="insertInboundInspection">
+	    INSERT ALL
+	    <foreach collection="rejectionList" item="item">
+	        INTO INBOUND_INSPECTION (PODETAIL_ID, PO_ID, REJECTION_CODE, DEFECT_QUANTITY)
+	        VALUES (#{item.PODETAIL_ID}, #{item.PO_ID}, #{item.REJECTION_CODE}, #{item.DEFECT_QUANTITY})
+	    </foreach>
+	    SELECT 1 FROM DUAL
+	</insert>
+
+		
+	<delete id="deleteInboundInspection">
+	    DELETE FROM INBOUND_INSPECTION
+    	WHERE PODETAIL_ID = #{poDetailId}
+	</delete>
+
+	
+	<select id="selectRejectionCode" resultType="map">
+		SELECT
+			   CODE_ID
+			 , REJECTION
+			 , DESCRIPTION 
+		  FROM
+			   REJECTION_CODE
+			   <!--user 추가-->
+	</select>
+    
+	<insert id="insertInboundinspection">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO INBOUND_INSPECTION (
+				  PO_ID
+				, PODETAIL_ID
+				, DEFECT_QUANTITY
+				, REJECTION_CODE	
+			)
+			VALUES (
+				  #{item.PO_ID}
+				, #{item.PODETAIL_ID}
+				, #{item.REJECTION_QUANTITY}
+				, #{item.REJECTION_CODE}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+    
+    <insert id="insertInboundLots">
+		INSERT INTO INBOUND_LOTS (
+				  LOT_ID
+				, PO_ID
+				, MATERIAL_ID
+				, QUANTITY
+		)
+		   SELECT 
+				  PD.PO_ID || '/' || PD.PODETAIL_ID || '/' || (PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0)) AS LOT_ID
+				, PD.PO_ID
+				, PD.MATERIAL_ID
+				, PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0) AS QUANTITY
+			 FROM
+				  PO_DETAIL PD
+		LEFT JOIN
+				  INBOUND_INSPECTION II
+			   ON
+				  PD.PO_ID = II.PO_ID 
+			  AND
+			  	  PD.PODETAIL_ID = II.PODETAIL_ID
+			WHERE
+				  PD.PO_ID =  #{po_id}
+		 GROUP BY
+		 		  PD.PO_ID, PD.PODETAIL_ID, PD.MATERIAL_ID, PD.PO_COUNT
+		   HAVING
+				  PD.PO_COUNT - NVL(SUM(II.DEFECT_QUANTITY), 0) > 0
+    </insert>
+    
+	<update id="updatePoDetailStatus" parameterType="map">
+		UPDATE PO_DETAIL
+		   SET PO_STATUS = 'C'
+		 WHERE PO_ID = #{po_id}
+	</update>
+	
+	<update id="updatePurchaseOrderStatus" parameterType="map">
+		UPDATE PURCHASE_ORDER
+		   SET PO_STATUS = 'C'
+		 WHERE PO_ID = #{po_id}
+	</update>
+	
+<!-- ======================= << PRODUCTION INSPECTION >> ======================= -->
+	<select id="selectDefectCode" resultType="map">
+		SELECT 
+			   DEFECT_ID
+			 , DEFECT_NAME
+			 , DESCRIPTION
+		  FROM
+		  	   DEFECT_CODE
+		 WHERE
+			   PROCESS_ID = #{process_id}	
+		   AND USE_YN = 'Y'
+    </select>
+    
+    <select id="selectDefectCauseCode" resultType="map">
+    	SELECT
+			   DCC.CAUSE_TYPE_CODE
+			 , MC.SUB_NAME
+		     , DCC.CAUSE_TYPE_CODE || DCC.CAUSE_ID AS CAUSE_ID
+		     , DCC.DESCRIPTION
+		  FROM
+		  	   DEFECT_CAUSE_CODE DCC
+	 LEFT JOIN
+	 		   MES_COMMON MC
+	 		   					ON
+	 		   					   DCC.CAUSE_TYPE_CODE = MC.SUB_ID
+		 WHERE 
+			   MC.MAIN_ID = 'DFTY'
+	       AND 
+	       	   DCC.PROCESS_ID = #{process_id}
+	       AND
+	       	   DCC.CAUSE_TYPE_CODE = #{cause_type}
+		   AND
+		   	   DCC.USE_YN = 'Y'
+    </select>
+	
+	<insert id="insertProductionInspection">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO PRODUCTION_INSPECTION (
+				  PRODUCTION_ORDER_ID	
+				, PRODUCTION_ORDER_DETAIL_ID
+				, ITEM_ID				
+				, TOTAL_QUANTITY		
+				, DEFECT_QUANTITY		
+				, DEFECT_CODE			
+				, DEFECT_CAUSE_CODE
+			) VALUES (
+				  #{item.PRODUCTION_ORDER_ID}
+				, #{item.PRODUCTION_ORDER_DETAIL_ID}
+				, #{item.ITEM_ID}
+				, #{item.TOTAL_QUANTITY}
+				, #{item.DEFECT_QUANTITY}
+				, #{item.DEFECT_CODE}
+				, #{item.DEFECT_CAUSE_CODE}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<insert id="insertProductionLot">
+        INSERT INTO PRODUCTION_LOT ( 
+		      PRODUCTION_LOT_ID
+		    , PRODUCTION_ORDER_DETAIL_ID
+		    , ITEM_ID
+		    , QUANTITY
+		)
+		SELECT * FROM (
+		    WITH PARAMS AS (
+				<foreach collection="list" item="item" separator="UNION ALL">
+					SELECT
+						   #{item.PRODUCTION_ORDER_DETAIL_ID} AS PRODUCTION_ORDER_DETAIL_ID
+						 , #{item.ITEM_ID} AS ITEM_ID
+						 , #{item.PRODUCTION_ORDER_ID} AS PRODUCTION_ORDER_ID
+						 , #{item.TOTAL_QUANTITY} AS TOTAL_QUANTITY
+						 , #{item.DEFECT_QUANTITY} AS DEFECT_QUANTITY
+					FROM
+						 DUAL
+				</foreach>
+		    ),
+		    AGG AS (
+		        SELECT 
+		               PRODUCTION_ORDER_DETAIL_ID
+		             , ITEM_ID
+		             , PRODUCTION_ORDER_ID
+		             , MAX(TOTAL_QUANTITY) AS TOTAL_QUANTITY
+		             , SUM(DEFECT_QUANTITY) AS SUM_DEFECT_QUANTITY
+		        FROM PARAMS
+		        GROUP BY PRODUCTION_ORDER_DETAIL_ID, ITEM_ID, PRODUCTION_ORDER_ID
+		    )
+		    SELECT 
+		        CASE 
+		            WHEN I.ITEM_TYPE = '완제품' 
+		            THEN A.PRODUCTION_ORDER_ID || '/' || A.ITEM_ID || '/' || (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY)
+		            ELSE A.PRODUCTION_ORDER_DETAIL_ID || '/' || A.ITEM_ID || '/' || (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY)
+		        END AS PRODUCTION_LOT_ID
+		        , A.PRODUCTION_ORDER_DETAIL_ID
+		        , A.ITEM_ID
+		        , (A.TOTAL_QUANTITY - A.SUM_DEFECT_QUANTITY) AS QUANTITY
+		    FROM AGG A
+		    LEFT JOIN ITEM I ON A.ITEM_ID = I.ITEM_ID
+		)
+
+    </insert>
+    
+    <update id="updateProductionOrderDetail">
+    	UPDATE
+    		   PRODUCTION_ORDER_DETAIL
+		   SET
+		   	   COMPLETE_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+			 , COMPLETE_TIME = TO_CHAR(SYSDATE, 'HH24:MI:SS')
+			 , STATUS = 'ST-003'
+		 WHERE
+		 	   PRODUCTION_ORDER_DETAIL_ID = #{list[0].PRODUCTION_ORDER_DETAIL_ID}
+    </update>
+    
+    <update id="updateWortcenterLog">
+    	UPDATE
+    		   WORKCENTER_LOG
+		   SET 
+		   	   END_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+			 , END_TIME = TO_CHAR(SYSDATE, 'HH24:MI:SS')
+		 WHERE
+		 	   PRODUCTION_ORDER_DETAIL_ID = #{list[0].PRODUCTION_ORDER_DETAIL_ID}
+    </update>
+<!-- =========================================================================== -->	
+	
+	
+	
+</mapper>

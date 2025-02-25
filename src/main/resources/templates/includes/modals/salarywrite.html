@@ -1,0 +1,126 @@
+<div class="modal fade" id="modal-lg" th:fragment="salarywrite">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">급여 정보 입력</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- form -->
+			<form th:action="@{/writeSalary}" method="post" id="writeSalaryForm">
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+					
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+					              <label>귀속 연월</label>
+									<div class="input-group date" id="reservationdate" data-target-input="nearest">
+									    <input type="text" autocomplete='off' class="form-control datetimepicker-input" id="daterange" name="PAYDAY" placeholder="년-월 선택"  />
+									</div>
+					            </div>
+				            </div>
+						 </div>
+						<div class="row">
+							<div class="col-md-5">
+								<div class="form-group">
+					              <label>사원 번호</label>
+				                    <input type="text" class="form-control" id="member" name="MEMBER_ID" data-target="#reservationdate" readonly/>
+					            </div>
+							</div>
+							<div class="col-md-7">
+								<div class="form-group">
+					              <label>사원명</label>
+				                    <input type="text" class="form-control" id="name" name="NAME" placeholder="사원명을 입력하세요." readonly>
+					            </div>
+				            </div>
+						 </div>
+ 						<div class="row"> 
+ 							<div class="col-md-6"> 
+								<div class="form-group">
+									<label for="exampleInputEmail1">부서명</label>
+									<select class="form-control select" id="department" name="DEPT_ID" disabled>
+										<option selected="selected" disabled>부서선택</option>
+										<option value="DEV">개발부</option>												
+										<option value="HR">인사팀</option>												
+										<option value="AC">회계팀</option>												
+										<option value="AD">총무팀</option>												
+										<option value="DN">국내영업팀</option>												
+										<option value="PL">영업기획팀</option>												
+										<option value="SRV">서버개발팀</option>												
+										<option value="WEB">웹개발팀</option>												
+										<option value="MOB">모바일개발팀</option>												
+										<option value="MNT">유지보수팀</option>												
+										<option value="MS">경영지원부</option>												
+										<option value="SA">영업부</option>												
+									</select>
+								</div>
+ 							</div> 
+ 							<div class="col-md-6"> 
+ 								<div class="form-group"> 
+									<label for="exampleInputEmail1">직급</label>
+									<select class="form-control select" id="grade" name="GRADE_ID" disabled>
+										<option selected="selected" disabled>직급선택</option>												
+										<option value="AS">대리</option>												
+										<option value="MG">과장</option>												
+										<option value="SM">차장</option>												
+										<option value="GM">부장</option>												
+										<option value="DR">이사</option>												
+										<option value="ED">상무</option>												
+										<option value="SD">전무</option>												
+										<option value="VP">부사장</option>												
+										<option value="PR">사장</option>												
+										<option value="ST">사원</option>												
+										<option value="AM">주임</option>												
+									</select>
+ 								</div> 
+ 							</div> 
+ 						</div> 
+						<div class="row">
+							<div class="col-md-4">
+				                <div class="form-group">
+				                  <label>급여 항목</label>
+				                 	<input type="text" readonly class="form-control" placeholder="기본급" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="직책 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연휴 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="야근 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="연말 격려 수당" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="만기 근속자 포상" style="background-color: white !important;"> <br>
+				                	<input type="text" readonly class="form-control" placeholder="실적 우수자 포상" style="background-color: white !important;"> <br>
+				                </div>
+							</div>
+							<div class="col-md-8">
+								<div class="form-group">
+								    <label>금액</label>
+								    <input type="text" id="salary" name="SALARY" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" readonly><br>
+						            <input type="text" autocomplete='off' id="positionBonus" name="POSITION_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" ><br>
+						            <input type="text" autocomplete='off' id="holidayBonus" name="HOLIDAY_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" ><br>
+						            <input type="text" id="nightBonus" name="NIGHT_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" readonly><br>
+						            <input type="text" autocomplete='off' id="yearendBonus" name="YEAREND_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" ><br>
+						            <input type="text" autocomplete='off' id="fullserviceBonus" name="FULLSERVICE_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" ><br>
+						            <input type="text" autocomplete='off' id="performanceBonus"  name="PERFORMANCE_BONUS" class="form-control" placeholder="금액을 입력하세요." onkeypress="return isNumberKey(event)" >
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal">닫기</button>
+<!-- 						<button type="submit" id="submitBtn" class="btn btn-primary">급여 등록</button> -->
+						<button type="button" id="submitBtn2" class="btn btn-primary">급여 등록</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+			</form>
+			<!-- /.form -->
+		</div>
+	</div>
+</div>

@@ -1,0 +1,110 @@
+<!--
+	<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
+		수정
+	</button>
+-->
+
+<!-- 모달창 -->
+<div class="modal fade" id="modal-lg" th:fragment="attendanceTimeAdd">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- 모달창 헤더 -->
+			<div class="modal-header">
+				<h4 class="modal-title">출퇴근 기준 시각 등록</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- /.모달창 헤더 -->
+			
+			<!-- form -->
+<!-- 			<form th:action="@{/}" method="post" id="attendanceTimeForm"> -->
+				<!-- 모달창 바디 -->
+				<div class="modal-body">
+					<div class="card-body">
+						<div class="form-group">
+						
+							<label for="exampleInputEmail1">회원번호</label>
+							<div class="row">
+								<div class="col-md-6">
+									<select id="memberSelect" class="form-control select" style="width: 100%">
+									</select>											
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+								<!-- time Picker -->
+									<label>출근 기준 시간</label>
+									<div class="bootstrap-timepicker">
+										<div class="form-group">
+											<div class="input-group date" id="timepickerStart" data-target-input="nearest">
+												<input type="text" id="CHECK_IN_TIME" class="form-control datetimepicker-input" data-target="#timepickerStart" />
+												<div class="input-group-append" data-target="#timepickerStart" data-toggle="datetimepicker">
+													<div class="input-group-text">
+														<i class="far fa-clock"></i>
+													</div>
+												</div>
+											</div>
+											<!-- /.input group -->
+										</div>
+										<!-- /.form group -->
+									</div>
+									<!-- /.time Picker -->
+								</div>
+								<div class="col-md-6">
+								<!-- time Picker -->
+									<label>퇴근 기준 시간</label>
+									<div class="bootstrap-timepicker">
+										<div class="form-group">
+											<div class="input-group date" id="timepickerEnd" data-target-input="nearest">
+												<input type="text" id="CHECK_OUT_TIME" class="form-control datetimepicker-input" data-target="#timepickerEnd"/>
+												<div class="input-group-append" data-target="#timepickerEnd" data-toggle="datetimepicker">
+													<div class="input-group-text">
+														<i class="far fa-clock"></i>
+													</div>
+												</div>
+											</div>
+											<!-- /.input group -->
+										</div>
+										<!-- /.form group -->
+									</div>
+									<!-- /.time Picker -->
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<!-- Date -->
+									<div class="form-group">
+										<label>적용 시작 일자</label>
+										<div class="input-group date" id="reservationdate" data-target-input="nearest">
+											<input type="text" id="STARTING_DATE" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+											<div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<!-- /.모달창 바디 -->
+				<!-- 모달창 푸터-->
+				<div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary" id="timeSave">저장</button>
+					</div>
+				</div>
+				<!-- /.모달창 푸터-->
+<!-- 			</form> -->
+			<!-- /.form -->
+		</div>
+	</div>
+</div>
+<!-- /.모달창 -->

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>부서 목록</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="../../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="../../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="../../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+    <!-- summernote -->
+    <link rel="stylesheet" href="../../plugins/summernote/summernote-bs4.min.css">
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="../../plugins/codemirror/codemirror.css">
+    <link rel="stylesheet" href="../../plugins/codemirror/theme/monokai.css">
+    <!-- SimpleMDE -->
+    <link rel="stylesheet" href="../../plugins/simplemde/simplemde.min.css">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- 상단 메뉴 -->
+    <nav th:replace="~{includes/navbar :: navbar}"></nav>
+    <!-- /.상단 메뉴 -->
+
+    <!-- 좌측 메뉴 -->
+    <aside th:replace="~{includes/sidebar :: sidebar}"></aside>
+    <!-- /.좌측 메뉴 -->
+
+    <div class="content-wrapper">
+		<!-- 콘텐츠 헤더 (Page header) -->
+		<nav th:replace="~{includes/pageHeader :: pageHeader}"></nav>
+
+        <!-- 메인 콘텐츠 -->
+        <section class="content">
+            <div class="container-fluid">
+                <!-- 부서목록 카드 -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            
+                            <!-- /.card-header -->
+
+                            <!-- 카드 본문(테이블) -->
+                            <div class="card-body">
+                                <table id="deptTable" class="table table-bordered table-striped"></table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer th:replace="~{includes/footer :: footer}"></footer>
+
+</div>
+<!-- /.wrapper -->
+
+<!-- JavaScript -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../../dist/js/adminlte.min.js"></script>
+<script src="../../plugins/summernote/summernote-bs4.min.js"></script>
+<script src="../../plugins/codemirror/codemirror.js"></script>
+<script src="../../plugins/codemirror/mode/css/css.js"></script>
+<script src="../../plugins/codemirror/mode/xml/xml.js"></script>
+<script src="../../plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="../../dist/js/demo.js"></script>
+
+<!-- DataTables -->
+<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+
+<!-- Bootstrap 5 (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    // 페이지가 로드되면 자동으로 테이블 표시
+    $(document).ready(function() {
+        console.log("Document ready: initializing dataTable");
+        dataTable('deptTable', false);
+    });
+
+    // DataTable 초기화 함수
+    function dataTable(tableId, isUpdate) {
+        // 기존 테이블이 존재하면 파괴
+        if (isUpdate) {
+            console.log("Destroying existing DataTable on #" + tableId);
+            $("#" + tableId).DataTable().destroy();
+        }
+
+        console.log("Initializing DataTable on #" + tableId);
+
+        $("#" + tableId).DataTable({
+            aaSorting: [], // 초기 정렬 비활성화
+            language: {
+                search: "검색",
+                paginate: {
+                    "next": "다음",
+                    "previous": "이전"
+                },
+                zeroRecords: "검색 결과 없음"
+            },
+            ajax: {
+                url: "/getDepartmentList",
+                type: "POST",
+                beforeSend: function (xhr) {
+                    const token = $("meta[name='_csrf']").attr("content");
+                    const header = $("meta[name='_csrf_header']").attr("content");
+                    console.log("beforeSend: setting CSRF token", token);
+                    xhr.setRequestHeader(header, token);
+                },
+                dataSrc: function (res) {
+                    // Ajax 성공 시 찍히는 로그
+                    console.log("서버 응답:", res);
+                    // 서버 응답 형식에 맞게 return
+                    return res; 
+                    // 예: 응답이 { data: [...] } 형태면 return res.data;
+                },
+                error: function (xhr, status, error) {
+                    // Ajax 실패 시 찍히는 로그
+                    console.error("Ajax Error. Status:", status, "Error:", error);
+                }
+            },
+            columns: [
+                {data: "DEPT_ID",         title: "부서",       defaultContent: ""},
+                {data: "PARENT_DEPT_ID",  title: "상위부서",   defaultContent: ""},
+                {data: "DEPT_NAME",       title: "부서장",       defaultContent: ""},
+                {data: "USE_YN",          title: "사용여부",   defaultContent: ""}
+            ]
+        });
+    }
+</script>
+
+</body>
+</html>
