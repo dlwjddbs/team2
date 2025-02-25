@@ -30,11 +30,13 @@ public interface DashboardMapper {
 	
 	// ====================================================================================
 	
-	List<Map<String, Object>> getPoStackedBarChart(Map<String, Object> map);
+	List<Map<String, Object>> selectPoBarChartDaily(Map<String, Object> map);
+	List<Map<String, Object>> selectPoBarChartWeekly(Map<String, Object> map);
+	List<Map<String, Object>> selectPoBarChartMonthly(Map<String, Object> map);
 	
 	List<Map<String, Object>> selectClientPo(Map<String, Object> map);
 	
-	List<Map<String, Object>> getClientInboundChart(Map<String, Object> map);
+	List<Map<String, Object>> selectClientInboundChart(Map<String, Object> map);
 	
 	List<Map<String, Object>> selectInboundChart(Map<String, Object> map);
 }
