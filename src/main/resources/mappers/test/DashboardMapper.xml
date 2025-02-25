@@ -254,9 +254,9 @@
 	 		   INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
 	  GROUP BY 
 			   GROUPING SETS (
-			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD')), -- 일별
-			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'IYYY-IW')),   -- 주별
-			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM'))    -- 월별
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM-DD')),	-- 일별
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'IYYY-IW')),		-- 주별
+			       (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY-MM'))    	-- 월별
 			   )
 	  ORDER BY 
 	  		   TYPE

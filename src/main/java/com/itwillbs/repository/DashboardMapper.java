@@ -31,7 +31,9 @@ public interface DashboardMapper {
 	// ====================================================================================
 	
 	List<Map<String, Object>> selectPoBarChartDaily(Map<String, Object> map);
+	
 	List<Map<String, Object>> selectPoBarChartWeekly(Map<String, Object> map);
+	
 	List<Map<String, Object>> selectPoBarChartMonthly(Map<String, Object> map);
 	
 	List<Map<String, Object>> selectClientPo(Map<String, Object> map);
