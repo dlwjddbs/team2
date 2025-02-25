@@ -1,11 +1,13 @@
 # Build stage
 FROM gradle:jdk21 AS build
-WORKDIR /app
-COPY . .
+WORKDIR /app/team2
+COPY team2/ .
+#WORKDIR /app
+#COPY . .
 
 # Gradle 권한 설정 및 빌드 실행
-RUN chmod +x ./team2/gradlew
-RUN ./team2/gradlew bootWar --no-daemon
+RUN chmod +x ./gradlew
+RUN ./gradlew bootWar --no-daemon
 
 # Runtime stage
 FROM ubuntu:jammy
