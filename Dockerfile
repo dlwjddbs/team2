@@ -5,7 +5,7 @@ COPY . .
 
 # Gradle 권한 설정 및 빌드 실행
 RUN chmod +x ./gradlew
-RUN ./gradlew bootWar --no-daemon
+RUN ./team2/gradlew bootWar --no-daemon
 
 # Runtime stage
 FROM ubuntu:jammy
