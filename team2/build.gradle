@@ -82,3 +82,4 @@ bootWar {
 	archiveBaseName = 'ROOT' // WAR 파일의 기본 이름을 'ROOT' 로 설정
 	archiveVersion = '' // 버전 번호를 비워서 파일 이름에 버전이 포함되지 않도록 함
 }
+
