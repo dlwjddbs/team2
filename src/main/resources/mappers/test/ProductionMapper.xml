@@ -236,7 +236,7 @@
 						    FROM PRODUCTION_ORDER_DETAIL
 						   WHERE PRODUCTION_ORDER_DETAIL_ID = #{PRODUCTION_ORDER_DETAIL_ID}
 					   )
-				   AND STATUS = 'ST-002') >= 1
+				   AND STATUS IN('ST-002', 'ST-001')) >= 1
 	</update>
 	
 <!-- ================ << LOT Tracking >> ================ -->
