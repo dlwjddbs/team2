@@ -184,14 +184,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/js/jquery.orgchart.min.js" integrity="sha512-IUNqrYw8R7mj0iBzb0FOTGTgEFrxZCHVCHnePUEmcjJ/XQE/0sqRhBmGpp20N2lVzAkIBs0Sz+ibRN8/W9YFnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		let lotGrid = null;
-
-		$(function () {
-			$("#detail_info").hide();
-			loadLotTree();
-		});
-
-		const lot_url = '/rest/production/lot';
+		const lot_url = '/rest/lots';
 		const lot_dataSource = {
 			api: {
 				readData: {url: lot_url, method: 'GET'},
@@ -212,8 +205,8 @@
 				bodyHeight: 770,
 				rowHeight: 60,
 				columns: [
-					{header: '워크센터 코드', name: 'lot_ID', align: 'center', width: 100},
-					{header: '워크센터명', name: 'lot_NAME', align: 'left'},
+					{header: 'LOT', name: 'PRODUCTION_LOT_ID', align: 'center', width: 100},
+					{header: '제품명', name: 'ITEM_NAME', align: 'left'},
 				],
 			});
 			
@@ -231,7 +224,7 @@
 					end: [ev.rowKey, lotGrid.getColumns().length]
 				});
 				
-				const lotId = lotGrid.getValue(ev.rowKey, "lot_ID");
+				const lotId = lotGrid.getValue(ev.rowKey, "LOT_ID");
 				loadLotTree(lotId);
 			});
 		}
@@ -253,7 +246,7 @@
                     "menuOrder": "1",
                     "menuDepth": "2",
                     "id": "lot1-1",
-                    "text": "작업지시상세ID_1"
+                    "text": "PROD-20250225-0001"
                 },
                 {
                     "parent": "lot1",
