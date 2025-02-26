@@ -46,6 +46,11 @@ $(document).on("shown.bs.modal", "#productionInspection", function () {
             api: { readData: { url: url, method: 'GET', initParams: {'process_id': process_id} } },
             contentType: 'application/json',
         };
+		
+		if (defectGrid) {
+			defectGrid.destroy();
+			defectGrid = null;
+		}
 
         defectGrid = new tui.Grid({
             el: document.getElementById('defect_grid'),

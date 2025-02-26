@@ -30,28 +30,34 @@
 	<style>
 		#keyboard {
 			display: grid;
-		    grid-template-columns: repeat(3, 1fr);
-		    gap: 3px;
-		    width: 100%;
-		    max-width: 100%;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 3px;
+			width: 100%;
+			max-width: 100%;
 			margin-top: 5px;
 		}
 		
 		#keyboard .btn {
 			flex: 1;
 			aspect-ratio: 1 / 1;
-		    display: flex; 
-		    align-items: center; 
-		    justify-content: center;
+			display: flex; 
+			align-items: center; 
+			justify-content: center;
 			font-size: 1.5rem;
 		}
 		
-		.tui-grid-cell-has-input  {
-		    background-color: white !important;
+		.defect-type-hidden {
+			display: none !important;
 		}
 		
-		.defect-type-hidden {
-		    display: none !important;
+		.selected-row {
+			background-color: #d1ffd6 !important;
+		}
+		.deselected-row {
+			background-color: #ffd1d1;
+		}
+		.modal-custom-size {
+			max-width: 1700px;
 		}
 
 	</style>
@@ -96,19 +102,6 @@
 	<nav th:replace="~{includes/modals/productionMaterialAdd :: productionMaterialAdd}"></nav>
 	<nav th:replace="~{POP/productionInspection :: productionInspection}"></nav>
 	
-	
-	<style>
-		.selected-row {
-			background-color: #d1ffd6;
-		}
-		.deselected-row {
-			background-color: #ffd1d1;
-		}
-		.modal-custom-size {
-			max-width: 1600px;
-		}
-	</style>
-	
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 		let workcenterGrid = null;
@@ -116,8 +109,6 @@
 		let defectGrid = null;
 		let causeGrid = null;
 		let defectInputGrid = null;
-		
-		
 		
 		const workcenter_url = '/rest/production/workcenter';
 		const workcenter_dataSource = {
