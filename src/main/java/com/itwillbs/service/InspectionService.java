@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.itwillbs.repository.InspectionMapper;
 
@@ -83,6 +84,7 @@ public class InspectionService {
 		return resultMap;
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertRejectionCode(List<Map<String, Object>> createdRows) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -100,6 +102,8 @@ public class InspectionService {
 		} catch (Exception e) {
 			result = false;
 			message = "insertToastTest 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -145,7 +149,8 @@ public class InspectionService {
 		
 		return resultMap;
 	}
-
+	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> processInboundInspection(List<Map<String, Object>> rejectionList) {
 		Map<String, Object> resultMap = new HashMap<>();
 		
@@ -175,6 +180,8 @@ public class InspectionService {
         	System.out.println("서비스 오류 e: " + e);
             result = false;
             message = "processInboundInspection() 실패";
+			
+			throw e;
         }
 
         resultMap.put("result", result);
@@ -204,7 +211,8 @@ public class InspectionService {
 		
 		return resultMap;
 	}
-
+	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertInboundLots(Map<String, Object> map) {
 		Map<String, List<Map<String, Object>>> content = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
@@ -219,6 +227,8 @@ public class InspectionService {
 		} catch (Exception e) {
 			result = false;
 			message = "insertInboundLots 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
@@ -270,7 +280,8 @@ public class InspectionService {
 		
 		return resultMap;
 	}
-
+	
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> insertProductionInspection(List<Map<String, Object>> list) {
 		Map<String, Object> resultMap = new HashMap<>();
 		System.out.println("insertProductionInspection");
@@ -287,6 +298,8 @@ public class InspectionService {
 			System.out.println(e);
 			result = false;
 			message = "insertProductionInspection 실패";
+			
+			throw e;
 		}
 		
 		resultMap.put("result", result);
