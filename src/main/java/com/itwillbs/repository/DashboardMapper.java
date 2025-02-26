@@ -43,5 +43,5 @@ public interface DashboardMapper {
 	List<Map<String, Object>> selectInboundChart(Map<String, Object> map);
 	
 	// 생산 현황
-	List<Map<String, Object>> selectProductionOrderDetail(Map<String, Object> map);
+	List<Map<String, Object>> selectProductionLotDetail(Map<String, Object> map);
 }

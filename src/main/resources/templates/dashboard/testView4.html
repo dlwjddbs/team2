@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-		<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css"/>
 	<!-- Toast UI Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css"/>
@@ -33,7 +33,7 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- ChartJS -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
 	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
@@ -192,7 +192,7 @@
 	<script th:inline="javascript">
 	
 		let productionOrderDetailGrid = null;
-		const production_order_url = '/rest/dashboard/productionOrderDetail';
+		const production_order_url = '/rest/dashboard/productionLotDetail';
 		const inboundDetailDataSource = {
 			api: {
 				readData: {url: production_order_url, method: 'GET'}
@@ -203,9 +203,10 @@
 			{header: '상세작업코드', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center', width: 150},
 			{header: '품목코드', name: 'ITEM_ID', align: 'center',},
 			{header: '품목명', name: 'ITEM_NAME', align: 'left'},
+			{header: '기준단위', name: 'ITEM_UNIT', align: 'center'},
 			{
-				header: '생산량', 
-				name: 'AMOUNT', 
+				header: '총 개수', 
+				name: 'TOTAL_QUANTITY', 
 				align: 'right',
 				formatter: function({ value }) {
 					if (!value) {
@@ -214,11 +215,20 @@
 					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
 				}
 			},
-			{header: '기준단위', name: 'ITEM_UNIT', align: 'center'},
-			{header: '생성일자', name: 'CREATE_DATE', align: 'center'},
+			{
+				header: '불량 개수', 
+				name: 'DEFECT_QUANTITY', 
+				align: 'right',
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+			{header: '시작일자', name: 'CREATE_DATE', align: 'center'},
+			{header: '완료일자', name: 'COMPLETE_DATE', align: 'center'},
 			{header: '진행상태', name: 'STATUS_NAME', align: 'center'},
-			{header: '상태코드', name: 'STATUS_CODE', hidden: true},
-			{header: '작동중개수', name: 'RUNNNING_WORKCENTER_CNT', hidden: true}
 	    ];
 	    // Chart.js를 사용하여 차트 생성
 		$(function () {
