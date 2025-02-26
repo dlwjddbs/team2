@@ -74,6 +74,7 @@ public class SalesService {
 		try {
 			if (orderIds.size() > 0) {
 				salesMapper.deleteOrder(orderIds);
+				salesMapper.deleteShipmentRequest(orderIds);
 			}
 		} catch (Exception e) {
 			result = false;
@@ -114,6 +115,53 @@ public class SalesService {
 		} catch (Exception e) {
 			result = false;
 			message = "insertRequestOrder 실패";
+			
+			throw e;
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> insertShipmentRequestDetail(List<Map<String, Object>> createdRows) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Boolean result = true;
+		String message = "insertShipmentRequestDetail 성공";
+		
+		try {
+			if (createdRows.size() > 0) {
+				int max_id = salesMapper.selectTodayMaxShipmentRequestDetailId();
+				
+				LocalDate now = LocalDate.now();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+				String formatedNow = now.format(formatter);
+				
+				for (Map<String, Object> row : createdRows) {
+					String shipmentRequestDetailId = "SRDI-" + formatedNow + "-" + String.format("%04d", max_id);
+					row.put("SHIPMENT_REQUEST_DETAIL_ID", shipmentRequestDetailId);
+					
+					max_id++;
+				}
+				
+				salesMapper.insertShipmentRequestDetail(createdRows);
+				
+				// 창고 개수 차감
+				salesMapper.updateWarehouseQuantity(createdRows);
+				// 로트 개수 차감
+				salesMapper.updateProductionLotQuantity(createdRows);
+				
+				Map<String, Object> createdRow = createdRows.getFirst();
+				// 출하 상태, 일자 갱신
+				salesMapper.updateShipmentRequestStatus(createdRow);
+				// 수주 상태, 일자 갱신
+				salesMapper.updateOrderStatus(createdRow);
+			}
+		} catch (Exception e) {
+			result = false;
+			message = "insertShipmentRequestDetail 실패";
 			
 			throw e;
 		}

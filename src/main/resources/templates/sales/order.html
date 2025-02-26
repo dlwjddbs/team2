@@ -117,7 +117,23 @@
 		const process_columns = [
 			{header: '수주번호', name: 'ORDER_ID', align: 'center', editor: null},
 			{header: '수주일자', name: 'ORDER_DATE', align: 'center', editor: null},
-			{header: '상태', name: 'STATUS_NAME', align: 'center', editor: null},
+			{
+				header: '상태',
+				name: 'STATUS_NAME',
+				align: 'center',
+				editor: null,
+				formatter: ({ value }) => {
+					let color = 'red';
+
+					switch (value) {
+						case '마감':
+							color = 'blue';
+							break;
+					}
+
+					return `<span style="color: ${color}; font-weight: bold;">${value}</span>`;
+				}
+			},
 			{header: '거래처', name: 'CLIENT_NAME', align: 'left', editor: null},
 			{header: '품목코드', name: 'ITEM_ID', align: 'center', editor: null},
 			{header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
@@ -156,6 +172,12 @@
 			el.style.border = 'solid 1px #ddd';
 			el.style.margin = 'auto 5px';
 			
+			if (props.columnInfo.name == 'DELIVERY_DATE'
+				&& processGrid.getValue(props.rowKey, 'isNew') == null) {
+				el.disabled = true;
+				el.style.border = 'solid 1px white';
+			}
+
 			if (props.columnInfo.name == 'QUANTITY'
 				&& processGrid.getValue(props.rowKey, 'isNew') == null) {
 				el.disabled = true;
@@ -290,6 +312,32 @@
 			
 			processGrid.on('failResponse', function(ev) {
 				alert(JSON.parse(ev.xhr.responseText).message);
+			});
+			
+			let cnt = 0;
+			processGrid.on('onGridMounted', () => {
+			    // 테이블 출력 완전히 끝난 후 데이터 가져오는 함수
+			    const checkGridRendered = function() {
+				    setTimeout(function() {
+			            if (processGrid.getData().length > 0) {
+			            	processGrid.getData().forEach((row, index) => {
+		 	            		// 마감은 삭제 불가.
+		 				        if (row.STATUS_NAME == '마감') {
+		 				        	processGrid.disableRowCheck(index); // 해당 행의 체크박스를 비활성화
+		 				        }
+		 				    });
+			            } else {
+			            	if (cnt > 20) {  // 애초에 빈 데이터일 때 무한루프 안빠지게.
+			            		return;
+			            	}
+			            	
+			            	cnt++;
+			                checkGridRendered(); // 데이터가 없으면 다시 체크
+			            }
+				    }, 100);
+			    };
+			    
+			    checkGridRendered();
 			});
 		}
 		

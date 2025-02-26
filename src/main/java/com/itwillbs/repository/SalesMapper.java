@@ -21,6 +21,8 @@ public interface SalesMapper {
 	int selectTodayMaxOrderId();
 
 	int deleteOrder(List<String> orderIds);
+	
+	int deleteShipmentRequest(List<String> orderIds);
 
 	List<Map<String, Object>> selectRequestOrder(Map<String, Object> requestData);
 
@@ -33,5 +35,17 @@ public interface SalesMapper {
 	List<Map<String, Object>> selectShipmentRequestDetailLot(Map<String, Object> requestData);
 	
 	List<Map<String, Object>> selectShipmentRequestDetail(Map<String, Object> requestData);
-	
+
+	int selectTodayMaxShipmentRequestDetailId();
+
+	int insertShipmentRequestDetail(List<Map<String, Object>> createdRows);
+
+	int updateShipmentRequestStatus(Map<String, Object> createdRow);
+
+	int updateOrderStatus(Map<String, Object> createdRow);
+
+	int updateWarehouseQuantity(List<Map<String, Object>> createdRows);
+
+	int updateProductionLotQuantity(List<Map<String, Object>> createdRows);
+
 }

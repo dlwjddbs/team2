@@ -101,6 +101,18 @@
 		</foreach>
 	</delete>
 	
+	<delete id="deleteShipmentRequest">
+		DELETE FROM SHIPMENT_REQUEST
+		 WHERE SHIPMENT_REQUEST_ID IN(
+			SELECT SHIPMENT_REQUEST_ID 
+			  FROM SHIPMENT_REQUEST
+			 WHERE ORDER_INTAKE_ID IN
+	 		<foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+				#{id}
+			</foreach>
+		 )
+	</delete>
+	
 	<select id="selectRequestOrder" resultType="map">
 		SELECT
 			   oi.ORDER_ID 		AS ORDER_ID
@@ -236,4 +248,75 @@
 					   ON il.WAREHOUSE_ID = w.WAREHOUSE_ID 
 		 WHERE srd.SHIPMENT_REQUEST_ID = #{shipment_request_id}
 	</select>
+	
+	<select id="selectTodayMaxShipmentRequestDetailId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(SHIPMENT_REQUEST_DETAIL_ID, '-([0-9]+)$', 1, 1, NULL, 1))), 0) + 1 AS MAX_NUMBER
+		  FROM SHIPMENT_REQUEST_DETAIL
+		 WHERE SHIPMENT_REQUEST_DETAIL_ID LIKE '%' || TO_CHAR(CURRENT_DATE, 'YYYYMMDD') || '%'
+	</select>
+	
+	<insert id="insertShipmentRequestDetail">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO SHIPMENT_REQUEST_DETAIL (
+				  SHIPMENT_REQUEST_DETAIL_ID
+				, SHIPMENT_REQUEST_ID
+				, ITEM_LOT
+				, QUANTITY
+			)
+			VALUES (
+				  #{item.SHIPMENT_REQUEST_DETAIL_ID}
+				, #{item.SHIPMENT_REQUEST_ID}
+				, #{item.PRODUCTION_LOT_ID}
+				, #{item.SHIPPED_QUANTITY}
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<update id="updateShipmentRequestStatus">
+		UPDATE SHIPMENT_REQUEST 
+		   SET 
+			   STATUS = 'RS-002'
+			 , SHIPMENT_COMPLETION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		 WHERE SHIPMENT_REQUEST_ID = #{SHIPMENT_REQUEST_ID}
+	</update>
+	
+	<update id="updateOrderStatus">
+		UPDATE ORDER_INTAKE 
+		   SET 
+			   STATUS = 'OS-002'
+			 , DELIVERY_COMPLETION_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+		 WHERE ORDER_ID = (
+			SELECT oi.ORDER_ID 
+			  FROM SHIPMENT_REQUEST sr 
+				   INNER JOIN ORDER_INTAKE oi 
+						   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID 
+			 WHERE sr.SHIPMENT_REQUEST_ID = #{SHIPMENT_REQUEST_ID}
+		 )
+	</update>
+	
+	<update id="updateWarehouseQuantity">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE ITEM_LOCATION
+			   SET 
+				   CURRENT_QUANTITY = CURRENT_QUANTITY - #{row.SHIPPED_QUANTITY}
+				 , UPDATE_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+			 WHERE ITEM_ID = (
+				SELECT ITEM_ID
+				  FROM PRODUCTION_LOT
+				 WHERE PRODUCTION_LOT_ID = #{row.PRODUCTION_LOT_ID}
+			 )
+		</foreach>
+	</update>
+	
+	<update id="updateProductionLotQuantity">
+		<foreach collection="list" item="row" separator=";" open="DECLARE BEGIN" close="; END;">
+			UPDATE PRODUCTION_LOT 
+			   SET 
+				   QUANTITY = QUANTITY - #{row.SHIPPED_QUANTITY}
+				 , UPDATE_DATE = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')
+			 WHERE PRODUCTION_LOT_ID = #{row.PRODUCTION_LOT_ID}
+		</foreach>
+	</update>
 </mapper>
