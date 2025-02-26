@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>AdminLTE 3 | DataTables</title>
+	<title>Aurora</title>
 
 	<!-- Google Font: Source Sans Pro -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -23,7 +23,11 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/css/jquery.orgchart.min.css" integrity="sha512-9A2BSSUL5eXVMWwrB8aDX8GeOOSMMVCk3fvqOplnswmo4IN4s6DW2ywpb3VCDcGCVwDc3g6S1k9T72NsCkgw5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<!-- jsTree CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
-
+	<style>
+	    #divinfo {
+	        display: none; /* 기본적으로 숨김 */
+	    }
+	</style>
 </head>
 <body class="layout-top-nav">
 	<div class="wrapper">
@@ -35,7 +39,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>Lots</h1>
+							<h1>로트추적</h1>
 						</div>
 					</div>
 				</div>
@@ -49,9 +53,6 @@
 					<div class="row">
 						<div class="col-3">
 							<div class="card">
-								<div class="card-header">
-									<h3>Lot Tree Test</h3>
-								</div>
 								<div class="card-body">
 									<div id="lot_grid"></div>
 								</div>
@@ -59,9 +60,6 @@
 						</div>
 						<div class="col-3">
 							<div class="card">
-								<div class="card-header">
-									<h3>Lot Tree Test</h3>
-								</div>
 								<div class="card-body">
 									<div id="lot_tree" class="bg-white border rounded"
 										style="height: calc(100vh - 300px); overflow-y: scroll;">
@@ -71,62 +69,40 @@
 						</div>
 						<div class="col-6">
 							<div class="card" id="detail_info">
-								<div class="card-header">
-									<h3></h3>
-								</div>
 								<div class="card-body">
-									<!-- 원자재 -->
-									<!--
+									<div  id="divinfo">
 									<div class="row">
-										<div class="col-12">
-											<h4>
-												<i class="fas fa-globe"></i> 회사명
-												<small class="float-right">입고일: 2/10/2014</small>
-											</h4>
-										</div>
-									</div>
-									<div class="row invoice-info">
-						                <div class="col-sm-4 invoice-col">
-						                  From
-						                  <address>
-						                    <strong>Admin, Inc.</strong><br>
-						                    795 Folsom Ave, Suite 600<br>
-						                    San Francisco, CA 94107<br>
-						                    Phone: (804) 123-5432<br>
-						                    Email: info@almasaeedstudio.com
-						                  </address>
-						                </div>
-						                <div class="col-sm-4 invoice-col">
-						                  To
-						                  <address>
-						                    <strong>John Doe</strong><br>
-						                    795 Folsom Ave, Suite 600<br>
-						                    San Francisco, CA 94107<br>
-						                    Phone: (555) 539-1037<br>
-						                    Email: john.doe@example.com
-						                  </address>
-						                </div>
-						                <div class="col-sm-4 invoice-col">
-						                  <b>Invoice #007612</b><br>
-						                  <br>
-						                  <b>Order ID:</b> 4F3S8J<br>
-						                  <b>Payment Due:</b> 2/22/2014<br>
-						                  <b>Account:</b> 968-34567
+						                <div class="col-12">
+						                  <h4 class="CLIENT_NAME">
+						                  </h4>
 						                </div>
 						              </div>
-									  -->
-									  <div class="row">
-  										<div class="col-12">
-  											<h4>
-  												<i class="fas fa-globe"></i> 회사명
-  												<small class="float-right">생산일: 2/10/2014</small>
-  											</h4>
-  										</div>
-  									</div>
-									
-									  <!-- 뎁스 수정... -->
+									  <div class="row invoice-info">
+						                  <div class="col-sm-4 invoice-col">
+						                    <address id="client_info">
+						                      <strong class="CLIENT_NAME"></strong><br>
+						                      주소: <a id="CLIENT_ADDRESS"></a><br>
+						                      회사전화: <a id="CLIENT_TEL"></a><br>
+						                      담당자: <a id="REST_NAME"></a>
+						                    </address>
+						                  </div>
+						                  <!-- /.col -->
+						                  <div class="col-sm-4 invoice-col">
+						                  </div>
+						                  <!-- /.col -->
+						                  <div class="col-sm-4 invoice-col" id="goodsInfo">
+						                    <b id="MATERIAL"></b><br>
+						                    <br>
+											단가: <a id="MATERIAL_PRICE"></a><br>
+											입고수량: <a id="TOTAL_QUANTITY"></a>
+											양품수량: <a id="QUANTITY"></a>
+											불량수량: <a id="REJECTION_QUANTITY"></a>
+						                  </div>
+						                  <!-- /.col -->
+						                </div>
 									<div id="toast_single">
 											<!-- Toast Grid Ajax -->
+									</div>
 									</div>
 								</div>
 							</div>
@@ -184,7 +160,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/5.0.0/js/jquery.orgchart.min.js" integrity="sha512-IUNqrYw8R7mj0iBzb0FOTGTgEFrxZCHVCHnePUEmcjJ/XQE/0sqRhBmGpp20N2lVzAkIBs0Sz+ibRN8/W9YFnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<!-- Page specific script -->
 	<script th:inline="javascript">
-		const lot_url = '/rest/lots';
+		 let po_id = '';
+		
+		let grid1 = null;
+ 		const lot_url = '/rest/lots';
 		const lot_dataSource = {
 			api: {
 				readData: {url: lot_url, method: 'GET'},
@@ -202,11 +181,9 @@
 				data: lot_dataSource,
 				scrollX: true,
 				scrollY: true,
-				bodyHeight: 770,
-				rowHeight: 60,
 				columns: [
-					{header: 'LOT', name: 'PRODUCTION_LOT_ID', align: 'center', width: 100},
-					{header: '제품명', name: 'ITEM_NAME', align: 'left'},
+					{header: 'LOT', name: 'PRODUCTION_LOT_ID', align: 'center'},
+					{header: '제품명', name: 'ITEM_NAME', align: 'left', width: 100},
 				],
 			});
 			
@@ -224,149 +201,149 @@
 					end: [ev.rowKey, lotGrid.getColumns().length]
 				});
 				
-				const lotId = lotGrid.getValue(ev.rowKey, "LOT_ID");
+				const lotId = lotGrid.getValue(ev.rowKey, "PRODUCTION_LOT_ID");
+				console.log(lotId)
 				loadLotTree(lotId);
 			});
 		}
 		
 		
 // -------------------------------------------------------------------------------------------
-		//OrgTree
-		function loadLotTree() {
-			let jsonData = 			
-				[{
-                    "parent": "#",
-                    "menuOrder": "1",
-                    "menuDepth": "1",
-                    "id": "lot1",
-                    "text": "작업지시ID"
-                },
-                {
-                    "parent": "lot1",
-                    "menuOrder": "1",
-                    "menuDepth": "2",
-                    "id": "lot1-1",
-                    "text": "PROD-20250225-0001"
-                },
-                {
-                    "parent": "lot1",
-                    "menuOrder": "2",
-                    "menuDepth": "2",
-                    "id": "lot1-2",
-                    "text": "작업지시상세ID_2"
-                },
-                {
-                    "parent": "lot1",
-                    "menuOrder": "3",
-                    "menuDepth": "2",
-                    "id": "lot1-3",
-                    "text": "작업지시상세ID_3"
-                },
-                {
-                    "parent": "lot1",
-                    "menuOrder": "4",
-                    "menuDepth": "2",
-                    "id": "lot1-4",
-                    "text": "작업지시상세ID_4"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "1",
-                    "menuDepth": "3",
-                    "id": "lot1-1-1",
-                    "text": "반제품ID_1"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "2",
-                    "menuDepth": "3",
-                    "id": "lot1-1-2",
-                    "text": "반제품ID_2"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "3",
-                    "menuDepth": "3",
-                    "id": "lot1-1-3",
-                    "text": "반제품ID_3"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "1",
-                    "menuDepth": "4",
-                    "id": "lot1-1-1",
-                    "text": "원자재ID_1"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "2",
-                    "menuDepth": "5",
-                    "id": "lot1-1-2",
-                    "text": "원자재ID_2"
-                },
-                {
-                    "parent": "lot1-1",
-                    "menuOrder": "3",
-                    "menuDepth": "6",
-                    "id": "lot1-1-3",
-                    "text": "원자재ID_3"
-                },
-                ];
-				
-				$('#lot_tree').jstree({
-	                'core' : {
-	                "animation" : 0,
-	                "check_callback": true,
-	                'data' : jsonData
-	                }
-	            });
-		}		
-	
+		//Tree
+
+		function loadLotTree(lotId) {
+		    $.ajax({
+		        url: '/ajax/lotHierarchy',
+		        type: 'POST',
+		        contentType: 'application/json',
+		        data: JSON.stringify({ lotId: lotId }),
+		        success: function (response) {
+					
+		            let treeData = transformData(response);
+					
+					$('#lot_tree').jstree({
+		                'core' : {
+		                "animation" : 0,
+		                "check_callback": true,
+		                'data' : treeData
+		                }
+		            });
+					
+					
+		        },
+		        error: function (error) {
+		            console.error('❌ 데이터 요청 실패:', error);
+		        }
+		    });
+		}
+
+		function transformData(data) {
+		    let treeData = [];
+		    let nodeMap = {};
+
+		    data.forEach(row => {
+		        let lotId = row.PRODUCTION_LOT_ID;
+		        let itemLot = row.ITEM_LOT;
+		        let level = row.LEVEL;
+
+		        
+		        if (!nodeMap[lotId]) {
+		            nodeMap[lotId] = {
+		                id: lotId,
+		                parent: "#",
+		                menuOrder: Object.keys(nodeMap).length + 1,
+		                menuDepth: 1,
+		                text: `${lotId}`
+		            };
+		            treeData.push(nodeMap[lotId]);
+		        }
+
+		       
+		        if (!nodeMap[itemLot]) {
+		            nodeMap[itemLot] = {
+		                id: itemLot,
+		                parent: lotId,
+		                menuOrder: Object.keys(nodeMap).length + 1,
+		                menuDepth: level + 1,
+		                text: ` ${itemLot}`
+		            };
+		            treeData.push(nodeMap[itemLot]);
+		        }
+		    });
+
+		    return treeData;
+		}
+
+		
 		$('#lot_tree').on('select_node.jstree', function(e,data){
-			console.log(data.node.id);
 			let select_id = data.node.id;
-			// 그리드 생성
-			grid();
-			
-			$("#detail_info").show();
-			$("#detail_info h3").text(data.node.text);
-			
-			
-			
-			
-			
-			
-			
+			console.log(select_id);
+			$.ajax({
+		        url: '/ajax/lotDetailInfo',
+		        type: 'POST',
+		        contentType: 'application/json',
+		        data: JSON.stringify({ select_id: select_id }),
+		        success: function (response) {
+					console.log(response);
+					info(response);
+					$("#divinfo").show();
+		        },
+		        error: function (error) {
+		            console.error('❌ 데이터 요청 실패:', error);
+		        }
+			});
 			
 		});
+		
+		function info(data) {
+		    if (data.lotDetail && data.lotDetail.length > 0) {
+		        let detail = data.lotDetail[0];
+				
+				po_id = detail.PO_ID;
+				
+		        $(".CLIENT_NAME").text(detail.CLIENT_NAME);
+		        $("#CLIENT_ADDRESS").text(detail.CLIENT_ADDRESS);
+		        $("#CLIENT_TEL").text(detail.CLIENT_TEL);
+		        $("#REST_NAME").text(detail.REST_NAME);
+		        $("#MATERIAL").text(`발주번호: ${detail.PO_ID}`);
+		    }
+
+		    if (data.materialInfo && data.materialInfo.length > 0) {
+		        let material = data.materialInfo[0];
+
+		        $("#MATERIAL_PRICE").text(material.MATERIAL_PRICE.toLocaleString() + " 원");
+		        $("#QUANTITY").text(material.QUANTITY.toLocaleString() + " 개");
+		        $("#MATERIAL").text(material.MATERIAL);
+		    }
+			grid();
+		}
+
 // ---------------------------------------------------------------------------------
-		const url = '/ajax/toastTest';
-		const dataSource = {
-	        api: {
-	            readData: {url: url, method: 'GET'},
-	        },
-			contentType: 'application/json',
-	    };
 		
 		function grid() {
 			
-			if(grid1) {
+			if (grid1) {
 				grid1.destroy();
 				grid1 = null;
-		  }
+	        }
 			
+			const url = '/rest/inboundInspection';
+			const dataSource = {
+		        api: {
+		            readData: {url: url, method: 'GET', initParams: { po_id: po_id } },
+		        },
+				contentType: 'application/json',
+		    };
 			
 		    grid1 = new tui.Grid({
 		        el: document.getElementById('toast_single'),
 		        data: dataSource,
 		        scrollX: true,
 		        scrollY: true,
-		        rowHeaders: ['checkbox'],
 		        columns: [
-		            {header: 'ID', name: 'ID', align: 'center', editor: 'text'},
-		            {header: 'COL_1', name: 'COL_1', align: 'center', editor: 'text'},
-		            {header: 'COL_2', name: 'COL_2', align: 'center', editor: 'text'},
-		            {header: 'COL_3', name: 'COL_3', align: 'center', editor: 'text'},
+		            {header: 'LOT', name: 'INSPECTION_ID', align: 'center', editor: 'text'},
+		            {header: '불량사유', name: 'REJECTION', align: 'center', editor: 'text'},
+		            {header: '수량', name: 'DEFECT_QUANTITY', align: 'center', editor: 'text'}
 		        ],
 		    });
 
@@ -375,94 +352,8 @@
 		    });
 			
 			
-			grid1.on('editingStart', function(ev) {
-			    const {rowKey, columnName, value} = ev;
-			    const rowData = grid1.getRow(rowKey);
-				
-				// PK 수정 불가 && 새로 추가된 행은 작성 가능
-				if (columnName == 'ID' && !rowData.isNew) {
-					ev.stop();
-				}
-			});
 		}
 
-		$("#btn_add_row").on("click", function () {
-		    const newRowKey = grid1.appendRow(
-		        {
-		            "ID": '',
-		            "COL_1": '',
-		            "COL_2": '',
-		            "COL_3": '',
-		            isNew: true
-		        },
-		        {focus: true}
-		    );
-		});
-
-        $("#btn_insert").on("click", function() {
-			grid1.request('createData');
-			grid1.reloadData();  // 실패시 테이블 리로드
-			// GET 요청시 데이터 보낼려면 header 설정
-		});
-		
-		$("#btn_update").on("click", function() {
-			grid1.request('updateData');
-		});
-		
-        $("#btn_delete").on("click", function() {
-			grid1.removeCheckedRows();
-			
-			// 반드시 removeCheckedRows()후에 실행 순서
-			// DELETE는 body가 없고 url과 header만 있음, 기본값 url -> url대신 header에 담아 보냄
-			const ids = grid1.getModifiedRows().deletedRows.map(row => row.ID).join(',');
-			dataSource.api.deleteData.headers['X-Delete-IDs'] = ids;
-			
-		    grid1.request('deleteData');
-			grid1.reloadData();  // 실패시 테이블 리로드
-		});	
-
-// ---------------------------------------------------------------------------------
-		/*
-		// jQuery Org Chart
-		$("#toast_single").on("click", function() {
-			
-			console.log("toast click");
-			
-			var data = {
-		        id: '1',
-		        name: 'Root Node',
-		        title: 'CEO',
-		        children: [
-		          {
-		            id: '2',
-		            name: 'Child Node 1',
-		            title: 'Manager',
-		            children: [
-		              { id: '3', name: 'Grandchild Node 1', title: 'Engineer' },
-		              { id: '4', name: 'Grandchild Node 2', title: 'Engineer' }
-		            ]
-		          },
-		          {
-		            id: '5',
-		            name: 'Child Node 2',
-		            title: 'Manager'
-		          }
-		        ]
-		      };
-				
-			  console.log(data);
-		      // OrgChart 초기화
-		      $('#chart_container').orgchart({
-				
-		        'data': data, // 데이터 입력
-		        'nodeContent': 'title', // 노드에 표시할 속성
-		        'pan': true, // 패닝 활성화
-		        'zoom': false, // 줌 활성화
-				'direction': 'b2t' // 방향 설정 (bottom to top)
-		      });
-		});
-		*/
-		
 	</script>
 </body>
 </html>

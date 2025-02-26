@@ -40,7 +40,13 @@ public class LotsRestController {
 	@GetMapping("/rest/lots")
 	public Map<String, Object> getLots() {
 		return lotsService.selectLots();
-	}	
+	}
+	
+	@GetMapping("/rest/inboundInspection")
+	public Map<String, Object> getInboundInspection(@RequestParam Map<String, Object> map) {
+		return lotsService.selectInboundInspection(map);
+	}
+	
 	
 }
 
