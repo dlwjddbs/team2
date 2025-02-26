@@ -253,29 +253,126 @@
 	<!-- ==================== 불량률 ==================== -->
 	
 	<!-- ==================== 생산 현황 ==================== -->
+	
+	<!-- 막대 차트 조회 (생산량 - 일별/주별/월별) -->
+	<!-- 구현중 -->
+    <select id="selectProductChart" resultType="map">
+    	<!-- selectInboundChart 기록 스택바차트 조회 -->
+    	<!-- 일별/주별/월별 불량률 기록을 조회 -->
+    	<!-- GROUPING SETS 활용 -->
+		SELECT 
+		       CASE 
+		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"')) = 0 THEN 'daily'
+		           WHEN GROUPING(
+		               TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		               (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
+		                TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'
+		           ) = 0 THEN 'weekly'
+		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')) = 0 THEN 'monthly'
+		       END AS TYPE
+		     , COALESCE(
+		           TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"'),  -- 일별
+		           TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
+		            TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주',  -- 주별 (2월 2주)
+		           TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')  -- 월별
+		       ) AS TIME_PERIOD
+		     , NVL(SUM(PD.PO_COUNT), 0) AS TOTAL_PO_COUNT
+		     , NVL(SUM(II.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
+		     , CASE 
+		           WHEN SUM(PD.PO_COUNT) = 0 THEN 0
+		           ELSE ROUND(NVL(SUM(II.DEFECT_QUANTITY), 0) / SUM(PD.PO_COUNT) * 100, 2)
+		       END AS DEFECT_RATE
+		  FROM 
+		       PURCHASE_ORDER PO
+	 LEFT JOIN 
+		       PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
+ 	 LEFT JOIN 
+		       INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
+	  GROUP BY 
+		       GROUPING SETS (
+		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"')),  -- 일별
+		           (TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		            (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
+		             TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'), -- 주별
+		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"'))  -- 월별
+		       )
+	  ORDER BY 
+		       TYPE
+		     , TIME_PERIOD
+    </select>
+    
+    <!-- 라인 차트 조회 (생산 불량률 - 일별/주별/월별) -->
+    <!-- 구현중 -->
+    <select id="selectProductInboundChart" resultType="map">
+    	<!-- selectInboundChart 기록 스택바차트 조회 -->
+    	<!-- 일별/주별/월별 불량률 기록을 조회 -->
+    	<!-- GROUPING SETS 활용 -->
+	  	SELECT 
+		       CASE 
+		           WHEN GROUPING(TO_CHAR(TO_DATE(pod.COMPLETE_DATE , 'YY/MM/DD'), 'MM"월" DD"일"')) = 0 THEN 'daily'
+		           WHEN GROUPING(
+		               TO_NUMBER(TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		               (TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'WW') - 
+		                TO_CHAR(TRUNC(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'
+		           ) = 0 THEN 'weekly'
+		           WHEN GROUPING(TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')) = 0 THEN 'monthly'
+		       END AS TYPE
+		     , COALESCE(
+		           TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"'),  -- 일별
+		           TO_NUMBER(TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		           (TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'WW') - 
+		            TO_CHAR(TRUNC(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주',  -- 주별 (2월 2주)
+		           TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')  -- 월별
+		       ) AS TIME_PERIOD
+		     , NVL(SUM(pi.TOTAL_QUANTITY), 0) AS TOTAL_QUANTITY
+		     , NVL(SUM(pi.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
+		     , CASE 
+		           WHEN SUM(pi.TOTAL_QUANTITY) = 0 THEN 0
+		           ELSE ROUND(NVL(SUM(pi.DEFECT_QUANTITY), 0) / SUM(pi.TOTAL_QUANTITY) * 100, 2)
+		       END AS DEFECT_RATE
+		  FROM 
+		       PRODUCTION_ORDER_DETAIL pod
+ 	 LEFT JOIN 
+		       PRODUCTION_INSPECTION pi ON pod.PRODUCTION_ORDER_DETAIL_ID = pi.PRODUCTION_ORDER_DETAIL_ID
+	  GROUP BY 
+		       GROUPING SETS (
+		           (TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"')),  -- 일별
+		           (TO_NUMBER(TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
+		            (TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'WW') - 
+		             TO_CHAR(TRUNC(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'), -- 주별
+		           (TO_CHAR(TO_DATE(pod.COMPLETE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"'))  -- 월별
+		       )
+	  ORDER BY 
+		       TYPE
+		     , TIME_PERIOD
+    </select>
+	
 	<!-- 그리드 조회 (생산 현황) -->
-	<select id="selectProductionOrderDetail" resultType="map">
+	<select id="selectProductionLotDetail" resultType="map">
 		SELECT
-			   pod.PRODUCTION_ORDER_DETAIL_ID 				AS PRODUCTION_ORDER_DETAIL_ID
-			 , pod.PRODUCTION_ORDER_ID 						AS PRODUCTION_ORDER_ID
-			 , pod.ITEM_ID 									AS ITEM_ID
-			 , i.ITEM_NAME 									AS ITEM_NAME
-			 , pod.AMOUNT 									AS AMOUNT
-			 , i.ITEM_UNIT 									AS ITEM_UNIT
-			 , po.CREATE_DATE 								AS CREATE_DATE
-			 , pod.STATUS 									AS STATUS_CODE
-			 , mc.SUB_NAME 									AS STATUS_NAME
+			   pod.PRODUCTION_ORDER_DETAIL_ID 			AS PRODUCTION_ORDER_DETAIL_ID
+			 , pl.ITEM_ID 								AS ITEM_ID
+			 , i.ITEM_NAME 								AS ITEM_NAME
+			 , i.ITEM_UNIT 								AS ITEM_UNIT
+			 , pi.TOTAL_QUANTITY 						AS TOTAL_QUANTITY
+			 , pi.DEFECT_QUANTITY 						AS DEFECT_QUANTITY
+			 , mc.SUB_NAME 								AS STATUS_NAME
+			 , pi.CREATE_DATE 							AS CREATE_DATE
+			 , pod.COMPLETE_DATE 						AS COMPLETE_DATE
 		  FROM 
 		  	   PRODUCTION_ORDER_DETAIL pod
-			   INNER JOIN PRODUCTION_ORDER po 
-					   ON pod.PRODUCTION_ORDER_ID = po.PRODUCTION_ORDER_ID
-			   INNER JOIN ITEM i 
-					   ON pod.ITEM_ID = i.ITEM_ID
-			   INNER JOIN MES_COMMON mc 
-					   ON pod.STATUS = mc.CLASSIFICATION_ID 
+	INNER JOIN PRODUCTION_LOT pl 
+			ON pod.PRODUCTION_ORDER_DETAIL_ID  = pl.PRODUCTION_ORDER_DETAIL_ID 
+	INNER JOIN PRODUCTION_INSPECTION pi 
+			ON pl.PRODUCTION_ORDER_DETAIL_ID = pi.PRODUCTION_ORDER_DETAIL_ID 
+	INNER JOIN ITEM i 
+			ON pl.ITEM_ID = i.ITEM_ID
+	INNER JOIN MES_COMMON mc 
+			ON pod.STATUS = mc.CLASSIFICATION_ID 
 	  ORDER BY 
-	  		   po.CREATE_DATE
-	  		 , po.CREATE_TIME ASC
+	  		   pod.COMPLETE_DATE
+	  		 , pod.COMPLETE_TIME ASC
 	</select>
 	
 	
