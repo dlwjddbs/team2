@@ -195,9 +195,26 @@
 		let clientCurrentSelectedRowKey = null;
 		let clientIsEditModeEnabled = false; 
 		const client_columns = [
-            {header: '거래처 코드', name: 'CLIENT_ID', align: 'center', editor: null},
+			{
+		        header: '거래처 코드',
+		        name: 'CLIENT_ID',
+		        align: 'center',
+		        editor: null,
+		        formatter: function({ value }) {
+		            return `<span style="font-weight: bold;">${value}</span>`;
+		        }
+		    },
             {header: '거래처명', name: 'CLIENT_NAME', align: 'left', editor: null},
-            {header: '거래처 유형', name: 'CLIENT_TYPE', align: 'center', editor: null},
+			{
+			    header: '거래처 유형',
+			    name: 'CLIENT_TYPE',
+			    align: 'center',
+			    editor: null,
+			    formatter: function({ value }) {
+			        let color = value === '매입사' ? 'purple' : value === '매출사' ? 'orange' : 'black';
+			        return `<span style="color: ${color};">${value}</span>`;
+			    }
+			},
             {
 				header: '사업자번호', 
 				name: 'BUSINESS_NUMBER', 
@@ -217,7 +234,20 @@
 			},
             {header: '대표자', name: 'CEO_NAME', align: 'left', editor: null},
             {header: '전화번호', name: 'CLIENT_TEL', align: 'left', editor: null},
-            {header: '거래상태', name: 'CLIENT_STATUS', align: 'center', editor: null},
+			{
+			    header: '거래상태',
+			    name: 'CLIENT_STATUS',
+			    align: 'center',
+			    editor: null,
+			    formatter: function({ value }) {
+			        if (value === '거래중') {
+			            return `<span style="color: blue; font-weight: bold;">${value}</span>`;
+			        } else if (value === '거래중지') {
+			            return `<span style="text-decoration: line-through; color: gray;">${value}</span>`;
+			        }
+			        return value;
+			    }
+			}
         ];
 		
 		// 거래처 상세
@@ -442,17 +472,6 @@
 			        clientGrid.addRowClassName(newRowKey, 'selected-row');
 			        clientCurrentSelectedRowKey = newRowKey;
 				
-					// 거래처 상세 그리드 생성
-					/*const clientID = clientGrid.getRow(newRowKey).CLIENT_ID;
-					clientDetailInit(clientID);
-					clientCurrentSelectedID = clientID;	
-					$("#btn_group_client").show();
-			    } else {
-			        // 같은 행을 클릭한 경우 선택 해제
-			        clientCurrentSelectedRowKey = null;
-					clientCurrentSelectedID = null;
-					$("#btn_group_client").hide();
-			    }*/
 				   const clientID = clientGrid.getValue(newRowKey, 'CLIENT_ID');
 				    console.log("선택된 거래처 ID: ", clientID); // clientID가 제대로 가져와지는지 확인
 

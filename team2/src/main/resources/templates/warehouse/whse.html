@@ -214,7 +214,15 @@
 			contentType: 'application/json',
 	    };
 		const whse_columns = [
-            {header: '창고 코드', name: 'WAREHOUSE_ID', align: 'center', editor: null},
+            {
+				header: '창고 코드', 
+				name: 'WAREHOUSE_ID', 
+				align: 'center', 
+				editor: null,
+				formatter: function({ value }) {
+		            return `<span style="font-weight: bold;">${value}</span>`;
+		        }
+			},
             {header: '창고명', name: 'WAREHOUSE_NAME', align: 'left', editor: null},
             {header: '창고 유형', name: 'WAREHOUSE_TYPE', align: 'center', editor: null},
             {header: '구역 수', name: 'LOCATION_COUNT', align: 'center', editor: null},
@@ -244,7 +252,15 @@
 			contentType: 'application/json',
 		};
 		const location_columns = [
-		    {header: '구역 코드', name: 'LOCATION_ID', align: 'center', editor: null},
+		    {
+				header: '구역 코드', 
+				name: 'LOCATION_ID', 
+				align: 'center', 
+				editor: null,
+				formatter: function({ value }) {
+		            return `<span style="font-weight: bold;">${value}</span>`;
+		        }
+			},
 		    {header: '구역명', name: 'LOCATION_NAME', align: 'center', editor: null},
 		    {header: '자재 코드', name: 'PRODUCT_ID', align: 'left', editor: null},
 		    {header: '정렬', name: 'LOCATION_ORDER', align: 'center', editor: null},

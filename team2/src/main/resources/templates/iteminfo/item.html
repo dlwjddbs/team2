@@ -172,7 +172,15 @@
 			contentType: 'application/json',
 	    };
 		const item_columns = [
-            {header: '품목 코드', name: 'ITEM_ID', align: 'center', editor: null},
+            {
+				header: '품목 코드', 
+				name: 'ITEM_ID', 		
+				align: 'center',
+				editor: null,
+				formatter: function({ value }) {
+				    return `<span style="font-weight: bold;">${value}</span>`;
+				}
+		    },
             {header: '품목명', name: 'ITEM_NAME', align: 'left', editor: null},
             {header: '품목 유형', name: 'ITEM_TYPE', align: 'left', editor: null},
 			{
