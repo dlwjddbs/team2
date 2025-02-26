@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css"/>
 	<!-- Toast UI Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css"/>
 	<!-- daterange picker -->
@@ -31,6 +33,8 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- ChartJS -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	<!-- SheetJS (Excel 변환 라이브러리) -->
@@ -64,7 +68,7 @@
 	        <section class="content">
 	        	<section class="content-header">
 		            <div class="container-fluid">
-		                <h1>MES 대시보드 (예시) - 전체 현황</h1>
+		                <h1>MES 대시보드 - 전체 현황</h1>
 		            </div>
 	        	</section>
 	        	
@@ -75,7 +79,7 @@
 	                        <div class="small-box bg-info">
 	                            <div class="inner">
 	                                <h3>95%</h3>
-	                                <p>생산 진행률</p>
+	                                <p>생산 진행률(예시)</p>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -83,7 +87,7 @@
 	                        <div class="small-box bg-danger">
 	                            <div class="inner">
 	                                <h3>3%</h3>
-	                                <p>불량률</p>
+	                                <p>불량률(예시)</p>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -91,7 +95,7 @@
 	                        <div class="small-box bg-success">
 	                            <div class="inner">
 	                                <h3>85%</h3>
-	                                <p>설비 가동률</p>
+	                                <p>설비 가동률(예시)</p>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -102,9 +106,12 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">LOT 추적</h3>
+	                                <h3 class="card-title">LOT 추적(예시)</h3>
 	                            </div>
 	                            <div class="card-body">
+	                            	<!-- <div id="lotGrid">
+	                                	Toast UI Grid
+	                                </div> -->
 	                                <table id="lotTrackingTable" class="table table-bordered">
 	                                    <thead>
 	                                        <tr>
@@ -125,7 +132,7 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">공정별 생산량 & 불량률</h3>
+	                                <h3 class="card-title">공정별 생산량 & 불량률(예시)</h3>
 	                            </div>
 	                            <div class="card-body">
 	                                <canvas id="processChart"></canvas>
@@ -142,7 +149,7 @@
 	                                <h3 class="card-title">설비 가동 현황</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="equipmentChart"></canvas>
+	                                <canvas id="equipStatusChart"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -150,7 +157,7 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">설비 가동 이력</h3>
+	                                <h3 class="card-title">설비 가동 이력(예시)</h3>
 	                            </div>
 	                            <div class="card-body">
 	                                <canvas id="equipmentHistoryChart"></canvas>
@@ -179,42 +186,88 @@
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+	
+		$(function () {
+			donutChart('equipStatusChart', false);
+		});
+		
 		document.addEventListener("DOMContentLoaded", function() {
 		    new Chart(document.getElementById("processChart"), {
 		        type: "bar",
 		        data: {
-		            labels: ["절단", "조립", "검사"],
-		            datasets: [{ label: "생산량", data: [200, 180, 220], backgroundColor: "blue" },
-		                       { label: "불량률", data: [5, 3, 7], backgroundColor: "red" }]
-		        }
-		    });
-	
-		    new Chart(document.getElementById("equipmentChart"), {
-		        type: "doughnut",
-		        data: {
-		            labels: ["사용중", "사용안함"],
-		            datasets: [{
-		                data: [85, 15],
-		                backgroundColor: ["green", "gray"]
-		            }]
-		        },
-		        options: {
-		            responsive: true,	// 반응형, 캔버스 크기 조절
-		            maintainAspectRatio: false,	// 크기 조절될 때 원본 캔버스 방향 비율 유지
-		            rotation: -90,	// 위쪽을 시작점으로 설정
-		            circumference: 180,	// 반원 형태를 위해 180도 설정
-		            cutout: "50%",	// 도넛 두께 조정 (차트의 중앙 부분을 비움, 필요시 조절)
+		            labels: ["발주", "생산", "조립", "검사"],
+		            datasets: [{ label: "생산량", data: [200, 180, 220, 600], backgroundColor: "blue" },
+		                       { label: "불량률", data: [5, 3, 7, 15], backgroundColor: "red" }]
 		        }
 		    });
 	
 		    new Chart(document.getElementById("equipmentHistoryChart"), {
 		        type: "line",
 		        data: {
-		            labels: ["08:00", "10:00", "12:00", "14:00"],
-		            datasets: [{ label: "가동률", data: [80, 85, 90, 87], borderColor: "blue", fill: false }]
+		            labels: ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+		            datasets: [{ label: "가동률", data: [60, 85, 95, 87, 90, 80, 70], borderColor: "blue", fill: false }]
 		        }
 		    });
 		});
+		
+		// 설비 가동 현황 차트
+		function donutChart(chartId, isUpdate) {
+			//let deptCode = $("#DEP").val();
+			//let rankCode = $("#RANK").val();
+			
+			$.ajax({
+                type : "POST",
+                url : "/dashboard/getEquipmentDonutChart",
+/*                 data : {
+					startDate : date[0],					
+					endDate : date[1],
+					//deptCode : deptCode,
+					//rankCode : rankCode
+				}, */
+                success : function(res){
+					let labels = [];
+					let data = [];
+					
+					res.forEach((element) => {
+						labels.push(element.ATTENDANCE_TEXT);
+						data.push(element.PIE_CHART_VALUE);
+					});
+					
+					let donutChartCanvas = $('#' + chartId).get(0).getContext('2d')
+					let donutData = {
+						labels: labels,
+						datasets: [
+							{
+								data: data,
+								backgroundColor: ["green", "gray"]
+							}
+						]
+					}
+					
+					let donutOptions = {
+			            responsive: true,	// 반응형, 캔버스 크기 조절
+			            maintainAspectRatio: false,	// 크기 조절될 때 원본 캔버스 방향 비율 유지
+			            rotation: -90,	// 위쪽을 시작점으로 설정
+			            circumference: 180,	// 반원 형태를 위해 180도 설정
+			            cutout: "50%",	// 도넛 두께 조정 (차트의 중앙 부분을 비움, 필요시 조절)
+					}
+					
+					// 차트 재생성 시 기존의 차트 삭제
+					if (isUpdate) {
+					    myDonutChart.destroy();
+					} 
+					
+					myDonutChart = new Chart(donutChartCanvas, {
+						type: 'doughnut',
+						data: donutData,
+						options: donutOptions
+					});
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown){
+                    console.log("donutChart() ajax 실패");
+                }
+            });
+		}
 	</script>
 </body>
 </html>

@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+		<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css"/>
 	<!-- Toast UI Grid -->
 	<link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css"/>
 	<!-- daterange picker -->
@@ -29,8 +31,10 @@
 	<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
 	<!-- date-range-picker -->
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
-	<!-- ChartJS (v2.9.4) -->
-	<script src="../../plugins/chart.js/Chart.min.js"></script>
+	<!-- ChartJS -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<!-- Toast UI Pagination (Toast UI 페이징) -->
+	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 	<!-- Toast UI Grid -->
 	<script src="https://uicdn.toast.com/tui-grid/latest/tui-grid.min.js"></script>
 	<!-- SheetJS (Excel 변환 라이브러리) -->
@@ -78,6 +82,58 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
+	                                <h3 class="card-title">일별 생산량</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="productionChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- 불량률 차트 -->
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">일별 생산 불량률</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="defectChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	                
+	                <div class="row">
+	                    <!-- 생산 현황 차트 -->
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">주별 생산량</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="productionChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- 불량률 차트 -->
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
+	                                <h3 class="card-title">주별 생산 불량률</h3>
+	                            </div>
+	                            <div class="card-body">
+	                                <canvas id="defectChart"></canvas>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	                
+	                <div class="row">
+	                    <!-- 생산 현황 차트 -->
+	                    <div class="col-lg-6">
+	                        <div class="card">
+	                            <div class="card-header">
 	                                <h3 class="card-title">월별 생산량</h3>
 	                            </div>
 	                            <div class="card-body">
@@ -90,7 +146,7 @@
 	                    <div class="col-lg-6">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">불량률</h3>
+	                                <h3 class="card-title">월별 생산 불량률</h3>
 	                            </div>
 	                            <div class="card-body">
 	                                <canvas id="defectChart"></canvas>
@@ -98,16 +154,18 @@
 	                        </div>
 	                    </div>
 	                </div>
-	
+	                
 	                <!-- 생산 실적 그리드 -->
 	                <div class="row">
 	                    <div class="col-12">
 	                        <div class="card">
 	                            <div class="card-header">
-	                                <h3 class="card-title">생산 실적</h3>
+	                                <h3 class="card-title">생산 실적 현황</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <div id="grid"></div>
+	                                <div id="productionOrderDetail">
+	                                	<!-- Toast UI Grid -->
+	                                </div>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -132,6 +190,51 @@
 
 	<!-- Page specific script -->
 	<script th:inline="javascript">
+	
+		let productionOrderDetailGrid = null;
+		const production_order_url = '/rest/dashboard/productionOrderDetail';
+		const inboundDetailDataSource = {
+			api: {
+				readData: {url: production_order_url, method: 'GET'}
+			},
+			contentType: 'application/json',
+		};
+		const productionOrderDetail_columns = [
+			{header: '상세작업코드', name: 'PRODUCTION_ORDER_DETAIL_ID', align: 'center', width: 150},
+			{header: '품목코드', name: 'ITEM_ID', align: 'center',},
+			{header: '품목명', name: 'ITEM_NAME', align: 'left'},
+			{
+				header: '생산량', 
+				name: 'AMOUNT', 
+				align: 'right',
+				formatter: function({ value }) {
+					if (!value) {
+						return '0';
+					}
+					return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 천 단위 콤마 추가
+				}
+			},
+			{header: '기준단위', name: 'ITEM_UNIT', align: 'center'},
+			{header: '생성일자', name: 'CREATE_DATE', align: 'center'},
+			{header: '진행상태', name: 'STATUS_NAME', align: 'center'},
+			{header: '상태코드', name: 'STATUS_CODE', hidden: true},
+			{header: '작동중개수', name: 'RUNNNING_WORKCENTER_CNT', hidden: true}
+	    ];
+	    // Chart.js를 사용하여 차트 생성
+		$(function () {
+			delayedLoadCharts();
+		    
+			productionOrderDetailInit();
+		});
+	    
+	    // 브라우저가 다음 프레임을 그릴 준비가 된 후 실행
+	    // 부드러운 렌더링 보장, 차트가 제대로 안 그려지는 문제 해결
+		function delayedLoadCharts() {
+		    requestAnimationFrame(() => {
+		        //loadCharts();
+		    });
+		}   
+
 	    // Chart.js를 사용하여 차트 생성
 	    const ctx1 = document.getElementById('productionChart').getContext('2d');
 	    const productionChart = new Chart(ctx1, {
@@ -170,24 +273,26 @@
 	    });
 	
 	    // Toast UI Grid를 사용하여 그리드 생성
-	    const grid = new tui.Grid({
-	        el: document.getElementById('grid'),
-	        data: {
-	            contentType: 'json',
-	            api: {
-	                readData: { url: '/api/production-results', method: 'GET' }
-	            }
-	        },
-	        columns: [
-	            { header: '날짜', name: 'date' },
-	            { header: '제품명', name: 'productName' },
-	            { header: '생산량', name: 'quantity' },
-	            { header: '불량 수', name: 'defectCount' }
-	        ],
-	        pageOptions: {
-	            perPage: 10
-	        }
-	    });
+		function productionOrderDetailInit() {
+			if(productionOrderDetailGrid) {
+				productionOrderDetailGrid.destroy();
+				productionOrderDetailGrid = null;
+			}
+
+			productionOrderDetailGrid = new tui.Grid({
+				el: document.getElementById('productionOrderDetail'),
+				data: inboundDetailDataSource,
+				scrollX: true,
+				scrollY: true,
+				bodyHeight: 550,
+				rowHeight: 50,
+				columns: productionOrderDetail_columns,
+ 		        pageOptions: {
+		            useClient: true, // 클라이언트에서 페이징 처리
+		            perPage: 10  // 한 페이지당 10개씩 표시
+		        },
+			});
+		}
 	</script>
 </body>
 </html>
