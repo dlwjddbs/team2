@@ -308,6 +308,17 @@
 		 	   PRODUCTION_ORDER_DETAIL_ID = #{list[0].PRODUCTION_ORDER_DETAIL_ID}
     </update>
     
+	<update id="updateProductionOrder">
+    	UPDATE
+    		   PRODUCTION_ORDER
+		   SET 
+		   	   COMPLETE_DATE = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+			 , COMPLETE_TIME = TO_CHAR(SYSDATE, 'HH24:MI:SS')
+			 , STATUS = 'ST-003'
+		 WHERE
+		 	   PRODUCTION_ORDER_ID = #{list[0].PRODUCTION_ORDER_ID}
+    </update>
+    
     <update id="updateWortcenterLog">
     	UPDATE
     		   WORKCENTER_LOG

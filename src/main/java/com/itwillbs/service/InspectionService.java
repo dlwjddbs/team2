@@ -281,6 +281,7 @@ public class InspectionService {
 			inspectionMapper.insertProductionInspection(list);
 			inspectionMapper.insertProductionLot(list);
 			inspectionMapper.updateProductionOrderDetail(list);
+			inspectionMapper.updateProductionOrder(list);
 			inspectionMapper.updateWortcenterLog(list);
 		} catch (Exception e) {
 			System.out.println(e);

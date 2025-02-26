@@ -368,7 +368,7 @@
 			let id = '';
 			let requiredQuantity = '';
 			
-			gridData.forEach((row) => {
+			productionOrderGrid.getData().forEach((row) => {
 				const rowkey = row.rowKey;
 
 				if (productionOrderGrid.getRowClassName(rowkey).includes('selected-row')) {

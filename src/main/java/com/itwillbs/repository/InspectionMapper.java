@@ -51,4 +51,6 @@ public interface InspectionMapper {
 
 	int updateWortcenterLog(@Param("list")List<Map<String, Object>> list);
 
+	int updateProductionOrder(@Param("list")List<Map<String, Object>> list);
+
 }
