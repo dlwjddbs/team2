@@ -30,15 +30,18 @@ public interface DashboardMapper {
 	
 	// ====================================================================================
 	
-	List<Map<String, Object>> selectPoBarChartDaily(Map<String, Object> map);
+	// 발주 상태 - 일별/주별/월별
+	List<Map<String, Object>> selectPoBarChart(Map<String, Object> map);
 	
-	List<Map<String, Object>> selectPoBarChartWeekly(Map<String, Object> map);
-	
-	List<Map<String, Object>> selectPoBarChartMonthly(Map<String, Object> map);
-	
+	// 거래처별 발주량 및 불량률
 	List<Map<String, Object>> selectClientPo(Map<String, Object> map);
 	
+	// 거래처별 불량률
 	List<Map<String, Object>> selectClientInboundChart(Map<String, Object> map);
 	
+	// 불량률 - 일별/주별/월별
 	List<Map<String, Object>> selectInboundChart(Map<String, Object> map);
+	
+	// 생산 현황
+	List<Map<String, Object>> selectProductionOrderDetail(Map<String, Object> map);
 }
