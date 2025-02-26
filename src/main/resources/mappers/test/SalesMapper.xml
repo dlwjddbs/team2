@@ -181,49 +181,30 @@
 	</select>
 	
 	<select id="selectShipmentRequestDetailLot" resultType="map">
-		WITH SHIPMENT_DATA AS (
-			SELECT 
-				   oi.ITEM_ID																	AS ITEM_ID
-			 	 , i.ITEM_NAME																	AS ITEM_NAME
-				 , i.ITEM_UNIT																	AS ITEM_UNIT
-				 , pl.PRODUCTION_LOT_ID															AS PRODUCTION_LOT_ID
-				 , pl.CREATE_DATE																AS CREATE_DATE
-				 , pl.QUANTITY																	AS CURRENT_QUANTITY
-				 , w.WAREHOUSE_NAME																AS WAREHOUSE_NAME
-				 , SUM(pl.QUANTITY) OVER (PARTITION BY oi.ITEM_ID ORDER BY pl.CREATE_DATE ASC) 	AS CUM_SUM
-			  FROM SHIPMENT_REQUEST sr
-				   INNER JOIN ORDER_INTAKE oi 
-						   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID 
-				   INNER JOIN ITEM i 
-						   ON oi.ITEM_ID = i.ITEM_ID 
-				   INNER JOIN PRODUCTION_LOT pl 
-						   ON i.ITEM_ID = pl.ITEM_ID 
-				   INNER JOIN ITEM_LOCATION il 
-						   ON i.ITEM_ID = il.ITEM_ID 
-				   INNER JOIN WAREHOUSE w 
-						   ON il.WAREHOUSE_ID = w.WAREHOUSE_ID 
-			 WHERE
-				   1 = 1
-			   AND sr.SHIPMENT_REQUEST_ID = #{shipment_request_id}
-			   AND pl.QUANTITY > 0
-			 ORDER BY pl.CREATE_DATE ASC
-		)
 		SELECT 
-			   SHIPMENT_DATA.*
-			 , CASE 
-					WHEN CUM_SUM - CURRENT_QUANTITY >= #{request_quantity} 	THEN 0
-					WHEN CUM_SUM >= #{request_quantity} 					THEN #{request_quantity} - (CUM_SUM - CURRENT_QUANTITY)
-					ELSE CURRENT_QUANTITY
-			   END AS SHIPPED_QUANTITY
-			 , CASE 
-					WHEN (CASE 
-								WHEN CUM_SUM - CURRENT_QUANTITY >= #{request_quantity} 	THEN 0
-								WHEN CUM_SUM >= #{request_quantity} 					THEN #{request_quantity} - (CUM_SUM - CURRENT_QUANTITY)
-								ELSE CURRENT_QUANTITY
-						   END) > 0 THEN 'Y'
-					ELSE 'N'
-			   END AS SHIPPED_FLAG
-		  FROM SHIPMENT_DATA
+			   oi.ITEM_ID																	AS ITEM_ID
+		 	 , i.ITEM_NAME																	AS ITEM_NAME
+			 , i.ITEM_UNIT																	AS ITEM_UNIT
+			 , pl.PRODUCTION_LOT_ID															AS PRODUCTION_LOT_ID
+			 , pl.CREATE_DATE																AS CREATE_DATE
+			 , pl.QUANTITY																	AS CURRENT_QUANTITY
+			 , w.WAREHOUSE_NAME																AS WAREHOUSE_NAME
+		  FROM SHIPMENT_REQUEST sr
+			   INNER JOIN ORDER_INTAKE oi 
+					   ON sr.ORDER_INTAKE_ID = oi.ORDER_ID 
+			   INNER JOIN ITEM i 
+					   ON oi.ITEM_ID = i.ITEM_ID 
+			   INNER JOIN PRODUCTION_LOT pl 
+					   ON i.ITEM_ID = pl.ITEM_ID 
+			   INNER JOIN ITEM_LOCATION il 
+					   ON i.ITEM_ID = il.ITEM_ID 
+			   INNER JOIN WAREHOUSE w 
+					   ON il.WAREHOUSE_ID = w.WAREHOUSE_ID 
+		 WHERE
+			   1 = 1
+		   AND sr.SHIPMENT_REQUEST_ID = #{shipment_request_id}
+		   AND pl.QUANTITY > 0
+		 ORDER BY pl.CREATE_DATE ASC
 	</select>
 	
 	<select id="selectShipmentRequestDetail" resultType="map">

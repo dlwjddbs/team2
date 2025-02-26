@@ -1,6 +1,8 @@
 package com.itwillbs.service;
 
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -170,6 +172,68 @@ public class SalesService {
 		resultMap.put("message", message);
 		
 		return resultMap;
+	}
+	
+	public Map<String, Object> selectShipmentRequestDetailLot(Map<String, Object> requestData) {
+		Map<String, List<Map<String, Object>>> content = new HashMap<>();
+		Map<String, Object> resultMap = new HashMap<>();
+		
+		boolean result = true;
+		String message = "selectShipmentRequestDetailLot 성공";
+		
+		try {
+			List<Map<String, Object>> dataList = salesMapper.selectShipmentRequestDetailLot(requestData);
+			
+			Object requestQuantityObj = requestData.get("request_quantity");
+			int remainingQuantity = getSafeIntValue(requestData.get("request_quantity"));
+
+			for (Map<String, Object> data : dataList) {
+				int currentQuantity = getSafeIntValue(data.get("CURRENT_QUANTITY"));
+				
+				int shippedQuantity = 0;
+				
+				if (remainingQuantity > 0) {
+					if (currentQuantity <= remainingQuantity) {
+						shippedQuantity = currentQuantity;
+						remainingQuantity -= currentQuantity;
+					} else {
+						shippedQuantity = remainingQuantity;
+						remainingQuantity = 0;
+					}
+				}
+				
+				data.put("SHIPPED_QUANTITY", shippedQuantity);
+				data.put("SHIPPED_FLAG", shippedQuantity > 0 ? "Y" : "N");
+			}
+			
+			content.put("contents", dataList);
+			resultMap.put("data", content);
+		} catch (Exception e) {
+			System.out.println(e);
+			result = false;
+			message = "selectShipmentRequestDetailLot 실패";
+		}
+		
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		
+		return resultMap;
+	}
+	
+	public static int getSafeIntValue(Object obj) {
+		if (obj instanceof BigDecimal) {
+			return ((BigDecimal) obj).intValue();
+		}
+		
+		if (obj instanceof Number) {
+			return ((Number) obj).intValue();
+		} 
+		
+		if (obj instanceof String) {
+			return Integer.parseInt((String) obj);
+		}
+		
+		return 0; // 변환 불가능한 경우 기본값 0
 	}
 	
 }
