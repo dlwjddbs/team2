@@ -417,12 +417,13 @@
 						                grid2.setValue(rowKey, "VAT", vat); // 부가세 값 저장
 						                grid2.setValue(rowKey, "TOTAL_PRICE", totalWithVat); // 부가세 포함 가격 저장
 
-						                // 전체 합계 업데이트 (grid1 반영)
-						                totalItemCount = totalItemCount - previousValue + newValue;
-						                grid1.setValue(rowIdx, "PO_COUNT", totalItemCount);
+						             // grid1의 총금액 업데이트
+						                let totalPrice = 0;
+						                grid2.getData().forEach(row => {
+						                    totalPrice += Number(row.TOTAL_PRICE) || 0; // 각 품목의 총금액을 더함
+						                });
 
-						                totalItemPrice = totalItemPrice - previousValue + newValue;
-						                grid1.setValue(rowIdx, "PO_PRICE", totalItemPrice);
+						                grid1.setValue(rowIdx, "PO_PRICE", totalPrice); // grid1의 총금액 업데이트
 						            }
 						        }
 						    });
