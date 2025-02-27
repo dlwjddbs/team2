@@ -385,7 +385,7 @@
 
 		                filteredData.forEach((item) => {
 		                    labels.push(item.TIME_PERIOD);  // X축: 기간(날짜/주/월)
-		                    data.push(item.DEFECT_RATE);    // Y축: 불량률 (%)
+		                    data.push(item.DEFECT_PPM);    // Y축: 불량률 (%) (백만 개 당 불량 개수로 수정)
 		                });
 
 		                // 지정된 canvas의 컨텍스트 가져오기
