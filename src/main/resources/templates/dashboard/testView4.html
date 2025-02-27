@@ -85,7 +85,7 @@
 	                                <h3 class="card-title">일별 생산량</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="productionChart"></canvas>
+	                                <canvas id="pdChartDaily"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -97,7 +97,7 @@
 	                                <h3 class="card-title">일별 생산 불량률</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="defectChart"></canvas>
+	                                <canvas id="defectChartDaily"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -111,7 +111,7 @@
 	                                <h3 class="card-title">주별 생산량</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="productionChart"></canvas>
+	                                <canvas id="pdChartWeekly"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -123,7 +123,7 @@
 	                                <h3 class="card-title">주별 생산 불량률</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="defectChart"></canvas>
+	                                <canvas id="defectChartWeekly"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -137,7 +137,7 @@
 	                                <h3 class="card-title">월별 생산량</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="productionChart"></canvas>
+	                                <canvas id="pdChartMonthly"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -149,7 +149,7 @@
 	                                <h3 class="card-title">월별 생산 불량률</h3>
 	                            </div>
 	                            <div class="card-body">
-	                                <canvas id="defectChart"></canvas>
+	                                <canvas id="defectChartMonthly"></canvas>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -230,6 +230,7 @@
 			{header: '완료일자', name: 'COMPLETE_DATE', align: 'center'},
 			{header: '진행상태', name: 'STATUS_NAME', align: 'center'},
 	    ];
+		
 	    // Chart.js를 사용하여 차트 생성
 		$(function () {
 			delayedLoadCharts();
@@ -241,47 +242,26 @@
 	    // 부드러운 렌더링 보장, 차트가 제대로 안 그려지는 문제 해결
 		function delayedLoadCharts() {
 		    requestAnimationFrame(() => {
-		        //loadCharts();
+		        loadCharts();
 		    });
-		}   
+		}    
+		
+		function loadCharts() {
+			console.log("loadCharts 호출됨");
+			
+		    try {
+		        const pdData = "/rest/dashboard/productBarChart";
+		        pdCountBarChart(pdData, false);
+		        
+		        const pdDefectData = "/rest/dashboard/productDefectChart";
+		        defectlineChart(pdDefectData, false);
 
-	    // Chart.js를 사용하여 차트 생성
-	    const ctx1 = document.getElementById('productionChart').getContext('2d');
-	    const productionChart = new Chart(ctx1, {
-	        type: 'bar',
-	        data: {
-	            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
-	            datasets: [{
-	                label: '생산량',
-	                data: [120, 150, 180, 200, 170, 190],
-	                backgroundColor: 'rgba(60,141,188,0.9)'
-	            }]
-	        },
-	        options: {
-	            responsive: true,
-	            maintainAspectRatio: false
-	        }
-	    });
-	
-	    const ctx2 = document.getElementById('defectChart').getContext('2d');
-	    const defectChart = new Chart(ctx2, {
-	        type: 'line',
-	        data: {
-	            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
-	            datasets: [{
-	                label: '불량률 (%)',
-	                data: [2.5, 3.0, 1.8, 2.2, 2.0, 1.5],
-	                backgroundColor: 'rgba(255,99,132,0.2)',
-	                borderColor: 'rgba(255,99,132,1)',
-	                borderWidth: 1
-	            }]
-	        },
-	        options: {
-	            responsive: true,
-	            maintainAspectRatio: false
-	        }
-	    });
-	
+		        console.log("모든 차트 데이터 로드 완료!");
+		    } catch (error) {
+		        console.error("차트 데이터 로드 중 오류 발생:", error);
+		    }
+		}
+		
 	    // Toast UI Grid를 사용하여 그리드 생성
 		function productionOrderDetailInit() {
 			if(productionOrderDetailGrid) {
@@ -303,6 +283,160 @@
 		        },
 			});
 		}
+	    
+		// 생산량 막대 차트
+		function pdCountBarChart(url, isUpdate) {
+		    const periods = ['daily', 'weekly', 'monthly'];
+		    const chartIds = ['pdChartDaily', 'pdChartWeekly', 'pdChartMonthly'];
+
+		    $.ajax({
+		        type: "GET",
+		        url: url,
+		        success: function (res) {
+		            if (!res.result || !res.data || !res.data.contents) {
+		                console.log("데이터가 없습니다.");
+		                return;
+		            }
+
+		            console.log("pdCountBarChart - response data:", res.data.contents);
+
+		            // 모든 차트 생성 반복문
+		            periods.forEach((period, index) => {
+		                const chartId = chartIds[index];
+
+		                // period (daily, weekly, monthly) 에 해당하는 데이터만 필터링
+		                const filteredData = res.data.contents.filter(item => item.TYPE === period);
+
+		                let labels = filteredData.map(item => item.TIME_PERIOD); // X축: 날짜
+		                let dataValues = filteredData.map(item => item.TOTAL_AMOUNT); // Y축: 생산량
+
+		                // 지정된 canvas의 컨텍스트 가져오기
+		                const ctx = $('#' + chartId).get(0).getContext('2d');
+
+		                // 기존 차트가 있으면 삭제 (업데이트 시)
+		                if (isUpdate && window[chartId]) {
+		                    window[chartId].destroy();
+		                }
+
+		                // 막대 차트 생성
+		                window[chartId] = new Chart(ctx, {
+		                    type: 'bar',
+		                    data: {
+		                        labels: labels,
+		                        datasets: [{
+		                            label: "생산량",
+		                            data: dataValues,
+		                            backgroundColor: '#00c0ef'
+		                        }]
+		                    },
+		                    options: {
+		                        responsive: true,
+		                        maintainAspectRatio: false,
+		                        scales: {
+		                            x: { title: { display: true, text: '날짜' } },
+		                            y: { title: { display: true, text: '생산량' }, min: 0 }
+		                        },
+		                        plugins: {
+		                            legend: { display: false }
+		                        }
+		                    }
+		                });
+		            });
+		        },
+		        error: function () {
+		            console.log("pdCountBarChart() ajax 실패");
+		        }
+		    });
+		}
+
+		
+		// 생산 불량률 라인 차트
+		function defectlineChart(url, isUpdate) {
+		    const periods = ['daily', 'weekly', 'monthly'];
+		    const chartIds = ['defectChartDaily', 'defectChartWeekly', 'defectChartMonthly'];
+
+		    $.ajax({
+		        type: "GET",
+		        url: url,
+		        success: function (res) {
+		            if (!res.result || !res.data || !res.data.contents) {
+		                console.log("데이터가 없습니다.");
+		                return;
+		            }
+
+		            console.log("inboundlineChart - response data:", res.data.contents);
+
+		            periods.forEach((period, index) => {
+		                const chartId = chartIds[index];
+
+		                // period에 해당하는 데이터 필터링 (NULL 제거)
+		                const filteredData = res.data.contents
+		                    .filter(item => item.TYPE === period && item.TIME_PERIOD !== null)
+		                    .sort((a, b) => a.TIME_PERIOD.localeCompare(b.TIME_PERIOD)); // 정렬 추가
+
+		                if (filteredData.length === 0) {
+		                    console.log(`${period} 데이터가 없습니다.`);
+		                    return;
+		                }
+
+		                let labels = filteredData.map(item => item.TIME_PERIOD);
+		                let data = filteredData.map(item => item.DEFECT_RATE);
+
+		                // 기존 차트 삭제 (업데이트 시)
+		                if (isUpdate && window[chartId]) {
+		                    window[chartId].destroy();
+		                }
+
+		                // 차트 생성
+		                const ctx = $('#' + chartId).get(0).getContext('2d');
+		                window[chartId] = new Chart(ctx, {
+		                    type: 'line',
+		                    data: {
+		                        labels: labels,
+		                        datasets: [{
+		                            label: `불량률 (%) - ${period.toUpperCase()}`,
+		                            data: data,
+		                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+		                            borderColor: 'rgba(255, 99, 132, 1)',
+		                            borderWidth: 2,
+		                            pointRadius: 5,
+		                            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+		                            fill: false,
+		                            tension: 0.1
+		                        }]
+		                    },
+		                    options: {
+		                        responsive: true,
+		                        maintainAspectRatio: false,
+		                        scales: {
+		                            y: {
+		                                beginAtZero: true,
+		                                ticks: {
+		                                    callback: function (value) {
+		                                        return value + "%";
+		                                    }
+		                                }
+		                            }
+		                        },
+		                        plugins: {
+		                            tooltip: {
+		                                callbacks: {
+		                                    label: function (tooltipItem) {
+		                                        return tooltipItem.raw + " %";
+		                                    }
+		                                }
+		                            }
+		                        }
+		                    }
+		                });
+		            });
+		        },
+		        error: function () {
+		            console.log("inboundlineChart() ajax 실패");
+		        }
+		    });
+		}
+
 	</script>
 </body>
 </html>

@@ -63,21 +63,21 @@
 		       END
     </select>
     
-    <!-- 현재 미사용 -->
-    <select id="getProductionStackedBarChart" resultType="map">
-    	<!-- get___StackedBarChart 기록 스택바차트 조회 -->
-    	<!-- 미구현 -->
+    <!-- 도넛 차트 조회 (설비 가동 현황)  -->
+    <select id="selectEquipDonutChart" resultType="map">
+    	<!-- EQUIPMENT 상태 도넛차트 조회 -->
 		SELECT 
-			   EQUIPMENT_STATUS
-			 , CASE 
-			       WHEN EQUIPMENT_STATUS = 'Y' THEN '사용중' 
-			       WHEN EQUIPMENT_STATUS = 'N' THEN '사용안함' 
-			       ELSE '미정'
-		       END 							AS ATTENDANCE_TEXT
-			 , COUNT(EQUIPMENT_STATUS)		AS PIE_CHART_VALUE
-		  FROM EQUIPMENT
-	  GROUP BY EQUIPMENT_STATUS
-	  ORDER BY 
+		       EQUIPMENT_STATUS,
+		       CASE 
+		           WHEN EQUIPMENT_STATUS = 'Y' THEN '사용중' 
+		           WHEN EQUIPMENT_STATUS = 'N' THEN '사용안함' 
+		           ELSE '미정'
+		       END AS ATTENDANCE_TEXT,
+		       COUNT(EQUIPMENT_STATUS) AS PIE_CHART_VALUE,
+		       ROUND(COUNT(EQUIPMENT_STATUS) * 100 / (SELECT COUNT(*) FROM EQUIPMENT), 2) AS PERCENTAGE
+		FROM EQUIPMENT
+		GROUP BY EQUIPMENT_STATUS
+		ORDER BY 
 		       CASE 
 		           WHEN EQUIPMENT_STATUS = 'Y' THEN 1  
 		           WHEN EQUIPMENT_STATUS = 'N' THEN 2  
@@ -132,6 +132,13 @@
 	  ORDER BY 
 		       TYPE 
 		     , TIME_PERIOD
+		     , CASE 
+		           WHEN PO_STATUS = 'N' THEN 1
+		           WHEN PO_STATUS = 'I' THEN 2 
+		           WHEN PO_STATUS = 'Y' THEN 3 
+		           WHEN PO_STATUS = 'C' THEN 4
+		           ELSE 5
+		       END
     </select>
     
     <!-- ==================== 발주 상태 ==================== -->
@@ -256,56 +263,46 @@
 	
 	<!-- 막대 차트 조회 (생산량 - 일별/주별/월별) -->
 	<!-- 구현중 -->
-    <select id="selectProductChart" resultType="map">
-    	<!-- selectInboundChart 기록 스택바차트 조회 -->
-    	<!-- 일별/주별/월별 불량률 기록을 조회 -->
+    <select id="selectProductBarChart" resultType="map">
+    	<!-- PRODUCTION_ORDER_DETAIL 기록 스택바차트 조회 -->
+    	<!-- 일별/주별/월별 생산량 기록을 조회 -->
     	<!-- GROUPING SETS 활용 -->
+		WITH TEMP AS (
+		    SELECT 
+		        TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD') AS COMPLETE_DATE, 
+		        TO_CHAR(TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD'), 'MM"월 "DD"일"') AS DAILY_PERIOD,
+		        TO_CHAR(TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD'), 'MM"월 "') || 
+		            (TO_CHAR(TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD'), 'WW') - 
+		             TO_CHAR(TRUNC(TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD'), 'MM'), 'WW') + 1) || '주' AS WEEKLY_PERIOD,
+		        TO_CHAR(TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD'), 'YYYY"년 "MM"월"') AS MONTHLY_PERIOD,
+		        AMOUNT
+		    FROM PRODUCTION_ORDER_DETAIL
+		    WHERE 
+		        TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD') >= TRUNC(SYSDATE) - INTERVAL '6' DAY  -- 최근 7일 (일별)
+		        OR TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD') >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1) -- 최근 1개월 (주별)
+		        OR TO_DATE(COMPLETE_DATE, 'YYYY-MM-DD') >= ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), -12) -- 최근 1년 (월별)
+		)
 		SELECT 
-		       CASE 
-		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"')) = 0 THEN 'daily'
-		           WHEN GROUPING(
-		               TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
-		               (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
-		                TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'
-		           ) = 0 THEN 'weekly'
-		           WHEN GROUPING(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')) = 0 THEN 'monthly'
-		       END AS TYPE
-		     , COALESCE(
-		           TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"'),  -- 일별
-		           TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
-		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
-		            TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주',  -- 주별 (2월 2주)
-		           TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"')  -- 월별
-		       ) AS TIME_PERIOD
-		     , NVL(SUM(PD.PO_COUNT), 0) AS TOTAL_PO_COUNT
-		     , NVL(SUM(II.DEFECT_QUANTITY), 0) AS TOTAL_DEFECT_QUANTITY
-		     , CASE 
-		           WHEN SUM(PD.PO_COUNT) = 0 THEN 0
-		           ELSE ROUND(NVL(SUM(II.DEFECT_QUANTITY), 0) / SUM(PD.PO_COUNT) * 100, 2)
-		       END AS DEFECT_RATE
-		  FROM 
-		       PURCHASE_ORDER PO
-	 LEFT JOIN 
-		       PO_DETAIL PD ON PO.PO_ID = PD.PO_ID
- 	 LEFT JOIN 
-		       INBOUND_INSPECTION II ON PD.PODETAIL_ID = II.PODETAIL_ID
-	  GROUP BY 
-		       GROUPING SETS (
-		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM"월" DD"일"')),  -- 일별
-		           (TO_NUMBER(TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM')) || '월 ' || 
-		            (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'WW') - 
-		             TO_CHAR(TRUNC(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'MM'), 'WW') + 1) || '주'), -- 주별
-		           (TO_CHAR(TO_DATE(PO.CREATE_DATE, 'YY/MM/DD'), 'YYYY"년" MM"월"'))  -- 월별
-		       )
-	  ORDER BY 
-		       TYPE
-		     , TIME_PERIOD
+		    CASE 
+		        WHEN GROUPING(DAILY_PERIOD) = 0 THEN 'daily'
+		        WHEN GROUPING(WEEKLY_PERIOD) = 0 THEN 'weekly'
+		        WHEN GROUPING(MONTHLY_PERIOD) = 0 THEN 'monthly'
+		    END AS TYPE,  
+		    COALESCE(DAILY_PERIOD, WEEKLY_PERIOD, MONTHLY_PERIOD) AS TIME_PERIOD,
+		    SUM(AMOUNT) AS TOTAL_AMOUNT
+		FROM TEMP
+		GROUP BY GROUPING SETS (
+		    (DAILY_PERIOD),  -- 일별
+		    (WEEKLY_PERIOD), -- 주별
+		    (MONTHLY_PERIOD) -- 월별
+		)
+		ORDER BY TYPE, TIME_PERIOD
     </select>
     
     <!-- 라인 차트 조회 (생산 불량률 - 일별/주별/월별) -->
     <!-- 구현중 -->
-    <select id="selectProductInboundChart" resultType="map">
-    	<!-- selectInboundChart 기록 스택바차트 조회 -->
+    <select id="selectProductDefectChart" resultType="map">
+    	<!-- selectProductInboundChart 기록 라인 차트 조회 -->
     	<!-- 일별/주별/월별 불량률 기록을 조회 -->
     	<!-- GROUPING SETS 활용 -->
 	  	SELECT 
@@ -333,7 +330,7 @@
 		       END AS DEFECT_RATE
 		  FROM 
 		       PRODUCTION_ORDER_DETAIL pod
- 	 LEFT JOIN 
+ 	INNER JOIN 
 		       PRODUCTION_INSPECTION pi ON pod.PRODUCTION_ORDER_DETAIL_ID = pi.PRODUCTION_ORDER_DETAIL_ID
 	  GROUP BY 
 		       GROUPING SETS (
@@ -379,17 +376,20 @@
 	<!-- ==================== 생산 현황 ==================== -->
 	
 	<!-- ==================== LOT 추적 ==================== -->
-	<select id="selectProductionLot" resultType="map">
+	
+	<select id="selectLotTracking" resultType="map">
 		SELECT
 			   PL.PRODUCTION_LOT_ID 
-			 , I.ITEM_NAME 
+			 , IT.ITEM_ID 
+			 , IT.ITEM_NAME 
+			 , IT.ITEM_TYPE
 		  FROM
-		  	   PRODUCTION_LOT PL
-	INNER JOIN
-			   ITEM I
-			ON PL.ITEM_ID = I.ITEM_ID 
-		 WHERE I.ITEM_TYPE = '완제품'
-	</select>
+		  	   PRODUCTION_LOT PL 
+	INNER JOIN 
+			   ITEM IT ON PL.ITEM_ID = IT.ITEM_ID 
+		WHERE
+			   IT.ITEM_TYPE = '완제품'
+    </select>
 	
 	
 	<!-- ==================== LOT 추적 ==================== -->

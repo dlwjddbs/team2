@@ -283,6 +283,9 @@
 		    const periods = ['daily', 'weekly', 'monthly'];
 		    const chartIds = ['poChartDaily', 'poChartWeekly', 'poChartMonthly'];
 
+		    const statusLabels = ['미결', '진행중', '마감', '검수마감']; // 상태 순서 고정
+		    const statusColors = ['#f56954', '#f39c12', '#00a65a', '#00c0ef']; // 상태별 색상
+
 		    $.ajax({
 		        type: "GET",
 		        url: url,
@@ -294,23 +297,25 @@
 
 		            console.log("poStatusBarChart - response data:", res.data.contents);
 
-		            // 모든 차트 생성 반복문
+		            // 차트 생성 반복문 (daily, weekly, monthly)
 		            periods.forEach((period, index) => {
 		                const chartId = chartIds[index];
 
-		                // period (daily, weekly, monthly) 에 해당하는 데이터만 필터링
+		                // 해당 기간(period)의 데이터 필터링
 		                const filteredData = res.data.contents.filter(item => item.TYPE === period);
 
-		                let labels = [...new Set(filteredData.map(item => item.TIME_PERIOD))]; // X축: 기간
-		                let datasets = {};
+		                let labels = [...new Set(filteredData.map(item => item.TIME_PERIOD))]; // X축: 날짜만 사용
+		                let datasetMap = {};
 
-		                // 발주 상태별로 데이터 정리
-		                filteredData.forEach((item) => {
-		                    if (!datasets[item.PO_TEXT]) {
-		                        datasets[item.PO_TEXT] = Array(labels.length).fill(0);
-		                    }
+		                // 모든 발주 상태 초기화 (값이 없을 때 0으로 표시하기 위함)
+		                statusLabels.forEach(status => {
+		                    datasetMap[status] = Array(labels.length).fill(0);
+		                });
+
+		                // 데이터 정리 (X축: 날짜, Y축: 발주 건수)
+		                filteredData.forEach(item => {
 		                    const index = labels.indexOf(item.TIME_PERIOD);
-		                    datasets[item.PO_TEXT][index] = item.STACK_CHART_VALUE;
+		                    datasetMap[item.PO_TEXT][index] = item.STACK_CHART_VALUE;
 		                });
 
 		                // 지정된 canvas의 컨텍스트 가져오기
@@ -321,23 +326,23 @@
 		                    window[chartId].destroy();
 		                }
 
-		                // 스택형 막대 차트 생성
+		                // 개별 막대 차트 생성
 		                window[chartId] = new Chart(ctx, {
 		                    type: 'bar',
 		                    data: {
-		                        labels: labels,
-		                        datasets: Object.keys(datasets).map((key, index) => ({
-		                            label: key,
-		                            data: datasets[key],
-		                            backgroundColor: ['#00c0ef', '#00a65a', '#f39c12', '#f56954'][index % 4]
+		                        labels: labels, // X축: 날짜만
+		                        datasets: statusLabels.map((status, index) => ({
+		                            label: status,
+		                            data: datasetMap[status],
+		                            backgroundColor: statusColors[index]
 		                        }))
 		                    },
 		                    options: {
 		                        responsive: true,
 		                        maintainAspectRatio: false,
 		                        scales: {
-		                            x: { stacked: true, title: { display: true, text: '날짜' } },
-		                            y: { stacked: true, title: { display: true, text: '발주 상태 (건수)' }, min: 0 }
+		                            x: { title: { display: true, text: '날짜' } },
+		                            y: { title: { display: true, text: '발주 건수' }, min: 0 }
 		                        },
 		                        plugins: {
 		                            legend: { position: "top" }
@@ -352,64 +357,7 @@
 		    });
 		}
 
-
-		// 거래처별 불량률 차트
-		function clientInboundChart(url, chartId, isUpdate) {
-		    $.ajax({
-		        type: "GET",
-		        url: url,
-		        success: function (res) {
-		            if (!res.result || !res.data || !res.data.contents) {
-		                console.log("데이터가 없습니다.");
-		                return;
-		            }
-		            
-		            let labels = [];   // X축 (거래처명)
-		            let data = [];     // Y축 (불량률 %)
-		            
-		            console.log("clientInboundChart - response data:", res.data.contents);
-		            
-		            res.data.contents.forEach((el) => {
-		                labels.push(el.CLIENT_NAME);
-		                data.push(el.DEFECT_RATE);
-		            });
-
-		            let ctx = $('#' + chartId).get(0).getContext('2d');
-		            
-		            // 기존 차트 삭제 후 재생성
-		            if (isUpdate && window.myClientInboundChart) {
-		                window.myClientInboundChart.destroy();
-		            }
-
-		            window.myClientInboundChart = new Chart(ctx, {
-		                type: 'bar',
-		                data: {
-		                    labels: labels,
-		                    datasets: [{
-		                        label: '불량률 (%)',
-		                        data: data,
-		                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
-		                        borderColor: 'rgba(255, 99, 132, 1)',
-		                        borderWidth: 1
-		                    }]
-		                },
-		                options: {
-		                    responsive: true,
-		                    maintainAspectRatio: false,
-		                    scales: {
-		                        // x: { title: { display: true, text: '거래처' } },
-		                        y: { beginAtZero: true, max: 100 }
-		                            // title: { display: true, text: '불량률 (%)' }
-		                    }
-		                }
-		            });
-		        },
-		        error: function () {
-		            console.log("clientInboundChart() ajax 실패");
-		        }
-		    });
-		}
-		
+		// 발주 불량률 라인 차트
 		function inboundlineChart(url, isUpdate) {
 			const periods = ['daily', 'weekly', 'monthly'];
 		    const chartIds = ['poInboundChartDaily', 'poInboundChartWeekly', 'poInboundChartMonthly'];
@@ -493,6 +441,63 @@
 		        },
 		        error: function () {
 		            console.log("inboundlineChart() ajax 실패");
+		        }
+		    });
+		}
+
+		// 거래처별 불량률 차트
+		function clientInboundChart(url, chartId, isUpdate) {
+		    $.ajax({
+		        type: "GET",
+		        url: url,
+		        success: function (res) {
+		            if (!res.result || !res.data || !res.data.contents) {
+		                console.log("데이터가 없습니다.");
+		                return;
+		            }
+		            
+		            let labels = [];   // X축 (거래처명)
+		            let data = [];     // Y축 (불량률 %)
+		            
+		            console.log("clientInboundChart - response data:", res.data.contents);
+		            
+		            res.data.contents.forEach((el) => {
+		                labels.push(el.CLIENT_NAME);
+		                data.push(el.DEFECT_RATE);
+		            });
+
+		            let ctx = $('#' + chartId).get(0).getContext('2d');
+		            
+		            // 기존 차트 삭제 후 재생성
+		            if (isUpdate && window.myClientInboundChart) {
+		                window.myClientInboundChart.destroy();
+		            }
+
+		            window.myClientInboundChart = new Chart(ctx, {
+		                type: 'bar',
+		                data: {
+		                    labels: labels,
+		                    datasets: [{
+		                        label: '불량률 (%)',
+		                        data: data,
+		                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+		                        borderColor: 'rgba(255, 99, 132, 1)',
+		                        borderWidth: 1
+		                    }]
+		                },
+		                options: {
+		                    responsive: true,
+		                    maintainAspectRatio: false,
+		                    scales: {
+		                        // x: { title: { display: true, text: '거래처' } },
+		                        y: { beginAtZero: true, max: 100 }
+		                            // title: { display: true, text: '불량률 (%)' }
+		                    }
+		                }
+		            });
+		        },
+		        error: function () {
+		            console.log("clientInboundChart() ajax 실패");
 		        }
 		    });
 		}

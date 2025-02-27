@@ -33,6 +33,7 @@
 	<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
 	<!-- ChartJS -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 	<!-- Toast UI Pagination (Toast UI 페이징) -->
 	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
 	<!-- Toast UI Grid -->
@@ -94,7 +95,8 @@
 	                    <div class="col-lg-4 col-6">
 	                        <div class="small-box bg-success">
 	                            <div class="inner">
-	                                <h3>85%</h3>
+	                            	<!-- AJAX로 값 변경 -->
+	                                <h3 id="equipmentUsageRate">0%</h3> 
 	                                <p>설비 가동률</p>
 	                            </div>
 	                        </div>
@@ -109,22 +111,9 @@
 	                                <h3 class="card-title">LOT 추적</h3>
 	                            </div>
 	                            <div class="card-body">
-	                            	<!-- <div id="lotGrid">
-	                                	Toast UI Grid
-	                                </div> -->
-	                                <table id="lotTrackingTable" class="table table-bordered">
-	                                    <thead>
-	                                        <tr>
-	                                            <th>LOT 번호</th>
-	                                            <th>공정</th>
-	                                            <th>상태</th>
-	                                        </tr>
-	                                    </thead>
-	                                    <tbody>
-	                                        <tr><td>LOT001</td><td>조립</td><td>진행중</td></tr>
-	                                        <tr><td>LOT002</td><td>검사</td><td>완료</td></tr>
-	                                    </tbody>
-	                                </table>
+	                                <div id="lotGrid">
+	                                	<!-- Toast UI Grid -->
+	                                </div>
 	                            </div>
 	                        </div>
 	                    </div>
@@ -187,8 +176,26 @@
 	<!-- Page specific script -->
 	<script th:inline="javascript">
 	
+		// 거래처별 발주량 그리드
+		let lotGrid = null;
+		const lotUrl = '/rest/dashboard/lotTracking';
+		const lotDataSource = {
+			api: {
+			    readData: {url: lotUrl, method: 'GET'},
+			},
+			contentType: 'application/json',
+	    };
+		const lot_columns = [
+	        {header: 'LOT 번호', name: 'PRODUCTION_LOT_ID', align: 'center', sortable: true, editor: null},
+	        {header: '제품 코드', name: 'ITEM_ID', align: 'center', sortable: true, editor: null},
+	        {header: '제품명', name: 'ITEM_NAME', align: 'center', sortable: true, editor: null},
+	        {header: '제품 유형', name: 'ITEM_TYPE', align: 'center', sortable: true, editor: null},
+	    ];
+	
 		$(function () {
-			donutChart('equipStatusChart', false);
+			lotInit();
+			
+			equipDonutChart('equipStatusChart', false);
 		});
 		
 		document.addEventListener("DOMContentLoaded", function() {
@@ -210,27 +217,44 @@
 		    });
 		});
 		
+	    // Toast UI Grid를 사용하여 그리드 생성
+		function lotInit() {
+			if(lotGrid) {
+				lotGrid.destroy();
+				lotGrid = null;
+			}
+
+			lotGrid = new tui.Grid({
+				el: document.getElementById('lotGrid'),
+				data: lotDataSource,
+				scrollX: true,
+				scrollY: true,
+				columns: lot_columns,
+ 		        pageOptions: {
+		            useClient: true, // 클라이언트에서 페이징 처리
+		            perPage: 10  // 한 페이지당 10개씩 표시
+		        },
+			});
+		}
+		
 		// 설비 가동 현황 차트
-		function donutChart(chartId, isUpdate) {
-			//let deptCode = $("#DEP").val();
-			//let rankCode = $("#RANK").val();
-			
+		function equipDonutChart(chartId, isUpdate) {	
 			$.ajax({
-                type : "POST",
-                url : "/dashboard/getEquipmentDonutChart",
-/*                 data : {
-					startDate : date[0],					
-					endDate : date[1],
-					//deptCode : deptCode,
-					//rankCode : rankCode
-				}, */
+                type : "GET",
+                url : "/rest/dashboard/equipDonutChart",
                 success : function(res){
+                	
+                	console.log("equipDonutChart - response data:", res.data.contents);
+                	
 					let labels = [];
 					let data = [];
 					
-					res.forEach((element) => {
-						labels.push(element.ATTENDANCE_TEXT);
-						data.push(element.PIE_CHART_VALUE);
+		            let percentage = res.data.contents[0].PERCENTAGE || 0; // 백분율 값 가져오기
+		            $("#equipmentUsageRate").text(percentage + "%"); // HTML 업데이트
+					
+					res.data.contents.forEach((el) => {
+						labels.push(el.ATTENDANCE_TEXT);
+						data.push(el.PIE_CHART_VALUE);
 					});
 					
 					let donutChartCanvas = $('#' + chartId).get(0).getContext('2d')
@@ -245,11 +269,24 @@
 					}
 					
 					let donutOptions = {
+						radius: '80%',
 			            responsive: true,	// 반응형, 캔버스 크기 조절
 			            maintainAspectRatio: false,	// 크기 조절될 때 원본 캔버스 방향 비율 유지
 			            rotation: -90,	// 위쪽을 시작점으로 설정
 			            circumference: 180,	// 반원 형태를 위해 180도 설정
 			            cutout: "50%",	// 도넛 두께 조정 (차트의 중앙 부분을 비움, 필요시 조절)
+			            plugins: {
+			                datalabels: {
+			                    color: '#000', // 글자 색상
+			                    font: { weight: 'bold', size: 14 }, // 폰트 스타일
+			                    align: 'end', // 도넛 바깥쪽에 배치
+			                    anchor: 'end', // 도넛 바깥쪽에 배치
+			                    formatter: (value, context) => {
+			                        const label = context.chart.data.labels[context.dataIndex]; // 라벨 (사용중 / 사용안함)
+			                        return `${value}대`; // 개수 추가 (개수만 표시되도록 수정함)
+			                    }
+			                }
+			            }
 					}
 					
 					// 차트 재생성 시 기존의 차트 삭제
@@ -260,7 +297,8 @@
 					myDonutChart = new Chart(donutChartCanvas, {
 						type: 'doughnut',
 						data: donutData,
-						options: donutOptions
+						options: donutOptions,
+						plugins: [ChartDataLabels] // 플러그인 활성화
 					});
                 },
                 error : function(XMLHttpRequest, textStatus, errorThrown){

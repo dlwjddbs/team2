@@ -30,6 +30,9 @@ public interface DashboardMapper {
 	
 	// ====================================================================================
 	
+	// 설비 가동률
+	List<Map<String, Object>> selectEquipDonutChart(Map<String, Object> map);
+	
 	// 발주 상태 - 일별/주별/월별
 	List<Map<String, Object>> selectPoBarChart(Map<String, Object> map);
 	
@@ -39,9 +42,18 @@ public interface DashboardMapper {
 	// 거래처별 불량률
 	List<Map<String, Object>> selectClientInboundChart(Map<String, Object> map);
 	
-	// 불량률 - 일별/주별/월별
+	// 발주 불량률 - 일별/주별/월별
 	List<Map<String, Object>> selectInboundChart(Map<String, Object> map);
+	
+	// 생산량 - 일별/주별/월별
+	List<Map<String, Object>> selectProductBarChart(Map<String, Object> map);
+	
+	// 생산 불량률 - 일별/주별/월별
+	List<Map<String, Object>> selectProductDefectChart(Map<String, Object> map);
 	
 	// 생산 현황
 	List<Map<String, Object>> selectProductionLotDetail(Map<String, Object> map);
+	
+	// 전체 LOT 추적
+	List<Map<String, Object>> selectLotTracking(Map<String, Object> map);
 }
